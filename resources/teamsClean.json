@@ -1,0 +1,198 @@
+{
+  "The Officials": {
+    "played": 0,
+    "wins": 0,
+    "losses": 0,
+    "cards": 0,
+    "leftPlayer": {
+      "name": "Jared Healy",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": false
+    },
+    "rightPlayer": {
+      "name": "Alex Soudure",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": true
+    }
+  },
+  "Whipped": {
+    "played": 0,
+    "wins": 0,
+    "losses": 0,
+    "cards": 0,
+    "leftPlayer": {
+      "name": "Dora Wan",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": false
+    },
+    "rightPlayer": {
+      "name": "Michael Russ",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": true
+    }
+  },
+  "BarbenHeimer": {
+    "played": 0,
+    "wins": 0,
+    "losses": 0,
+    "cards": 0,
+    "leftPlayer": {
+      "name": "Olivia Stronach",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": true
+    },
+    "rightPlayer": {
+      "name": "Ethan Dal Molin",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": false
+    }
+  },
+  "Bad Bois": {
+    "played": 0,
+    "wins": 0,
+    "losses": 0,
+    "cards": 0,
+    "leftPlayer": {
+      "name": "Brigitte Gredzuk",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": false
+    },
+    "rightPlayer": {
+      "name": "James Sharpham",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": true
+    }
+  },
+  "Blaaergh": {
+    "played": 0,
+    "wins": 0,
+    "losses": 0,
+    "cards": 0,
+    "leftPlayer": {
+      "name": "Liam Cooper",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": true
+    },
+    "rightPlayer": {
+      "name": "Eva Hajigabriel",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": false
+    }
+  },
+  "Seanitha": {
+    "played": 0,
+    "wins": 0,
+    "losses": 0,
+    "cards": 0,
+    "leftPlayer": {
+      "name": "Sean Robinson",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": true
+    },
+    "rightPlayer": {
+      "name": "Tabitha Blechenden",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": false
+    }
+  },
+  "KISS": {
+    "played": 0,
+    "wins": 0,
+    "losses": 0,
+    "cards": 0,
+    "leftPlayer": {
+      "name": "Will Prozerska",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": true
+    },
+    "rightPlayer": {
+      "name": "Lachlan Banks",
+      "goals": 0,
+      "greenCards": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "roundsPlayed": 0,
+      "roundsCarded": 0,
+      "aces": 0,
+      "captain": false
+    }
+  }
+}
