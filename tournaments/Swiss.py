@@ -1,6 +1,7 @@
 import math
 
-from structure import Team, Game
+from structure.Game import Game
+from structure.Team import Team
 from tournaments.Tournament import Tournament
 
 

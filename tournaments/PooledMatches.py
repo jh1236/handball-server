@@ -1,4 +1,4 @@
-from structure import Game, Team
+from structure.Game import Game
 from tournaments.Tournament import Tournament
 from util import n_chunks
 
@@ -28,7 +28,7 @@ class PooledMatches(Tournament):
         self.pool_count %= len(self.pools)
         team_one = self.pools[self.pool_count][self.count]
         team_two = self.pools[self.pool_count][len(self.pools) - 1 - self.count]
-        if not team_one and not team_two:
+        if not team_one or not team_two:
             return None
         return Game(team_one, team_two)
 

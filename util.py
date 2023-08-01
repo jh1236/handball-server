@@ -12,8 +12,7 @@ def chunks_sized(lst: list[T], n: int) -> list[list[T]]:
 
 
 def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
-    """Yield n number of striped chunks from l.
-    """
+    """Yield n number of striped chunks from l. """
     l = l.copy()
     while s and len(l) % n != 0:
         l.append(s)
