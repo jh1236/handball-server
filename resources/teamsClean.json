@@ -120,12 +120,12 @@
             "name": "Nicholas Burvil",
             "redCards": 0,
             "roundsCarded": 0,
-            "roundsPlayed": 3,
+            "roundsPlayed": 0,
             "yellowCards": 0
         },
         "losses": 0,
         "name": "Satnavs",
-        "played": 3,
+        "played": 0,
         "rightPlayer": {
             "aces": 0,
             "goals": 0,
@@ -133,7 +133,7 @@
             "name": "Tristan Nel",
             "redCards": 0,
             "roundsCarded": 0,
-            "roundsPlayed": 3,
+            "roundsPlayed": 0,
             "yellowCards": 0
         },
         "timeouts": 0,
@@ -224,28 +224,28 @@
         "wins": 0
     },
     "Whipped": {
-        "cards": 1,
+        "cards": 0,
         "leftPlayer": {
-            "aces": 1,
-            "goals": 3,
+            "aces": 0,
+            "goals": 0,
             "greenCards": 0,
             "name": "Dora Wan",
             "redCards": 0,
             "roundsCarded": 0,
-            "roundsPlayed": 3,
+            "roundsPlayed": 0,
             "yellowCards": 0
         },
         "losses": 0,
         "name": "Whipped",
-        "played": 3,
+        "played": 0,
         "rightPlayer": {
             "aces": 0,
             "goals": 0,
-            "greenCards": 1,
+            "greenCards": 0,
             "name": "Michael Russ",
             "redCards": 0,
             "roundsCarded": 0,
-            "roundsPlayed": 3,
+            "roundsPlayed": 0,
             "yellowCards": 0
         },
         "timeouts": 0,
