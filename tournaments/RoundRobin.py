@@ -1,4 +1,4 @@
-from structure.Game import Game
+from structure.Fixture import Fixture
 from structure.Team import Team
 from tournaments.Tournament import Tournament
 
@@ -12,18 +12,15 @@ class RoundRobin(Tournament):
         self.draw_fixes = False
         super().__init__(teams)
 
-    def matches_per_round(self):
-        return len(self.teams_balanced) // 2
+    def generate_fixtures(self) -> [Fixture]:
 
-    def next_round(self):
-        self.teams_balanced[1:] = [self.teams_balanced[-1]] + self.teams_balanced[1:-1]
-
-    def rounds(self):
-        return len(self.teams_balanced) - 1
-
-    def next(self) -> Game | None:
-        team_one = self.teams_balanced[self.count]
-        team_two = self.teams_balanced[len(self.teams_balanced) - 1 - self.count]
-        if not team_one or not team_two:
-            return None
-        return Game(team_one, team_two)
+        fixtures = []
+        for i, _ in enumerate(self.teams_balanced):
+            mid = len(self.teams_balanced) // 2
+            for j in range(mid):
+                match = Fixture(self.teams_balanced[j], self.teams_balanced[len(self.teams_balanced) - 1 - j], self, i)
+                fixtures.append(match)
+            # Rotate the teams except the first one
+            self.teams_balanced[1:] = [self.teams_balanced[-1]] + self.teams_balanced[1:-1]
+        print(fixtures)
+        return fixtures

@@ -7,9 +7,8 @@ from tournaments.Tournament import Tournament
 
 class Swiss(Tournament):
     def __init__(self, teams: list[Team]):
-        super().__init__(teams)
         self.n = len(teams) // 2
-        self.ranked_teams: list[Team] = []
+        super().__init__(teams)
 
     def __len__(self):
         return len(self.teams) * math.log2(len(self.teams))

@@ -1,32 +1,23 @@
-from structure import Game
+import math
+
+from structure.Fixture import Fixture
 from tournaments.Tournament import Tournament
 from util import chunks_sized
 
 
 class SingleElim(Tournament):
     def __init__(self, teams):
+        self.teams_balanced: list = teams.copy()
+        while math.log2(len(self.teams_balanced)) != math.floor(math.log2(len(self.teams_balanced))):
+            self.teams_balanced += [None]
         super().__init__(teams)
-        self.games: list[Game] = []
 
-    def __iter__(self):
-        self.count = -1
-        self.round = 0
-        self.games = [Game(i[0], i[1]) for i in chunks_sized(self.teams, 2)]
-        return self
-
-    def __next__(self):
-        self.count += 1
-        self.ranked_teams = sorted(self.teams, key=lambda a: -a.wins)
-        if len(self.games) == 1:
-            print(f"Standings after round {self.round}")
-            for i, v in enumerate(self.ranked_teams):
-                print(f"{i}: {v} ({v.wins} wins)")
-            raise StopIteration()
-        if self.count == len(self.games):
-            self.count = 0
-            self.round += 1
-            self.games = [Game(i[0].winner, i[1].winner) for i in chunks_sized(self.games, 2)]
-            print(f"Standings after round {self.round}")
-            for i, v in enumerate(self.ranked_teams):
-                print(f"{i}: {v} ({v.wins} wins)")
-        return self.games[self.count]
+    def generate_fixtures(self) -> [Fixture]:
+        out: list[Fixture] = []
+        n = 0
+        games: list[Fixture] = [Fixture(i[0], i[1], n, self) for i in chunks_sized(self.teams_balanced, 2) if i]
+        while len(games) > 1:
+            out += games
+            n += 1
+            games = [Fixture(i.winner, j.winner, n, self) for i, j in chunks_sized(games, 2) if i or j]
+        return [i for i in out if not i.bye]

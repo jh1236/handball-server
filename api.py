@@ -1,40 +1,25 @@
-import json
-
 import flask
 from flask import request
 
 import tournaments
-from structure.Team import Team
+from tournaments.Tournament import Tournament
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-with open("G:/Programming/python/HandballAPI/resources/teamsClean.json") as fp:
-    team_list = [Team.from_map(k, v) for k, v in json.load(fp).items()]
-competition = tournaments.rr(team_list)
+competition: Tournament = tournaments.single_elim.load()
+print(competition.fixtures)
 
 
 @app.route('/api/teams', methods=['GET'])
 def teams():
-    print({i.name: i.as_map() for i in team_list[0:1]})
-    return {i.name: i.as_map() for i in team_list}
+    return {i.name: i.as_map() for i in competition.teams}
 
 
 @app.route('/api/games/current', methods=['GET'])
 def games():
+    competition.save()
     return competition.current_game.as_map()
-
-
-@app.route('/api/games/update', methods=['POST'])
-def post_test():
-    print(request.json)
-    with open("G:/Programming/python/HandballAPI/resources/games.json") as fp:
-        games = json.load(fp)
-    games[-1] = request.json
-    print(games)
-    with open("G:/Programming/python/HandballAPI/resources/games.json", "w") as fp:
-        json.dump(games, fp)
-    return "", 204
 
 
 @app.route('/api/games/update/score', methods=['POST'])
@@ -47,6 +32,15 @@ def score():
         competition.current_game.team_one.add_score(left_player, c)
     else:
         competition.current_game.team_two.add_score(left_player, c)
+    competition.current_game.print_gamestate()
+    return "", 204
+
+
+@app.route('/api/games/update/start', methods=['POST'])
+def start():
+    print(request.json)
+
+    competition.current_game.started = True
     competition.current_game.print_gamestate()
     return "", 204
 

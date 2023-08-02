@@ -1,3 +1,6 @@
+from structure.Game import Game
+
+
 class Player:
     @classmethod
     def from_map(cls, map):
@@ -23,25 +26,30 @@ class Player:
         self.roundsCarded = 0
 
     def score_goal(self, ace=False):
-        self.goals += 1
-        if ace:
-            self.aces += 1
+        if Game.record_stats:
+            self.goals += 1
+            if ace:
+                self.aces += 1
 
     def green_card(self):
-        self.greenCards += 1
+        if Game.record_stats:
+            self.greenCards += 1
 
     def yellow_card(self):
         self.carded = True
-        self.yellowCards += 1
+        if Game.record_stats:
+            self.yellowCards += 1
 
     def red_card(self):
         self.carded = True
-        self.redCards += 1
+        if Game.record_stats:
+            self.redCards += 1
 
     def next_point(self):
-        if self.carded:
-            self.roundsCarded += 1
-        self.roundsPlayed += 1
+        if Game.record_stats:
+            if self.carded:
+                self.roundsCarded += 1
+            self.roundsPlayed += 1
 
     def as_map(self):
         dct = {
