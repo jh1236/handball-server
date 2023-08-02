@@ -7,7 +7,7 @@ from tournaments.Tournament import Tournament
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-competition: Tournament = tournaments.single_elim.load()
+competition: Tournament = tournaments.pooled.load()
 print(competition.fixtures)
 
 

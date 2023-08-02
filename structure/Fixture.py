@@ -48,6 +48,8 @@ class Fixture:
     def set_game(self, game: Game):
         self.game = game
         self.game.fixture = self
+        if self.game.is_over():
+            self.game_over()
 
     def to_game(self):
         if not self.game:

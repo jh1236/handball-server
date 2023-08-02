@@ -69,9 +69,9 @@ class Game:
                 self.get_loser().losses += 1
                 self.team_one.played += 1
                 self.team_two.played += 1
-            self.comp.on_game_over()
             if self.fixture:
                 self.fixture.game_over()
+            self.comp.on_game_over()
 
     def __repr__(self):
         return f"{self.team_one} vs {self.team_two}"
