@@ -5,11 +5,11 @@ from util import n_chunks
 
 class PooledMatches(Tournament):
     def __init__(self, teams, pool_count=2):
-        teams = teams.copy()
+        teams2 = teams.copy()
         self.pool_count = 0
-        while (len(teams) % 2) % pool_count != 0:
-            teams.append(None)
-        self.pools = [*n_chunks(teams, pool_count)]
+        while (len(teams2) % 2) % pool_count != 0:
+            teams2.append(None)
+        self.pools = [*n_chunks(teams2, pool_count)]
         print(self.pools)
         super().__init__(teams)
 
@@ -21,7 +21,7 @@ class PooledMatches(Tournament):
                 for k in self.pools:
                     team_one = k[j]
                     team_two = k[len(self.pools[0]) - 1 - j]
-                    match = Fixture(team_one, team_two, self, i)
+                    match = Fixture(team_one, team_two, i, self)
                     fixtures.append(match)
             # Rotate the teams except the first one
             for k, _ in enumerate(self.pools):

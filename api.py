@@ -8,7 +8,7 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
 competition: Tournament = tournaments.pooled.load()
-print(competition.fixtures)
+print(competition.teams)
 
 
 @app.route('/api/teams', methods=['GET'])

@@ -18,7 +18,7 @@ class RoundRobin(Tournament):
         for i, _ in enumerate(self.teams_balanced):
             mid = len(self.teams_balanced) // 2
             for j in range(mid):
-                match = Fixture(self.teams_balanced[j], self.teams_balanced[len(self.teams_balanced) - 1 - j], self, i)
+                match = Fixture(self.teams_balanced[j], self.teams_balanced[len(self.teams_balanced) - 1 - j], i, self)
                 fixtures.append(match)
             # Rotate the teams except the first one
             self.teams_balanced[1:] = [self.teams_balanced[-1]] + self.teams_balanced[1:-1]
