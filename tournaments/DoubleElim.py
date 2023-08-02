@@ -2,7 +2,7 @@ from structure.Fixture import Fixture
 from tournaments.Tournament import Tournament
 
 
-class Swiss(Tournament):
+class DoubleElim(Tournament):
     def __init__(self, teams):
         super().__init__(teams)
 
@@ -13,5 +13,5 @@ class Swiss(Tournament):
         # which are both set up to automatically fill at run time
         # the constructor for Fixture is (teamOne, teamTwo, Tournament, roundNumber)
         # so just pass self as the third param and the number of the round for the fourth.
-        # Feel free to look around at the other ones I've implemented
+        # Feel free to look around at the other ones I've implemented.
         return []

@@ -41,6 +41,8 @@ def start():
     print(request.json)
 
     competition.current_game.started = True
+    if request.json["swap"]:
+        pass
     competition.current_game.print_gamestate()
     return "", 204
 

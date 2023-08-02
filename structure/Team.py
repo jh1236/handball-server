@@ -51,8 +51,6 @@ class Team:
         self.cards = 0
         self.timeouts = 0
         self.goals_scored = 0
-        self.played_against = []
-        #
 
     def card_timer(self):
         if self.left_card_count == -1 or self.right_card_count == -1:
@@ -69,7 +67,6 @@ class Team:
 
         self.first = False
         self.game = game
-        self.played_against.append(self.opponent)
 
     def call_timeout(self):
         self.add_to_game_str("TT")

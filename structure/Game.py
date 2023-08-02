@@ -57,6 +57,16 @@ class Game:
         return (self.team_one.score >= GOALS_TO_WIN or self.team_two.score >= GOALS_TO_WIN) and \
                abs(self.team_one.score - self.team_two.score) > 1
 
+    def swap_teams(self):
+        if self.started:
+            raise Exception("Teams cannot be swapped during an active game!!")
+        else:
+            self.team_one, self.team_two = self.team_two, self.team_one
+            self.team_one.join_game(self)
+            self.team_two.join_game(self)
+            self.team_one.serving = True
+            self.team_one.first = True
+
     def next_point(self):
         self.started = True
         self.round_count += 1
