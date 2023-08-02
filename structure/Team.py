@@ -17,7 +17,6 @@ class Team:
         return team
 
     def add_to_game_str(self, c: str):
-
         print(self.game.game_string)
         if self.first:
             self.game.game_string += c.upper()
@@ -127,12 +126,18 @@ class Team:
         if Game.record_stats:
             self.cards += 1
         if left_player:
-            self.add_to_game_str("yL")
+            if time == 3:
+                self.add_to_game_str("yL")
+            else:
+                self.add_to_game_str(f"{time % 10}L")
             self.left_player.yellow_card()
             if self.left_card_count >= 0:
                 self.left_card_count += time
         else:
-            self.add_to_game_str("yR")
+            if time == 3:
+                self.add_to_game_str("yR")
+            else:
+                self.add_to_game_str(f"{time % 10}R")
             self.right_player.yellow_card()
             if self.right_card_count >= 0:
                 self.right_card_count += time

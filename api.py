@@ -40,9 +40,7 @@ def score():
 def start():
     print(request.json)
 
-    competition.current_game.started = True
-    if request.json["swap"]:
-        pass
+    competition.current_game.start(request.json["swap"])
     competition.current_game.print_gamestate()
     return "", 204
 
@@ -69,14 +67,16 @@ def card():
         if color == "green":
             competition.current_game.team_one.green_card(left_player)
         elif color == "yellow":
-            competition.current_game.team_one.yellow_card(left_player)
+            time = request.json["time"]
+            competition.current_game.team_one.yellow_card(left_player, time)
         elif color == "red":
             competition.current_game.team_one.red_card(left_player)
     else:
         if color == "green":
             competition.current_game.team_two.green_card(left_player)
         elif color == "yellow":
-            competition.current_game.team_two.yellow_card(left_player)
+            time = request.json["time"]
+            competition.current_game.team_two.yellow_card(left_player, time)
         elif color == "red":
             competition.current_game.team_two.red_card(left_player)
     competition.current_game.print_gamestate()
