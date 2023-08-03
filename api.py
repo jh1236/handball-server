@@ -7,7 +7,7 @@ from tournaments.Tournament import Tournament
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-competition: Tournament = tournaments.pooled.load()
+competition: Tournament = tournaments.single_elim.load()
 print(competition.teams)
 
 
@@ -20,6 +20,11 @@ def teams():
 def games():
     competition.save()
     return competition.current_game.as_map()
+
+
+@app.route('/api/games/display', methods=['GET'])
+def display():
+    return competition.current_game.display_map()
 
 
 @app.route('/api/games/update/score', methods=['POST'])
@@ -81,6 +86,16 @@ def card():
             competition.current_game.team_two.red_card(left_player)
     competition.current_game.print_gamestate()
     return "", 204
+
+
+@app.route('/', methods=['GET'])
+def site():
+    with open("G:/Programming/python/HandballAPI/resources/site.html") as fp:
+        string = fp.read()
+    repl = "\n".join([j.fixture_to_table_row() for j in competition.fixtures])
+    string = string.replace("%replace%", repl)
+
+    return string, 200
 
 
 if __name__ == "__main__":

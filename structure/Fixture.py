@@ -19,7 +19,7 @@ class TeamPromise:
 
 
 class Fixture:
-    def __init__(self, team_one: Team | TeamPromise, team_two: Team| TeamPromise | None, round_number, comp):
+    def __init__(self, team_one: Team | TeamPromise, team_two: Team | TeamPromise | None, round_number, comp):
         if team_one is None:
             team_one, team_two = team_two, team_one
         self._team_one = team_one
@@ -32,6 +32,24 @@ class Fixture:
         self.game = None
         if self.bye:
             self.game_over()
+
+    def fixture_to_table_row(self):
+        if self.bye:
+
+            return f"""    <tr>
+            <td>{self.team_one()}</td>
+            <td> vs </td>
+            <td>BYE</td>
+            <td> - </td>
+        </tr>"""
+        else:
+            return f"""    <tr>
+            <td>{self._team_one}</td>
+            <td> vs </td>
+            <td>{self._team_two}</td>
+            <td> {'0 - 0' if self.game is None else self.game.score()}</td>
+        </tr>"""
+
 
     def team_one(self):
         if isinstance(self._team_one, TeamPromise):

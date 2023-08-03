@@ -1,1 +1,21 @@
-[{"teamOne": "The Officials", "teamTwo": "Whipped", "scoreOne": 2, "scoreTwo": 1, "game": "SLsLGRTTttTTSLTTyR"}]
+[
+    {
+        "firstTeamWon": false,
+        "game": "SLSRVRVL",
+        "scoreOne": 0,
+        "scoreTwo": 11,
+        "started": true,
+        "swapped": false,
+        "teamOne": "BarbenHeimer",
+        "teamTwo": "Whipped"
+    },
+    {
+        "game": "GL2lSLSRyrSLslSLslSLslSRslSRsl",
+        "scoreOne": 7,
+        "scoreTwo": 5,
+        "started": true,
+        "swapped": false,
+        "teamOne": "Blaaergh",
+        "teamTwo": "The Officials"
+    }
+]

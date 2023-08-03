@@ -30,7 +30,8 @@ class Tournament:
         self.count = -1
         self.match_count = -1
         self.round = 0
-        self.fixtures: list[Fixture] = self.generate_fixtures()
+        self.generator = self.generate_round()
+        self.fixtures: list[Fixture] = []
         self.next_game()
 
     def on_game_over(self):
@@ -50,13 +51,20 @@ class Tournament:
         for i, v in enumerate([i for i in self.ranked_teams if i], start=1):
             print(f"{i}: {v} ({v.wins} wins)")
 
-    def generate_fixtures(self) -> [Fixture]:
-        raise NotImplemented("")
-
     def next_game(self):
         self.match_count += 1
+        if self.match_count >= len(self.fixtures):
+            self.next_round()
         self.current_game = self.fixtures[self.match_count]
         if self.current_game.bye:
             self.next_game()
         else:
             self.current_game = self.current_game.to_game()
+
+    def next_round(self) -> [Fixture]:
+        self.round += 1
+        self.fixtures += next(self.generator)
+
+    def generate_round(self):
+        # Subclass will yield from this func
+        raise NotImplementedError()

@@ -12,7 +12,7 @@ class RoundRobin(Tournament):
         self.draw_fixes = False
         super().__init__(teams)
 
-    def generate_fixtures(self) -> [Fixture]:
+    def next_round(self) -> [Fixture]:
 
         fixtures = []
         for i, _ in enumerate(self.teams_balanced):

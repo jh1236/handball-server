@@ -11,12 +11,14 @@ class Game:
         Game.record_stats = False
         team_one = [i for i in comp.teams if i.name == map["teamOne"]][0]
         team_two = [i for i in comp.teams if i.name == map["teamTwo"]][0]
+        swapped = map["swapped"]
         game = Game(team_one, team_two)
+        game.start(swapped)
         game.comp = comp
         j: str
         for j in chunks_sized(map["game"], 2):
-            team = team_one if (j[0].isupper()) else team_two
-            left = j[1] == 'L'
+            team = team_one if (j[1].isupper()) else team_two
+            left = j[1].upper() == 'L'
             c = j[0].lower()
             if c == 's':
                 team.add_score(left)
@@ -31,20 +33,25 @@ class Game:
             elif c == 't':
                 team.call_timeout()
             elif c.isdigit():
-                team.yellow_card(left, int(c))
+                if c == '0':
+                    team.yellow_card(left, 10)
+                else:
+                    team.yellow_card(left, int(c))
         Game.record_stats = True
         return game
 
     def __init__(self, team_one, team_two):
         self.team_one = team_one
         self.team_two = team_two
+        self.swapped = False
         team_one.opponent = team_two
         team_two.opponent = team_one
         team_one.join_game(self)
         team_two.join_game(self)
+        self.server = team_one
         self.team_one.serving = True
         self.team_one.first = True
-        self.serving = (True, True)
+        self.serve_left = True
         self.winner = None
         self.comp = None
         self.fixture = None
@@ -52,20 +59,25 @@ class Game:
         self.started = False
         self.game_string = ""
 
-    def cycle_service(self):
-        self.serving = (not self.serving[0], self.serving[1] if self.serving[0] else not self.serving[1])
+    def score(self):
+        return f"{self.team_one.score} - {self.team_two.score}"
+
+    def set_server(self, new_server):
+        if self.server != new_server:
+            self.server = new_server
+            if self.server.first:
+                self.serve_left = not self.serve_left
 
     def is_over(self):
         return (self.team_one.score >= GOALS_TO_WIN or self.team_two.score >= GOALS_TO_WIN) and \
                abs(self.team_one.score - self.team_two.score) > 1
 
     def start(self, swapped=False):
+        self.swapped = swapped
         if swapped:
+            self.server = self.team_two
             self.team_two.first = True
-            self.team_two.serving = True
-        else:
-            self.team_one.first = True
-            self.team_one.serving = True
+            self.team_one.first = False
         self.started = True
 
     def next_point(self):
@@ -93,10 +105,39 @@ class Game:
             "scoreOne": self.team_one.score,
             "scoreTwo": self.team_two.score,
             "game": self.game_string,
-            "started": self.started
+            "started": self.started,
+            "swapped": self.swapped,
         }
         if self.winner:
             dct["firstTeamWon"] = self.winner.first
+        return dct
+
+    def display_map(self):
+        dct = {
+            "teamOne": {
+                "name": self.team_one.name,
+                "leftPlayer": self.team_one.left_player.name,
+                "rightPlayer": self.team_one.right_player.name,
+                "score": self.team_one.score,
+                "cards": self.team_one.card_timer(),
+                "greenCard": self.team_one.green_carded,
+                "cardDuration": self.team_one.card_duration(),
+            },
+            "teamTwo": {
+                "name": self.team_two.name,
+                "leftPlayer": self.team_two.left_player.name,
+                "rightPlayer": self.team_two.right_player.name,
+                "score": self.team_two.score,
+                "cards": self.team_two.card_timer(),
+                "greenCard": self.team_two.green_carded,
+                "cardDuration": self.team_two.card_duration(),
+            },
+            "firstTeamServing": self.server.first,
+            "leftPlayerServing": self.serve_left,
+            "game": self.game_string,
+            "started": self.started,
+            "rounds": self.round_count,
+        }
         return dct
 
     def print_gamestate(self):

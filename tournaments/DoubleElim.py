@@ -6,7 +6,7 @@ class DoubleElim(Tournament):
     def __init__(self, teams):
         super().__init__(teams)
 
-    def generate_fixtures(self) -> [Fixture]:
+    def next_round(self) -> [Fixture]:
         # This is where the entire fixtures are generated
         # if you need a fixture to depend on the winner or loser of another
         # then you can use Fixture.winner and Fixture.loser,
