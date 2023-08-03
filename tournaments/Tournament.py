@@ -9,10 +9,10 @@ class Tournament:
     @classmethod
     def load(cls):
 
-        with open("G:/Programming/python/HandballAPI/resources/teamsClean.json") as fp:
+        with open("./resources/teamsClean.json") as fp:
             teams = [Team.from_map(k, v) for k, v in json.load(fp).items()]
-        comp = cls(teams)
-        with open("G:/Programming/python/HandballAPI/resources/games.json") as fp:
+            comp = cls(teams)
+        with open("./resources/games.json") as fp:
             games = [Game.from_map(i, comp) for i in json.load(fp)]
         i = 0
         for i, v in enumerate(games):
@@ -41,9 +41,9 @@ class Tournament:
 
     def save(self):
         print("Saving...")
-        with open("G:/Programming/python/HandballAPI/resources/teamsClean.json", "w+") as fp:
+        with open("./resources/teamsClean.json", "w+") as fp:
             json.dump({i.name: i.as_map() for i in self.teams}, fp, indent=4, sort_keys=True)
-        with open("G:/Programming/python/HandballAPI/resources/games.json", "w+") as fp:
+        with open("./resources/games.json", "w+") as fp:
             json.dump([i.to_game().as_map() for i in self.fixtures[:self.match_count + 1] if not i.bye], fp, indent=4,
                       sort_keys=True)
 
