@@ -65,7 +65,7 @@ class Game:
     def set_server(self, new_server):
         if self.server != new_server:
             self.server = new_server
-            if self.server.first:
+            if self.server.serveFirst:
                 self.serve_left = not self.serve_left
 
     def is_over(self):
@@ -75,9 +75,17 @@ class Game:
     def start(self, swapped=False):
         self.swapped = swapped
         if swapped:
+            print(f"{swapped = }")
             self.server = self.team_two
-            self.team_two.first = True
-            self.team_one.first = False
+            self.team_two.serving = True
+            self.team_two.serveFirst = True
+            self.team_one.serving = False
+            self.team_one.serveFirst = False
+        else:
+            self.team_two.serving = False
+            self.team_two.serveFirst = False
+            self.team_one.serving = True
+            self.team_one.serveFirst = True
         self.started = True
 
     def next_point(self):
@@ -109,7 +117,7 @@ class Game:
             "swapped": self.swapped,
         }
         if self.winner:
-            dct["firstTeamWon"] = self.winner.first
+            dct["firstTeamWon"] = self.winner == self.team_one
         return dct
 
     def display_map(self):
@@ -132,7 +140,7 @@ class Game:
                 "greenCard": self.team_two.green_carded,
                 "cardDuration": self.team_two.card_duration(),
             },
-            "firstTeamServing": self.server.first,
+            "firstTeamServing": self.server == self.team_one,
             "leftPlayerServing": self.serve_left,
             "game": self.game_string,
             "started": self.started,
