@@ -23,7 +23,7 @@ class Tournament:
         return comp
 
     def __init__(self, teams):
-        self.current_game = None
+        self.current_game: Game | None = None
         self.teams: list = teams
         self.ranked_teams: list = teams
         self.match_count = 0
@@ -44,7 +44,7 @@ class Tournament:
         with open("./resources/teamsClean.json", "w+") as fp:
             json.dump({i.name: i.as_map() for i in self.teams}, fp, indent=4, sort_keys=True)
         with open("./resources/games.json", "w+") as fp:
-            json.dump([i.to_game().as_map() for i in self.fixtures[:self.match_count + 1] if not i.bye], fp, indent=4,
+            json.dump([i.to_game().as_map() for i in self.fixtures[:self.match_count + self.current_game.started] if not i.bye], fp, indent=4,
                       sort_keys=True)
 
     def print_ladder(self):

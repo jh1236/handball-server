@@ -60,6 +60,6 @@ class Player:
             "yellowCards": self.yellowCards,
             "redCards": self.redCards,
             "roundsPlayed": self.roundsPlayed,
-            "roundsCarded": self.roundsCarded
+            "roundsCarded": self.roundsCarded,
         }
         return dct

@@ -7,7 +7,7 @@ from tournaments.Tournament import Tournament
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-competition: Tournament = tournaments.single_elim.load()
+competition: Tournament = tournaments.rr.load()
 print(competition.teams)
 
 
@@ -32,11 +32,11 @@ def score():
     print(request.json)
     c = request.json["ace"]
     first_team = request.json["firstTeam"]
-    left_player = request.json["leftPlayer"]
+    first_player = request.json["firstPlayer"]
     if first_team:
-        competition.current_game.team_one.add_score(left_player, c)
+        competition.current_game.team_one.add_score(first_player, c)
     else:
-        competition.current_game.team_two.add_score(left_player, c)
+        competition.current_game.team_two.add_score(first_player, c)
     competition.current_game.print_gamestate()
     return "", 204
 
@@ -45,7 +45,7 @@ def score():
 def start():
     print(request.json)
 
-    competition.current_game.start(request.json["swap"])
+    competition.current_game.start(request.json["swap"], request.json["swapTeamOne"], request.json["swapTeamTwo"])
     competition.current_game.print_gamestate()
     return "", 204
 
@@ -67,23 +67,23 @@ def card():
     print(request.json)
     color = request.json["color"]
     first_team = request.json["firstTeam"]
-    left_player = request.json["leftPlayer"]
+    first_player = request.json["firstPlayer"]
     if first_team:
         if color == "green":
-            competition.current_game.team_one.green_card(left_player)
+            competition.current_game.team_one.green_card(first_player)
         elif color == "yellow":
             time = request.json["time"]
-            competition.current_game.team_one.yellow_card(left_player, time)
+            competition.current_game.team_one.yellow_card(first_player, time)
         elif color == "red":
-            competition.current_game.team_one.red_card(left_player)
+            competition.current_game.team_one.red_card(first_player)
     else:
         if color == "green":
-            competition.current_game.team_two.green_card(left_player)
+            competition.current_game.team_two.green_card(first_player)
         elif color == "yellow":
             time = request.json["time"]
-            competition.current_game.team_two.yellow_card(left_player, time)
+            competition.current_game.team_two.yellow_card(first_player, time)
         elif color == "red":
-            competition.current_game.team_two.red_card(left_player)
+            competition.current_game.team_two.red_card(first_player)
     competition.current_game.print_gamestate()
     return "", 204
 

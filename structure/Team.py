@@ -5,19 +5,18 @@ from structure.Player import Player
 class Team:
     @classmethod
     def from_map(cls, name, map):
-        left_player = Player.from_map(map["leftPlayer"])
-        right_player = Player.from_map(map["rightPlayer"])
+        left_player = Player.from_map(map["playerOne"])
+        right_player = Player.from_map(map["playerTwo"])
         team = Team(name, left_player, right_player)
         team.played = map["played"]
         team.wins = map["wins"]
         team.losses = map["losses"]
         team.cards = map["cards"]
-        team.left_player = left_player
-        team.right_player = right_player
+        team.player_one = left_player
+        team.player_two = right_player
         return team
 
     def add_to_game_str(self, c: str):
-        print(self.game.game_string)
         if self.first:
             self.game.game_string += c.upper()
         else:
@@ -25,40 +24,49 @@ class Team:
 
     def __init__(self, name: str, left: Player, right: Player):
 
+        self.swapped: bool = False
         self.name = name
         # properties related to the current game
-        self.left_card_count = 0
-        self.right_card_count = 0
-        self.left_card_duration = 0
-        self.right_card_duration = 0
-        self.score = 0
-        self.game = None
+        self.left_card_count: int = 0
+        self.right_card_count: int = 0
+        self.left_card_duration: int = 0
+        self.right_card_duration: int = 0
+        self.score: int = 0
+        self.game: Game | None = None
         self.opponent: Team | None = None
-        self.first = False
-        self.serving = False
-        self.green_carded = False
-        self.timeouts_remaining = 2
+        self.first: bool = False
+        self.serving: bool = False
+        self.green_carded: bool = False
+        self.timeouts_remaining: int = 2
         #
 
         # statistics
-        self.left_player = left
-        self.right_player = right
-        self.played = 0
-        self.wins = 0
-        self.losses = 0
-        self.cards = 0
-        self.timeouts = 0
-        self.goals_scored = 0
+        self.player_one: Player = left
+        self.player_two: Player = right
+        self.played: int = 0
+        self.wins: int = 0
+        self.losses: int = 0
+        self.cards: int = 0
+        self.timeouts: int = 0
+        self.goals_scored: int = 0
+        self.server: Player = self.player_one
+
+    def start(self, swapped=False):
+        self.swapped = swapped
+        if not (swapped ^ self.serving):
+            self.server = self.player_two
+            self.player_two.serveFirst = True
+            self.player_one.serveFirst = False
+        else:
+            self.server = self.player_one
+            self.player_two.serveFirst = True
+            self.player_one.serveFirst = False
 
     def card_timer(self):
         if self.left_card_count == -1 or self.right_card_count == -1:
             return -1
 
         return max(self.left_card_count, self.right_card_count)
-
-    def server(self):
-        return self.left_player if (self.game.serve_left and not self.left_player.carded) \
-                                   or self.right_player.carded else self.right_player
 
     def card_duration(self):
         if self.left_card_count > self.right_card_count:
@@ -83,22 +91,17 @@ class Team:
             self.timeouts += 1
         self.timeouts_remaining -= 1
 
-    def add_score(self, is_left_player=None, ace=False):
-        c = 'a' if ace else 's'
-        if is_left_player:
-            self.add_to_game_str(c + "L")
-            self.left_player.score_goal(ace)
-        elif is_left_player is False:
-            self.add_to_game_str(c + "R")
-            self.right_player.score_goal(ace)
-        self.score += 1
-        self.goals_scored += 1
-        self.game.set_server(self)
-        self.game.next_point()
+    def set_server(self):
+        self.game.server = self
+        self.opponent.serving = False
+        if self.server == self.player_one:
+            self.server = self.player_two
+        else:
+            self.server = self.player_one
 
     def next_point(self):
-        self.left_player.next_point()
-        self.right_player.next_point()
+        self.player_one.next_point()
+        self.player_two.next_point()
         if self.left_card_count > 0:
             self.left_card_count -= 1
         else:
@@ -107,14 +110,28 @@ class Team:
             self.right_card_count -= 1
         else:
             self.right_card_duration = 3
-        self.left_player.is_carded = self.left_card_count != 0
-        self.right_player.is_carded = self.right_card_count != 0
+        self.player_one.is_carded = self.left_card_count != 0
+        self.player_two.is_carded = self.right_card_count != 0
+
+    def add_score(self, is_left_player=None, ace=False):
+        c = 'a' if ace else 's'
+        if is_left_player:
+            self.add_to_game_str(c + "L")
+            self.player_one.score_goal(ace)
+        elif is_left_player is False:
+            self.add_to_game_str(c + "R")
+            self.player_two.score_goal(ace)
+        self.score += 1
+        self.goals_scored += 1
+        if not self.serving:
+            self.set_server()
+        self.game.next_point()
 
     def as_map(self):
         dct = {
             "name": self.name,
-            "leftPlayer": self.left_player.as_map(),
-            "rightPlayer": self.right_player.as_map(),
+            "playerOne": self.player_one.as_map(),
+            "playerTwo": self.player_two.as_map(),
             "played": self.played,
             "wins": self.wins,
             "losses": self.losses,
@@ -132,10 +149,10 @@ class Team:
             self.cards += 1
         if left_player:
             self.add_to_game_str("gL")
-            self.left_player.green_card()
+            self.player_one.green_card()
         else:
             self.add_to_game_str("gR")
-            self.right_player.green_card()
+            self.player_two.green_card()
 
     def yellow_card(self, left_player, time=3):
         if Game.record_stats:
@@ -145,7 +162,7 @@ class Team:
                 self.add_to_game_str("yL")
             else:
                 self.add_to_game_str(f"{time % 10}L")
-            self.left_player.yellow_card()
+            self.player_one.yellow_card()
             if self.left_card_count >= 0:
                 self.left_card_count += time
                 self.left_card_duration = self.left_card_count
@@ -154,10 +171,10 @@ class Team:
                 self.add_to_game_str("yR")
             else:
                 self.add_to_game_str(f"{time % 10}R")
-            self.right_player.yellow_card()
+            self.player_two.yellow_card()
             if self.right_card_count >= 0:
                 self.right_card_count += time
-                self.right_card_count = self.right_card_duration
+                self.right_card_duration = self.right_card_count
         while self.left_card_count != 0 and self.right_card_count != 0 and not self.game.is_over():
             self.opponent.add_score()
 
@@ -166,11 +183,11 @@ class Team:
             self.cards += 1
         if left_player:
             self.add_to_game_str("vL")
-            self.left_player.red_card()
+            self.player_one.red_card()
             self.left_card_count = -1
         else:
             self.add_to_game_str("vR")
-            self.right_player.red_card()
+            self.player_two.red_card()
             self.right_card_count = -1
         while self.left_card_count != 0 and self.right_card_count != 0 and not self.game.is_over():
             self.opponent.add_score()

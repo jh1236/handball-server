@@ -1,4 +1,10 @@
 from util import chunks_sized
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from structure.Fixture import Fixture
+    from tournaments.Tournament import Tournament
+    from Team import Team
 
 GOALS_TO_WIN = 11
 
@@ -13,80 +19,76 @@ class Game:
         team_two = [i for i in comp.teams if i.name == map["teamTwo"]][0]
         swapped = map["swapped"]
         game = Game(team_one, team_two)
-        game.start(swapped)
+        game.start(swapped, map["swapTeamOne"], map["swapTeamTwo"])
         game.comp = comp
         j: str
         for j in chunks_sized(map["game"], 2):
             team = team_one if (j[1].isupper()) else team_two
-            left = j[1].upper() == 'L'
+            first = j[1].upper() == 'L'
             c = j[0].lower()
             if c == 's':
-                team.add_score(left)
+                team.add_score(first)
             elif c == 'a':
-                team.add_score(left, True)
+                team.add_score(first, True)
             elif c == 'g':
-                team.green_card(left)
+                team.green_card(first)
             elif c == 'y':
-                team.yellow_card(left)
+                team.yellow_card(first)
             elif c == 'v':
-                team.red_card(left)
+                team.red_card(first)
             elif c == 't':
                 team.call_timeout()
             elif c.isdigit():
                 if c == '0':
-                    team.yellow_card(left, 10)
+                    team.yellow_card(first, 10)
                 else:
-                    team.yellow_card(left, int(c))
+                    print(int(c))
+                    team.yellow_card(first, int(c))
         Game.record_stats = True
         return game
 
     def __init__(self, team_one, team_two):
-        self.team_one = team_one
-        self.team_two = team_two
-        self.swapped = False
+        self.team_one: Team = team_one
+        self.team_two: Team = team_two
+        self.swapped: bool = False
         team_one.opponent = team_two
         team_two.opponent = team_one
         team_one.join_game(self)
         team_two.join_game(self)
-        self.server = team_one
+        self.server: Team = team_one
         self.team_one.serving = True
         self.team_one.first = True
-        self.serve_left = True
-        self.winner = None
-        self.comp = None
-        self.fixture = None
-        self.round_count = 0
-        self.started = False
-        self.game_string = ""
+        self.winner: Team | None = None
+        self.comp: Tournament | None = None
+        self.fixture: Fixture | None = None
+        self.round_count: int = 0
+        self.started: bool = False
+        self.game_string: str = ""
 
     def score(self):
         return f"{self.team_one.score} - {self.team_two.score}"
-
-    def set_server(self, new_server):
-        if self.server != new_server:
-            self.server = new_server
-            if self.server.serveFirst:
-                self.serve_left = not self.serve_left
 
     def is_over(self):
         return (self.team_one.score >= GOALS_TO_WIN or self.team_two.score >= GOALS_TO_WIN) and \
                abs(self.team_one.score - self.team_two.score) > 1
 
-    def start(self, swapped=False):
+    def start(self, swapped: bool, swap_one: bool, swap_two: bool):
         self.swapped = swapped
         if swapped:
-            print(f"{swapped = }")
-            self.server = self.team_two
             self.team_two.serving = True
             self.team_two.serveFirst = True
             self.team_one.serving = False
             self.team_one.serveFirst = False
+            self.server = self.team_two
         else:
             self.team_two.serving = False
             self.team_two.serveFirst = False
             self.team_one.serving = True
             self.team_one.serveFirst = True
+            self.server = self.team_one
         self.started = True
+        self.team_one.start(swap_one)
+        self.team_two.start(swap_two)
 
     def next_point(self):
         self.round_count += 1
@@ -112,6 +114,8 @@ class Game:
             "teamTwo": self.team_two.name,
             "scoreOne": self.team_one.score,
             "scoreTwo": self.team_two.score,
+            "swapTeamOne": self.team_one.swapped,
+            "swapTeamTwo": self.team_two.swapped,
             "game": self.game_string,
             "started": self.started,
             "swapped": self.swapped,
@@ -124,8 +128,8 @@ class Game:
         dct = {
             "teamOne": {
                 "name": self.team_one.name,
-                "leftPlayer": self.team_one.left_player.name,
-                "rightPlayer": self.team_one.right_player.name,
+                "playerOne": self.team_one.player_one.name,
+                "playerTwo": self.team_one.player_two.name,
                 "score": self.team_one.score,
                 "cards": self.team_one.card_timer(),
                 "greenCard": self.team_one.green_carded,
@@ -133,15 +137,15 @@ class Game:
             },
             "teamTwo": {
                 "name": self.team_two.name,
-                "leftPlayer": self.team_two.left_player.name,
-                "rightPlayer": self.team_two.right_player.name,
+                "playerOne": self.team_two.player_one.name,
+                "playerTwo": self.team_two.player_two.name,
                 "score": self.team_two.score,
                 "cards": self.team_two.card_timer(),
                 "greenCard": self.team_two.green_carded,
                 "cardDuration": self.team_two.card_duration(),
             },
             "firstTeamServing": self.server == self.team_one,
-            "leftPlayerServing": self.serve_left,
+            "serverName": self.server.server.name,
             "game": self.game_string,
             "started": self.started,
             "rounds": self.round_count,
