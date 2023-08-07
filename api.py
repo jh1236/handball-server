@@ -7,7 +7,7 @@ from tournaments.Tournament import Tournament
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-competition: Tournament = tournaments.rr.load()
+competition: Tournament = tournaments.Swiss.load()
 print(competition.teams)
 
 
@@ -90,7 +90,7 @@ def card():
 
 @app.route('/', methods=['GET'])
 def site():
-    with open("G:/Programming/python/HandballAPI/resources/site.html") as fp:
+    with open("./resources/site.html") as fp:
         string = fp.read()
     repl = "\n".join([j.fixture_to_table_row() for j in competition.fixtures])
     string = string.replace("%replace%", repl)

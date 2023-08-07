@@ -8,10 +8,9 @@ from structure.Game import Game
 class Tournament:
     @classmethod
     def load(cls):
-
         with open("./resources/teamsClean.json") as fp:
             teams = [Team.from_map(k, v) for k, v in json.load(fp).items()]
-            comp = cls(teams)
+        comp = cls(teams)
         with open("./resources/games.json") as fp:
             games = [Game.from_map(i, comp) for i in json.load(fp)]
         i = 0
@@ -63,7 +62,11 @@ class Tournament:
 
     def next_round(self) -> [Fixture]:
         self.round += 1
-        self.fixtures += next(self.generator)
+        tempfixtures = next(self.generator)
+        for i in tempfixtures:
+            i.team_one().play_team(i.team_two())
+            i.team_two().play_team(i.team_one())
+        self.fixtures += tempfixtures
 
     def generate_round(self):
         # Subclass will yield from this func

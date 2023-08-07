@@ -50,6 +50,7 @@ class Team:
         self.timeouts: int = 0
         self.goals_scored: int = 0
         self.server: Player = self.player_one
+        self.teams_played = []
 
     def start(self, swapped=False):
         self.swapped = swapped
@@ -191,3 +192,12 @@ class Team:
             self.right_card_count = -1
         while self.left_card_count != 0 and self.right_card_count != 0 and not self.game.is_over():
             self.opponent.add_score()
+
+    def has_played(self, team):
+        return team in self.teams_played
+
+    def play_team(self, team):
+        self.teams_played.append(team)
+
+
+BYE = Team(None, Player(None), Player(None)) # im dumb and couldnt figure out how to put this inside the class without making a circular refrence
