@@ -8,10 +8,12 @@ class Team:
         left_player = Player.from_map(map["playerOne"])
         right_player = Player.from_map(map["playerTwo"])
         team = Team(name, left_player, right_player)
-        team.played = map["played"]
-        team.wins = map["wins"]
-        team.losses = map["losses"]
-        team.cards = map["cards"]
+        team.played = map.get("played", 0)
+        team.goals_for = map.get("goalsFor", 0)
+        team.goals_against = map.get("goalsAgainst", 0)
+        team.wins = map.get("wins", 0)
+        team.losses = map.get("losses", 0)
+        team.cards = map.get("cards", 0)
         team.player_one = left_player
         team.player_two = right_player
         return team
@@ -48,7 +50,8 @@ class Team:
         self.losses: int = 0
         self.cards: int = 0
         self.timeouts: int = 0
-        self.goals_scored: int = 0
+        self.goals_for: int = 0
+        self.goals_against: int = 0
         self.server: Player = self.player_one
         self.teams_played = []
 
@@ -123,14 +126,17 @@ class Team:
             self.add_to_game_str(c + "R")
             self.player_two.score_goal(ace)
         self.score += 1
-        self.goals_scored += 1
+        self.goals_for += 1
         if not self.serving:
             self.set_server()
+        self.opponent.scored_against()
         self.game.next_point()
+
+    def scored_against(self):
+        self.goals_against += 1
 
     def as_map(self):
         dct = {
-            "name": self.name,
             "playerOne": self.player_one.as_map(),
             "playerTwo": self.player_two.as_map(),
             "played": self.played,
@@ -138,6 +144,8 @@ class Team:
             "losses": self.losses,
             "cards": self.cards,
             "timeouts": self.timeouts,
+            "goalsFor": self.goals_for,
+            "goalsAgainst": self.goals_against
         }
         return dct
 
@@ -200,4 +208,5 @@ class Team:
         self.teams_played.append(team)
 
 
-BYE = Team(None, Player(None), Player(None)) # im dumb and couldnt figure out how to put this inside the class without making a circular refrence
+BYE = Team(None, Player(None), Player(
+    None))  # im dumb and couldnt figure out how to put this inside the class without making a circular refrence

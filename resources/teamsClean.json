@@ -1,254 +1,38 @@
 {
     "Bad Bois": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Brigitte Gredzuk",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "Bad Bois",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "James Sharpham",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "Brigitte Gredzuk",
+        "playerTwo": "James Sharpham"
     },
     "BarbenHeimer": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Olivia Stronach",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "BarbenHeimer",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Ethan Dal Molin",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "Olivia Stronach",
+        "playerTwo": "Ethan Dal Molin"
     },
     "Blaaergh": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Liam Cooper",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "Blaaergh",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Eva Hajigabriel",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "Liam Cooper",
+        "playerTwo": "Eva Hajigabriel"
     },
     "KISS": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Will Prozerska",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "KISS",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Lachlan Banks",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "Will Prozerska",
+        "playerTwo": "Lachlan Banks"
     },
     "Satnavs": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Nicholas Burvil",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "Satnavs",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Tristan Nel",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "Nicholas Burvil",
+        "playerTwo": "Tristan Nel"
     },
     "Seanitha": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Sean Robinson",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "Seanitha",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Tabitha Blechenden",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "Sean Robinson",
+        "playerTwo": "Tabitha Blechenden"
     },
     "Sleeby": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "James Saunders",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "Sleeby",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Jamie Dymmott",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "James Saunders",
+        "playerTwo": "Jamie Dymmott"
     },
     "The Officials": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Jared Healy",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "The Officials",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Alex Soudure",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "Jared Healy",
+        "playerTwo": "Alex Soudure"
     },
     "Whipped": {
-        "cards": 0,
-        "leftPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Dora Wan",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "losses": 0,
-        "name": "Whipped",
-        "played": 0,
-        "rightPlayer": {
-            "aces": 0,
-            "goals": 0,
-            "greenCards": 0,
-            "name": "Michael Russ",
-            "redCards": 0,
-            "roundsCarded": 0,
-            "roundsPlayed": 0,
-            "yellowCards": 0
-        },
-        "timeouts": 0,
-        "wins": 0
+        "playerOne": "Dora Wan",
+        "playerTwo": "Michael Russ"
     }
 }

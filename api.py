@@ -94,7 +94,6 @@ def site():
         string = fp.read()
     repl = "\n".join([j.fixture_to_table_row() for j in competition.fixtures])
     string = string.replace("%replace%", repl)
-
     return string, 200
 
 

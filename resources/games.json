@@ -1,21 +1,25 @@
 [
     {
-        "firstTeamWon": false,
-        "game": "SLSRVRVL",
-        "scoreOne": 0,
-        "scoreTwo": 11,
+        "firstTeamWon": true,
+        "game": "slalylvrvl",
+        "scoreOne": 11,
+        "scoreTwo": 2,
         "started": true,
+        "swapTeamOne": false,
+        "swapTeamTwo": false,
         "swapped": false,
-        "teamOne": "BarbenHeimer",
-        "teamTwo": "Whipped"
+        "teamOne": "Bad Bois",
+        "teamTwo": "BarbenHeimer"
     },
     {
-        "game": "GL2lSLSRyrSLslSLslSLslSRslSRsl",
-        "scoreOne": 7,
-        "scoreTwo": 5,
+        "game": "SLslSLslSR0lSLYLsrSRYRsrSLsrSRsrSR",
+        "scoreOne": 8,
+        "scoreTwo": 7,
         "started": true,
-        "swapped": false,
+        "swapTeamOne": true,
+        "swapTeamTwo": true,
+        "swapped": true,
         "teamOne": "Blaaergh",
-        "teamTwo": "The Officials"
+        "teamTwo": "KISS"
     }
 ]

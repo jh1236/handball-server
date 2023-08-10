@@ -4,6 +4,8 @@ from structure.Game import Game
 class Player:
     @classmethod
     def from_map(cls, map):
+        if isinstance(map, str):
+            return Player(map)
         player = Player(map["name"])
         player.aces = map["aces"]
         player.goals = map["goals"]

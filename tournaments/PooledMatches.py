@@ -39,6 +39,6 @@ class PooledMatches(Tournament):
             yield fixtures
 
         fixtures = []
-        for t1, t2 in zip_longest(*[[j for j in i if j] for i in self.pools]):
+        for t1, t2 in zip_longest(*[sorted([j for j in i if j], key=lambda a: -a.wins) for i in self.pools]):
             fixtures.append(Fixture(t1, t2, i + 1, self))
         yield fixtures
