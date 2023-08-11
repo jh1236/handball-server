@@ -29,10 +29,6 @@ class Team:
         self.swapped: bool = False
         self.name = name
         # properties related to the current game
-        self.left_card_count: int = 0
-        self.right_card_count: int = 0
-        self.left_card_duration: int = 0
-        self.right_card_duration: int = 0
         self.score: int = 0
         self.game: Game | None = None
         self.opponent: Team | None = None
@@ -67,22 +63,21 @@ class Team:
             self.player_one.serveFirst = False
 
     def card_timer(self):
-        if self.left_card_count == -1 or self.right_card_count == -1:
+        if self.player_one.card_count == -1 or self.player_two.card_count == -1:
             return -1
 
-        return max(self.left_card_count, self.right_card_count)
+        return max(self.player_one.card_count, self.player_two.card_count)
 
     def card_duration(self):
-        if self.left_card_count > self.right_card_count:
-            return self.left_card_duration
+        if self.player_one.card_count > self.player_two.card_count:
+            return self.player_one.card_duration
         else:
-            return self.right_card_duration
+            return self.player_two.card_duration
 
     def join_game(self, game):
         self.timeouts_remaining = 2
-        self.right_card_count = 0
-        self.green_carded = False
-        self.left_card_count = 0
+        self.player_one.reset()
+        self.player_two.reset()
         self.serving = False
         self.score = 0
 
@@ -106,16 +101,7 @@ class Team:
     def next_point(self):
         self.player_one.next_point()
         self.player_two.next_point()
-        if self.left_card_count > 0:
-            self.left_card_count -= 1
-        else:
-            self.left_card_duration = 3
-        if self.right_card_count > 0:
-            self.right_card_count -= 1
-        else:
-            self.right_card_duration = 3
-        self.player_one.is_carded = self.left_card_count != 0
-        self.player_two.is_carded = self.right_card_count != 0
+
 
     def add_score(self, is_left_player=None, ace=False):
         c = 'a' if ace else 's'
@@ -171,20 +157,16 @@ class Team:
                 self.add_to_game_str("yL")
             else:
                 self.add_to_game_str(f"{time % 10}L")
-            self.player_one.yellow_card()
-            if self.left_card_count >= 0:
-                self.left_card_count += time
-                self.left_card_duration = self.left_card_count
+            self.player_one.yellow_card(time)
+
         else:
             if time == 3:
                 self.add_to_game_str("yR")
             else:
                 self.add_to_game_str(f"{time % 10}R")
-            self.player_two.yellow_card()
-            if self.right_card_count >= 0:
-                self.right_card_count += time
-                self.right_card_duration = self.right_card_count
-        while self.left_card_count != 0 and self.right_card_count != 0 and not self.game.is_over():
+            self.player_two.yellow_card(time)
+
+        while self.player_one.card_count != 0 and self.player_two.card_count != 0 and not self.game.is_over():
             self.opponent.add_score()
 
     def red_card(self, left_player):
@@ -193,12 +175,10 @@ class Team:
         if left_player:
             self.add_to_game_str("vL")
             self.player_one.red_card()
-            self.left_card_count = -1
         else:
             self.add_to_game_str("vR")
             self.player_two.red_card()
-            self.right_card_count = -1
-        while self.left_card_count != 0 and self.right_card_count != 0 and not self.game.is_over():
+        while self.player_one.card_count != 0 and self.player_two.card_count != 0 and not self.game.is_over():
             self.opponent.add_score()
 
     def has_played(self, team):
@@ -208,5 +188,5 @@ class Team:
         self.teams_played.append(team)
 
 
-BYE = Team(None, Player(None), Player(
-    None))  # im dumb and couldnt figure out how to put this inside the class without making a circular refrence
+# im dumb and couldnt figure out how to put this inside the class without making a circular refrence
+BYE = Team(None, Player(None), Player(None))

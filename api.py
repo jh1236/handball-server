@@ -61,6 +61,13 @@ def timeout():
     competition.current_game.print_gamestate()
     return "", 204
 
+@app.route('/api/games/update/undo', methods=['POST'])
+def undo():
+    print(request.json)
+    competition.current_game.undo()
+    competition.current_game.print_gamestate()
+    return "", 204
+
 
 @app.route('/api/games/update/card', methods=['POST'])
 def card():

@@ -13,8 +13,8 @@ class Game:
     record_stats = True
 
     @classmethod
-    def from_map(cls, map, comp):
-        Game.record_stats = False
+    def from_map(cls, map, comp, record_stats=False):
+        Game.record_stats = record_stats
         team_one = [i for i in comp.teams if i.name == map["teamOne"]][0]
         team_two = [i for i in comp.teams if i.name == map["teamTwo"]][0]
         swapped = map["swapped"]
@@ -123,6 +123,12 @@ class Game:
         if self.winner:
             dct["firstTeamWon"] = self.winner == self.team_one
         return dct
+
+    def undo(self):
+        self.game_string = self.game_string[:-2]
+        print(f"'{self.game_string}'")
+        self.comp.save()
+        self.comp.recalc_team_stats()
 
     def display_map(self):
         dct = {
