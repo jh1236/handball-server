@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Handball Tournament</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
+        <h1>This is my first website!!</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>First Team</th>
+                    <th></th>
+                    <th>Second Team</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for fixture in fixtures %}
+                <tr>
+                    <td>{{ fixture[0] }}</td>
+                    <td> vs </td>
+                    <td>{{ fixture[1] }}</td>
+                    <td>{{ fixture[2] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </body>
+</html>

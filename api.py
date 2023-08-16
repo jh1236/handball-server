@@ -1,5 +1,5 @@
 import flask
-from flask import request
+from flask import request, render_template
 
 import tournaments
 from tournaments.Tournament import Tournament
@@ -97,12 +97,14 @@ def card():
 
 @app.route('/', methods=['GET'])
 def site():
-    with open("./resources/site.html") as fp:
-        string = fp.read()
-    repl = "\n".join([j.fixture_to_table_row() for j in competition.fixtures])
-    string = string.replace("%replace%", repl)
-    return string, 200
+    fixtures = []
+    for j in competition.fixtures:
+        #print(j.fixture_to_table_row_2()) # for testing
+        fixtures.append(j.fixture_to_table_row_2())
+    
+    return render_template("site.html", fixtures=fixtures), 200
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
+    # 5000: arbitrary port but one with higher value, lower ones might be reserved

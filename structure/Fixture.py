@@ -49,6 +49,15 @@ class Fixture:
             <td>{self._team_two}</td>
             <td> {'0 - 0' if self.game is None else self.game.score()}</td>
         </tr>"""
+    
+    # new ver of above function to return non-html; not sure if same thing could be done with the old ver   
+    def fixture_to_table_row_2(self):
+        if self.bye:
+            return (self.team_one(), "BYE", " - ")
+        elif self.game is None:
+            return (self._team_one, self._team_two, "0 - 0")
+        else:
+            return (self._team_one, self._team_two, self.game.score())
 
 
     def team_one(self):
