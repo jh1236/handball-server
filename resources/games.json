@@ -1,1 +1,50 @@
-[]
+[
+    {
+        "firstTeamWon": false,
+        "game": "VRVL",
+        "scoreOne": 0,
+        "scoreTwo": 11,
+        "started": true,
+        "swapTeamOne": false,
+        "swapTeamTwo": false,
+        "swapped": false,
+        "teamOne": "Bad Bois",
+        "teamTwo": "Blaaergh"
+    },
+    {
+        "firstTeamWon": false,
+        "game": "VRVL",
+        "scoreOne": 0,
+        "scoreTwo": 0,
+        "started": true,
+        "swapTeamOne": false,
+        "swapTeamTwo": false,
+        "swapped": false,
+        "teamOne": "Satnavs",
+        "teamTwo": "The Officials"
+    },
+    {
+        "firstTeamWon": true,
+        "game": "",
+        "scoreOne": 11,
+        "scoreTwo": 0,
+        "started": false,
+        "swapTeamOne": false,
+        "swapTeamTwo": false,
+        "swapped": false,
+        "teamOne": "IKEA workers",
+        "teamTwo": "Satnavs"
+    },
+    {
+        "firstTeamWon": true,
+        "game": "vrvl",
+        "scoreOne": 11,
+        "scoreTwo": 0,
+        "started": true,
+        "swapTeamOne": false,
+        "swapTeamTwo": false,
+        "swapped": false,
+        "teamOne": "Seanitha",
+        "teamTwo": "Sleeby"
+    }
+]

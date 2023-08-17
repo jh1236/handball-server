@@ -1,5 +1,5 @@
 import flask
-from flask import request
+from flask import request, send_file
 
 import tournaments
 from tournaments.Tournament import Tournament
@@ -61,6 +61,7 @@ def timeout():
     competition.current_game.print_gamestate()
     return "", 204
 
+
 @app.route('/api/games/update/undo', methods=['POST'])
 def undo():
     print(request.json)
@@ -93,6 +94,12 @@ def card():
             competition.current_game.team_two.red_card(first_player)
     competition.current_game.print_gamestate()
     return "", 204
+
+
+@app.route('/api/teams/image', methods=['GET'])
+def image():
+    team = request.args.get("name", type=str)
+    return send_file(f"./resources/images/{team}.png", mimetype='image/png')
 
 
 @app.route('/', methods=['GET'])

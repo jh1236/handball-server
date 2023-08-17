@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from structure.Game import Game
-from structure.Team import Team
+from structure.Team import Team, BYE
 
 BOLD = "\033[1m"
 
@@ -20,13 +20,13 @@ class TeamPromise:
 
 class Fixture:
     def __init__(self, team_one: Team | TeamPromise, team_two: Team | TeamPromise | None, round_number, comp):
-        if team_one is None:
+        if team_one is None or team_one == BYE:
             team_one, team_two = team_two, team_one
         self._team_one = team_one
         self.comp = comp
         self._team_two = team_two
         self.round_number = round_number
-        self.bye = team_two is None
+        self.bye = team_two is None or team_two == BYE
         self.winner = TeamPromise(self.team_one() if self.bye else None, "TBA")
         self.loser = TeamPromise(None, "TBA")
         self.game = None

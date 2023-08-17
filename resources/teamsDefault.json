@@ -11,17 +11,17 @@
     "playerOne": "Liam Cooper",
     "playerTwo": "Eva Hajigabriel"
   },
-  "KISS": {
-    "playerOne": "Will Prozerska",
+  "IKEA workers": {
+    "playerOne": "William Prozerska",
     "playerTwo": "Lachlan Banks"
   },
   "Satnavs": {
-    "playerOne": "Nicholas Burvil",
+    "playerOne": "Nicholas Burvill",
     "playerTwo": "Tristan Nel"
   },
   "Seanitha": {
     "playerOne": "Sean Robinson",
-    "playerTwo": "Tabitha Blechenden"
+    "playerTwo": "Tabitha Blechynden"
   },
   "Sleeby": {
     "playerOne": "James Saunders",
@@ -34,5 +34,9 @@
   "Whipped": {
     "playerOne": "Dora Wan",
     "playerTwo": "Michael Russ"
+  },
+  "Ball Handlers": {
+    "playerOne": "Fletcher Morrison",
+    "playerTwo": "Jett Higgins"
   }
 }
