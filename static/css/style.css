@@ -1,0 +1,44 @@
+/* Globals and general body */
+:root {
+    --font-family: "Lexend Deca", sans-serif;
+    --color-bg: #fff;
+    --color-text: hsl(210,8%,25%);
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+
+    padding: 50px;
+    margin: auto;
+    text-align: center;
+}
+
+/* Fixtures table and its contents */ 
+.table {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.table tr td:first-child {
+    width: 120px;
+}
+
+.table tr td:nth-child(2) {
+    width: 30px;
+    text-align: left;
+}
+
+.table tr td:nth-child(3) {
+    width: 120px;
+}
+
+.table tr td:nth-child(4) {
+    width: 80px;
+}
