@@ -14,6 +14,7 @@ class Player:
         player.redCards = map["redCards"]
         player.roundsPlayed = map["roundsPlayed"]
         player.roundsCarded = map["roundsCarded"]
+        player.best_points = map.get("bestPoints", 0)
         return player
 
     def __init__(self, name: str):
@@ -26,6 +27,7 @@ class Player:
         self.redCards: int = 0
         self.roundsPlayed: int = 0
         self.roundsCarded: int = 0
+        self.best_points: int = 0
 
         self.card_count: int = 0
         self.card_duration: int = 0
@@ -72,8 +74,13 @@ class Player:
             "redCards": self.redCards,
             "roundsPlayed": self.roundsPlayed,
             "roundsCarded": self.roundsCarded,
+            "bestPoints": self.best_points,
         }
         return dct
 
     def reset(self):
-        pass
+        self.card_count = 0
+        self.card_duration = 0
+
+    def add_best_points(self, points_count):
+        self.best_points += points_count

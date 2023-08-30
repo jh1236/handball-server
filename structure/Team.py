@@ -61,6 +61,8 @@ class Team:
             self.server = self.player_one
             self.player_two.serveFirst = True
             self.player_one.serveFirst = False
+        self.player_one.reset()
+        self.player_two.reset()
 
     def card_timer(self):
         if self.player_one.card_count == -1 or self.player_two.card_count == -1:
@@ -101,7 +103,6 @@ class Team:
     def next_point(self):
         self.player_one.next_point()
         self.player_two.next_point()
-
 
     def add_score(self, is_left_player=None, ace=False):
         c = 'a' if ace else 's'

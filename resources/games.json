@@ -1,50 +1,27 @@
 [
     {
+        "bestPlayer": "Olivia Stronach",
+        "finished": true,
         "firstTeamWon": false,
-        "game": "VRVL",
-        "scoreOne": 0,
+        "game": "SLSLSLVLVR",
+        "scoreOne": 3,
         "scoreTwo": 11,
         "started": true,
         "swapTeamOne": false,
         "swapTeamTwo": false,
         "swapped": false,
-        "teamOne": "Bad Bois",
-        "teamTwo": "Blaaergh"
+        "teamOne": "Ball Handlers",
+        "teamTwo": "BarbenHeimer"
     },
     {
-        "firstTeamWon": false,
-        "game": "VRVL",
-        "scoreOne": 0,
-        "scoreTwo": 0,
+        "game": "SLSLSLVLYR",
+        "scoreOne": 3,
+        "scoreTwo": 3,
         "started": true,
         "swapTeamOne": false,
         "swapTeamTwo": false,
         "swapped": false,
-        "teamOne": "Satnavs",
-        "teamTwo": "The Officials"
-    },
-    {
-        "firstTeamWon": true,
-        "game": "",
-        "scoreOne": 11,
-        "scoreTwo": 0,
-        "started": false,
-        "swapTeamOne": false,
-        "swapTeamTwo": false,
-        "swapped": false,
-        "teamOne": "IKEA workers",
-        "teamTwo": "Satnavs"
-    },
-    {
-        "firstTeamWon": true,
-        "game": "vrvl",
-        "scoreOne": 11,
-        "scoreTwo": 0,
-        "started": true,
-        "swapTeamOne": false,
-        "swapTeamTwo": false,
-        "swapped": false,
-        "teamOne": "Seanitha",
-        "teamTwo": "Sleeby"
+        "teamOne": "Blaaergh",
+        "teamTwo": "IKEA workers"
     }
 ]

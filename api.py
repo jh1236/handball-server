@@ -2,6 +2,7 @@ import flask
 from flask import request, send_file, render_template
 
 import tournaments
+from structure.Fixture import Fixture
 from tournaments.Tournament import Tournament
 
 app = flask.Flask(__name__)
@@ -14,6 +15,16 @@ print(competition.teams)
 @app.route('/api/teams', methods=['GET'])
 def teams():
     return {i.name: i.as_map() for i in competition.teams}
+
+
+@app.route('/api/games/current_round')
+def current_games():
+    return [i.to_map() for i in competition.rounds[-1] if not i.game.is_over()]
+
+
+@app.route('/api/fixtures', methods=['GET'])
+def fixtures():
+    return [i.game.as_map() for i in competition.fixtures]
 
 
 @app.route('/api/games/current', methods=['GET'])
@@ -50,6 +61,14 @@ def start():
     return "", 204
 
 
+@app.route('/api/games/update/end', methods=['POST'])
+def end():
+    print(request.json)
+    competition.current_game.end(request.json["bestPlayer"])
+    competition.current_game.print_gamestate()
+    return "", 204
+
+
 @app.route('/api/games/update/timeout', methods=['POST'])
 def timeout():
     print(request.json)
@@ -60,6 +79,7 @@ def timeout():
         competition.current_game.team_two.call_timeout()
     competition.current_game.print_gamestate()
     return "", 204
+
 
 @app.route('/api/games/update/undo', methods=['POST'])
 def undo():
@@ -105,12 +125,15 @@ def image():
 def site():
     fixtures = []
     for j in competition.fixtures:
-        #print(j.fixture_to_table_row_2()) # for testing
-        fixtures.append(j.fixture_to_table_row_2())
+        # print(j.fixture_to_table_row_2()) # for testing
+        if isinstance(j, Fixture):
+            fixtures.append(j.fixture_to_table_row())
+        else:
+            fixtures.append(j)
 
     return render_template("site.html", fixtures=fixtures), 200
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=80, debug=True)
     # 5000: arbitrary port but one with higher value, lower ones might be reserved

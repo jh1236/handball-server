@@ -6,27 +6,27 @@ from tournaments.Tournament import Tournament
 
 
 class Swiss(Tournament):
-    def __init__(self, teams, rounds=3):
+    def __init__(self, teams, rounds=6):
 
         self.teams_fixed = teams.copy()
         if len(self.teams_fixed) % 2 == 1:
             self.teams_fixed.append(BYE)
-        self.rounds = rounds
+        self.round_count = rounds
         self.max_rounds = len(self.teams_fixed) - 1
 
         super().__init__(teams)
 
     def generate_round(self):
-        """itterator that returns each round, call next value after each round is completed"""
-        for round in range(self.rounds):
-            yield self.matchmake(round)
+        """iterator that returns each round, call next value after each round is completed"""
+        for i in range(self.round_count):
+            yield self.match_make(i)
 
-    def matchmake(self, round):
+    def match_make(self, r):
         """ 
         find the highest scoring team and pair them with the next highest scoring team.
-        if a match can't be made, this function will progressivly fuck with the players respective rankings
-        until a match can be made, this function should produce matches untill all possible rounds can be made
-        at the cost of your cpu usage, if a case where a match cannot be made it will fallback to having duplicate 
+        if a match can't be made, this function will progressively fuck with the players respective rankings
+        until a match can be made, this function should produce matches until all possible rounds can be made
+        at the cost of your cpu usage, if a case where a match cannot be made it will fall back to having duplicate
         rounds cause fuck you for not using round-robin
         """
 
@@ -56,7 +56,7 @@ class Swiss(Tournament):
 
                 if not found:
                     if loop_count > self.max_rounds:  # fallback if alot of
-                        return self.fall_back_Swiss(target, unfilled, roster)
+                        return self.fall_back_swiss(target, unfilled, roster)
 
                     # if a roster can't be made, move the problem player to the end of the array, 
                     # and reverse the array to give more chance
@@ -67,10 +67,14 @@ class Swiss(Tournament):
                     unfilled.reverse()
                     roster = []
                     trial = False
-        return [Fixture(team1, team2, round, self) for team1, team2 in roster]
+        print(roster)
+        while self.fixtures and (roster[0][0] in self.fixtures[-1] or roster[0][1] in self.fixtures[-1]):
+            roster.append(roster.pop(0))
+
+        return [Fixture(team1, team2, r, self) for team1, team2 in roster]
 
     @staticmethod
-    def fall_back_Swiss(target, unfilled, roster):
+    def fall_back_swiss(target, unfilled, roster):
         print("COULD NOT FIND UNIQUE TEAM. ALLOWING REPLAY")
         roster.append([target, unfilled.pop(0)])
         for n in range(0, len(unfilled), 2):

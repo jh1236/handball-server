@@ -2,6 +2,7 @@ from util import chunks_sized
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from structure.Player import Player
     from structure.Fixture import Fixture
     from tournaments.Tournament import Tournament
     from Team import Team
@@ -44,13 +45,23 @@ class Game:
                 else:
                     print(int(c))
                     team.yellow_card(first, int(c))
+        if map.get("finished", False):
+            game.end(map["bestPlayer"])
+
         Game.record_stats = True
         return game
 
     def __init__(self, team_one, team_two):
+        self.best_player: Player | None = None
         self.team_one: Team = team_one
         self.team_two: Team = team_two
+        self.players: list[Player] = [self.team_one.player_one, self.team_one.player_two,
+                                      self.team_two.player_one, self.team_two.player_two]
         self.swapped: bool = False
+        self.team_one_swapped: bool = False
+        self.team_two_swapped: bool = False
+        self.team_one_score: int = 0
+        self.team_two_score: int = 0
         team_one.opponent = team_two
         team_two.opponent = team_one
         team_one.join_game(self)
@@ -66,7 +77,7 @@ class Game:
         self.game_string: str = ""
 
     def score(self):
-        return f"{self.team_one.score} - {self.team_two.score}"
+        return f"{self.team_one_score} - {self.team_two_score}"
 
     def is_over(self):
         return (self.team_one.score >= GOALS_TO_WIN or self.team_two.score >= GOALS_TO_WIN) and \
@@ -89,21 +100,34 @@ class Game:
         self.started = True
         self.team_one.start(swap_one)
         self.team_two.start(swap_two)
+        self.team_one_swapped = swap_one
+        self.team_two_swapped = swap_two
+        self.team_two.opponent = self.team_one
+        self.team_one.opponent = self.team_two
+
+    # TODO: Add F&B votes
+    def end(self, best_player):
+        if isinstance(best_player, str):
+            best_player = [i for i in self.players if i.name == best_player][0]
+        self.best_player = best_player
+        best_player.add_best_points(1)
+        self.winner = self.get_winner()
+        if Game.record_stats:
+            self.winner.wins += 1
+            self.get_loser().losses += 1
+            self.team_one.played += 1
+            self.team_two.played += 1
+        if self.fixture:
+            self.fixture.game_over()
+        self.comp.on_game_over()
 
     def next_point(self):
         self.round_count += 1
         self.team_one.next_point()
         self.team_two.next_point()
-        if self.is_over() and not self.winner:
-            self.winner = self.get_winner()
-            if Game.record_stats:
-                self.winner.wins += 1
-                self.get_loser().losses += 1
-                self.team_one.played += 1
-                self.team_two.played += 1
-            if self.fixture:
-                self.fixture.game_over()
-            self.comp.on_game_over()
+        self.team_one_score = self.team_one.score
+        self.team_two_score = self.team_two.score
+        print(f"{self.team_one.score} - {self.team_two.score}")
 
     def __repr__(self):
         return f"{self.team_one} vs {self.team_two}"
@@ -112,16 +136,18 @@ class Game:
         dct = {
             "teamOne": self.team_one.name,
             "teamTwo": self.team_two.name,
-            "scoreOne": self.team_one.score,
-            "scoreTwo": self.team_two.score,
-            "swapTeamOne": self.team_one.swapped,
-            "swapTeamTwo": self.team_two.swapped,
+            "scoreOne": self.team_one_score,
+            "scoreTwo": self.team_two_score,
+            "swapTeamOne": self.team_one_swapped,
+            "swapTeamTwo": self.team_two_swapped,
             "game": self.game_string,
             "started": self.started,
             "swapped": self.swapped,
         }
         if self.winner:
             dct["firstTeamWon"] = self.winner == self.team_one
+            dct["bestPlayer"] = self.best_player.name
+            dct["finished"] = True
         return dct
 
     def undo(self):
@@ -136,7 +162,7 @@ class Game:
                 "name": self.team_one.name,
                 "playerOne": self.team_one.player_one.name,
                 "playerTwo": self.team_one.player_two.name,
-                "score": self.team_one.score,
+                "score": self.team_one_score,
                 "cards": self.team_one.card_timer(),
                 "greenCard": self.team_one.green_carded,
                 "cardDuration": self.team_one.card_duration(),
@@ -145,7 +171,7 @@ class Game:
                 "name": self.team_two.name,
                 "playerOne": self.team_two.player_one.name,
                 "playerTwo": self.team_two.player_two.name,
-                "score": self.team_two.score,
+                "score": self.team_two_score,
                 "cards": self.team_two.card_timer(),
                 "greenCard": self.team_two.green_carded,
                 "cardDuration": self.team_two.card_duration(),
