@@ -1,10 +1,10 @@
 from structure.Fixture import Fixture
-from tournaments.Tournament import Tournament
+from tournaments.Fixtures import Fixtures
 from util import n_chunks
 from itertools import zip_longest
 
 
-class PooledMatches(Tournament):
+class PooledMatches(Fixtures):
     def __init__(self, teams):
         teams2 = teams.copy()
         self.pool_count = 0
@@ -19,7 +19,7 @@ class PooledMatches(Tournament):
                 else:
                     del i[-1]
         print(self.pools)
-        super().__init__(teams)
+        super().__init__()
 
     def next_round(self) -> [Fixture]:
         for i in range(len(self.pools[0]) // 2):

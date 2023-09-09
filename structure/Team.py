@@ -1,193 +1,112 @@
 from structure.Game import Game
-from structure.Player import Player
+from structure.Player import Player, GamePlayer
 
 
 class Team:
-    @classmethod
-    def from_map(cls, name, map):
-        left_player = Player.from_map(map["playerOne"])
-        right_player = Player.from_map(map["playerTwo"])
-        team = Team(name, left_player, right_player)
-        team.played = map.get("played", 0)
-        team.goals_for = map.get("goalsFor", 0)
-        team.goals_against = map.get("goalsAgainst", 0)
-        team.wins = map.get("wins", 0)
-        team.losses = map.get("losses", 0)
-        team.cards = map.get("cards", 0)
-        team.player_one = left_player
-        team.player_two = right_player
-        return team
-
-    def add_to_game_str(self, c: str):
-        if self.first:
-            self.game.game_string += c.upper()
-        else:
-            self.game.game_string += c.lower()
-
-    def __init__(self, name: str, left: Player, right: Player):
-
-        self.swapped: bool = False
+    def __init__(self, name: str, players: list[Player]):
         self.name = name
-        # properties related to the current game
-        self.score: int = 0
-        self.game: Game | None = None
-        self.opponent: Team | None = None
-        self.first: bool = False
-        self.serving: bool = False
-        self.green_carded: bool = False
-        self.timeouts_remaining: int = 2
-        #
+        self.players: list[Player] = players
+        self.points_scored = 0
+        self.games_won = 0
+        self.games_played = 0
+        self.teams_played = 0
 
-        # statistics
-        self.player_one: Player = left
-        self.player_two: Player = right
-        self.played: int = 0
-        self.wins: int = 0
-        self.losses: int = 0
-        self.cards: int = 0
-        self.timeouts: int = 0
-        self.goals_for: int = 0
-        self.goals_against: int = 0
-        self.server: Player = self.player_one
-        self.teams_played = []
-
-    def start(self, swapped=False):
-        self.swapped = swapped
-        if not (swapped ^ self.serving):
-            self.server = self.player_two
-            self.player_two.serveFirst = True
-            self.player_one.serveFirst = False
-        else:
-            self.server = self.player_one
-            self.player_two.serveFirst = True
-            self.player_one.serveFirst = False
-        self.player_one.reset()
-        self.player_two.reset()
-
-    def card_timer(self):
-        if self.player_one.card_count == -1 or self.player_two.card_count == -1:
-            return -1
-
-        return max(self.player_one.card_count, self.player_two.card_count)
-
-    def card_duration(self):
-        if self.player_one.card_count > self.player_two.card_count:
-            return self.player_one.card_duration
-        else:
-            return self.player_two.card_duration
-
-    def join_game(self, game):
-        self.timeouts_remaining = 2
-        self.player_one.reset()
-        self.player_two.reset()
-        self.serving = False
-        self.score = 0
-
-        self.first = False
-        self.game = game
-
-    def call_timeout(self):
-        self.add_to_game_str("TT")
-        if Game.record_stats:
-            self.timeouts += 1
-        self.timeouts_remaining -= 1
-
-    def set_server(self):
-        self.game.server = self
-        self.opponent.serving = False
-        if self.server == self.player_one:
-            self.server = self.player_two
-        else:
-            self.server = self.player_one
-
-    def next_point(self):
-        self.player_one.next_point()
-        self.player_two.next_point()
-
-    def add_score(self, is_left_player=None, ace=False):
-        c = 'a' if ace else 's'
-        if is_left_player:
-            self.add_to_game_str(c + "L")
-            self.player_one.score_goal(ace)
-        elif is_left_player is False:
-            self.add_to_game_str(c + "R")
-            self.player_two.score_goal(ace)
-        self.score += 1
-        self.goals_for += 1
-        if not self.serving:
-            self.set_server()
-        self.opponent.scored_against()
-        self.game.next_point()
-
-    def scored_against(self):
-        self.goals_against += 1
-
-    def as_map(self):
-        dct = {
-            "playerOne": self.player_one.as_map(),
-            "playerTwo": self.player_two.as_map(),
-            "played": self.played,
-            "wins": self.wins,
-            "losses": self.losses,
-            "cards": self.cards,
-            "timeouts": self.timeouts,
-            "goalsFor": self.goals_for,
-            "goalsAgainst": self.goals_against
-        }
-        return dct
+    def get_game_team(self, game: Game):
+        return GameTeam(self, game)
 
     def __repr__(self):
-        return f"{self.name}"
+        return self.name
 
-    def green_card(self, left_player):
+
+BYE = Team("BYE", [])
+
+
+class GameTeam:
+    def __init__(self, team: Team, game: Game):
+        self.game: Game = game
+        self.opponent: GameTeam | None = None
+        self.team: Team = team
+        self.name: str = self.team.name
+        self.players: list[GamePlayer] = [i.game_player() for i in team.players]
+
+        self.green_carded: bool = False
+        self.serving: bool = False
+        self.score: int = 0
+        self.time_outs: int = 2
+        self.swapped: bool = False
+        self.first_player_serves: bool = True
+
+    def __eq__(self, other):
+        return isinstance(other, GameTeam) and other.name == self.name
+
+    def __repr__(self):
+        return repr(self.team)
+
+    def reset(self):
+        self.green_carded = False
+        self.score = 0
+        self.serving = False
+        self.time_outs = 2
+        [i.reset() for i in self.players]
+
+    def start(self, serve_first: bool, swap_players: bool):
+        print(f"swapped is {swap_players}")
+        self.swapped = swap_players
+        # Guaranteed to work, just trust the process
+        self.opponent: GameTeam = [i for i in self.game.teams if i != self][0]
+        self.serving = serve_first
+        self.first_player_serves = serve_first
+        players = reversed(self.team.players) if swap_players else self.team.players
+        self.players = [i.game_player() for i in players]
+
+    def next_point(self):
+        [i.next_point() for i in self.players]
+
+    def lost_point(self):
+        self.serving = False
+
+    def score_point(self, left_player: bool | None = None, ace: bool = False):
+        if left_player is not None:
+            self.players[left_player].score_point(ace)
+        self.score += 1
+        self.opponent.lost_point()
+        if not self.serving:
+            self.first_player_serves = not self.first_player_serves
+            self.serving = True
+        if left_player is not None:
+            string = "a" if ace else "s"
+            string += "l" if left_player else "r"
+            self.game.add_to_game_string(string, self)
+        self.game.next_point()
+
+    def green_card(self, left_player: bool):
         self.green_carded = True
-        if Game.record_stats:
-            self.cards += 1
-        if left_player:
-            self.add_to_game_str("gL")
-            self.player_one.green_card()
+        self.players[left_player].green_card()
+        self.game.add_to_game_string("g" + ("l" if left_player else "r"), self)
+
+    def yellow_card(self, left_player: bool, time: int = 3):
+        self.players[left_player].yellow_card(time)
+        if time == 3:
+            self.game.add_to_game_string("y" + ("l" if left_player else "r"), self)
         else:
-            self.add_to_game_str("gR")
-            self.player_two.green_card()
+            self.game.add_to_game_string(f"{time}{'l' if left_player else 'r'}", self)
+        while all([i.is_carded() for i in self.players]):
+            self.opponent.score_point()
 
-    def yellow_card(self, left_player, time=3):
-        if Game.record_stats:
-            self.cards += 1
-        if left_player:
-            if time == 3:
-                self.add_to_game_str("yL")
-            else:
-                self.add_to_game_str(f"{time % 10}L")
-            self.player_one.yellow_card(time)
+    def red_card(self, left_player: bool):
+        self.players[left_player].red_card()
+        self.game.add_to_game_string(f"v{'l' if left_player else 'r'}", self)
+        while all([i.is_carded() for i in self.players]) and not self.game.game_ended():
+            self.opponent.score_point()
 
-        else:
-            if time == 3:
-                self.add_to_game_str("yR")
-            else:
-                self.add_to_game_str(f"{time % 10}R")
-            self.player_two.yellow_card(time)
+    def timeout(self):
+        self.game.add_to_game_string(f"tt", self)
+        self.time_outs -= 1
 
-        while self.player_one.card_count != 0 and self.player_two.card_count != 0 and not self.game.is_over():
-            self.opponent.add_score()
+    def card_time(self):
+        if 0 > min(self.players, key=lambda a: a.card_time_remaining).card_time_remaining:
+            return -1
+        return max(self.players, key=lambda a: a.card_time_remaining).card_time_remaining
 
-    def red_card(self, left_player):
-        if Game.record_stats:
-            self.cards += 1
-        if left_player:
-            self.add_to_game_str("vL")
-            self.player_one.red_card()
-        else:
-            self.add_to_game_str("vR")
-            self.player_two.red_card()
-        while self.player_one.card_count != 0 and self.player_two.card_count != 0 and not self.game.is_over():
-            self.opponent.add_score()
-
-    def has_played(self, team):
-        return team in self.teams_played
-
-    def play_team(self, team):
-        self.teams_played.append(team)
-
-
-# im dumb and couldnt figure out how to put this inside the class without making a circular refrence
-BYE = Team(None, Player(None), Player(None))
+    def card_duration(self):
+        return max(self.players, key=lambda a: a.card_time_remaining).card_duration

@@ -2,10 +2,10 @@ import itertools
 
 from structure.Fixture import Fixture
 from structure.Team import BYE
-from tournaments.Tournament import Tournament
+from tournaments.Fixtures import Fixtures
 
 
-class Swiss(Tournament):
+class Swiss(Fixtures):
     def __init__(self, teams, rounds=6):
 
         self.teams_fixed = teams.copy()

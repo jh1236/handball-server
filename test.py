@@ -1,103 +1,114 @@
 import tournaments
+from tournaments.Fixtures import Fixtures
 from tournaments.Tournament import Tournament
 
-competition: Tournament = tournaments.Swiss.load()
+competition: Tournament = Tournament()
 print(competition.teams)
 
 
 def teams():
-    return {i.name: i.as_map() for i in competition.teams}
+    return {i.name: [j.name for j in i.players] for i in competition.teams}
 
 
 def current_games():
-    return [i.to_map() for i in competition.rounds[-1] if not i.game.is_over()]
+    return [i.as_map() for i in competition.fixtures.rounds[-1]]
 
 
-def fixtures():
-    return [i.game.as_map() for i in competition.fixtures]
+def all_fixtures():
+    return [i.as_map() for i in competition.fixtures.games_to_list()]
 
 
-def games():
-    competition.save()
-    return competition.current_game.as_map()
+def display(game_id):
+    return competition.fixtures.get_game(game_id).display_map()
 
 
-def display():
-    return competition.current_game.display_map()
-
-
-def score(ace, first_team, first_player):
-    if first_team:
-        competition.current_game.team_one.add_score(first_player, ace)
-    else:
-        competition.current_game.team_two.add_score(first_player, ace)
-    competition.current_game.print_gamestate()
+def score(game_id, ace, first_team, first_player):
+    competition.fixtures.get_game(game_id).teams[first_team].score_point(first_player, ace)
+    competition.fixtures.get_game(game_id).print_gamestate()
     return "", 204
 
 
-def start(swap, swapTeamOne, swapTeamTwo):
-    competition.current_game.start(swap, swapTeamOne, swapTeamTwo)
-    competition.current_game.print_gamestate()
+def start(game_id, firstTeamServes, swapTeamOne, swapTeamTwo):
+    competition.fixtures.get_game(game_id).start(firstTeamServes, swapTeamOne, swapTeamTwo)
+    competition.fixtures.get_game(game_id).print_gamestate()
     return "", 204
 
 
-def end(best_player):
-    competition.current_game.end(best_player)
-    competition.current_game.print_gamestate()
+def end(game_id, best_player):
+    competition.fixtures.get_game(game_id).end(best_player)
+    competition.fixtures.get_game(game_id).print_gamestate()
     return "", 204
 
 
-def timeout(first_team):
-    if first_team:
-        competition.current_game.team_one.call_timeout()
-    else:
-        competition.current_game.team_two.call_timeout()
-    competition.current_game.print_gamestate()
+def timeout(game_id, first_team):
+    competition.fixtures.get_game(game_id).teams[first_team].timeout()
+    competition.fixtures.get_game(game_id).print_gamestate()
     return "", 204
 
 
-def undo():
-    competition.current_game.undo()
-    competition.current_game.print_gamestate()
+def undo(game_id):
+    competition.fixtures.get_game(game_id).undo()
+    competition.fixtures.get_game(game_id).print_gamestate()
     return "", 204
 
 
-def card(color, first_team, first_player, time=3):
-    if first_team:
-        if color == "green":
-            competition.current_game.team_one.green_card(first_player)
-        elif color == "yellow":
-            competition.current_game.team_one.yellow_card(first_player, time)
-        elif color == "red":
-            competition.current_game.team_one.red_card(first_player)
-    else:
-        if color == "green":
-            competition.current_game.team_two.green_card(first_player)
-        elif color == "yellow":
-            competition.current_game.team_two.yellow_card(first_player, time)
-        elif color == "red":
-            competition.current_game.team_two.red_card(first_player)
-    competition.current_game.print_gamestate()
+def card(game_id, color, first_team, first_player, time=3):
+    if color == "green":
+        competition.fixtures.get_game(game_id, ).teams[first_team].green_card(first_player)
+    elif color == "yellow":
+        competition.fixtures.get_game(game_id).teams[first_team].yellow_card(first_player, time)
+    elif color == "red":
+        competition.fixtures.get_game(game_id).teams[first_team].red_card(first_player)
+
+    competition.fixtures.get_game(game_id).print_gamestate()
     return "", 204
 
 
-start(False, False, False)
-score(False, True, True)
-score(False, True, True)
-score(False, True, True)
-card("red", True, True)
-undo()
-card("red", True, True)
-card("red", True, False)
-end("Olivia Stronach")
-start(False, False, False)
-undo()
-undo()
-undo()
-undo()
-score(False, True, True)
-score(False, True, True)
-score(False, True, True)
-card("red", True, True)
-card("yellow", True, False)
-print([i.fixture_to_table_row() for i in competition.fixtures])
+start(0, False, False, False)
+score(0, False, True, True)
+score(0, False, True, True)
+score(0, False, True, True)
+card(0, "red", True, True)
+undo(0, )
+card(0, "red", True, True)
+card(0, "red", True, False)
+end(0, "Olivia Stronach")
+start(1, False, False, False)
+print([[j.fixture_to_table_row() for j in i] for i in competition.fixtures.rounds])
+
+undo(1, )
+undo(1, )
+undo(1, )
+undo(1, )
+undo(1, )
+undo(1, )
+undo(1, )
+undo(1, )
+score(1, False, True, True)
+score(1, False, True, True)
+score(1, False, True, True)
+card(1, "red", True, True)
+card(1, "red", True, False)
+start(2, False, False, False)
+score(2, False, True, True)
+score(2, False, True, True)
+score(2, False, True, True)
+card(2, "red", True, True)
+card(2, "red", True, False)
+start(3, False, False, False)
+card(3, "red", True, True)
+card(3, "red", True, False)
+start(4, False, False, False)
+card(4, "red", True, True)
+card(4, "red", True, False)
+start(5, False, False, False)
+card(5, "red", True, True)
+card(5, "red", True, False)
+start(6, False, False, False)
+card(6, "red", True, True)
+card(6, "red", True, False)
+start(7, False, False, False)
+card(7, "red", True, True)
+card(7, "red", True, False)
+for i in competition.fixtures.rounds:
+    print([j.fixture_to_table_row() for j in i])

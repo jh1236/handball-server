@@ -1,86 +1,67 @@
-from structure.Game import Game
-
-
 class Player:
-    @classmethod
-    def from_map(cls, map):
-        if isinstance(map, str):
-            return Player(map)
-        player = Player(map["name"])
-        player.aces = map["aces"]
-        player.goals = map["goals"]
-        player.greenCards = map["greenCards"]
-        player.yellowCards = map["yellowCards"]
-        player.redCards = map["redCards"]
-        player.roundsPlayed = map["roundsPlayed"]
-        player.roundsCarded = map["roundsCarded"]
-        player.best_points = map.get("bestPoints", 0)
-        return player
-
     def __init__(self, name: str):
-        self.carded: bool = False
-        self.name: str = name
-        self.aces: int = 0
-        self.goals: int = 0
-        self.greenCards: int = 0
-        self.yellowCards: int = 0
-        self.redCards: int = 0
-        self.roundsPlayed: int = 0
-        self.roundsCarded: int = 0
-        self.best_points: int = 0
+        self.name = name
+        self.green_cards: int = 0
+        self.yellow_cards: int = 0
+        self.red_cards: int = 0
+        self.time_on_court: int = 0
+        self.time_carded: int = 0
 
-        self.card_count: int = 0
-        self.card_duration: int = 0
+    def __repr__(self):
+        return self.name
 
     def score_goal(self, ace=False):
-        if Game.record_stats:
-            self.goals += 1
-            if ace:
-                self.aces += 1
+        pass
 
     def green_card(self):
-        if Game.record_stats:
-            self.greenCards += 1
+        pass
 
     def yellow_card(self, time: int = 3):
-        self.carded = True
-        if self.card_count >= 0:
-            self.card_count += time
-            self.card_duration = self.card_count
-        if Game.record_stats:
-            self.yellowCards += 1
+        pass
 
     def red_card(self):
-        self.carded = True
-        self.card_count = -1
-        if Game.record_stats:
-            self.redCards += 1
+        pass
 
     def next_point(self):
-        if Game.record_stats:
-            if self.card_count != 0:
-                if self.card_count > 0:
-                    self.card_count -= 1
-                self.roundsCarded += 1
-            self.roundsPlayed += 1
+        pass
 
-    def as_map(self):
-        dct = {
-            "name": self.name,
-            "aces": self.aces,
-            "goals": self.goals,
-            "greenCards": self.greenCards,
-            "yellowCards": self.yellowCards,
-            "redCards": self.redCards,
-            "roundsPlayed": self.roundsPlayed,
-            "roundsCarded": self.roundsCarded,
-            "bestPoints": self.best_points,
-        }
-        return dct
+    def game_player(self):
+        return GamePlayer(self)
+
+
+class GamePlayer:
+    def __init__(self, player: Player):
+        self.player = player
+        self.name = self.player.name
+        self.card_time_remaining: int = 0  # how many rounds the player is carded for (-1 is infinite)
+        self.card_duration: int = 0  # total time the player is carded for (used for progress bar in app)
+
+    def score_point(self, ace: bool):
+        if True: return
+        # TODO: make it so that stats are added at the end of the game (to allow for undos)
+        self.player.score_goal(ace)
+
+    def green_card(self):
+        if True: return
+        self.player.green_cards += 1
+
+    def yellow_card(self, time):
+        # self.player.yellow_cards += 1
+        if self.card_time_remaining >= 0:
+            self.card_time_remaining += time
+            self.card_duration += time
+
+    def red_card(self):
+        # self.player.red_cards += 1
+        self.card_time_remaining = -1
+
+    def is_carded(self):
+        return self.card_time_remaining != 0
+
+    def next_point(self):
+        if self.card_time_remaining > 0:
+            self.card_time_remaining -= 1
 
     def reset(self):
-        self.card_count = 0
+        self.card_time_remaining = 0
         self.card_duration = 0
-
-    def add_best_points(self, points_count):
-        self.best_points += points_count

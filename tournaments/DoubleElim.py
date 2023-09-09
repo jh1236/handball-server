@@ -1,8 +1,8 @@
 from structure.Fixture import Fixture
-from tournaments.Tournament import Tournament
+from tournaments.Fixtures import Fixtures
 
 
-class DoubleElim(Tournament):
+class DoubleElim(Fixtures):
     def __init__(self, teams):
         super().__init__(teams)
 

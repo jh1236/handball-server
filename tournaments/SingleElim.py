@@ -1,32 +1,34 @@
 import math
 
-from structure.Fixture import Fixture
-from tournaments.Tournament import Tournament
+from structure.Game import Game
+from tournaments.Fixtures import Fixtures
 from util import chunks_sized
 
 
-class SingleElim(Tournament):
-    def __init__(self, teams):
-        super().__init__(teams)
+class SingleElim(Fixtures):
+    def __init__(self, tournament):
+        self.teams = tournament.teams
+        self.games: list[Game] = []
+        super().__init__(tournament)
 
     def generate_round(self):
-        out: list[Fixture] = []
-        games = self.teams.copy()
-        i = len(games)
-        n = 0
-        while math.log2(len(games)) != math.floor(math.log2(len(games))):
-            n = 1
-            i -= 1
-            f = Fixture(games[i], games[i - 1], 0, self)
-            games[i] = f.winner
-            del games[i - 1]
-            print(games)
-            out.append(f)
-        yield out
-        games: list[Fixture] = [Fixture(i[0], i[1], n, self) for i in chunks_sized(games, 2) if i]
-        while len(games) > 1:
-            print("Called)")
-            yield games
-            n += 1
-            print(f"level {n}: {games}")
-            games = [Fixture(i.winner, j.winner, n, self) for i, j in chunks_sized(games, 2) if i or j]
+        # check to see if we have a power of two number of teams
+        r = []
+        pre_play_offs = 2 ** round(math.log2(len(self.teams)) % 1)
+        for _ in range(pre_play_offs):
+            r.append(Game(self.teams.pop(), self.teams.pop()))
+        self.games = r
+        yield r
+        for g in self.games:
+            self.teams.append(g.winner())
+        while len(self.teams) > 1:
+            r = []
+            while len(self.teams) > 0:
+                team_one = self.teams.pop()
+                team_two = self.teams.pop()
+                print(f"{team_one} vs {team_two}")
+                r.append(Game(team_one, team_two))
+            yield r
+            self.games = r
+            for g in self.games:
+                self.teams.insert(0, g.winner())

@@ -1,135 +1,128 @@
 import flask
-from flask import request, send_file, render_template
+from flask import request, send_file, render_template, Response
 
-import tournaments
-from structure.Fixture import Fixture
 from tournaments.Tournament import Tournament
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-competition: Tournament = tournaments.Swiss.load()
-print(competition.teams)
+competition = Tournament()
 
 
-@app.route('/api/teams', methods=['GET'])
+@app.get('/api/teams')
 def teams():
-    return {i.name: i.as_map() for i in competition.teams}
+    return {i.name: [j.name for j in i.players] for i in competition.teams}
 
 
-@app.route('/api/games/current_round')
-def current_games():
-    return [i.to_map() for i in competition.rounds[-1] if not i.game.is_over()]
+@app.get('/api/current_round')
+def current_round():
+    return [i.as_map() for i in competition.fixtures.rounds[-1]]
 
 
-@app.route('/api/fixtures', methods=['GET'])
-def fixtures():
-    return [i.game.as_map() for i in competition.fixtures]
+@app.get('/api/fixtures')
+def all_fixtures():
+    return [i.as_map() for i in competition.fixtures.games_to_list()]
 
 
-@app.route('/api/games/current', methods=['GET'])
-def games():
-    competition.save()
-    return competition.current_game.as_map()
-
-
-@app.route('/api/games/display', methods=['GET'])
+@app.get('/api/games/display')
 def display():
-    return competition.current_game.display_map()
+    game_id = int(request.args["id"])
+    return competition.fixtures.get_game(game_id).display_map()
 
 
-@app.route('/api/games/update/score', methods=['POST'])
+@app.get('/api/games/game')
+def game():
+    game_id = int(request.args["id"])
+    return competition.fixtures.get_game(game_id).as_map()
+
+
+@app.post('/api/games/update/score')
 def score():
     print(request.json)
-    c = request.json["ace"]
+    game_id = request.json["id"]
+    ace = request.json["ace"]
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]
-    if first_team:
-        competition.current_game.team_one.add_score(first_player, c)
-    else:
-        competition.current_game.team_two.add_score(first_player, c)
-    competition.current_game.print_gamestate()
+    competition.fixtures.get_game(game_id).teams[not first_team].score_point(first_player, ace)
+    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
     return "", 204
 
 
-@app.route('/api/games/update/start', methods=['POST'])
+@app.post('/api/games/update/start')
 def start():
     print(request.json)
+    game_id = request.json["id"]
 
-    competition.current_game.start(request.json["swap"], request.json["swapTeamOne"], request.json["swapTeamTwo"])
-    competition.current_game.print_gamestate()
+    competition.fixtures.get_game(game_id).start(request.json["firstTeamServed"], request.json["swapTeamOne"],
+                                                 request.json["swapTeamTwo"])
+    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
     return "", 204
 
 
-@app.route('/api/games/update/end', methods=['POST'])
+@app.post('/api/games/update/end')
 def end():
     print(request.json)
-    competition.current_game.end(request.json["bestPlayer"])
-    competition.current_game.print_gamestate()
+    game_id = request.json["id"]
+    competition.fixtures.get_game(game_id).end(request.json["bestPlayer"])
+    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
     return "", 204
 
 
-@app.route('/api/games/update/timeout', methods=['POST'])
+@app.post('/api/games/update/timeout')
 def timeout():
     print(request.json)
     first_team = request.json["firstTeam"]
-    if first_team:
-        competition.current_game.team_one.call_timeout()
-    else:
-        competition.current_game.team_two.call_timeout()
-    competition.current_game.print_gamestate()
+    game_id = request.json["id"]
+    competition.fixtures.get_game(game_id).teams[not first_team].timeout()
+    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
     return "", 204
 
 
-@app.route('/api/games/update/undo', methods=['POST'])
+@app.post('/api/games/update/undo')
 def undo():
     print(request.json)
-    competition.current_game.undo()
-    competition.current_game.print_gamestate()
+    game_id = request.json["id"]
+    competition.fixtures.get_game(game_id).undo()
+    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
     return "", 204
 
 
-@app.route('/api/games/update/card', methods=['POST'])
+@app.post('/api/games/update/card')
 def card():
     print(request.json)
     color = request.json["color"]
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]
-    if first_team:
-        if color == "green":
-            competition.current_game.team_one.green_card(first_player)
-        elif color == "yellow":
-            time = request.json["time"]
-            competition.current_game.team_one.yellow_card(first_player, time)
-        elif color == "red":
-            competition.current_game.team_one.red_card(first_player)
-    else:
-        if color == "green":
-            competition.current_game.team_two.green_card(first_player)
-        elif color == "yellow":
-            time = request.json["time"]
-            competition.current_game.team_two.yellow_card(first_player, time)
-        elif color == "red":
-            competition.current_game.team_two.red_card(first_player)
-    competition.current_game.print_gamestate()
+    game_id = request.json["id"]
+    if color == "green":
+        competition.fixtures.get_game(game_id, ).teams[not first_team].green_card(first_player)
+    elif color == "yellow":
+        competition.fixtures.get_game(game_id).teams[not first_team].yellow_card(first_player, request.json["time"])
+    elif color == "red":
+        competition.fixtures.get_game(game_id).teams[not first_team].red_card(first_player)
+
+    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
     return "", 204
 
 
-@app.route('/api/teams/image', methods=['GET'])
+@app.get('/api/teams/image')
 def image():
     team = request.args.get("name", type=str)
     return send_file(f"./resources/images/{team}.png", mimetype='image/png')
 
 
-@app.route('/', methods=['GET'])
+@app.get('/')
 def site():
     fixtures = []
-    for j in competition.fixtures:
+    for j in competition.fixtures.games_to_list():
         # print(j.fixture_to_table_row_2()) # for testing
-        if isinstance(j, Fixture):
-            fixtures.append(j.fixture_to_table_row())
-        else:
-            fixtures.append(j)
+        fixtures.append(j.fixture_to_table_row())
 
     return render_template("site.html", fixtures=fixtures), 200
 
