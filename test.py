@@ -85,16 +85,14 @@ while game_id < game_count:
         competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
         continue
     competition.fixtures.get_game(game_id)
-    code = random.randint(0, 4)
-    if code == 0:
+    code = random.randint(0, 10)
+    if code <= 7:
         score(game_id, r_bool(), r_bool(), r_bool())
-    elif code == 1:
+    elif code <= 9:
         choice = random.choice(["green", "yellow"] * 2 + ["red"])
         card(game_id, choice, r_bool(), r_bool())
-    elif code == 2:
+    elif code == 10:
         timeout(game_id, r_bool())
-    elif code == 3 and game.game_string:
-        undo(game_id)
 for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
     print(f"{i}: {t.name}")
 

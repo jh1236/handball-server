@@ -15,6 +15,7 @@ class Team:
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
+        self.timeouts: int = 0
 
     def get_game_team(self, game: Game):
         return GameTeam(self, game)
@@ -38,6 +39,7 @@ class Team:
         green_cards = self.green_cards + sum([i.green_cards for i in game_teams])
         yellow_cards = self.yellow_cards + sum([i.yellow_cards for i in game_teams])
         red_cards = self.red_cards + sum([i.red_cards for i in game_teams])
+        timeouts = self.timeouts + sum([(2 - i.timeouts) for i in game_teams])
         d = {
             "Games Played": self.games_played,
             "Games Won": self.games_won,
@@ -48,6 +50,7 @@ class Team:
             "Green Cards": green_cards,
             "Yellow Cards": yellow_cards,
             "Red Cards": red_cards,
+            "Timeouts Called": timeouts,
         }
         if include_players:
             d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]
@@ -70,10 +73,10 @@ class GameTeam:
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
+        self.timeouts: int = 2
         self.green_carded: bool = False
         self.serving: bool = False
         self.score: int = 0
-        self.time_outs: int = 2
         self.swapped: bool = False
         self.first_player_serves: bool = True
 
@@ -87,7 +90,7 @@ class GameTeam:
         self.green_carded = False
         self.score = 0
         self.serving = False
-        self.time_outs = 2
+        self.timeouts = 2
         self.green_cards = 0
         self.yellow_cards = 0
         self.red_cards = 0
@@ -136,7 +139,7 @@ class GameTeam:
             self.game.add_to_game_string("y" + ("l" if first_player else "r"), self)
         else:
             self.game.add_to_game_string(f"{time}{'l' if first_player else 'r'}", self)
-        while all([i.is_carded() for i in self.players]):
+        while all([i.is_carded() for i in self.players]) and not self.game.game_ended():
             self.opponent.score_point()
 
     def red_card(self, first_player: bool):
@@ -148,7 +151,7 @@ class GameTeam:
 
     def timeout(self):
         self.game.add_to_game_string(f"tt", self)
-        self.time_outs -= 1
+        self.timeouts -= 1
 
     def card_time(self):
         if 0 > min(self.players, key=lambda a: a.card_time_remaining).card_time_remaining:
@@ -169,6 +172,7 @@ class GameTeam:
         self.team.green_cards += self.green_cards
         self.team.yellow_cards += self.yellow_cards
         self.team.red_cards += self.red_cards
+        self.team.timeouts += (2 - self.timeouts)
 
     def nice_name(self):
         return self.team.nice_name()
@@ -178,6 +182,7 @@ class GameTeam:
             "Green Cards": self.green_cards,
             "Yellow Cards": self.yellow_cards,
             "Red Cards": self.red_cards,
+            "Timeouts Remaining": self.timeouts
         }
         if include_players:
             d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]

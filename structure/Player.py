@@ -114,8 +114,8 @@ class GamePlayer:
         self.player.votes += self.best
 
     def tidy_name(self):
-        first, second = self.name.split(" ")
-        first = first[0] + ". "
+        first, second = self.name.split(" ", 1)
+        second = " " + second[0] + "."
         return first + second
 
     def get_stats(self):

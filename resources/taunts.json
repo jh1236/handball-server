@@ -1,0 +1,26 @@
+{
+  "score": [
+    "%p scored",
+    "%o got styled on by %p",
+    "%p just embarrassed %r..."
+  ],
+  "ace": [
+    "%p just hit an ace!",
+    "%p just zinged one past %a"
+  ],
+  "green": [
+    "%p was green carded"
+  ],
+  "yellow": [
+    "%p was yellow carded",
+    "%p was yellow carded.  Good luck %q..."
+  ],
+  "red": [
+    "%p was red carded",
+    "%p was red carded.  Disgraceful Play."
+  ],
+  "timeout": [
+    "%t called a timeout",
+    "%t has taken a tactical regathering"
+  ]
+}

@@ -1,6 +1,7 @@
 import flask
 from flask import request, send_file, render_template, Response
 
+from structure.GameUtils import game_string_to_commentary
 from tournaments.Tournament import Tournament
 
 app = flask.Flask(__name__)
@@ -32,7 +33,7 @@ def stats():
 
 @app.get('/api/games/current_round')
 def current_round():
-    return [i.as_map() for i in competition.fixtures.rounds[-1]]
+    return [i.as_map() for i in competition.fixtures.games_to_list() if not i.best_player]
 
 
 @app.get('/api/games/fixtures')
@@ -158,10 +159,12 @@ def game_site(game_id):
     teams = game.teams
     team_dicts = [i.get_stats() for i in teams]
     stats = [(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]]
+    best = game.best_player.tidy_name() if game.best_player else "TBD"
     players = [i for i in game.players()]
     player_stats = [(i, *[j.get_stats()[i] for j in players]) for i in players[0].get_stats()]
     return render_template("game_page.html", players=[i.tidy_name() for i in players],
-                           teams=teams, stats=stats, player_stats=player_stats, official=game.primary_official), 200
+                           teams=teams, stats=stats, player_stats=player_stats, official=game.primary_official,
+                           commentary=game_string_to_commentary(game), best=best), 200
 
 
 @app.get('/ladder/')

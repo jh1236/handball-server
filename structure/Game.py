@@ -60,7 +60,7 @@ class Game:
         print(f"         {self.teams[0].__repr__():^15}| {self.teams[1].__repr__():^15}")
         print(f"score   :{self.teams[0].score:^15}| {self.teams[1].score:^15}")
         print(f"cards   :{self.teams[0].card_time():^15}| {self.teams[1].card_time():^15}")
-        print(f"timeouts:{self.teams[0].time_outs:^15}| {self.teams[1].time_outs:^15}")
+        print(f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}")
 
     def start(self, team_one_serves, swap_team_one, swap_team_two):
         self.started = True
