@@ -1,5 +1,27 @@
 [
-  "Jared Healy",
-  "Aimee Soudure",
-  "Lachlan Banks"
+  {
+    "name": "Jared Healy",
+    "team": "The Officials",
+    "primary": true
+  },
+  {
+    "name": "Aimee Soudure",
+    "team": "None",
+    "primary": true
+  },
+  {
+    "name": "Zaiah Deards",
+    "team": "None",
+    "primary": true
+  },
+  {
+    "name": "Lachlan Banks",
+    "team": "IKEA workers",
+    "primary": true
+  },
+  {
+    "name": "Brigitte Gredziuk",
+    "team": "Bad Bois",
+    "primary": true
+  }
 ]

@@ -16,7 +16,7 @@ class SingleElim(Fixtures):
         r = []
         pre_play_offs = 2 ** round(math.log2(len(self.teams)) % 1)
         for _ in range(pre_play_offs):
-            r.append(Game(self.teams.pop(), self.teams.pop()))
+            r.append(Game(self.teams.pop(), self.teams.pop(), self))
         self.games = r
         yield r
         for g in self.games:
@@ -27,7 +27,7 @@ class SingleElim(Fixtures):
                 team_one = self.teams.pop()
                 team_two = self.teams.pop()
                 print(f"{team_one} vs {team_two}")
-                r.append(Game(team_one, team_two))
+                r.append(Game(team_one, team_two, self))
             yield r
             self.games = r
             for g in self.games:

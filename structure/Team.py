@@ -6,16 +6,43 @@ class Team:
     def __init__(self, name: str, players: list[Player]):
         self.name = name
         self.players: list[Player] = players
-        self.points_scored = 0
-        self.games_won = 0
-        self.games_played = 0
-        self.teams_played = 0
+        self.teams_played: list[Team] = []
+        self.points_against: int = 0
+        self.points_for: int = 0
+        self.games_won: int = 0
+        self.games_played: int = 0
+        self.tournament = None
 
     def get_game_team(self, game: Game):
         return GameTeam(self, game)
 
+    def has_played(self, other):
+        return other in self.teams_played
+
     def __repr__(self):
         return self.name
+
+    def get_stats(self, include_players=False):
+        game_teams: list[GameTeam] = []
+        for i in self.tournament.fixtures.games_to_list():
+            team_names = [j.name for j in i.teams]
+            if i.in_progress() and self.name in team_names:
+                game_teams.append(i.teams[team_names.index(self.name)])
+
+        points_for = self.points_for + sum([i.score for i in game_teams])
+        points_against = self.points_against + sum([i.opponent.score for i in game_teams])
+        dif = points_for - points_against
+        d = {
+            "Games Played": self.games_played,
+            "Games Won": self.games_won,
+            "Games Lost": self.games_played - self.games_won,
+            "Points For": points_for,
+            "Points Against": points_against,
+            "Point Difference": dif,
+        }
+        if include_players:
+            d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]
+        return d
 
 
 BYE = Team("BYE", [])
@@ -53,7 +80,7 @@ class GameTeam:
         print(f"swapped is {swap_players}")
         self.swapped = swap_players
         # Guaranteed to work, just trust the process
-        self.opponent: GameTeam = [i for i in self.game.teams if i != self][0]
+        self.opponent: GameTeam = [i for i in self.game.teams if i.name != self.name][0]
         self.serving = serve_first
         self.first_player_serves = serve_first
         players = reversed(self.team.players) if swap_players else self.team.players
@@ -65,37 +92,37 @@ class GameTeam:
     def lost_point(self):
         self.serving = False
 
-    def score_point(self, left_player: bool | None = None, ace: bool = False):
-        if left_player is not None:
-            self.players[left_player].score_point(ace)
+    def score_point(self, first_player: bool | None = None, ace: bool = False):
+        if first_player is not None:
+            self.players[not first_player].score_point(ace)
         self.score += 1
         self.opponent.lost_point()
         if not self.serving:
             self.first_player_serves = not self.first_player_serves
             self.serving = True
-        if left_player is not None:
+        if first_player is not None:
             string = "a" if ace else "s"
-            string += "l" if left_player else "r"
+            string += "l" if first_player else "r"
             self.game.add_to_game_string(string, self)
         self.game.next_point()
 
-    def green_card(self, left_player: bool):
+    def green_card(self, first_player: bool):
         self.green_carded = True
-        self.players[left_player].green_card()
-        self.game.add_to_game_string("g" + ("l" if left_player else "r"), self)
+        self.players[not first_player].green_card()
+        self.game.add_to_game_string("g" + ("l" if first_player else "r"), self)
 
-    def yellow_card(self, left_player: bool, time: int = 3):
-        self.players[left_player].yellow_card(time)
+    def yellow_card(self, first_player: bool, time: int = 3):
+        self.players[not first_player].yellow_card(time)
         if time == 3:
-            self.game.add_to_game_string("y" + ("l" if left_player else "r"), self)
+            self.game.add_to_game_string("y" + ("l" if first_player else "r"), self)
         else:
-            self.game.add_to_game_string(f"{time}{'l' if left_player else 'r'}", self)
+            self.game.add_to_game_string(f"{time}{'l' if first_player else 'r'}", self)
         while all([i.is_carded() for i in self.players]):
             self.opponent.score_point()
 
-    def red_card(self, left_player: bool):
-        self.players[left_player].red_card()
-        self.game.add_to_game_string(f"v{'l' if left_player else 'r'}", self)
+    def red_card(self, first_player: bool):
+        self.players[not first_player].red_card()
+        self.game.add_to_game_string(f"v{'l' if first_player else 'r'}", self)
         while all([i.is_carded() for i in self.players]) and not self.game.game_ended():
             self.opponent.score_point()
 
@@ -110,3 +137,12 @@ class GameTeam:
 
     def card_duration(self):
         return max(self.players, key=lambda a: a.card_time_remaining).card_duration
+
+    def end(self):
+        [i.end() for i in self.players]
+        self.team.points_for += self.score
+        print(self.name + " :" + str(self.opponent.score))
+        self.team.points_against += self.opponent.score
+        self.team.games_played += 1
+        self.team.games_won += self.game.winner() == self.team
+        self.team.teams_played.append(self.opponent.team)

@@ -5,24 +5,31 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     </head>
     <body>
+    <div id="navBar"></div>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
         <h1>Fixtures</h1>
         <table class="table">
             <thead>
                 <tr>
-                    <th>First Team</th>
+                    <th><b>First Team</b></th>
                     <th></th>
-                    <th>Second Team</th>
-                    <th>Result</th>
+                    <th><b>Second Team</b></th>
+                    <th><b>Official</b></th>
+                    <th><b>Result</b></th>
                 </tr>
             </thead>
             <tbody>
-            {% for fixture in fixtures %}
+            {% for i, round in fixtures %}
+                <tr><th>Round {{i + 1}}</th></tr>
+                {% for game in round %}
                 <tr>
-                    <td>{{ fixture[0] }}</td>
+                    <td>{{ game[0] }}</td>
                     <td> vs </td>
-                    <td>{{ fixture[1] }}</td>
-                    <td>{{ fixture[2] }}</td>
+                    <td>{{ game[1] }}</td>
+                    <td><i>{{ game[2] }}</i></td>
+                    <td>{{ game[3] }}</td>
                 </tr>
+                {% endfor %}
             {% endfor %}
             </tbody>
         </table>

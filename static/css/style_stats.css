@@ -1,0 +1,24 @@
+@import "style.css";
+
+.table tr td:first-child {
+    width: 200px;
+    text-align: left;
+}
+
+.table tr td:nth-child(2) {
+    width: 100px;
+    text-align: left;
+}
+
+.table tr td:nth-child(3) {
+    width: 100px;
+    text-align: left;
+}
+
+
+img.team_logo {
+    width: 100px;
+    height: 100px;
+    left: 50%;
+    top: 5%
+}

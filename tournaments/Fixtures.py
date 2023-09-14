@@ -10,6 +10,7 @@ class Fixtures:
         self.generator = self.generate_round()
         self.get_game(0)  # used to initialise the first round
         self.load()
+        self.appoint_umpires()
 
     def games_to_list(self) -> list[Game]:
         return [game for r in self.rounds for game in r]
@@ -20,6 +21,7 @@ class Fixtures:
             self.rounds.append(next(self.generator))
         if all([i.best_player for i in self.rounds[-1]]):
             self.rounds.append(next(self.generator))
+        self.appoint_umpires()
         self.assign_ids()
         return self.games_to_list()[game_id]
 
@@ -44,3 +46,22 @@ class Fixtures:
     def assign_ids(self):
         for i, g in enumerate(self.games_to_list()):
             g.id = i
+
+    def dump(self):
+        self.rounds: list[list[Game]] = []
+        self.generator = self.generate_round()
+        self.get_game(0)  # used to initialise the first round
+        self.save()
+
+    def appoint_umpires(self):
+        for prev, game, next in zip([None] + self.games_to_list()[:-1], self.games_to_list(),
+                                    self.games_to_list()[1:] + [None]):
+            if game.primary_official is not None: continue
+            teams = [i.team for i in game.teams] + ([] if not next else [i.team for i in next.teams])
+            for p in self.tournament.officials.get_primary_officials():
+                if prev and prev.primary_official == p: continue
+                if p.team and p.team in teams:
+                    continue
+                print(p.name, p.games_officiated, game)
+                game.set_primary_official(p)
+                break

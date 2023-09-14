@@ -9,17 +9,33 @@ app.config["DEBUG"] = True
 competition = Tournament()
 
 
+# Team related endpoints
 @app.get('/api/teams')
 def teams():
     return {i.name: [j.name for j in i.players] for i in competition.teams}
 
 
-@app.get('/api/current_round')
+@app.get('/api/teams/image')
+def image():
+    team = request.args.get("name", type=str)
+    return send_file(f"./resources/images/{team}.png", mimetype='image/png')
+
+
+@app.get('/api/teams/stats')
+def stats():
+    team_name = request.args.get("name", type=str)
+    team = [i for i in competition.teams if team_name == i.name.lower().replace(" ", "_")][0]
+    return team.get_stats(include_players=True)
+
+
+# fixture related endpoints
+
+@app.get('/api/games/current_round')
 def current_round():
     return [i.as_map() for i in competition.fixtures.rounds[-1]]
 
 
-@app.get('/api/fixtures')
+@app.get('/api/games/fixtures')
 def all_fixtures():
     return [i.as_map() for i in competition.fixtures.games_to_list()]
 
@@ -35,6 +51,8 @@ def game():
     game_id = int(request.args["id"])
     return competition.fixtures.get_game(game_id).as_map()
 
+
+# gameplay related endpoints
 
 @app.post('/api/games/update/score')
 def score():
@@ -111,20 +129,48 @@ def card():
     return "", 204
 
 
-@app.get('/api/teams/image')
-def image():
-    team = request.args.get("name", type=str)
-    return send_file(f"./resources/images/{team}.png", mimetype='image/png')
-
+# website related endpoints
 
 @app.get('/')
 def site():
-    fixtures = []
-    for j in competition.fixtures.games_to_list():
-        # print(j.fixture_to_table_row_2()) # for testing
-        fixtures.append(j.fixture_to_table_row())
-
+    fixtures = [(n, [i.fixture_to_table_row() for i in j]) for n, j in enumerate(competition.fixtures.rounds)]
     return render_template("site.html", fixtures=fixtures), 200
+
+
+@app.get('/stats/')
+def stats_directory_site():
+    teams = [(i.name, i.name.lower().replace(" ", "_")) for i in competition.teams]
+    return render_template("stats.html", teams=teams), 200
+
+
+@app.get('/stats/<team_name>')
+def stats_site(team_name):
+    team = [i for i in competition.teams if team_name == i.name.lower().replace(" ", "_")][0]
+    players = [(i.name, [(k, v) for k, v in i.get_stats().items()]) for i in team.players]
+    return render_template("each_team_stats.html", stats=[(k, v) for k, v in team.get_stats().items()],
+                           teamName=team.name,
+                           players=players, teamNameClean=team.name.lower().replace(" ", "_")), 200
+
+
+@app.get('/ladder/')
+def ladder_site():
+    teams = [(i.name, i.name.lower().replace(" ", "_"), [(k, v) for k, v in i.get_stats().items()]) for i in
+             sorted(competition.teams, key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])))]
+    headers = [
+        "Team Name",
+        "Games Played",
+        "Games Won",
+        "Games Lost",
+        "Points For",
+        "Points Against",
+        "Point Difference",
+    ]
+    return render_template("ladder.html", headers=headers, teams=teams), 200
+
+
+@app.get('/rules/')
+def rules():
+    return send_file("./resources/rules.pdf"), 200
 
 
 if __name__ == "__main__":

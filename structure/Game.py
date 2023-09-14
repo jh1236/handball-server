@@ -10,13 +10,11 @@ class Game:
         team_one = [i for i in tournament.teams if i.name == game_map["teamOne"]["name"]][0]
         team_two = [i for i in tournament.teams if i.name == game_map["teamTwo"]["name"]][0]
         swapped = game_map["firstTeamServed"]
-        game = Game(team_one, team_two)
+        game = Game(team_one, team_two, tournament)
         team_one_swap = team_one.players[0].name != game_map["teamOne"]["players"][0]
-        print(f'"{team_one.players[0]}" != "{game_map["teamOne"]["players"][0]}"')
-        print(team_one_swap)
         team_two_swap = team_two.players[0].name != game_map["teamTwo"]["players"][0]
-        print(f'"{team_two.players[0]}" != "{game_map["teamTwo"]["players"][0]}"')
-        print(team_two_swap)
+        game.set_primary_official(
+            [i for i in tournament.officials.get_primary_officials() if i.name == game_map["official"]][0])
         if not game_map["started"]: return game
         game.start(swapped, team_one_swap, team_two_swap)
         game.load_from_string(game_map["game"])
@@ -26,7 +24,8 @@ class Game:
         Game.record_stats = True
         return game
 
-    def __init__(self, team_one, team_two):
+    def __init__(self, team_one, team_two, tournament):
+        self.tournament = tournament
         self.id: int = -1
         self.game_string: str = ""
         self.rounds: int = 0
@@ -34,6 +33,11 @@ class Game:
         self.best_player: GamePlayer | None = None
         self.teams: list = [team_one.get_game_team(self), team_two.get_game_team(self)]
         self.first_team_serves: bool = False
+        self.primary_official = None
+
+    def set_primary_official(self, o):
+        o.games_officiated += 1
+        self.primary_official = o
 
     def add_to_game_string(self, string: str, team):
         if team == self.teams[0]:
@@ -67,14 +71,22 @@ class Game:
     def end(self, best_player: str):
         if self.game_ended():
             self.best_player = [i for i in self.players() if i.name == best_player][0]
+            self.best_player.best_player()
+            [i.end() for i in self.teams]
+
+    def in_progress(self):
+        return self.started and not self.best_player
 
     def game_ended(self):
-        return max([i.score for i in self.teams]) >= 11 and abs(self.teams[0].score - self.teams[1].score) > 2
+        return max([i.score for i in self.teams]) >= 11 and abs(self.teams[0].score - self.teams[1].score) >= 2
 
     def undo(self):
-        self.game_string = self.game_string[:-2]
-        print(f"'{self.game_string}'")
-        self.load_from_string(self.game_string)
+        if self.game_string == "":
+            self.started = False
+        else:
+            self.game_string = self.game_string[:-2]
+            print(f"'{self.game_string}'")
+            self.load_from_string(self.game_string)
 
     def as_map(self):
         dct = {
@@ -91,7 +103,8 @@ class Game:
             "game": self.game_string,
             "started": self.started,
             "id": self.id,
-            "firstTeamServed": self.first_team_serves
+            "firstTeamServed": self.first_team_serves,
+            "official": self.primary_official.name
         }
         if self.best_player:  # game has been submitted and finalised
             dct["bestPlayer"] = self.best_player.name
@@ -101,7 +114,11 @@ class Game:
         serving_team = [*[i for i in self.teams if i.serving]]
         if serving_team:
             serving_team = serving_team[0]
-            server = serving_team.players[not serving_team.first_player_serves].name
+            server = serving_team.players[not serving_team.first_player_serves]
+            if server.is_carded():
+                server = serving_team.players[serving_team.first_player_serves].name
+            else:
+                server = server.name
         else:
             server = "None"
         dct = {
@@ -155,9 +172,13 @@ class Game:
                 else:
                     print(int(c))
                     team.yellow_card(first, int(c))
+        self.game_string = game_string
 
     def fixture_to_table_row(self):
-        return [self.teams[0], self.teams[1], self.score_string()]
+        return [self.teams[0], self.teams[1], self.primary_official, self.score_string()]
+
+    def __repr__(self):
+        return f"{self.teams[0]} vs {self.teams[1]}"
 
     def score_string(self):
         return f"{self.teams[0].score} - {self.teams[1].score}"

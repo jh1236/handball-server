@@ -1,20 +1,20 @@
 import itertools
 
-from structure.Fixture import Fixture
+from structure.Game import Game
 from structure.Team import BYE
 from tournaments.Fixtures import Fixtures
 
 
 class Swiss(Fixtures):
-    def __init__(self, teams, rounds=6):
+    def __init__(self, tournament, rounds=6):
 
-        self.teams_fixed = teams.copy()
+        self.teams_fixed = tournament.teams.copy()
         if len(self.teams_fixed) % 2 == 1:
             self.teams_fixed.append(BYE)
         self.round_count = rounds
         self.max_rounds = len(self.teams_fixed) - 1
 
-        super().__init__(teams)
+        super().__init__(tournament)
 
     def generate_round(self):
         """iterator that returns each round, call next value after each round is completed"""
@@ -35,7 +35,7 @@ class Swiss(Fixtures):
             raise Exception("all games have been played")
 
         roster = []
-        unfilled = sorted(self.teams_fixed, key=lambda x: x.wins, reverse=True)
+        unfilled = sorted(self.teams_fixed, key=lambda x: x.games_won, reverse=True)
 
         loop_count = 0
         while unfilled:
@@ -68,16 +68,12 @@ class Swiss(Fixtures):
                     roster = []
                     trial = False
         print(roster)
-        while self.fixtures and (roster[0][0] in self.fixtures[-1] or roster[0][1] in self.fixtures[-1]):
-            roster.append(roster.pop(0))
+        return [Game(team1, team2, self) for team1, team2 in roster]
 
-        return [Fixture(team1, team2, r, self) for team1, team2 in roster]
-
-    @staticmethod
-    def fall_back_swiss(target, unfilled, roster):
+    def fall_back_swiss(self, target, unfilled, roster):
         print("COULD NOT FIND UNIQUE TEAM. ALLOWING REPLAY")
         roster.append([target, unfilled.pop(0)])
         for n in range(0, len(unfilled), 2):
             roster.append(unfilled[n:n + 2])
         print(roster)
-        return roster
+        return [Game(i, j, self) for i, j in roster]

@@ -21,7 +21,7 @@ class RoundRobin(Fixtures):
                 team_two = self.teams_balanced[len(self.teams_balanced) - 1 - j]
                 if team_one is None or team_two is None:
                     continue
-                match = Game(team_one, team_two)
+                match = Game(team_one, team_two, self)
                 fixtures.append(match)
             # Rotate the teams except the first one
             self.teams_balanced[1:] = [self.teams_balanced[-1]] + self.teams_balanced[1:-1]

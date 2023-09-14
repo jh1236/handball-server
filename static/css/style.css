@@ -1,7 +1,7 @@
 /* Globals and general body */
 :root {
     --font-family: "Lexend Deca", sans-serif;
-    --color-bg: #fff;
+    --color-bg: #e0ffe0;
     --color-text: hsl(210,8%,25%);
 }
 
@@ -40,5 +40,18 @@ body {
 }
 
 .table tr td:nth-child(4) {
+    width: 120px;
+}
+.table tr td:nth-child(5) {
     width: 80px;
+}
+
+img.logo {
+
+    width: 100px;
+    height: 100px;
+}
+
+.nav {
+    text-align: left;
 }

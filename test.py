@@ -1,8 +1,10 @@
-import tournaments
-from tournaments.Fixtures import Fixtures
+from random import Random
+
+import api
 from tournaments.Tournament import Tournament
 
-competition: Tournament = Tournament()
+competition: Tournament = api.competition
+competition.dump()
 print(competition.teams)
 
 
@@ -23,92 +25,77 @@ def display(game_id):
 
 
 def score(game_id, ace, first_team, first_player):
-    competition.fixtures.get_game(game_id).teams[first_team].score_point(first_player, ace)
-    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.get_game(game_id).teams[not first_team].score_point(first_player, ace)
+    competition.fixtures.save()
     return "", 204
 
 
-def start(game_id, firstTeamServes, swapTeamOne, swapTeamTwo):
-    competition.fixtures.get_game(game_id).start(firstTeamServes, swapTeamOne, swapTeamTwo)
-    competition.fixtures.get_game(game_id).print_gamestate()
+def start(game_id, first_team_served, swap_team_one, swap_team_two):
+    competition.fixtures.get_game(game_id).start(first_team_served, swap_team_one, swap_team_two)
+    competition.fixtures.save()
     return "", 204
 
 
 def end(game_id, best_player):
     competition.fixtures.get_game(game_id).end(best_player)
-    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
     return "", 204
 
 
 def timeout(game_id, first_team):
-    competition.fixtures.get_game(game_id).teams[first_team].timeout()
-    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.get_game(game_id).teams[not first_team].timeout()
+    competition.fixtures.save()
     return "", 204
 
 
 def undo(game_id):
     competition.fixtures.get_game(game_id).undo()
-    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
     return "", 204
 
 
 def card(game_id, color, first_team, first_player, time=3):
     if color == "green":
-        competition.fixtures.get_game(game_id, ).teams[first_team].green_card(first_player)
+        competition.fixtures.get_game(game_id).teams[not first_team].green_card(first_player)
     elif color == "yellow":
-        competition.fixtures.get_game(game_id).teams[first_team].yellow_card(first_player, time)
+        competition.fixtures.get_game(game_id).teams[not first_team].yellow_card(first_player, time)
     elif color == "red":
-        competition.fixtures.get_game(game_id).teams[first_team].red_card(first_player)
-
-    competition.fixtures.get_game(game_id).print_gamestate()
+        competition.fixtures.get_game(game_id).teams[not first_team].red_card(first_player)
+    else:
+        raise Exception(f"Illegal argument {color}")
+    competition.fixtures.save()
     return "", 204
 
 
-start(0, False, False, False)
-score(0, False, True, True)
-score(0, False, True, True)
-score(0, False, True, True)
-card(0, "red", True, True)
-undo(0, )
-card(0, "red", True, True)
-card(0, "red", True, False)
-end(0, "Olivia Stronach")
-start(1, False, False, False)
-print([[j.fixture_to_table_row() for j in i] for i in competition.fixtures.rounds])
+game_id = 0
+random = Random()
+game_count = 20
 
-undo(1, )
-undo(1, )
-undo(1, )
-undo(1, )
-undo(1, )
-undo(1, )
-undo(1, )
-undo(1, )
-score(1, False, True, True)
-score(1, False, True, True)
-score(1, False, True, True)
-card(1, "red", True, True)
-card(1, "red", True, False)
-start(2, False, False, False)
-score(2, False, True, True)
-score(2, False, True, True)
-score(2, False, True, True)
-card(2, "red", True, True)
-card(2, "red", True, False)
-start(3, False, False, False)
-card(3, "red", True, True)
-card(3, "red", True, False)
-start(4, False, False, False)
-card(4, "red", True, True)
-card(4, "red", True, False)
-start(5, False, False, False)
-card(5, "red", True, True)
-card(5, "red", True, False)
-start(6, False, False, False)
-card(6, "red", True, True)
-card(6, "red", True, False)
-start(7, False, False, False)
-card(7, "red", True, True)
-card(7, "red", True, False)
-for i in competition.fixtures.rounds:
-    print([j.fixture_to_table_row() for j in i])
+
+def r_bool():
+    return bool(random.randint(0, 1))
+
+
+competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
+while game_id < game_count:
+    game = competition.fixtures.get_game(game_id)
+    if competition.fixtures.get_game(game_id).game_ended():
+        game.end(game.players()[0].name)
+        game_id += 1
+        competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
+        continue
+    competition.fixtures.get_game(game_id)
+    code = random.randint(0, 4)
+    if code == 0:
+        score(game_id, r_bool(), r_bool(), r_bool())
+    elif code == 1:
+        choice = random.choice(["green", "yellow"] * 2 + ["red"])
+        card(game_id, choice, r_bool(), r_bool())
+    elif code == 2:
+        timeout(game_id, r_bool())
+    elif code == 3 and game.game_string:
+        undo(game_id)
+for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
+    print(f"{i}: {t.name}")
+
+api.app.run(host="0.0.0.0", port=80, debug=True)
