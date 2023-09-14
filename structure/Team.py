@@ -184,6 +184,9 @@ class GameTeam:
         self.team.yellow_cards += self.yellow_cards
         self.team.red_cards += self.red_cards
         self.team.timeouts += (2 - self.timeouts)
+        self.game.primary_official.green_cards += self.green_cards
+        self.game.primary_official.yellow_cards += self.yellow_cards
+        self.game.primary_official.red_cards += self.red_cards
 
     def nice_name(self):
         return self.team.nice_name()

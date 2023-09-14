@@ -149,13 +149,13 @@ def site():
     return render_template("site.html", fixtures=fixtures), 200
 
 
-@app.get('/stats/')
+@app.get('/teams/')
 def stats_directory_site():
     teams = [(i.name, i.nice_name()) for i in competition.teams]
     return render_template("stats.html", teams=teams), 200
 
 
-@app.get('/stats/<team_name>')
+@app.get('/teams/<team_name>')
 def stats_site(team_name):
     team = [i for i in competition.teams if team_name == i.nice_name()][0]
     recent_games = []
@@ -170,7 +170,7 @@ def stats_site(team_name):
                            players=players, teamNameClean=team.nice_name(), recent_games=recent_games), 200
 
 
-@app.get('/game/<game_id>')
+@app.get('/games/<game_id>/')
 def game_site(game_id):
     if int(game_id) >= len(competition.fixtures.games_to_list()):
         raise Exception("Game Does not exist!!")
@@ -193,6 +193,24 @@ def ladder_site():
              sorted(competition.teams, key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])))]
     headers = ["Team Names"] + [i for i in competition.teams[0].get_stats()]
     return render_template("ladder.html", headers=headers, teams=teams), 200
+
+
+@app.get('/officials/<nice_name>/')
+def official_site(nice_name):
+    official = [i for i in competition.officials.officials if i.nice_name() == nice_name][0]
+    recent_games = []
+    for i in competition.fixtures.games_to_list():
+        if official != i.primary_official:
+            continue
+        recent_games.append((repr(i) + f" ({i.score_string()})", i.id))
+    return render_template("official.html", name=official.name,
+                           stats=[(k, v) for k, v in official.get_stats().items()], games=recent_games), 200
+
+
+@app.get('/officials/')
+def official_directory_site():
+    official = [(i, i.nice_name()) for i in competition.officials.officials]
+    return render_template("all_officials.html", officials=official), 200
 
 
 @app.get('/rules/')

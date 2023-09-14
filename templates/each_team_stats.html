@@ -8,7 +8,7 @@
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <a href="http://handball-tourney.zapto.org/stats/{{teamNameClean}}">
+    <a href="http://handball-tourney.zapto.org/teams/{{teamNameClean}}">
         <img src="http://handball-tourney.zapto.org/api/teams/image?name={{teamNameClean}}" class="team_logo"></a>
     <h1>Statistics for {{teamName}}</h1>
     <table class="table">
@@ -40,7 +40,7 @@
 <div style="top:70px;left:66% ; position: absolute;width: 33%">
     <h2>Recent Matches</h2>
     {% for line in recent_games %}
-    <p style="color: black;"><a class = "hide" href="http://handball-tourney.zapto.org/game/{{line[1]}}">{{line[0]}}</a></p>
+    <p style="color: black;"><a class = "hide" href="http://handball-tourney.zapto.org/games/{{line[1]}}">{{line[0]}}</a></p>
     {% endfor %}
 </div>
 

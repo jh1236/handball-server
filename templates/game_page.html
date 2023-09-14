@@ -11,18 +11,18 @@
     <h1>{{teams[0].name}} vs {{teams[1].name}} </h1>
     <h1 class="big">{{teams[0].score}} - {{teams[1].score}}</h1>
     <p><b>Round:</b> <i>{{roundNumber}}</i></p>
-    <p><b>Match Official:</b> <i>{{official}}</i></p>
+    <p><b>Match Official:</b> <a class = "hide" href = "http://handball-tourney.zapto.org/officials/{{official.nice_name()}}"><i>{{official}}</i></a></p>
     <p><b>Best on Court:</b> <i>{{best}}</i></p>
     <br>
     <table class="table">
         <tr>
-            <th><a href="http://handball-tourney.zapto.org/stats/{{teams[0].nice_name()}}"
+            <th><a href="http://handball-tourney.zapto.org/teams/{{teams[0].nice_name()}}"
                    class="hide"><img
                     src="http://handball-tourney.zapto.org/api/teams/image?name={{teams[0].nice_name()}}"
                     class="team_logo"
                     style="display: inline;left:70%;vertical-align:middle;"></a></th>
             <th style="color:#e0ffe0">Another spacer..</th>
-            <th><a href="http://handball-tourney.zapto.org/stats/{{teams[1].nice_name()}}"
+            <th><a href="http://handball-tourney.zapto.org/teams/{{teams[1].nice_name()}}"
                    class="hide"><img
                     src="http://handball-tourney.zapto.org/api/teams/image?name={{teams[1].nice_name()}}"
                     class="team_logo"
@@ -35,9 +35,9 @@
     <table class="table">
         <tr>
             <td></td>
-            <th colspan="2"><b><a href="http://handball-tourney.zapto.org/stats/{{teams[0].nice_name()}}"
+            <th colspan="2"><b><a href="http://handball-tourney.zapto.org/teams/{{teams[0].nice_name()}}"
                                   class="hide">{{teams[0].name}}</a></b></th>
-            <th colspan="2"><b><a href="http://handball-tourney.zapto.org/stats/{{teams[1].nice_name()}}"
+            <th colspan="2"><b><a href="http://handball-tourney.zapto.org/teams/{{teams[1].nice_name()}}"
                                   class="hide">{{teams[1].name}}</a></b></th>
             <th style="color:#e0ffe0">Spacerrrrrrr</th>
         </tr>

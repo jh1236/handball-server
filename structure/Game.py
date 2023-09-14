@@ -74,6 +74,8 @@ class Game:
             self.best_player = [i for i in self.players() if i.name == best_player][0]
             self.best_player.best_player()
             [i.end() for i in self.teams]
+            self.primary_official.games_umpired += 1
+            self.primary_official.rounds_umpired += self.rounds
 
     def in_progress(self):
         return self.started and not self.best_player

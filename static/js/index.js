@@ -28,5 +28,6 @@ function addToNavBar(display, link) {
 
 addToNavBar("Home", "http://handball-tourney.zapto.org/")
 addToNavBar("Ladder", "http://handball-tourney.zapto.org/ladder")
-addToNavBar("Teams", "http://handball-tourney.zapto.org/stats")
+addToNavBar("Teams", "http://handball-tourney.zapto.org/teams")
+addToNavBar("Officials", "http://handball-tourney.zapto.org/officials")
 addToNavBar("Rules", "http://handball-tourney.zapto.org/rules")

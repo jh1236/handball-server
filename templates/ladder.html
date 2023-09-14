@@ -20,11 +20,11 @@
     <tbody>
     {% for i, link, team in teams %}
     <tr>
-        <th><a href="http://handball-tourney.zapto.org/stats/{{link}}" class="hide"
+        <th><a href="http://handball-tourney.zapto.org/teams/{{link}}" class="hide"
                style="left: 30%;"><img
                 src="http://handball-tourney.zapto.org/api/teams/image?name={{link}}" class="team_logo"
                 style="display: inline;left:70%;width: 50px;height: 50px;vertical-align:middle;"></a></th>
-        <th style="text-align: left;"><a href="http://handball-tourney.zapto.org/stats/{{link}}"
+        <th style="text-align: left;"><a href="http://handball-tourney.zapto.org/teams/{{link}}"
                                          class="hide">{{i}}</a>
         </th>
         {% for stat in team %}
