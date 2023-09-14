@@ -2,7 +2,7 @@
 :root {
     --font-family: "Lexend Deca", sans-serif;
     --color-bg: #e0ffe0;
-    --color-text: hsl(210,8%,25%);
+    --color-text: hsl(210, 8%, 25%);
 }
 
 body {
@@ -15,7 +15,7 @@ body {
     text-align: center;
 }
 
-/* Fixtures table and its contents */ 
+/* Fixtures table and its contents */
 .table {
     background-color: var(--color-bg);
     color: var(--color-text);
@@ -24,6 +24,11 @@ body {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+}
+
+a.hide {
+    text-decoration: none;
+    color: inherit;
 }
 
 .table tr td:first-child {
@@ -42,6 +47,7 @@ body {
 .table tr td:nth-child(4) {
     width: 120px;
 }
+
 .table tr td:nth-child(5) {
     width: 80px;
 }

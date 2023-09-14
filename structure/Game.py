@@ -175,7 +175,7 @@ class Game:
         self.game_string = game_string
 
     def fixture_to_table_row(self):
-        return [self.teams[0], self.teams[1], self.primary_official, self.score_string()]
+        return [self.teams[0], self.teams[1], self.score_string(), self.id]
 
     def __repr__(self):
         return f"{self.teams[0]} vs {self.teams[1]}"

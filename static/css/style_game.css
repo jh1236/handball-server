@@ -1,0 +1,40 @@
+@import "style.css";
+
+h1.big {
+    font-size: 100px;
+}
+
+.table tr td:first-child {
+    width: 120px;
+}
+
+.table tr td:nth-child(2) {
+    width: 120px;
+    text-align: center;
+}
+
+.table tr td:nth-child(3) {
+    width: 120px;
+}
+
+.table tr td:nth-child(4) {
+    width: 120px;
+}
+
+.table tr td:nth-child(5) {
+    width: 120px;
+}
+
+.table tr td:nth-child(6) {
+    width: 120px;
+}
+
+.table tr td:nth-child(7) {
+    width: 120px;
+}
+
+
+img.team_logo {
+    width: 200px;
+    height: 200px;
+}

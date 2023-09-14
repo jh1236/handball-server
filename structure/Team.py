@@ -12,6 +12,9 @@ class Team:
         self.games_won: int = 0
         self.games_played: int = 0
         self.tournament = None
+        self.green_cards: int = 0
+        self.yellow_cards: int = 0
+        self.red_cards: int = 0
 
     def get_game_team(self, game: Game):
         return GameTeam(self, game)
@@ -32,6 +35,9 @@ class Team:
         points_for = self.points_for + sum([i.score for i in game_teams])
         points_against = self.points_against + sum([i.opponent.score for i in game_teams])
         dif = points_for - points_against
+        green_cards = self.green_cards + sum([i.green_cards for i in game_teams])
+        yellow_cards = self.yellow_cards + sum([i.yellow_cards for i in game_teams])
+        red_cards = self.red_cards + sum([i.red_cards for i in game_teams])
         d = {
             "Games Played": self.games_played,
             "Games Won": self.games_won,
@@ -39,10 +45,16 @@ class Team:
             "Points For": points_for,
             "Points Against": points_against,
             "Point Difference": dif,
+            "Green Cards": green_cards,
+            "Yellow Cards": yellow_cards,
+            "Red Cards": red_cards,
         }
         if include_players:
             d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]
         return d
+
+    def nice_name(self):
+        return self.name.lower().replace(" ", "_")
 
 
 BYE = Team("BYE", [])
@@ -55,7 +67,9 @@ class GameTeam:
         self.team: Team = team
         self.name: str = self.team.name
         self.players: list[GamePlayer] = [i.game_player() for i in team.players]
-
+        self.green_cards: int = 0
+        self.yellow_cards: int = 0
+        self.red_cards: int = 0
         self.green_carded: bool = False
         self.serving: bool = False
         self.score: int = 0
@@ -74,6 +88,9 @@ class GameTeam:
         self.score = 0
         self.serving = False
         self.time_outs = 2
+        self.green_cards = 0
+        self.yellow_cards = 0
+        self.red_cards = 0
         [i.reset() for i in self.players]
 
     def start(self, serve_first: bool, swap_players: bool):
@@ -108,10 +125,12 @@ class GameTeam:
 
     def green_card(self, first_player: bool):
         self.green_carded = True
+        self.green_cards += 1
         self.players[not first_player].green_card()
         self.game.add_to_game_string("g" + ("l" if first_player else "r"), self)
 
     def yellow_card(self, first_player: bool, time: int = 3):
+        self.yellow_cards += 1
         self.players[not first_player].yellow_card(time)
         if time == 3:
             self.game.add_to_game_string("y" + ("l" if first_player else "r"), self)
@@ -121,6 +140,7 @@ class GameTeam:
             self.opponent.score_point()
 
     def red_card(self, first_player: bool):
+        self.red_cards += 1
         self.players[not first_player].red_card()
         self.game.add_to_game_string(f"v{'l' if first_player else 'r'}", self)
         while all([i.is_carded() for i in self.players]) and not self.game.game_ended():
@@ -146,3 +166,19 @@ class GameTeam:
         self.team.games_played += 1
         self.team.games_won += self.game.winner() == self.team
         self.team.teams_played.append(self.opponent.team)
+        self.team.green_cards += self.green_cards
+        self.team.yellow_cards += self.yellow_cards
+        self.team.red_cards += self.red_cards
+
+    def nice_name(self):
+        return self.team.nice_name()
+
+    def get_stats(self, include_players=False):
+        d = {
+            "Green Cards": self.green_cards,
+            "Yellow Cards": self.yellow_cards,
+            "Red Cards": self.red_cards,
+        }
+        if include_players:
+            d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]
+        return d

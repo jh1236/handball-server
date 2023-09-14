@@ -112,3 +112,19 @@ class GamePlayer:
         self.player.yellow_cards += self.yellow_cards
         self.player.red_cards += self.red_cards
         self.player.votes += self.best
+
+    def tidy_name(self):
+        first, second = self.name.split(" ")
+        first = first[0] + ". "
+        return first + second
+
+    def get_stats(self):
+        return {
+            "Points Scored": self.points_scored,
+            "Aces": self.aces_scored,
+            "Rounds Played": self.time_on_court,
+            "Rounds On Bench": self.time_carded,
+            "Green Cards": self.green_cards,
+            "Yellow Cards": self.yellow_cards,
+            "Red Cards": self.red_cards,
+        }

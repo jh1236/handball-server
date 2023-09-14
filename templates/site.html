@@ -1,37 +1,39 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Handball Tournament</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    </head>
-    <body>
-    <div id="navBar"></div>
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-        <h1>Fixtures</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th><b>First Team</b></th>
-                    <th></th>
-                    <th><b>Second Team</b></th>
-                    <th><b>Official</b></th>
-                    <th><b>Result</b></th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for i, round in fixtures %}
-                <tr><th>Round {{i + 1}}</th></tr>
-                {% for game in round %}
-                <tr>
-                    <td>{{ game[0] }}</td>
-                    <td> vs </td>
-                    <td>{{ game[1] }}</td>
-                    <td><i>{{ game[2] }}</i></td>
-                    <td>{{ game[3] }}</td>
-                </tr>
-                {% endfor %}
-            {% endfor %}
-            </tbody>
-        </table>
-    </body>
+<head>
+    <title>Handball Tournament</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<h1>Fixtures</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th><b>First Team</b></th>
+        <th></th>
+        <th><b>Second Team</b></th>
+        <th><b>Official</b></th>
+        <th><b>Result</b></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i, round in fixtures %}
+    <tr>
+        <th>Round {{i + 1}}</th>
+    </tr>
+    {% for game in round %}
+
+    <tr>
+        <td><a href="http://handball-tourney.zapto.org/game/{{game[3]}}" class="hide">{{ game[0] }}</a></td>
+        <td><a href="http://handball-tourney.zapto.org/game/{{game[3]}}" class="hide"> vs</a></td>
+        <td><a href="http://handball-tourney.zapto.org/game/{{game[3]}}" class="hide">{{ game[1] }}</a></td>
+        <td><a href="http://handball-tourney.zapto.org/game/{{game[3]}}" class="hide">{{ game[2] }}</a></td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+    </tbody>
+</table>
+</body>
 </html>

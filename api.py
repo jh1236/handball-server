@@ -24,7 +24,7 @@ def image():
 @app.get('/api/teams/stats')
 def stats():
     team_name = request.args.get("name", type=str)
-    team = [i for i in competition.teams if team_name == i.name.lower().replace(" ", "_")][0]
+    team = [i for i in competition.teams if team_name == i.nice_name()][0]
     return team.get_stats(include_players=True)
 
 
@@ -139,22 +139,34 @@ def site():
 
 @app.get('/stats/')
 def stats_directory_site():
-    teams = [(i.name, i.name.lower().replace(" ", "_")) for i in competition.teams]
+    teams = [(i.name, i.nice_name()) for i in competition.teams]
     return render_template("stats.html", teams=teams), 200
 
 
 @app.get('/stats/<team_name>')
 def stats_site(team_name):
-    team = [i for i in competition.teams if team_name == i.name.lower().replace(" ", "_")][0]
+    team = [i for i in competition.teams if team_name == i.nice_name()][0]
     players = [(i.name, [(k, v) for k, v in i.get_stats().items()]) for i in team.players]
     return render_template("each_team_stats.html", stats=[(k, v) for k, v in team.get_stats().items()],
                            teamName=team.name,
-                           players=players, teamNameClean=team.name.lower().replace(" ", "_")), 200
+                           players=players, teamNameClean=team.nice_name()), 200
+
+
+@app.get('/game/<game_id>')
+def game_site(game_id):
+    game = competition.fixtures.get_game(int(game_id))
+    teams = game.teams
+    team_dicts = [i.get_stats() for i in teams]
+    stats = [(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]]
+    players = [i for i in game.players()]
+    player_stats = [(i, *[j.get_stats()[i] for j in players]) for i in players[0].get_stats()]
+    return render_template("game_page.html", players=[i.tidy_name() for i in players],
+                           teams=teams, stats=stats, player_stats=player_stats, official=game.primary_official), 200
 
 
 @app.get('/ladder/')
 def ladder_site():
-    teams = [(i.name, i.name.lower().replace(" ", "_"), [(k, v) for k, v in i.get_stats().items()]) for i in
+    teams = [(i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()]) for i in
              sorted(competition.teams, key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])))]
     headers = [
         "Team Name",
