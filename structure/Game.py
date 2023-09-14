@@ -165,6 +165,8 @@ class Game:
                 team.yellow_card(first)
             elif c == 'v':
                 team.red_card(first)
+            elif c == 'f':
+                team.fault()
             elif c == 't':
                 team.timeout()
             elif c.isdigit():

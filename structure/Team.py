@@ -79,6 +79,7 @@ class GameTeam:
         self.score: int = 0
         self.swapped: bool = False
         self.first_player_serves: bool = True
+        self.faulted: bool = False
 
     def __eq__(self, other):
         return isinstance(other, GameTeam) and other.name == self.name
@@ -107,6 +108,7 @@ class GameTeam:
         self.players = [i.game_player() for i in players]
 
     def next_point(self):
+        self.faulted = False
         [i.next_point() for i in self.players]
 
     def lost_point(self):
@@ -125,6 +127,15 @@ class GameTeam:
             string += "l" if first_player else "r"
             self.game.add_to_game_string(string, self)
         self.game.next_point()
+
+    def fault(self):
+        self.players[not self.first_player_serves].fault()
+        self.game.add_to_game_string("f" + ("l" if self.first_player_serves else "r"), self)
+        if self.faulted:
+            self.players[not self.first_player_serves].double_fault()
+            self.opponent.score_point()
+        else:
+            self.faulted = True
 
     def green_card(self, first_player: bool):
         self.green_carded = True

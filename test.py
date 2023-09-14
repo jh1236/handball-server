@@ -67,6 +67,13 @@ def card(game_id, color, first_team, first_player, time=3):
     return "", 204
 
 
+def fault(game_id, first_team):
+    competition.fixtures.get_game(game_id).teams[not first_team].fault()
+    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
+    return "", 204
+
+
 game_id = 0
 random = Random()
 game_count = 20
@@ -85,7 +92,7 @@ while game_id < game_count:
         competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
         continue
     competition.fixtures.get_game(game_id)
-    code = random.randint(0, 10)
+    code = random.randint(0, 11)
     if code <= 7:
         score(game_id, r_bool(), r_bool(), r_bool())
     elif code <= 9:
@@ -93,6 +100,8 @@ while game_id < game_count:
         card(game_id, choice, r_bool(), r_bool())
     elif code == 10:
         timeout(game_id, r_bool())
+    elif code == 11:
+        fault(game_id, r_bool())
 for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
     print(f"{i}: {t.name}")
 

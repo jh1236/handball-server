@@ -101,6 +101,17 @@ def timeout():
     return "", 204
 
 
+@app.post('/api/games/update/fault')
+def fault():
+    print(request.json)
+    first_team = request.json["firstTeam"]
+    game_id = request.json["id"]
+    competition.fixtures.get_game(game_id).teams[not first_team].fault()
+    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
+    return "", 204
+
+
 @app.post('/api/games/update/undo')
 def undo():
     print(request.json)

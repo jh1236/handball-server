@@ -2,6 +2,8 @@ class Player:
     def __init__(self, name: str):
         self.tournament = None
         self.name = name
+        self.faults: int = 0
+        self.double_faults:int = 0
         self.points_scored: int = 0
         self.aces_scored: int = 0
         self.green_cards: int = 0
@@ -30,10 +32,14 @@ class Player:
         red_cards = self.red_cards + sum([i.red_cards for i in game_teams])
         time_on_court = self.time_on_court + sum([i.time_on_court for i in game_teams])
         time_carded = self.time_carded + sum([i.time_carded for i in game_teams])
+        faults = self.faults + sum([i.faults for i in game_teams])
+        double_faults = self.double_faults + sum([i.double_faults for i in game_teams])
         return {
             "B&F Votes": self.votes,
             "Points scored": points_scored,
             "Aces scored": aces_scored,
+            "Faults": faults,
+            "Double Faults": double_faults,
             "Green cards": green_cards,
             "Yellow cards": yellow_cards,
             "Red cards": red_cards,
@@ -47,8 +53,10 @@ class Player:
 
 class GamePlayer:
     def __init__(self, player: Player):
+        self.double_faults: int = 0
         self.player: Player = player
-        self.name = self.player.name
+        self.name: str = self.player.name
+        self.faults: int = 0
         self.points_scored: int = 0
         self.aces_scored: int = 0
         self.time_on_court: int = 0
@@ -122,9 +130,17 @@ class GamePlayer:
         return {
             "Points Scored": self.points_scored,
             "Aces": self.aces_scored,
+            "Faults": self.faults,
+            "Double Faults": self.double_faults,
             "Rounds Played": self.time_on_court,
             "Rounds On Bench": self.time_carded,
             "Green Cards": self.green_cards,
             "Yellow Cards": self.yellow_cards,
             "Red Cards": self.red_cards,
         }
+
+    def fault(self):
+        self.faults += 1
+
+    def double_fault(self):
+        self.double_faults += 1

@@ -1,28 +1,43 @@
 {
   "score": [
-    "%p scored",
-    "%o got styled on by %p",
+    "%p scored.",
+    "%o got styled on by %p.",
     "%p just embarrassed %r...",
-    "Great placement by %p, really just out skilled %r"
+    "That was some atrocious defending by %r.",
+    "Great placement by %p, really just out skilled %r.",
+    "%o just got rolled. Try a little harder.",
+    "A simply undefendable hit by %p."
   ],
   "ace": [
     "%p just hit an ace!",
-    "%p just zinged one past %a",
+    "An un-returnable serve from %p.",
+    "I bet %p has been working on that serve for a while...",
+    "%p just zinged one past %r.",
     "And another ace for %p! They're on fire today!"
   ],
   "green": [
-    "%p was green carded"
+    "%p was green carded.",
+    "%p thought green meant go?",
+    "%p, YOU cANT SAy tHAT!"
   ],
   "yellow": [
-    "%p was yellow carded",
+    "%p was yellow carded.",
+    "%p needed a break...",
     "%p was yellow carded.  Good luck %q..."
   ],
   "red": [
-    "%p was red carded",
+    "%p was red carded.",
+    "%p trusts %q so much, they got carded out!",
     "%p was red carded.  Disgraceful Play."
   ],
   "timeout": [
-    "%t called a timeout",
-    "%t has taken a tactical regathering"
+    "%t called a timeout.",
+    "%t is out picking daisies.",
+    "%t is off with the fairies.",
+    "%p got hit in the family jewels and needs a break.",
+    "%t has taken a tactical regathering."
+  ],
+  "fault": [
+    "%p faulted."
   ]
 }
