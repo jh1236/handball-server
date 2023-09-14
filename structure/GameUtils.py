@@ -9,7 +9,7 @@ with open("./resources/taunts.json") as fp:
 
 
 def game_string_to_commentary(game: Game) -> list[str]:
-    rand = Random()
+    rand = Random(game.id)
     player_names = {
         "L": game.players()[0].tidy_name(),
         "R": game.players()[1].tidy_name(),
