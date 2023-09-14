@@ -3,6 +3,7 @@
 .table tr {
     height: 50px;
 }
+
 .table tr td:first-child {
     width: 140px;
     float: left;
@@ -29,5 +30,17 @@
 }
 
 .table tr td:nth-child(7) {
+    width: 120px;
+}
+
+.table tr td:nth-child(8) {
+    width: 120px;
+}
+
+.table tr td:nth-child(9) {
+    width: 120px;
+}
+
+.table tr td:nth-child(10) {
     width: 120px;
 }

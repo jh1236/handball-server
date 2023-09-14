@@ -2,11 +2,13 @@
   "score": [
     "%p scored",
     "%o got styled on by %p",
-    "%p just embarrassed %r..."
+    "%p just embarrassed %r...",
+    "Great placement by %p, really just out skilled %r"
   ],
   "ace": [
     "%p just hit an ace!",
-    "%p just zinged one past %a"
+    "%p just zinged one past %a",
+    "And another ace for %p! They're on fire today!"
   ],
   "green": [
     "%p was green carded"

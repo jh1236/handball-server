@@ -34,6 +34,7 @@ class Game:
         self.teams: list = [team_one.get_game_team(self), team_two.get_game_team(self)]
         self.first_team_serves: bool = False
         self.primary_official = None
+        self.round_number: int = 0
 
     def set_primary_official(self, o):
         o.games_officiated += 1

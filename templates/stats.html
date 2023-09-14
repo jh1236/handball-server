@@ -7,9 +7,8 @@
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<h1>Statistics</h1>
+<h1>Teams</h1>
 {% for team in teams %}
-<p>
 <table class="table">
     <tr>
         <td style="width:100px;"><a href="http://handball-tourney.zapto.org/stats/{{team[1]}}"
@@ -21,7 +20,6 @@
 
         <td style="width:200px;"><a href="http://handball-tourney.zapto.org/stats/{{team[1]}}" class="hide"><h3>{{team[0]}}</h3></a></td>
     </tr>
-    </p>
 </table>
 
 {% endfor %}

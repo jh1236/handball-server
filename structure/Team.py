@@ -44,13 +44,13 @@ class Team:
             "Games Played": self.games_played,
             "Games Won": self.games_won,
             "Games Lost": self.games_played - self.games_won,
-            "Points For": points_for,
-            "Points Against": points_against,
-            "Point Difference": dif,
             "Green Cards": green_cards,
             "Yellow Cards": yellow_cards,
             "Red Cards": red_cards,
             "Timeouts Called": timeouts,
+            "Points For": points_for,
+            "Points Against": points_against,
+            "Point Difference": dif
         }
         if include_players:
             d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]

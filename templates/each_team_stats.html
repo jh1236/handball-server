@@ -7,33 +7,42 @@
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<a href="http://handball-tourney.zapto.org/stats/{{teamNameClean}}">
-    <img src="http://handball-tourney.zapto.org/api/teams/image?name={{teamNameClean}}" class="team_logo"></a>
-<h1>Statistics for {{teamName}}</h1>
-<table class="table">
-    <tbody>
-    {% for stat in stats %}
-    <tr>
-        <th>{{ stat[0] }}:</th>
-        <td></td>
-        <td>{{ stat[1] }}</td>
-    </tr>
+<div style="top:0;left:0;bottom: 100%;width: 66%">
+    <a href="http://handball-tourney.zapto.org/stats/{{teamNameClean}}">
+        <img src="http://handball-tourney.zapto.org/api/teams/image?name={{teamNameClean}}" class="team_logo"></a>
+    <h1>Statistics for {{teamName}}</h1>
+    <table class="table">
+        <tbody>
+        {% for stat in stats %}
+        <tr>
+            <th>{{ stat[0] }}:</th>
+            <td></td>
+            <td>{{ stat[1] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% for player in players %}
+    <h3>Statistics for {{player[0]}}</h3>
+    <table class="table">
+        <tbody>
+        {% for stat in player[1] %}
+        <tr>
+            <th>{{ stat[0] }}:</th>
+            <td></td>
+            <td>{{ stat[1] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     {% endfor %}
-    </tbody>
-</table>
-{% for player in players %}
-<h3>Statistics for {{player[0]}}</h3>
-<table class="table">
-    <tbody>
-    {% for stat in player[1] %}
-    <tr>
-        <th>{{ stat[0] }}:</th>
-        <td></td>
-        <td>{{ stat[1] }}</td>
-    </tr>
+</div>
+<div style="top:70px;left:66% ; position: absolute;width: 33%">
+    <h2>Recent Matches</h2>
+    {% for line in recent_games %}
+    <p style="color: black;"><a class = "hide" href="http://handball-tourney.zapto.org/game/{{line[1]}}">{{line[0]}}</a></p>
     {% endfor %}
-    </tbody>
-</table>
-{% endfor %}
+</div>
+
 </body>
 </html>

@@ -147,39 +147,40 @@ def stats_directory_site():
 @app.get('/stats/<team_name>')
 def stats_site(team_name):
     team = [i for i in competition.teams if team_name == i.nice_name()][0]
+    recent_games = []
+    for i in competition.fixtures.games_to_list():
+        if team not in [j.team for j in i.teams] or not i.started:
+            continue
+        recent_games.append((repr(i) + f" ({i.score_string()})", i.id))
+
     players = [(i.name, [(k, v) for k, v in i.get_stats().items()]) for i in team.players]
     return render_template("each_team_stats.html", stats=[(k, v) for k, v in team.get_stats().items()],
                            teamName=team.name,
-                           players=players, teamNameClean=team.nice_name()), 200
+                           players=players, teamNameClean=team.nice_name(), recent_games=recent_games), 200
 
 
 @app.get('/game/<game_id>')
 def game_site(game_id):
+    if int(game_id) >= len(competition.fixtures.games_to_list()):
+        raise Exception("Game Does not exist!!")
     game = competition.fixtures.get_game(int(game_id))
     teams = game.teams
     team_dicts = [i.get_stats() for i in teams]
     stats = [(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]]
     best = game.best_player.tidy_name() if game.best_player else "TBD"
     players = [i for i in game.players()]
+    roundNumber = game.round_number + 1
     player_stats = [(i, *[j.get_stats()[i] for j in players]) for i in players[0].get_stats()]
     return render_template("game_page.html", players=[i.tidy_name() for i in players],
                            teams=teams, stats=stats, player_stats=player_stats, official=game.primary_official,
-                           commentary=game_string_to_commentary(game), best=best), 200
+                           commentary=game_string_to_commentary(game), best=best, roundNumber=roundNumber), 200
 
 
 @app.get('/ladder/')
 def ladder_site():
     teams = [(i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()]) for i in
              sorted(competition.teams, key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])))]
-    headers = [
-        "Team Name",
-        "Games Played",
-        "Games Won",
-        "Games Lost",
-        "Points For",
-        "Points Against",
-        "Point Difference",
-    ]
+    headers = ["Team Names"] + [i for i in competition.teams[0].get_stats()]
     return render_template("ladder.html", headers=headers, teams=teams), 200
 
 
