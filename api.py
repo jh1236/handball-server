@@ -189,10 +189,49 @@ def game_site(game_id):
 
 @app.get('/ladder/')
 def ladder_site():
-    teams = [(i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()]) for i in
+    priority = {
+        "Team Names": 1,
+        "Games Played": 2,
+        "Games Won": 1,
+        "Games Lost": 3,
+        "Green Cards": 5,
+        "Yellow Cards": 4,
+        "Red Cards": 4,
+        "Faults": 5,
+        "Timeouts Called": 5,
+        "Points For": 5,
+        "Points Against": 5,
+        "Point Difference": 2,
+    }
+    teams = [(i.name, i.nice_name(), [(v, priority[k]) for k, v in i.get_stats().items()]) for i in
              sorted(competition.teams, key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])))]
-    headers = ["Team Names"] + [i for i in competition.teams[0].get_stats()]
-    return render_template("ladder.html", headers=headers, teams=teams), 200
+    headers = [(i, priority[i]) for i in (["Team Names"] + [i for i in competition.teams[0].get_stats()])]
+    return render_template("ladder.html", headers=[(i - 1, k, v) for i, (k, v) in enumerate(headers)], teams=teams), 200
+
+
+@app.get('/players/')
+def players_site():
+    priority = {
+        "Name": 1,
+        "B&F Votes": 1,
+        "Points scored": 2,
+        "Aces scored": 2,
+        "Faults": 5,
+        "Double Faults": 5,
+        "Green Cards": 4,
+        "Yellow Cards": 3,
+        "Red Cards": 3,
+        "Rounds on Court": 5,
+        "Rounds Carded": 5,
+    }
+    all_players = []
+    for i in sorted(competition.teams, key=lambda a: a.name):
+        all_players += sorted(i.players, key=lambda a: a.name)
+    print(all_players)
+    teams = [(i.name, i.team.nice_name(), [(v, priority[k]) for k, v in i.get_stats().items()]) for i in all_players]
+    headers = ["Name"] + [i for i in competition.teams[0].players[0].get_stats()]
+    return render_template("players.html", headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
+                           teams=teams), 200
 
 
 @app.get('/officials/<nice_name>/')
@@ -202,7 +241,7 @@ def official_site(nice_name):
     for i in competition.fixtures.games_to_list():
         if official != i.primary_official:
             continue
-        recent_games.append((repr(i) + f" ({i.score_string()})", i.id))
+        recent_games.append((f"Round {i.round_number + 1}: {repr(i)} ({i.score_string()})", i.id))
     return render_template("official.html", name=official.name,
                            stats=[(k, v) for k, v in official.get_stats().items()], games=recent_games), 200
 
@@ -216,6 +255,11 @@ def official_directory_site():
 @app.get('/rules/')
 def rules():
     return send_file("./resources/rules.pdf"), 200
+
+
+@app.get('/code_of_conduct/')
+def code_of_conduct():
+    return send_file("./resources/code_of_conduct.pdf"), 200
 
 
 if __name__ == "__main__":

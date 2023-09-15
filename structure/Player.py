@@ -1,9 +1,10 @@
 class Player:
     def __init__(self, name: str):
         self.tournament = None
+        self.team = None
         self.name = name
         self.faults: int = 0
-        self.double_faults:int = 0
+        self.double_faults: int = 0
         self.points_scored: int = 0
         self.aces_scored: int = 0
         self.green_cards: int = 0
@@ -40,12 +41,15 @@ class Player:
             "Aces scored": aces_scored,
             "Faults": faults,
             "Double Faults": double_faults,
-            "Green cards": green_cards,
-            "Yellow cards": yellow_cards,
-            "Red cards": red_cards,
-            "Time on court": f"{time_on_court} rounds",
-            "Time Carded": f"{time_carded} rounds",
+            "Green Cards": green_cards,
+            "Yellow Cards": yellow_cards,
+            "Red Cards": red_cards,
+            "Rounds on Court": time_on_court,
+            "Rounds Carded": time_carded,
         }
+
+    def nice_name(self):
+        return self.name.lower().replace(" ", "_")
 
     def game_player(self):
         return GamePlayer(self)
@@ -75,6 +79,9 @@ class GamePlayer:
 
     def best_player(self):
         self.best = True
+
+    def nice_name(self):
+        return self.player.nice_name()
 
     def green_card(self):
         self.green_cards += 1
@@ -119,6 +126,8 @@ class GamePlayer:
         self.player.green_cards += self.green_cards
         self.player.yellow_cards += self.yellow_cards
         self.player.red_cards += self.red_cards
+        self.player.faults += self.faults
+        self.player.double_faults += self.double_faults
         self.player.votes += self.best
 
     def tidy_name(self):

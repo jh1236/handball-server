@@ -8,7 +8,7 @@
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
-<h1>Ladder</h1>
+<h1>Players</h1>
 <table class="table" id="sort">
     <thead>
     <tr>
@@ -19,7 +19,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for i, link, team in teams %}
+    {% for i, link, player in teams %}
     <tr>
         <th><a href="http://handball-tourney.zapto.org/teams/{{link}}" class="hide"
                style="left: 30%;"><img
@@ -28,7 +28,7 @@
         <th style="text-align: left;"><a href="http://handball-tourney.zapto.org/teams/{{link}}"
                                          class="hide">{{i}}</a>
         </th>
-        {% for stat, p in team %}
+        {% for stat, p in player %}
         <td class="priority-{{p}}">{{ stat }}</td>
         {% endfor %}
     </tr>

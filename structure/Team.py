@@ -6,6 +6,8 @@ class Team:
     def __init__(self, name: str, players: list[Player]):
         self.name = name
         self.players: list[Player] = players
+        for i in players:
+            i.team = self
         self.teams_played: list[Team] = []
         self.points_against: int = 0
         self.points_for: int = 0
@@ -15,6 +17,7 @@ class Team:
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
+        self.faults: int = 0
         self.timeouts: int = 0
 
     def get_game_team(self, game: Game):
@@ -39,7 +42,8 @@ class Team:
         green_cards = self.green_cards + sum([i.green_cards for i in game_teams])
         yellow_cards = self.yellow_cards + sum([i.yellow_cards for i in game_teams])
         red_cards = self.red_cards + sum([i.red_cards for i in game_teams])
-        timeouts = self.timeouts + sum([(2 - i.timeouts) for i in game_teams])
+        timeouts = self.timeouts + sum([(1 - i.timeouts) for i in game_teams])
+        faults = self.faults + sum([i.faults for i in game_teams])
         d = {
             "Games Played": self.games_played,
             "Games Won": self.games_won,
@@ -47,6 +51,7 @@ class Team:
             "Green Cards": green_cards,
             "Yellow Cards": yellow_cards,
             "Red Cards": red_cards,
+            "Faults": faults,
             "Timeouts Called": timeouts,
             "Points For": points_for,
             "Points Against": points_against,
@@ -73,10 +78,11 @@ class GameTeam:
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
-        self.timeouts: int = 2
+        self.timeouts: int = 1
         self.green_carded: bool = False
         self.serving: bool = False
         self.score: int = 0
+        self.faults: int = 0
         self.swapped: bool = False
         self.first_player_serves: bool = True
         self.faulted: bool = False
@@ -91,10 +97,11 @@ class GameTeam:
         self.green_carded = False
         self.score = 0
         self.serving = False
-        self.timeouts = 2
+        self.timeouts = 1
         self.green_cards = 0
         self.yellow_cards = 0
         self.red_cards = 0
+        self.faults = 0
         [i.reset() for i in self.players]
 
     def start(self, serve_first: bool, swap_players: bool):
@@ -131,6 +138,7 @@ class GameTeam:
     def fault(self):
         self.players[not self.first_player_serves].fault()
         self.game.add_to_game_string("f" + ("l" if self.first_player_serves else "r"), self)
+        self.faults += 1
         if self.faulted:
             self.players[not self.first_player_serves].double_fault()
             self.opponent.score_point()
@@ -183,10 +191,12 @@ class GameTeam:
         self.team.green_cards += self.green_cards
         self.team.yellow_cards += self.yellow_cards
         self.team.red_cards += self.red_cards
-        self.team.timeouts += (2 - self.timeouts)
+        self.team.faults += self.faults
+        self.team.timeouts += (1 - self.timeouts)
         self.game.primary_official.green_cards += self.green_cards
         self.game.primary_official.yellow_cards += self.yellow_cards
         self.game.primary_official.red_cards += self.red_cards
+        self.game.primary_official.faults += self.faults
 
     def nice_name(self):
         return self.team.nice_name()

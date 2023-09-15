@@ -6,10 +6,12 @@
     "That was some atrocious defending by %r.",
     "Great placement by %p, really just out skilled %r.",
     "%o just got rolled. Try a little harder.",
-    "A simply undefendable hit by %p."
+    "A simply un-defendable hit by %p.",
+    "A massive hit by %p! Dora has some running to do...",
+    "That ball went miles away! Good luck finding it %o..."
   ],
   "ace": [
-    "%p just hit an ace!",
+    "%p hit an ace.",
     "An un-returnable serve from %p.",
     "I bet %p has been working on that serve for a while...",
     "%p just zinged one past %r.",
@@ -27,17 +29,22 @@
   ],
   "red": [
     "%p was red carded.",
+    "It's fine. %p didn't wanna play anyway.",
     "%p trusts %q so much, they got carded out!",
-    "%p was red carded.  Disgraceful Play."
+    "%p was red carded.  Disgraceful Play.",
+    "Yikes! Someone should warn %p that %u is not gonna like that..."
   ],
   "timeout": [
     "%t called a timeout.",
     "%t is out picking daisies.",
     "%t is off with the fairies.",
     "%p got hit in the family jewels and needs a break.",
-    "%t has taken a tactical regathering."
+    "%t has taken a tactical regathering.",
+    "STOP! and wait 30 seconds for %t's timeout."
   ],
   "fault": [
-    "%p faulted."
+    "%p faulted.",
+    "%p didn't know that you're meant to serve diagonal.",
+    "Just reminding you %p, the ball needs to land in the court."
   ]
 }

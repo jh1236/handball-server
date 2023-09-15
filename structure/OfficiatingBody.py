@@ -10,6 +10,7 @@ class Official:
         self.games_officiated: int = 0
         self.primary: bool = primary
         self.games_umpired = 0
+        self.faults: int = 0
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
@@ -28,8 +29,10 @@ class Official:
             "Green Cards Given": self.green_cards,
             "Yellow Cards Given": self.yellow_cards,
             "Red Cards Given": self.red_cards,
+            "Cards Given": self.red_cards + self.yellow_cards + self.green_cards,
+            "Faults Called": self.faults,
             "Games Umpired": self.games_umpired,
-            "Rounds Umpired": self.rounds_umpired
+            "Rounds Umpired": self.rounds_umpired,
         }
 
 
