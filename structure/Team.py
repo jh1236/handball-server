@@ -34,6 +34,7 @@ class Team:
 
     def reset(self):
         self.teams_played: list[Team] = []
+        [i.reset() for i in self.players]
         self.points_against: int = 0
         self.points_for: int = 0
         self.games_won: int = 0

@@ -54,6 +54,20 @@ class Player:
     def game_player(self):
         return GamePlayer(self)
 
+    def reset(self):
+        self.faults = 0
+        self.double_faults = 0
+        self.points_scored = 0
+        self.aces_scored = 0
+        self.green_cards = 0
+        self.yellow_cards = 0
+        self.votes = 0
+        self.red_cards = 0
+        self.time_on_court = 0
+        self.time_carded = 0
+        self.rounds_played = 0
+        self.rounds_carded = 0
+
 
 class GamePlayer:
     def __init__(self, player: Player):
