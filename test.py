@@ -4,7 +4,7 @@ import api
 from tournaments.Tournament import Tournament
 
 competition: Tournament = api.competition
-competition.dump()
+competition.load()
 print(competition.teams)
 
 

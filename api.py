@@ -190,8 +190,16 @@ def game_site(game_id):
     best = game.best_player.tidy_name() if game.best_player else "TBD"
     players = [i for i in game.players()]
     roundNumber = game.round_number + 1
+    if not game.started:
+        status = "Waiting for toss"
+    elif not game.game_ended():
+        status = "Game in Progress"
+    elif not game.best_player:
+        status = "Finished"
+    else:
+        status = "Official"
     player_stats = [(i, *[j.get_stats()[i] for j in players]) for i in players[0].get_stats()]
-    return render_template("game_page.html", players=[i.tidy_name() for i in players],
+    return render_template("game_page.html", game=game, status=status, players=[i.tidy_name() for i in players],
                            teams=teams, stats=stats, player_stats=player_stats, official=game.primary_official,
                            commentary=game_string_to_commentary(game), best=best, roundNumber=roundNumber), 200
 

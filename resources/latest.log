@@ -54,3 +54,1973 @@
 [INFO: ] Request for end: {'id': 0, 'bestPlayer': 'Brigitte Gredziuk'}
 [WARN: ] Game The Breaking Bad Bois vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
 [INFO: ] (Game 0) game 0 is over! Winner was simps, Best Player is brigitte_gredziuk
+[INFO: ] Request for end: {'id': 0, 'bestPlayer': ''}
+[WARN: ] Game The Breaking Bad Bois vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 0) game 0 is over! Winner was simps, Best Player is brigitte_gredziuk
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for score: {'id': 0, 'firstTeam': False, 'firstPlayer': True, 'ace': False}
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 0 - 0
+[INFO: ] Request for score: {'id': 0, 'firstTeam': True, 'firstPlayer': False, 'ace': False}
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 1
+[INFO: ] Request for ace: {'id': 0, 'firstTeam': True}
+[INFO: ] (Game 0) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 1 - 1
+[INFO: ] Request for ace: {'id': 0, 'firstTeam': True}
+[INFO: ] (Game 0) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 1
+[INFO: ] Request for card: {'id': 0, 'firstTeam': True, 'firstPlayer': True, 'color': 'green', 'time': 3}
+[INFO: ] (Game 0) Green Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        1       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for card: {'id': 0, 'firstTeam': True, 'firstPlayer': False, 'color': 'red', 'time': 3}
+[INFO: ] (Game 0) Red Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 1
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 2
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 3
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 4
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 5
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 6
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 7
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 8
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 9
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 10
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |       11       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for end: {'id': 0, 'bestPlayer': 'Olivia Stronach'}
+[WARN: ] Game The Breaking Bad Bois vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 0) game 0 is over! Winner was simps, Best Player is olivia_stronach
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 0 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 1
+[INFO: ] (Game 0) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 1 - 1
+[INFO: ] (Game 0) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 1
+[INFO: ] (Game 0) Green Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        1       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 0 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 1
+[INFO: ] (Game 0) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 1 - 1
+[INFO: ] (Game 0) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 1
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        1       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 0 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 1
+[INFO: ] (Game 0) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 1 - 1
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       2       |        1       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 0 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 1
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       1       |        1       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 0 - 0
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        1       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for start: {'id': 0, 'firstTeamServed': True, 'swapTeamOne': False, 'swapTeamTwo': True}
+[INFO: ] (Game 0) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[INFO: ] Request for ace: {'id': 0, 'firstTeam': True}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] Request for ace: {'id': 0, 'firstTeam': True}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] Request for score: {'id': 0, 'firstTeam': True, 'firstPlayer': False, 'ace': False}
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 0
+[INFO: ] Request for score: {'id': 0, 'firstTeam': False, 'firstPlayer': False, 'ace': False}
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 3 - 0
+[INFO: ] Request for ace: {'id': 0, 'firstTeam': False}
+[INFO: ] (Game 0) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 1
+[INFO: ] Request for score: {'id': 0, 'firstTeam': False, 'firstPlayer': True, 'ace': False}
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 3 - 2
+[INFO: ] Request for card: {'id': 0, 'firstTeam': True, 'firstPlayer': True, 'color': 'red', 'time': 3}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        3       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for card: {'id': 0, 'firstTeam': True, 'firstPlayer': False, 'color': 'red', 'time': 3}
+[INFO: ] (Game 0) Red Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 3
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 4
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 5
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 6
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 7
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 8
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 9
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 10
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |       11       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for end: {'id': 0, 'bestPlayer': 'James Sharpham'}
+[WARN: ] Game The Breaking Bad Bois vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 0) game 0 is over! Winner was simps, Best Player is james_sharpham
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 0
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 3 - 0
+[INFO: ] (Game 0) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 1
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 3 - 2
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        3       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 0
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 3 - 0
+[INFO: ] (Game 0) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 1
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 3 - 2
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for card: {'id': 0, 'firstTeam': True, 'firstPlayer': True, 'color': 'red', 'time': 3}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        3       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for card: {'id': 0, 'firstTeam': True, 'firstPlayer': False, 'color': 'red', 'time': 3}
+[INFO: ] (Game 0) Red Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 3
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 4
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 5
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 6
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 7
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 8
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 9
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 3 - 10
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |       11       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for end: {'id': 0, 'bestPlayer': 'James Sharpham'}
+[INFO: ] (Game 0) game 0 is over! Winner was simps, Best Player is james_sharpham
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 0
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 3 - 0
+[INFO: ] (Game 0) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 1
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 3 - 2
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        3       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 0
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 3 - 0
+[INFO: ] (Game 0) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 1
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 3 - 2
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 0
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 3 - 0
+[INFO: ] (Game 0) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 1
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        2       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 0
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 3 - 0
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        1       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 0) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 0
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       3       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 0
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       2       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 0
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       1       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for start: {'id': 0, 'firstTeamServed': True, 'swapTeamOne': False, 'swapTeamTwo': False}
+[INFO: ] (Game 0) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[INFO: ] Request for undo: {'id': 0}
+[INFO: ] (Game 0) Undoing Game start
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 0) Started, james_sharpham serving from team breaking_bad_bois
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 0 - 0
+[INFO: ] (Game 0) Timeout called by breaking_bad_bois
+[INFO: ] (Game 0) Fault by a_random_hinge_guy from team simps
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        1       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 0 - 1
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 2
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 1 - 2
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 1 - 3
+[INFO: ] (Game 0) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 4
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 2 - 4
+[INFO: ] (Game 0) Timeout called by simps
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 2 - 5
+[INFO: ] (Game 0) Ace Scored by a_random_hinge_guy from team simps. Score is 2 - 6
+[INFO: ] (Game 0) Green Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 2 - 7
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 2 - 8
+[INFO: ] (Game 0) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 2 - 9
+[INFO: ] (Game 0) Point Scored by olivia_stronach from team simps. Score is 3 - 9
+[INFO: ] (Game 0) Red Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 0) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 3 - 10
+[INFO: ] (Game 0) Point Scored by a_random_hinge_guy from team simps. Score is 4 - 10
+[INFO: ] (Game 0) game 0 is over! Winner was simps, Best Player is james_sharpham
+[INFO: ] (Game 1) Started, will_prozerska serving from team google_workers
+[INFO: ] (Game 1) Timeout called by blaaergh
+[INFO: ] (Game 1) Timeout called by google_workers
+[INFO: ] (Game 1) Ace Scored by will_prozerska from team google_workers. Score is 0 - 0
+[INFO: ] (Game 1) Green Card for lachie_banks from team google_workers
+[INFO: ] (Game 1) Ace Scored by will_prozerska from team google_workers. Score is 0 - 1
+[INFO: ] (Game 1) Red Card for liam_cooper from team blaaergh
+[INFO: ] (Game 1) Ace Scored by liam_cooper from team blaaergh. Score is 0 - 2
+[INFO: ] (Game 1) Yellow Card for lachie_banks from team google_workers
+[INFO: ] (Game 1) Ace Scored by liam_cooper from team blaaergh. Score is 1 - 2
+[INFO: ] (Game 1) Point Scored by will_prozerska from team google_workers. Score is 2 - 2
+[INFO: ] (Game 1) Timeout called by blaaergh
+[INFO: ] (Game 1) Point Scored by will_prozerska from team google_workers. Score is 2 - 3
+[INFO: ] (Game 1) Fault by lachie_banks from team google_workers
+[INFO: ]             Blaaergh    | Google Workers 
+[INFO: ] score   :       2       |        4       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:      -1       |        0       
+[INFO: ] (Game 1) Timeout called by google_workers
+[INFO: ] (Game 1) Point Scored by will_prozerska from team google_workers. Score is 2 - 4
+[INFO: ] (Game 1) Point Scored by eva_hajigabriel from team blaaergh. Score is 2 - 5
+[INFO: ] (Game 1) Yellow Card for will_prozerska from team google_workers
+[INFO: ] (Game 1) Timeout called by blaaergh
+[INFO: ] (Game 1) Yellow Card for lachie_banks from team google_workers
+[INFO: ] (Game 1) Penalty Point Awarded to team blaaergh.  Score is 3 - 5
+[INFO: ] (Game 1) Penalty Point Awarded to team blaaergh.  Score is 4 - 5
+[INFO: ] (Game 1) Penalty Point Awarded to team blaaergh.  Score is 5 - 5
+[INFO: ] (Game 1) Ace Scored by will_prozerska from team google_workers. Score is 6 - 5
+[INFO: ] (Game 1) Ace Scored by lachie_banks from team google_workers. Score is 6 - 6
+[INFO: ] (Game 1) Ace Scored by lachie_banks from team google_workers. Score is 6 - 7
+[INFO: ] (Game 1) Timeout called by google_workers
+[INFO: ] (Game 1) Timeout called by blaaergh
+[INFO: ] (Game 1) Yellow Card for eva_hajigabriel from team blaaergh
+[INFO: ] (Game 1) Penalty Point Awarded to team google_workers.  Score is 6 - 8
+[INFO: ] (Game 1) Penalty Point Awarded to team google_workers.  Score is 6 - 9
+[INFO: ] (Game 1) Penalty Point Awarded to team google_workers.  Score is 6 - 10
+[INFO: ] (Game 1) game 1 is over! Winner was google_workers, Best Player is liam_cooper
+[INFO: ] (Game 2) Started, tristan_nel serving from team satnavs
+[INFO: ] (Game 2) Point Scored by sean_robinson from team seanitha. Score is 0 - 0
+[INFO: ] (Game 2) Ace Scored by nick_burvil from team satnavs. Score is 0 - 1
+[INFO: ] (Game 2) Fault by nick_burvil from team satnavs
+[INFO: ]              Satnavs    |    Seanitha    
+[INFO: ] score   :       1       |        1       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 2) Point Scored by tristan_nel from team satnavs. Score is 1 - 1
+[INFO: ] (Game 2) Point Scored by sean_robinson from team seanitha. Score is 2 - 1
+[INFO: ] (Game 2) Green Card for nick_burvil from team satnavs
+[INFO: ] (Game 2) Ace Scored by nick_burvil from team satnavs. Score is 2 - 2
+[INFO: ] (Game 2) Point Scored by tabitha_blechynden from team seanitha. Score is 3 - 2
+[INFO: ] (Game 2) Point Scored by tristan_nel from team satnavs. Score is 3 - 3
+[INFO: ] (Game 2) Fault by nick_burvil from team satnavs
+[INFO: ]              Satnavs    |    Seanitha    
+[INFO: ] score   :       4       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 2) Fault by nick_burvil from team satnavs
+[INFO: ] (Game 2) Penalty Point Awarded to team seanitha.  Score is 4 - 3
+[INFO: ]              Satnavs    |    Seanitha    
+[INFO: ] score   :       4       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 2) Green Card for sean_robinson from team seanitha
+[INFO: ] (Game 2) Fault by sean_robinson from team seanitha
+[INFO: ]              Satnavs    |    Seanitha    
+[INFO: ] score   :       4       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 2) Ace Scored by nick_burvil from team satnavs. Score is 4 - 4
+[INFO: ] (Game 2) Fault by tristan_nel from team satnavs
+[INFO: ]              Satnavs    |    Seanitha    
+[INFO: ] score   :       5       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 2) Ace Scored by sean_robinson from team seanitha. Score is 5 - 4
+[INFO: ] (Game 2) Timeout called by satnavs
+[INFO: ] (Game 2) Point Scored by tabitha_blechynden from team seanitha. Score is 5 - 5
+[INFO: ] (Game 2) Ace Scored by sean_robinson from team seanitha. Score is 5 - 6
+[INFO: ] (Game 2) Point Scored by nick_burvil from team satnavs. Score is 5 - 7
+[INFO: ] (Game 2) Ace Scored by sean_robinson from team seanitha. Score is 6 - 7
+[INFO: ] (Game 2) Fault by nick_burvil from team satnavs
+[INFO: ]              Satnavs    |    Seanitha    
+[INFO: ] score   :       6       |        8       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 2) Ace Scored by tabitha_blechynden from team seanitha. Score is 6 - 8
+[INFO: ] (Game 2) Fault by sean_robinson from team seanitha
+[INFO: ]              Satnavs    |    Seanitha    
+[INFO: ] score   :       6       |        9       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 2) Point Scored by sean_robinson from team seanitha. Score is 6 - 9
+[INFO: ] (Game 2) Ace Scored by sean_robinson from team seanitha. Score is 6 - 10
+[INFO: ] (Game 2) game 2 is over! Winner was seanitha, Best Player is tristan_nel
+[INFO: ] (Game 3) Started, jamie_dymmott serving from team sleeby
+[INFO: ] (Game 3) Ace Scored by james_saunders from team sleeby. Score is 0 - 0
+[INFO: ] (Game 3) Point Scored by zebiah_peaker from team tradies. Score is 1 - 0
+[INFO: ] (Game 3) Ace Scored by ethan_dal_molin from team tradies. Score is 1 - 1
+[INFO: ] (Game 3) Point Scored by zebiah_peaker from team tradies. Score is 1 - 2
+[INFO: ] (Game 3) Ace Scored by zebiah_peaker from team tradies. Score is 1 - 3
+[INFO: ] (Game 3) Point Scored by zebiah_peaker from team tradies. Score is 1 - 4
+[INFO: ] (Game 3) Point Scored by zebiah_peaker from team tradies. Score is 1 - 5
+[INFO: ] (Game 3) Timeout called by sleeby
+[INFO: ] (Game 3) Ace Scored by ethan_dal_molin from team tradies. Score is 1 - 6
+[INFO: ] (Game 3) Ace Scored by jamie_dymmott from team sleeby. Score is 1 - 7
+[INFO: ] (Game 3) Ace Scored by ethan_dal_molin from team tradies. Score is 2 - 7
+[INFO: ] (Game 3) Ace Scored by james_saunders from team sleeby. Score is 2 - 8
+[INFO: ] (Game 3) Ace Scored by james_saunders from team sleeby. Score is 3 - 8
+[INFO: ] (Game 3) Ace Scored by ethan_dal_molin from team tradies. Score is 4 - 8
+[INFO: ] (Game 3) Ace Scored by zebiah_peaker from team tradies. Score is 4 - 9
+[INFO: ] (Game 3) Point Scored by ethan_dal_molin from team tradies. Score is 4 - 10
+[INFO: ] (Game 3) game 3 is over! Winner was tradies, Best Player is jamie_dymmott
+[INFO: ] (Game 4) Started, michael_russ serving from team whipped
+[INFO: ] (Game 4) Ace Scored by michael_russ from team whipped. Score is 0 - 0
+[INFO: ] (Game 4) Point Scored by dora_wan from team whipped. Score is 0 - 1
+[INFO: ] (Game 4) Timeout called by officials
+[INFO: ] (Game 4) Point Scored by jared_healy from team officials. Score is 0 - 2
+[INFO: ] (Game 4) Point Scored by jared_healy from team officials. Score is 1 - 2
+[INFO: ] (Game 4) Fault by jared_healy from team officials
+[INFO: ]           The Officials |     Whipped    
+[INFO: ] score   :       2       |        2       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 4) Timeout called by whipped
+[INFO: ] (Game 4) Point Scored by michael_russ from team whipped. Score is 2 - 2
+[INFO: ] (Game 4) Ace Scored by michael_russ from team whipped. Score is 2 - 3
+[INFO: ] (Game 4) Ace Scored by alex_soudure from team officials. Score is 2 - 4
+[INFO: ] (Game 4) Green Card for dora_wan from team whipped
+[INFO: ] (Game 4) Point Scored by alex_soudure from team officials. Score is 3 - 4
+[INFO: ] (Game 4) Ace Scored by jared_healy from team officials. Score is 4 - 4
+[INFO: ] (Game 4) Point Scored by alex_soudure from team officials. Score is 5 - 4
+[INFO: ] (Game 4) Yellow Card for jared_healy from team officials
+[INFO: ] (Game 4) Point Scored by michael_russ from team whipped. Score is 6 - 4
+[INFO: ] (Game 4) Point Scored by dora_wan from team whipped. Score is 6 - 5
+[INFO: ] (Game 4) Point Scored by michael_russ from team whipped. Score is 6 - 6
+[INFO: ] (Game 4) Ace Scored by alex_soudure from team officials. Score is 6 - 7
+[INFO: ] (Game 4) Timeout called by whipped
+[INFO: ] (Game 4) Red Card for alex_soudure from team officials
+[INFO: ] (Game 4) Ace Scored by alex_soudure from team officials. Score is 7 - 7
+[INFO: ] (Game 4) Point Scored by jared_healy from team officials. Score is 8 - 7
+[INFO: ] (Game 4) Ace Scored by jared_healy from team officials. Score is 9 - 7
+[INFO: ] (Game 4) Ace Scored by alex_soudure from team officials. Score is 10 - 7
+[INFO: ] (Game 4) game 4 is over! Winner was officials, Best Player is jared_healy
+[INFO: ] (Game 5) Started, olivia_stronach serving from team simps
+[INFO: ] (Game 5) Ace Scored by will_prozerska from team google_workers. Score is 0 - 0
+[INFO: ] (Game 5) Timeout called by simps
+[INFO: ] (Game 5) Point Scored by will_prozerska from team google_workers. Score is 0 - 1
+[INFO: ] (Game 5) Point Scored by olivia_stronach from team simps. Score is 0 - 2
+[INFO: ] (Game 5) Ace Scored by a_random_hinge_guy from team simps. Score is 1 - 2
+[INFO: ] (Game 5) Ace Scored by a_random_hinge_guy from team simps. Score is 2 - 2
+[INFO: ] (Game 5) Point Scored by will_prozerska from team google_workers. Score is 3 - 2
+[INFO: ] (Game 5) Point Scored by lachie_banks from team google_workers. Score is 3 - 3
+[INFO: ] (Game 5) Point Scored by lachie_banks from team google_workers. Score is 3 - 4
+[INFO: ] (Game 5) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 5
+[INFO: ] (Game 5) Timeout called by google_workers
+[INFO: ] (Game 5) Red Card for olivia_stronach from team simps
+[INFO: ] (Game 5) Ace Scored by lachie_banks from team google_workers. Score is 4 - 5
+[INFO: ] (Game 5) Ace Scored by olivia_stronach from team simps. Score is 4 - 6
+[INFO: ] (Game 5) Point Scored by lachie_banks from team google_workers. Score is 5 - 6
+[INFO: ] (Game 5) Yellow Card for lachie_banks from team google_workers
+[INFO: ] (Game 5) Ace Scored by will_prozerska from team google_workers. Score is 5 - 7
+[INFO: ] (Game 5) Ace Scored by will_prozerska from team google_workers. Score is 5 - 8
+[INFO: ] (Game 5) Ace Scored by olivia_stronach from team simps. Score is 5 - 9
+[INFO: ] (Game 5) Green Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 5) Fault by olivia_stronach from team simps
+[INFO: ]               Simps     | Google Workers 
+[INFO: ] score   :       6       |        9       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       0       |        0       
+[INFO: ] (Game 5) Red Card for will_prozerska from team google_workers
+[INFO: ] (Game 5) Green Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 5) Ace Scored by lachie_banks from team google_workers. Score is 6 - 9
+[INFO: ] (Game 5) Point Scored by will_prozerska from team google_workers. Score is 6 - 10
+[INFO: ] (Game 5) game 5 is over! Winner was google_workers, Best Player is olivia_stronach
+[INFO: ] (Game 6) Started, ethan_dal_molin serving from team tradies
+[INFO: ] (Game 6) Point Scored by tabitha_blechynden from team seanitha. Score is 0 - 0
+[INFO: ] (Game 6) Point Scored by sean_robinson from team seanitha. Score is 1 - 0
+[INFO: ] (Game 6) Point Scored by tabitha_blechynden from team seanitha. Score is 2 - 0
+[INFO: ] (Game 6) Ace Scored by ethan_dal_molin from team tradies. Score is 3 - 0
+[INFO: ] (Game 6) Timeout called by seanitha
+[INFO: ] (Game 6) Point Scored by sean_robinson from team seanitha. Score is 3 - 1
+[INFO: ] (Game 6) Ace Scored by sean_robinson from team seanitha. Score is 4 - 1
+[INFO: ] (Game 6) Point Scored by sean_robinson from team seanitha. Score is 5 - 1
+[INFO: ] (Game 6) Point Scored by tabitha_blechynden from team seanitha. Score is 6 - 1
+[INFO: ] (Game 6) Red Card for ethan_dal_molin from team tradies
+[INFO: ] (Game 6) Ace Scored by zebiah_peaker from team tradies. Score is 7 - 1
+[INFO: ] (Game 6) Ace Scored by zebiah_peaker from team tradies. Score is 7 - 2
+[INFO: ] (Game 6) Green Card for sean_robinson from team seanitha
+[INFO: ] (Game 6) Fault by ethan_dal_molin from team tradies
+[INFO: ]             Seanitha    |   The Tradies  
+[INFO: ] score   :       7       |        3       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 6) Timeout called by tradies
+[INFO: ] (Game 6) Green Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 6) Fault by sean_robinson from team seanitha
+[INFO: ]             Seanitha    |   The Tradies  
+[INFO: ] score   :       7       |        3       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       0       |        0       
+[INFO: ] (Game 6) Timeout called by tradies
+[INFO: ] (Game 6) Ace Scored by ethan_dal_molin from team tradies. Score is 7 - 3
+[INFO: ] (Game 6) Ace Scored by zebiah_peaker from team tradies. Score is 7 - 4
+[INFO: ] (Game 6) Yellow Card for zebiah_peaker from team tradies
+[INFO: ] (Game 6) Penalty Point Awarded to team seanitha.  Score is 7 - 5
+[INFO: ] (Game 6) Penalty Point Awarded to team seanitha.  Score is 8 - 5
+[INFO: ] (Game 6) Penalty Point Awarded to team seanitha.  Score is 9 - 5
+[INFO: ] (Game 6) Point Scored by sean_robinson from team seanitha. Score is 10 - 5
+[INFO: ] (Game 6) game 6 is over! Winner was seanitha, Best Player is tabitha_blechynden
+[INFO: ] (Game 7) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[INFO: ] (Game 7) Ace Scored by alex_soudure from team officials. Score is 0 - 0
+[INFO: ] (Game 7) Point Scored by jared_healy from team officials. Score is 1 - 0
+[INFO: ] (Game 7) Ace Scored by alex_soudure from team officials. Score is 2 - 0
+[INFO: ] (Game 7) Green Card for jared_healy from team officials
+[INFO: ] (Game 7) Point Scored by james_sharpham from team breaking_bad_bois. Score is 3 - 0
+[INFO: ] (Game 7) Fault by james_sharpham from team breaking_bad_bois
+[INFO: ]           The Officials | The Breaking Bad Bois
+[INFO: ] score   :       3       |        1       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 7) Ace Scored by jared_healy from team officials. Score is 3 - 1
+[INFO: ] (Game 7) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 4 - 1
+[INFO: ] (Game 7) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 4 - 2
+[INFO: ] (Game 7) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 4 - 3
+[INFO: ] (Game 7) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 4 - 4
+[INFO: ] (Game 7) Point Scored by james_sharpham from team breaking_bad_bois. Score is 4 - 5
+[INFO: ] (Game 7) Point Scored by jared_healy from team officials. Score is 4 - 6
+[INFO: ] (Game 7) Timeout called by breaking_bad_bois
+[INFO: ] (Game 7) Point Scored by alex_soudure from team officials. Score is 5 - 6
+[INFO: ] (Game 7) Ace Scored by alex_soudure from team officials. Score is 6 - 6
+[INFO: ] (Game 7) Yellow Card for jared_healy from team officials
+[INFO: ] (Game 7) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 7 - 6
+[INFO: ] (Game 7) Point Scored by alex_soudure from team officials. Score is 7 - 7
+[INFO: ] (Game 7) Point Scored by alex_soudure from team officials. Score is 8 - 7
+[INFO: ] (Game 7) Point Scored by jared_healy from team officials. Score is 9 - 7
+[INFO: ] (Game 7) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 10 - 7
+[INFO: ] (Game 7) Point Scored by james_sharpham from team breaking_bad_bois. Score is 10 - 8
+[INFO: ] (Game 7) Ace Scored by alex_soudure from team officials. Score is 10 - 9
+[INFO: ] (Game 7) game 7 is over! Winner was officials, Best Player is jared_healy
+[INFO: ] (Game 8) Started, nick_burvil serving from team satnavs
+[INFO: ] (Game 8) Fault by liam_cooper from team blaaergh
+[INFO: ]             Blaaergh    |     Satnavs    
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 8) Ace Scored by nick_burvil from team satnavs. Score is 0 - 0
+[INFO: ] (Game 8) Fault by liam_cooper from team blaaergh
+[INFO: ]             Blaaergh    |     Satnavs    
+[INFO: ] score   :       0       |        1       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 8) Ace Scored by nick_burvil from team satnavs. Score is 0 - 1
+[INFO: ] (Game 8) Green Card for tristan_nel from team satnavs
+[INFO: ] (Game 8) Yellow Card for liam_cooper from team blaaergh
+[INFO: ] (Game 8) Ace Scored by eva_hajigabriel from team blaaergh. Score is 0 - 2
+[INFO: ] (Game 8) Ace Scored by eva_hajigabriel from team blaaergh. Score is 1 - 2
+[INFO: ] (Game 8) Point Scored by liam_cooper from team blaaergh. Score is 2 - 2
+[INFO: ] (Game 8) Point Scored by nick_burvil from team satnavs. Score is 3 - 2
+[INFO: ] (Game 8) Fault by tristan_nel from team satnavs
+[INFO: ]             Blaaergh    |     Satnavs    
+[INFO: ] score   :       3       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 8) Point Scored by eva_hajigabriel from team blaaergh. Score is 3 - 3
+[INFO: ] (Game 8) Yellow Card for eva_hajigabriel from team blaaergh
+[INFO: ] (Game 8) Timeout called by satnavs
+[INFO: ] (Game 8) Timeout called by satnavs
+[INFO: ] (Game 8) Ace Scored by nick_burvil from team satnavs. Score is 4 - 3
+[INFO: ] (Game 8) Red Card for eva_hajigabriel from team blaaergh
+[INFO: ] (Game 8) Point Scored by tristan_nel from team satnavs. Score is 4 - 4
+[INFO: ] (Game 8) Timeout called by blaaergh
+[INFO: ] (Game 8) Ace Scored by liam_cooper from team blaaergh. Score is 4 - 5
+[INFO: ] (Game 8) Ace Scored by nick_burvil from team satnavs. Score is 5 - 5
+[INFO: ] (Game 8) Point Scored by eva_hajigabriel from team blaaergh. Score is 5 - 6
+[INFO: ] (Game 8) Timeout called by blaaergh
+[INFO: ] (Game 8) Green Card for liam_cooper from team blaaergh
+[INFO: ] (Game 8) Fault by tristan_nel from team satnavs
+[INFO: ]             Blaaergh    |     Satnavs    
+[INFO: ] score   :       6       |        6       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:      -1       |       -1       
+[INFO: ] (Game 8) Ace Scored by eva_hajigabriel from team blaaergh. Score is 6 - 6
+[INFO: ] (Game 8) Point Scored by eva_hajigabriel from team blaaergh. Score is 7 - 6
+[INFO: ] (Game 8) Fault by tristan_nel from team satnavs
+[INFO: ]             Blaaergh    |     Satnavs    
+[INFO: ] score   :       8       |        6       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:      -1       |       -1       
+[INFO: ] (Game 8) Ace Scored by tristan_nel from team satnavs. Score is 8 - 6
+[INFO: ] (Game 8) Ace Scored by eva_hajigabriel from team blaaergh. Score is 8 - 7
+[INFO: ] (Game 8) Timeout called by blaaergh
+[INFO: ] (Game 8) Point Scored by liam_cooper from team blaaergh. Score is 9 - 7
+[INFO: ] (Game 8) Fault by eva_hajigabriel from team blaaergh
+[INFO: ]             Blaaergh    |     Satnavs    
+[INFO: ] score   :      10       |        7       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:      -2       |       -1       
+[INFO: ] (Game 8) Point Scored by tristan_nel from team satnavs. Score is 10 - 7
+[INFO: ] (Game 8) Fault by tristan_nel from team satnavs
+[INFO: ]             Blaaergh    |     Satnavs    
+[INFO: ] score   :      10       |        8       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:      -2       |       -1       
+[INFO: ] (Game 8) Fault by tristan_nel from team satnavs
+[INFO: ] (Game 8) Penalty Point Awarded to team blaaergh.  Score is 10 - 8
+[INFO: ]             Blaaergh    |     Satnavs    
+[INFO: ] score   :      11       |        8       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:      -2       |       -1       
+[INFO: ] (Game 8) game 8 is over! Winner was blaaergh, Best Player is eva_hajigabriel
+[INFO: ] (Game 9) Started, michael_russ serving from team whipped
+[INFO: ] (Game 9) Point Scored by jamie_dymmott from team sleeby. Score is 0 - 0
+[INFO: ] (Game 9) Timeout called by sleeby
+[INFO: ] (Game 9) Point Scored by michael_russ from team whipped. Score is 1 - 0
+[INFO: ] (Game 9) Ace Scored by michael_russ from team whipped. Score is 1 - 1
+[INFO: ] (Game 9) Ace Scored by michael_russ from team whipped. Score is 1 - 2
+[INFO: ] (Game 9) Yellow Card for michael_russ from team whipped
+[INFO: ] (Game 9) Ace Scored by dora_wan from team whipped. Score is 1 - 3
+[INFO: ] (Game 9) Point Scored by jamie_dymmott from team sleeby. Score is 1 - 4
+[INFO: ] (Game 9) Point Scored by dora_wan from team whipped. Score is 2 - 4
+[INFO: ] (Game 9) Point Scored by james_saunders from team sleeby. Score is 2 - 5
+[INFO: ] (Game 9) Point Scored by james_saunders from team sleeby. Score is 3 - 5
+[INFO: ] (Game 9) Yellow Card for jamie_dymmott from team sleeby
+[INFO: ] (Game 9) Point Scored by michael_russ from team whipped. Score is 4 - 5
+[INFO: ] (Game 9) Ace Scored by james_saunders from team sleeby. Score is 4 - 6
+[INFO: ] (Game 9) Fault by dora_wan from team whipped
+[INFO: ]              Sleeby     |     Whipped    
+[INFO: ] score   :       5       |        6       
+[INFO: ] cards   :       1       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 9) Ace Scored by james_saunders from team sleeby. Score is 5 - 6
+[INFO: ] (Game 9) Ace Scored by dora_wan from team whipped. Score is 6 - 6
+[INFO: ] (Game 9) Fault by michael_russ from team whipped
+[INFO: ]              Sleeby     |     Whipped    
+[INFO: ] score   :       6       |        7       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 9) Fault by michael_russ from team whipped
+[INFO: ] (Game 9) Penalty Point Awarded to team sleeby.  Score is 6 - 7
+[INFO: ]              Sleeby     |     Whipped    
+[INFO: ] score   :       7       |        7       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 9) Point Scored by michael_russ from team whipped. Score is 7 - 7
+[INFO: ] (Game 9) Yellow Card for james_saunders from team sleeby
+[INFO: ] (Game 9) Ace Scored by dora_wan from team whipped. Score is 7 - 8
+[INFO: ] (Game 9) Timeout called by sleeby
+[INFO: ] (Game 9) Fault by jamie_dymmott from team sleeby
+[INFO: ]              Sleeby     |     Whipped    
+[INFO: ] score   :       7       |        9       
+[INFO: ] cards   :       2       |        0       
+[INFO: ] timeouts:      -1       |        1       
+[INFO: ] (Game 9) Ace Scored by jamie_dymmott from team sleeby. Score is 7 - 9
+[INFO: ] (Game 9) Point Scored by jamie_dymmott from team sleeby. Score is 8 - 9
+[INFO: ] (Game 9) Fault by james_saunders from team sleeby
+[INFO: ]              Sleeby     |     Whipped    
+[INFO: ] score   :       9       |        9       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:      -1       |        1       
+[INFO: ] (Game 9) Point Scored by james_saunders from team sleeby. Score is 9 - 9
+[INFO: ] (Game 9) Ace Scored by james_saunders from team sleeby. Score is 10 - 9
+[INFO: ] (Game 9) game 9 is over! Winner was sleeby, Best Player is jamie_dymmott
+[INFO: ] (Game 10) Started, will_prozerska serving from team google_workers
+[INFO: ] (Game 10) Ace Scored by sean_robinson from team seanitha. Score is 0 - 0
+[INFO: ] (Game 10) Green Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 10) Point Scored by sean_robinson from team seanitha. Score is 0 - 1
+[INFO: ] (Game 10) Point Scored by will_prozerska from team google_workers. Score is 0 - 2
+[INFO: ] (Game 10) Point Scored by lachie_banks from team google_workers. Score is 1 - 2
+[INFO: ] (Game 10) Ace Scored by tabitha_blechynden from team seanitha. Score is 2 - 2
+[INFO: ] (Game 10) Ace Scored by lachie_banks from team google_workers. Score is 2 - 3
+[INFO: ] (Game 10) Ace Scored by lachie_banks from team google_workers. Score is 3 - 3
+[INFO: ] (Game 10) Timeout called by google_workers
+[INFO: ] (Game 10) Timeout called by google_workers
+[INFO: ] (Game 10) Point Scored by will_prozerska from team google_workers. Score is 4 - 3
+[INFO: ] (Game 10) Fault by will_prozerska from team google_workers
+[INFO: ]          Google Workers |    Seanitha    
+[INFO: ] score   :       5       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:      -1       |        1       
+[INFO: ] (Game 10) Point Scored by will_prozerska from team google_workers. Score is 5 - 3
+[INFO: ] (Game 10) Point Scored by sean_robinson from team seanitha. Score is 6 - 3
+[INFO: ] (Game 10) Fault by will_prozerska from team google_workers
+[INFO: ]          Google Workers |    Seanitha    
+[INFO: ] score   :       6       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:      -1       |        1       
+[INFO: ] (Game 10) Point Scored by will_prozerska from team google_workers. Score is 6 - 4
+[INFO: ] (Game 10) Green Card for will_prozerska from team google_workers
+[INFO: ] (Game 10) Point Scored by will_prozerska from team google_workers. Score is 7 - 4
+[INFO: ] (Game 10) Point Scored by lachie_banks from team google_workers. Score is 8 - 4
+[INFO: ] (Game 10) Ace Scored by tabitha_blechynden from team seanitha. Score is 9 - 4
+[INFO: ] (Game 10) Point Scored by sean_robinson from team seanitha. Score is 9 - 5
+[INFO: ] (Game 10) Ace Scored by lachie_banks from team google_workers. Score is 9 - 6
+[INFO: ] (Game 10) Ace Scored by will_prozerska from team google_workers. Score is 10 - 6
+[INFO: ] (Game 10) game 10 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 11) Started, jared_healy serving from team officials
+[INFO: ] (Game 11) Green Card for alex_soudure from team officials
+[INFO: ] (Game 11) Green Card for alex_soudure from team officials
+[INFO: ] (Game 11) Point Scored by a_random_hinge_guy from team simps. Score is 0 - 0
+[INFO: ] (Game 11) Point Scored by olivia_stronach from team simps. Score is 0 - 1
+[INFO: ] (Game 11) Ace Scored by jared_healy from team officials. Score is 0 - 2
+[INFO: ] (Game 11) Point Scored by a_random_hinge_guy from team simps. Score is 1 - 2
+[INFO: ] (Game 11) Ace Scored by jared_healy from team officials. Score is 1 - 3
+[INFO: ] (Game 11) Green Card for olivia_stronach from team simps
+[INFO: ] (Game 11) Point Scored by alex_soudure from team officials. Score is 2 - 3
+[INFO: ] (Game 11) Green Card for olivia_stronach from team simps
+[INFO: ] (Game 11) Ace Scored by jared_healy from team officials. Score is 3 - 3
+[INFO: ] (Game 11) Yellow Card for jared_healy from team officials
+[INFO: ] (Game 11) Ace Scored by jared_healy from team officials. Score is 4 - 3
+[INFO: ] (Game 11) Point Scored by alex_soudure from team officials. Score is 5 - 3
+[INFO: ] (Game 11) Point Scored by jared_healy from team officials. Score is 6 - 3
+[INFO: ] (Game 11) Timeout called by simps
+[INFO: ] (Game 11) Point Scored by olivia_stronach from team simps. Score is 7 - 3
+[INFO: ] (Game 11) Point Scored by alex_soudure from team officials. Score is 7 - 4
+[INFO: ] (Game 11) Ace Scored by jared_healy from team officials. Score is 8 - 4
+[INFO: ] (Game 11) Fault by alex_soudure from team officials
+[INFO: ]           The Officials |      Simps     
+[INFO: ] score   :       9       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 11) Ace Scored by jared_healy from team officials. Score is 9 - 4
+[INFO: ] (Game 11) Ace Scored by jared_healy from team officials. Score is 10 - 4
+[INFO: ] (Game 11) game 11 is over! Winner was officials, Best Player is jared_healy
+[INFO: ] (Game 12) Started, jamie_dymmott serving from team sleeby
+[INFO: ] (Game 12) Fault by jamie_dymmott from team sleeby
+[INFO: ]             Blaaergh    |     Sleeby     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 12) Fault by liam_cooper from team blaaergh
+[INFO: ]             Blaaergh    |     Sleeby     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 12) Point Scored by liam_cooper from team blaaergh. Score is 0 - 0
+[INFO: ] (Game 12) Point Scored by liam_cooper from team blaaergh. Score is 1 - 0
+[INFO: ] (Game 12) Green Card for liam_cooper from team blaaergh
+[INFO: ] (Game 12) Point Scored by liam_cooper from team blaaergh. Score is 2 - 0
+[INFO: ] (Game 12) Ace Scored by jamie_dymmott from team sleeby. Score is 3 - 0
+[INFO: ] (Game 12) Ace Scored by eva_hajigabriel from team blaaergh. Score is 3 - 1
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 4 - 1
+[INFO: ] (Game 12) Timeout called by sleeby
+[INFO: ] (Game 12) Ace Scored by eva_hajigabriel from team blaaergh. Score is 5 - 1
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 6 - 1
+[INFO: ] (Game 12) Point Scored by jamie_dymmott from team sleeby. Score is 7 - 1
+[INFO: ] (Game 12) Ace Scored by jamie_dymmott from team sleeby. Score is 7 - 2
+[INFO: ] (Game 12) Fault by jamie_dymmott from team sleeby
+[INFO: ]             Blaaergh    |     Sleeby     
+[INFO: ] score   :       7       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 12) Ace Scored by james_saunders from team sleeby. Score is 7 - 3
+[INFO: ] (Game 12) Point Scored by liam_cooper from team blaaergh. Score is 7 - 4
+[INFO: ] (Game 12) Ace Scored by eva_hajigabriel from team blaaergh. Score is 8 - 4
+[INFO: ] (Game 12) Red Card for jamie_dymmott from team sleeby
+[INFO: ] (Game 12) Fault by eva_hajigabriel from team blaaergh
+[INFO: ]             Blaaergh    |     Sleeby     
+[INFO: ] score   :       9       |        4       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 9 - 4
+[INFO: ] (Game 12) Timeout called by blaaergh
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 10 - 4
+[INFO: ] (Game 12) game 12 is over! Winner was blaaergh, Best Player is eva_hajigabriel
+[INFO: ] (Game 13) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[INFO: ] (Game 13) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 13) Timeout called by breaking_bad_bois
+[INFO: ] (Game 13) Point Scored by zebiah_peaker from team tradies. Score is 0 - 1
+[INFO: ] (Game 13) Fault by brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]            The Tradies  | The Breaking Bad Bois
+[INFO: ] score   :       1       |        1       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 13) Point Scored by ethan_dal_molin from team tradies. Score is 1 - 1
+[INFO: ] (Game 13) Red Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 13) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 2 - 1
+[INFO: ] (Game 13) Point Scored by ethan_dal_molin from team tradies. Score is 2 - 2
+[INFO: ] (Game 13) Point Scored by james_sharpham from team breaking_bad_bois. Score is 3 - 2
+[INFO: ] (Game 13) Timeout called by breaking_bad_bois
+[INFO: ] (Game 13) Point Scored by zebiah_peaker from team tradies. Score is 3 - 3
+[INFO: ] (Game 13) Point Scored by ethan_dal_molin from team tradies. Score is 4 - 3
+[INFO: ] (Game 13) Fault by brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]            The Tradies  | The Breaking Bad Bois
+[INFO: ] score   :       5       |        3       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       1       |       -1       
+[INFO: ] (Game 13) Timeout called by breaking_bad_bois
+[INFO: ] (Game 13) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 5 - 3
+[INFO: ] (Game 13) Ace Scored by zebiah_peaker from team tradies. Score is 5 - 4
+[INFO: ] (Game 13) Ace Scored by ethan_dal_molin from team tradies. Score is 6 - 4
+[INFO: ] (Game 13) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 7 - 4
+[INFO: ] (Game 13) Ace Scored by zebiah_peaker from team tradies. Score is 7 - 5
+[INFO: ] (Game 13) Point Scored by james_sharpham from team breaking_bad_bois. Score is 8 - 5
+[INFO: ] (Game 13) Yellow Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 13) Penalty Point Awarded to team tradies.  Score is 8 - 6
+[INFO: ] (Game 13) Penalty Point Awarded to team tradies.  Score is 9 - 6
+[INFO: ] (Game 13) Penalty Point Awarded to team tradies.  Score is 10 - 6
+[INFO: ] (Game 13) game 13 is over! Winner was tradies, Best Player is zebiah_peaker
+[INFO: ] (Game 14) Started, tristan_nel serving from team satnavs
+[INFO: ] (Game 14) Point Scored by nick_burvil from team satnavs. Score is 0 - 0
+[INFO: ] (Game 14) Point Scored by tristan_nel from team satnavs. Score is 1 - 0
+[INFO: ] (Game 14) Timeout called by satnavs
+[INFO: ] (Game 14) Point Scored by dora_wan from team whipped. Score is 2 - 0
+[INFO: ] (Game 14) Ace Scored by dora_wan from team whipped. Score is 2 - 1
+[INFO: ] (Game 14) Ace Scored by michael_russ from team whipped. Score is 2 - 2
+[INFO: ] (Game 14) Ace Scored by michael_russ from team whipped. Score is 2 - 3
+[INFO: ] (Game 14) Point Scored by nick_burvil from team satnavs. Score is 2 - 4
+[INFO: ] (Game 14) Point Scored by dora_wan from team whipped. Score is 3 - 4
+[INFO: ] (Game 14) Fault by dora_wan from team whipped
+[INFO: ]              Satnavs    |     Whipped    
+[INFO: ] score   :       3       |        5       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 14) Point Scored by tristan_nel from team satnavs. Score is 3 - 5
+[INFO: ] (Game 14) Point Scored by nick_burvil from team satnavs. Score is 4 - 5
+[INFO: ] (Game 14) Red Card for nick_burvil from team satnavs
+[INFO: ] (Game 14) Ace Scored by dora_wan from team whipped. Score is 5 - 5
+[INFO: ] (Game 14) Fault by tristan_nel from team satnavs
+[INFO: ]              Satnavs    |     Whipped    
+[INFO: ] score   :       5       |        6       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 14) Point Scored by michael_russ from team whipped. Score is 5 - 6
+[INFO: ] (Game 14) Red Card for michael_russ from team whipped
+[INFO: ] (Game 14) Red Card for tristan_nel from team satnavs
+[INFO: ] (Game 14) Penalty Point Awarded to team whipped.  Score is 5 - 7
+[INFO: ] (Game 14) Penalty Point Awarded to team whipped.  Score is 5 - 8
+[INFO: ] (Game 14) Penalty Point Awarded to team whipped.  Score is 5 - 9
+[INFO: ] (Game 14) Penalty Point Awarded to team whipped.  Score is 5 - 10
+[INFO: ] (Game 14) game 14 is over! Winner was whipped, Best Player is tristan_nel
+[INFO: ] (Game 15) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[INFO: ] (Game 15) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 15) Green Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 15) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 0 - 1
+[INFO: ] (Game 15) Ace Scored by dora_wan from team whipped. Score is 0 - 2
+[INFO: ] (Game 15) Ace Scored by michael_russ from team whipped. Score is 1 - 2
+[INFO: ] (Game 15) Ace Scored by michael_russ from team whipped. Score is 2 - 2
+[INFO: ] (Game 15) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 3 - 2
+[INFO: ] (Game 15) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 3 - 3
+[INFO: ] (Game 15) Ace Scored by dora_wan from team whipped. Score is 3 - 4
+[INFO: ] (Game 15) Timeout called by breaking_bad_bois
+[INFO: ] (Game 15) Ace Scored by michael_russ from team whipped. Score is 4 - 4
+[INFO: ] (Game 15) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 5 - 4
+[INFO: ] (Game 15) Green Card for dora_wan from team whipped
+[INFO: ] (Game 15) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 5 - 5
+[INFO: ] (Game 15) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 5 - 6
+[INFO: ] (Game 15) Ace Scored by dora_wan from team whipped. Score is 5 - 7
+[INFO: ] (Game 15) Ace Scored by michael_russ from team whipped. Score is 6 - 7
+[INFO: ] (Game 15) Green Card for michael_russ from team whipped
+[INFO: ] (Game 15) Fault by brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]              Whipped    | The Breaking Bad Bois
+[INFO: ] score   :       7       |        7       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 15) Point Scored by michael_russ from team whipped. Score is 7 - 7
+[INFO: ] (Game 15) Red Card for dora_wan from team whipped
+[INFO: ] (Game 15) Green Card for dora_wan from team whipped
+[INFO: ] (Game 15) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 8 - 7
+[INFO: ] (Game 15) Point Scored by dora_wan from team whipped. Score is 8 - 8
+[INFO: ] (Game 15) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 9 - 8
+[INFO: ] (Game 15) Yellow Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 15) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 9 - 9
+[INFO: ] (Game 15) Green Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 15) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 9 - 10
+[INFO: ] (Game 15) game 15 is over! Winner was breaking_bad_bois, Best Player is michael_russ
+[INFO: ] (Game 16) Started, jamie_dymmott serving from team sleeby
+[INFO: ] (Game 16) Green Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 16) Green Card for jamie_dymmott from team sleeby
+[INFO: ] (Game 16) Yellow Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 16) Fault by jamie_dymmott from team sleeby
+[INFO: ]              Sleeby     |      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        3       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 16) Ace Scored by a_random_hinge_guy from team simps. Score is 0 - 0
+[INFO: ] (Game 16) Ace Scored by olivia_stronach from team simps. Score is 0 - 1
+[INFO: ] (Game 16) Red Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 16) Ace Scored by a_random_hinge_guy from team simps. Score is 0 - 2
+[INFO: ] (Game 16) Point Scored by james_saunders from team sleeby. Score is 0 - 3
+[INFO: ] (Game 16) Point Scored by jamie_dymmott from team sleeby. Score is 1 - 3
+[INFO: ] (Game 16) Point Scored by olivia_stronach from team simps. Score is 2 - 3
+[INFO: ] (Game 16) Point Scored by olivia_stronach from team simps. Score is 2 - 4
+[INFO: ] (Game 16) Point Scored by jamie_dymmott from team sleeby. Score is 2 - 5
+[INFO: ] (Game 16) Ace Scored by james_saunders from team sleeby. Score is 3 - 5
+[INFO: ] (Game 16) Ace Scored by olivia_stronach from team simps. Score is 4 - 5
+[INFO: ] (Game 16) Point Scored by james_saunders from team sleeby. Score is 4 - 6
+[INFO: ] (Game 16) Ace Scored by a_random_hinge_guy from team simps. Score is 5 - 6
+[INFO: ] (Game 16) Ace Scored by a_random_hinge_guy from team simps. Score is 5 - 7
+[INFO: ] (Game 16) Point Scored by james_saunders from team sleeby. Score is 5 - 8
+[INFO: ] (Game 16) Ace Scored by james_saunders from team sleeby. Score is 6 - 8
+[INFO: ] (Game 16) Point Scored by jamie_dymmott from team sleeby. Score is 7 - 8
+[INFO: ] (Game 16) Fault by olivia_stronach from team simps
+[INFO: ]              Sleeby     |      Simps     
+[INFO: ] score   :       8       |        8       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 16) Point Scored by jamie_dymmott from team sleeby. Score is 8 - 8
+[INFO: ] (Game 16) Red Card for olivia_stronach from team simps
+[INFO: ] (Game 16) Penalty Point Awarded to team sleeby.  Score is 9 - 8
+[INFO: ] (Game 16) Penalty Point Awarded to team sleeby.  Score is 10 - 8
+[INFO: ] (Game 16) game 16 is over! Winner was sleeby, Best Player is jamie_dymmott
+[INFO: ] (Game 17) Started, liam_cooper serving from team blaaergh
+[INFO: ] (Game 17) Red Card for zebiah_peaker from team tradies
+[INFO: ] (Game 17) Green Card for ethan_dal_molin from team tradies
+[INFO: ] (Game 17) Ace Scored by ethan_dal_molin from team tradies. Score is 0 - 0
+[INFO: ] (Game 17) Point Scored by zebiah_peaker from team tradies. Score is 1 - 0
+[INFO: ] (Game 17) Point Scored by zebiah_peaker from team tradies. Score is 2 - 0
+[INFO: ] (Game 17) Green Card for zebiah_peaker from team tradies
+[INFO: ] (Game 17) Timeout called by blaaergh
+[INFO: ] (Game 17) Ace Scored by zebiah_peaker from team tradies. Score is 3 - 0
+[INFO: ] (Game 17) Point Scored by ethan_dal_molin from team tradies. Score is 4 - 0
+[INFO: ] (Game 17) Ace Scored by eva_hajigabriel from team blaaergh. Score is 5 - 0
+[INFO: ] (Game 17) Point Scored by zebiah_peaker from team tradies. Score is 5 - 1
+[INFO: ] (Game 17) Ace Scored by liam_cooper from team blaaergh. Score is 6 - 1
+[INFO: ] (Game 17) Point Scored by zebiah_peaker from team tradies. Score is 6 - 2
+[INFO: ] (Game 17) Fault by ethan_dal_molin from team tradies
+[INFO: ]            The Tradies  |    Blaaergh    
+[INFO: ] score   :       7       |        2       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 17) Timeout called by blaaergh
+[INFO: ] (Game 17) Ace Scored by ethan_dal_molin from team tradies. Score is 7 - 2
+[INFO: ] (Game 17) Timeout called by tradies
+[INFO: ] (Game 17) Timeout called by blaaergh
+[INFO: ] (Game 17) Point Scored by zebiah_peaker from team tradies. Score is 8 - 2
+[INFO: ] (Game 17) Ace Scored by ethan_dal_molin from team tradies. Score is 9 - 2
+[INFO: ] (Game 17) Point Scored by eva_hajigabriel from team blaaergh. Score is 10 - 2
+[INFO: ] (Game 17) Green Card for liam_cooper from team blaaergh
+[INFO: ] (Game 17) Ace Scored by eva_hajigabriel from team blaaergh. Score is 10 - 3
+[INFO: ] (Game 17) Ace Scored by zebiah_peaker from team tradies. Score is 10 - 4
+[INFO: ] (Game 17) game 17 is over! Winner was tradies, Best Player is ethan_dal_molin
+[INFO: ] (Game 18) Started, sean_robinson serving from team seanitha
+[INFO: ] (Game 18) Ace Scored by jared_healy from team officials. Score is 0 - 0
+[INFO: ] (Game 18) Yellow Card for jared_healy from team officials
+[INFO: ] (Game 18) Point Scored by alex_soudure from team officials. Score is 0 - 1
+[INFO: ] (Game 18) Point Scored by alex_soudure from team officials. Score is 0 - 2
+[INFO: ] (Game 18) Point Scored by jared_healy from team officials. Score is 0 - 3
+[INFO: ] (Game 18) Ace Scored by sean_robinson from team seanitha. Score is 0 - 4
+[INFO: ] (Game 18) Timeout called by officials
+[INFO: ] (Game 18) Fault by tabitha_blechynden from team seanitha
+[INFO: ]             Seanitha    |  The Officials 
+[INFO: ] score   :       1       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 18) Point Scored by sean_robinson from team seanitha. Score is 1 - 4
+[INFO: ] (Game 18) Red Card for sean_robinson from team seanitha
+[INFO: ] (Game 18) Yellow Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 18) Penalty Point Awarded to team officials.  Score is 2 - 4
+[INFO: ] (Game 18) Penalty Point Awarded to team officials.  Score is 2 - 5
+[INFO: ] (Game 18) Penalty Point Awarded to team officials.  Score is 2 - 6
+[INFO: ] (Game 18) Point Scored by tabitha_blechynden from team seanitha. Score is 2 - 7
+[INFO: ] (Game 18) Point Scored by sean_robinson from team seanitha. Score is 3 - 7
+[INFO: ] (Game 18) Yellow Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 18) Penalty Point Awarded to team officials.  Score is 4 - 7
+[INFO: ] (Game 18) Penalty Point Awarded to team officials.  Score is 4 - 8
+[INFO: ] (Game 18) Penalty Point Awarded to team officials.  Score is 4 - 9
+[INFO: ] (Game 18) Point Scored by sean_robinson from team seanitha. Score is 4 - 10
+[INFO: ] (Game 18) Timeout called by officials
+[INFO: ] (Game 18) Point Scored by alex_soudure from team officials. Score is 5 - 10
+[INFO: ] (Game 18) game 18 is over! Winner was officials, Best Player is sean_robinson
+[INFO: ] (Game 19) Started, tristan_nel serving from team satnavs
+[INFO: ] (Game 19) Point Scored by will_prozerska from team google_workers. Score is 0 - 0
+[INFO: ] (Game 19) Ace Scored by tristan_nel from team satnavs. Score is 1 - 0
+[INFO: ] (Game 19) Point Scored by tristan_nel from team satnavs. Score is 1 - 1
+[INFO: ] (Game 19) Yellow Card for tristan_nel from team satnavs
+[INFO: ] (Game 19) Fault by nick_burvil from team satnavs
+[INFO: ]          Google Workers |     Satnavs    
+[INFO: ] score   :       1       |        2       
+[INFO: ] cards   :       0       |        3       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 19) Ace Scored by will_prozerska from team google_workers. Score is 1 - 2
+[INFO: ] (Game 19) Ace Scored by tristan_nel from team satnavs. Score is 2 - 2
+[INFO: ] (Game 19) Yellow Card for lachie_banks from team google_workers
+[INFO: ] (Game 19) Point Scored by tristan_nel from team satnavs. Score is 2 - 3
+[INFO: ] (Game 19) Timeout called by google_workers
+[INFO: ] (Game 19) Point Scored by lachie_banks from team google_workers. Score is 2 - 4
+[INFO: ] (Game 19) Ace Scored by lachie_banks from team google_workers. Score is 3 - 4
+[INFO: ] (Game 19) Fault by will_prozerska from team google_workers
+[INFO: ]          Google Workers |     Satnavs    
+[INFO: ] score   :       4       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 19) Point Scored by will_prozerska from team google_workers. Score is 4 - 4
+[INFO: ] (Game 19) Red Card for nick_burvil from team satnavs
+[INFO: ] (Game 19) Point Scored by lachie_banks from team google_workers. Score is 5 - 4
+[INFO: ] (Game 19) Point Scored by will_prozerska from team google_workers. Score is 6 - 4
+[INFO: ] (Game 19) Point Scored by lachie_banks from team google_workers. Score is 7 - 4
+[INFO: ] (Game 19) Point Scored by will_prozerska from team google_workers. Score is 8 - 4
+[INFO: ] (Game 19) Yellow Card for lachie_banks from team google_workers
+[INFO: ] (Game 19) Fault by tristan_nel from team satnavs
+[INFO: ]          Google Workers |     Satnavs    
+[INFO: ] score   :       9       |        4       
+[INFO: ] cards   :       3       |       -1       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 19) Point Scored by lachie_banks from team google_workers. Score is 9 - 4
+[INFO: ] (Game 19) Green Card for lachie_banks from team google_workers
+[INFO: ] (Game 19) Ace Scored by lachie_banks from team google_workers. Score is 10 - 4
+[INFO: ] (Game 19) game 19 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 20) Started, alex_soudure serving from team officials
+[INFO: ] (Game 0) Started, tabitha_blechynden serving from team seanitha
+[INFO: ] (Game 0) Point Scored by michael_russ from team whipped. Score is 0 - 0
+[INFO: ] (Game 0) Ace Scored by dora_wan from team whipped. Score is 1 - 0
+[INFO: ] (Game 0) Point Scored by tabitha_blechynden from team seanitha. Score is 2 - 0
+[INFO: ] (Game 0) Point Scored by michael_russ from team whipped. Score is 2 - 1
+[INFO: ] (Game 0) Ace Scored by michael_russ from team whipped. Score is 3 - 1
+[INFO: ] (Game 0) Ace Scored by sean_robinson from team seanitha. Score is 4 - 1
+[INFO: ] (Game 0) Fault by tabitha_blechynden from team seanitha
+[INFO: ]              Whipped    |    Seanitha    
+[INFO: ] score   :       4       |        2       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 0) Green Card for michael_russ from team whipped
+[INFO: ] (Game 0) Timeout called by seanitha
+[INFO: ] (Game 0) Ace Scored by sean_robinson from team seanitha. Score is 4 - 2
+[INFO: ] (Game 0) Ace Scored by michael_russ from team whipped. Score is 4 - 3
+[INFO: ] (Game 0) Fault by michael_russ from team whipped
+[INFO: ]              Whipped    |    Seanitha    
+[INFO: ] score   :       5       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 0) Green Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 0) Point Scored by dora_wan from team whipped. Score is 5 - 3
+[INFO: ] (Game 0) Timeout called by whipped
+[INFO: ] (Game 0) Ace Scored by sean_robinson from team seanitha. Score is 6 - 3
+[INFO: ] (Game 0) Point Scored by dora_wan from team whipped. Score is 6 - 4
+[INFO: ] (Game 0) Ace Scored by tabitha_blechynden from team seanitha. Score is 7 - 4
+[INFO: ] (Game 0) Ace Scored by michael_russ from team whipped. Score is 7 - 5
+[INFO: ] (Game 0) Ace Scored by sean_robinson from team seanitha. Score is 8 - 5
+[INFO: ] (Game 0) Point Scored by dora_wan from team whipped. Score is 8 - 6
+[INFO: ] (Game 0) Ace Scored by dora_wan from team whipped. Score is 9 - 6
+[INFO: ] (Game 0) Point Scored by michael_russ from team whipped. Score is 10 - 6
+[INFO: ] (Game 0) game 0 is over! Winner was whipped, Best Player is michael_russ
+[INFO: ] (Game 1) Started, james_sharpham serving from team breaking_bad_bois
+[INFO: ] (Game 1) Point Scored by james_saunders from team sleeby. Score is 0 - 0
+[INFO: ] (Game 1) Point Scored by jamie_dymmott from team sleeby. Score is 0 - 1
+[INFO: ] (Game 1) Fault by jamie_dymmott from team sleeby
+[INFO: ]          The Breaking Bad Bois|     Sleeby     
+[INFO: ] score   :       0       |        2       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 1) Point Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 2
+[INFO: ] (Game 1) Fault by brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|     Sleeby     
+[INFO: ] score   :       1       |        2       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 1) Timeout called by breaking_bad_bois
+[INFO: ] (Game 1) Fault by brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 1) Penalty Point Awarded to team sleeby.  Score is 1 - 2
+[INFO: ]          The Breaking Bad Bois|     Sleeby     
+[INFO: ] score   :       1       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 1) Ace Scored by james_saunders from team sleeby. Score is 1 - 3
+[INFO: ] (Game 1) Fault by james_saunders from team sleeby
+[INFO: ]          The Breaking Bad Bois|     Sleeby     
+[INFO: ] score   :       1       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 1) Fault by brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]          The Breaking Bad Bois|     Sleeby     
+[INFO: ] score   :       1       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 1) Point Scored by james_saunders from team sleeby. Score is 1 - 4
+[INFO: ] (Game 1) Ace Scored by jamie_dymmott from team sleeby. Score is 1 - 5
+[INFO: ] (Game 1) Point Scored by jamie_dymmott from team sleeby. Score is 1 - 6
+[INFO: ] (Game 1) Green Card for jamie_dymmott from team sleeby
+[INFO: ] (Game 1) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 7
+[INFO: ] (Game 1) Point Scored by jamie_dymmott from team sleeby. Score is 2 - 7
+[INFO: ] (Game 1) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 2 - 8
+[INFO: ] (Game 1) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 3 - 8
+[INFO: ] (Game 1) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 4 - 8
+[INFO: ] (Game 1) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 5 - 8
+[INFO: ] (Game 1) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 6 - 8
+[INFO: ] (Game 1) Ace Scored by jamie_dymmott from team sleeby. Score is 7 - 8
+[INFO: ] (Game 1) Green Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 1) Green Card for james_saunders from team sleeby
+[INFO: ] (Game 1) Timeout called by breaking_bad_bois
+[INFO: ] (Game 1) Yellow Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 1) Yellow Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 1) Fault by james_saunders from team sleeby
+[INFO: ]          The Breaking Bad Bois|     Sleeby     
+[INFO: ] score   :       7       |        9       
+[INFO: ] cards   :       6       |        0       
+[INFO: ] timeouts:      -1       |        1       
+[INFO: ] (Game 1) Yellow Card for james_saunders from team sleeby
+[INFO: ] (Game 1) Red Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 1) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 7 - 9
+[INFO: ] (Game 1) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 8 - 9
+[INFO: ] (Game 1) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 9 - 9
+[INFO: ] (Game 1) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 10 - 9
+[INFO: ] (Game 1) game 1 is over! Winner was breaking_bad_bois, Best Player is james_sharpham
+[INFO: ] (Game 2) Started, eva_hajigabriel serving from team blaaergh
+[INFO: ] (Game 2) Point Scored by a_random_hinge_guy from team simps. Score is 0 - 0
+[INFO: ] (Game 2) Fault by eva_hajigabriel from team blaaergh
+[INFO: ]             Blaaergh    |      Simps     
+[INFO: ] score   :       0       |        1       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 2) Point Scored by olivia_stronach from team simps. Score is 0 - 1
+[INFO: ] (Game 2) Yellow Card for eva_hajigabriel from team blaaergh
+[INFO: ] (Game 2) Red Card for liam_cooper from team blaaergh
+[INFO: ] (Game 2) Penalty Point Awarded to team simps.  Score is 0 - 2
+[INFO: ] (Game 2) Penalty Point Awarded to team simps.  Score is 0 - 3
+[INFO: ] (Game 2) Penalty Point Awarded to team simps.  Score is 0 - 4
+[INFO: ] (Game 2) Ace Scored by liam_cooper from team blaaergh. Score is 0 - 5
+[INFO: ] (Game 2) Point Scored by olivia_stronach from team simps. Score is 1 - 5
+[INFO: ] (Game 2) Yellow Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 2) Point Scored by olivia_stronach from team simps. Score is 1 - 6
+[INFO: ] (Game 2) Yellow Card for liam_cooper from team blaaergh
+[INFO: ] (Game 2) Yellow Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 2) Point Scored by olivia_stronach from team simps. Score is 1 - 7
+[INFO: ] (Game 2) Ace Scored by eva_hajigabriel from team blaaergh. Score is 1 - 8
+[INFO: ] (Game 2) Point Scored by eva_hajigabriel from team blaaergh. Score is 2 - 8
+[INFO: ] (Game 2) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 8
+[INFO: ] (Game 2) Ace Scored by liam_cooper from team blaaergh. Score is 3 - 9
+[INFO: ] (Game 2) Point Scored by a_random_hinge_guy from team simps. Score is 4 - 9
+[INFO: ] (Game 2) Fault by liam_cooper from team blaaergh
+[INFO: ]             Blaaergh    |      Simps     
+[INFO: ] score   :       4       |       10       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 2) Ace Scored by eva_hajigabriel from team blaaergh. Score is 4 - 10
+[INFO: ] (Game 2) Ace Scored by liam_cooper from team blaaergh. Score is 5 - 10
+[INFO: ] (Game 2) Point Scored by liam_cooper from team blaaergh. Score is 6 - 10
+[INFO: ] (Game 2) Ace Scored by olivia_stronach from team simps. Score is 7 - 10
+[INFO: ] (Game 2) game 2 is over! Winner was simps, Best Player is eva_hajigabriel
+[INFO: ] (Game 3) Started, ethan_dal_molin serving from team tradies
+[INFO: ] (Game 3) Point Scored by ethan_dal_molin from team tradies. Score is 0 - 0
+[INFO: ] (Game 3) Fault by ethan_dal_molin from team tradies
+[INFO: ]            The Tradies  | Google Workers 
+[INFO: ] score   :       1       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 3) Ace Scored by will_prozerska from team google_workers. Score is 1 - 0
+[INFO: ] (Game 3) Point Scored by ethan_dal_molin from team tradies. Score is 1 - 1
+[INFO: ] (Game 3) Ace Scored by lachie_banks from team google_workers. Score is 2 - 1
+[INFO: ] (Game 3) Fault by zebiah_peaker from team tradies
+[INFO: ]            The Tradies  | Google Workers 
+[INFO: ] score   :       2       |        2       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 3) Point Scored by lachie_banks from team google_workers. Score is 2 - 2
+[INFO: ] (Game 3) Ace Scored by will_prozerska from team google_workers. Score is 2 - 3
+[INFO: ] (Game 3) Red Card for zebiah_peaker from team tradies
+[INFO: ] (Game 3) Fault by lachie_banks from team google_workers
+[INFO: ]            The Tradies  | Google Workers 
+[INFO: ] score   :       2       |        4       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 3) Ace Scored by zebiah_peaker from team tradies. Score is 2 - 4
+[INFO: ] (Game 3) Ace Scored by ethan_dal_molin from team tradies. Score is 3 - 4
+[INFO: ] (Game 3) Ace Scored by ethan_dal_molin from team tradies. Score is 4 - 4
+[INFO: ] (Game 3) Green Card for ethan_dal_molin from team tradies
+[INFO: ] (Game 3) Point Scored by zebiah_peaker from team tradies. Score is 5 - 4
+[INFO: ] (Game 3) Point Scored by ethan_dal_molin from team tradies. Score is 6 - 4
+[INFO: ] (Game 3) Point Scored by ethan_dal_molin from team tradies. Score is 7 - 4
+[INFO: ] (Game 3) Point Scored by will_prozerska from team google_workers. Score is 8 - 4
+[INFO: ] (Game 3) Ace Scored by lachie_banks from team google_workers. Score is 8 - 5
+[INFO: ] (Game 3) Ace Scored by zebiah_peaker from team tradies. Score is 8 - 6
+[INFO: ] (Game 3) Point Scored by zebiah_peaker from team tradies. Score is 9 - 6
+[INFO: ] (Game 3) Green Card for will_prozerska from team google_workers
+[INFO: ] (Game 3) Ace Scored by lachie_banks from team google_workers. Score is 10 - 6
+[INFO: ] (Game 3) Ace Scored by zebiah_peaker from team tradies. Score is 10 - 7
+[INFO: ] (Game 3) game 3 is over! Winner was tradies, Best Player is ethan_dal_molin
+[INFO: ] (Game 4) Started, alex_soudure serving from team officials
+[INFO: ] (Game 4) Ace Scored by nick_burvil from team satnavs. Score is 0 - 0
+[INFO: ] (Game 4) Timeout called by satnavs
+[INFO: ] (Game 4) Point Scored by nick_burvil from team satnavs. Score is 0 - 1
+[INFO: ] (Game 4) Timeout called by officials
+[INFO: ] (Game 4) Ace Scored by alex_soudure from team officials. Score is 0 - 2
+[INFO: ] (Game 4) Ace Scored by alex_soudure from team officials. Score is 1 - 2
+[INFO: ] (Game 4) Point Scored by alex_soudure from team officials. Score is 2 - 2
+[INFO: ] (Game 4) Ace Scored by jared_healy from team officials. Score is 3 - 2
+[INFO: ] (Game 4) Ace Scored by alex_soudure from team officials. Score is 4 - 2
+[INFO: ] (Game 4) Timeout called by officials
+[INFO: ] (Game 4) Point Scored by jared_healy from team officials. Score is 5 - 2
+[INFO: ] (Game 4) Point Scored by jared_healy from team officials. Score is 6 - 2
+[INFO: ] (Game 4) Point Scored by nick_burvil from team satnavs. Score is 7 - 2
+[INFO: ] (Game 4) Ace Scored by alex_soudure from team officials. Score is 7 - 3
+[INFO: ] (Game 4) Point Scored by nick_burvil from team satnavs. Score is 8 - 3
+[INFO: ] (Game 4) Ace Scored by jared_healy from team officials. Score is 8 - 4
+[INFO: ] (Game 4) Fault by nick_burvil from team satnavs
+[INFO: ]           The Officials |     Satnavs    
+[INFO: ] score   :       9       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:      -1       |        0       
+[INFO: ] (Game 4) Timeout called by officials
+[INFO: ] (Game 4) Ace Scored by jared_healy from team officials. Score is 9 - 4
+[INFO: ] (Game 4) Point Scored by alex_soudure from team officials. Score is 10 - 4
+[INFO: ] (Game 4) game 4 is over! Winner was officials, Best Player is alex_soudure
+[INFO: ] (Game 5) Started, alex_soudure serving from team officials
+[INFO: ] (Game 5) Ace Scored by alex_soudure from team officials. Score is 0 - 0
+[INFO: ] (Game 5) Point Scored by zebiah_peaker from team tradies. Score is 1 - 0
+[INFO: ] (Game 5) Ace Scored by jared_healy from team officials. Score is 1 - 1
+[INFO: ] (Game 5) Red Card for alex_soudure from team officials
+[INFO: ] (Game 5) Green Card for ethan_dal_molin from team tradies
+[INFO: ] (Game 5) Ace Scored by zebiah_peaker from team tradies. Score is 2 - 1
+[INFO: ] (Game 5) Ace Scored by jared_healy from team officials. Score is 2 - 2
+[INFO: ] (Game 5) Ace Scored by alex_soudure from team officials. Score is 3 - 2
+[INFO: ] (Game 5) Green Card for ethan_dal_molin from team tradies
+[INFO: ] (Game 5) Fault by zebiah_peaker from team tradies
+[INFO: ]           The Officials |   The Tradies  
+[INFO: ] score   :       4       |        2       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 5) Point Scored by ethan_dal_molin from team tradies. Score is 4 - 2
+[INFO: ] (Game 5) Point Scored by ethan_dal_molin from team tradies. Score is 4 - 3
+[INFO: ] (Game 5) Timeout called by officials
+[INFO: ] (Game 5) Point Scored by jared_healy from team officials. Score is 4 - 4
+[INFO: ] (Game 5) Ace Scored by ethan_dal_molin from team tradies. Score is 5 - 4
+[INFO: ] (Game 5) Ace Scored by zebiah_peaker from team tradies. Score is 5 - 5
+[INFO: ] (Game 5) Timeout called by officials
+[INFO: ] (Game 5) Point Scored by jared_healy from team officials. Score is 5 - 6
+[INFO: ] (Game 5) Yellow Card for alex_soudure from team officials
+[INFO: ] (Game 5) Ace Scored by alex_soudure from team officials. Score is 6 - 6
+[INFO: ] (Game 5) Point Scored by jared_healy from team officials. Score is 7 - 6
+[INFO: ] (Game 5) Fault by alex_soudure from team officials
+[INFO: ]           The Officials |   The Tradies  
+[INFO: ] score   :       8       |        6       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:      -1       |        1       
+[INFO: ] (Game 5) Yellow Card for ethan_dal_molin from team tradies
+[INFO: ] (Game 5) Point Scored by ethan_dal_molin from team tradies. Score is 8 - 6
+[INFO: ] (Game 5) Timeout called by tradies
+[INFO: ] (Game 5) Ace Scored by alex_soudure from team officials. Score is 8 - 7
+[INFO: ] (Game 5) Point Scored by alex_soudure from team officials. Score is 9 - 7
+[INFO: ] (Game 5) Fault by jared_healy from team officials
+[INFO: ]           The Officials |   The Tradies  
+[INFO: ] score   :      10       |        7       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:      -1       |        0       
+[INFO: ] (Game 5) Point Scored by zebiah_peaker from team tradies. Score is 10 - 7
+[INFO: ] (Game 5) Ace Scored by zebiah_peaker from team tradies. Score is 10 - 8
+[INFO: ] (Game 5) Ace Scored by alex_soudure from team officials. Score is 10 - 9
+[INFO: ] (Game 5) game 5 is over! Winner was officials, Best Player is alex_soudure
+[INFO: ] (Game 6) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[INFO: ] (Game 6) Timeout called by google_workers
+[INFO: ] (Game 6) Timeout called by breaking_bad_bois
+[INFO: ] (Game 6) Timeout called by breaking_bad_bois
+[INFO: ] (Game 6) Fault by lachie_banks from team google_workers
+[INFO: ]          Google Workers | The Breaking Bad Bois
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |       -1       
+[INFO: ] (Game 6) Point Scored by lachie_banks from team google_workers. Score is 0 - 0
+[INFO: ] (Game 6) Green Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 6) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 6) Yellow Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 6) Point Scored by lachie_banks from team google_workers. Score is 1 - 1
+[INFO: ] (Game 6) Timeout called by google_workers
+[INFO: ] (Game 6) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 2 - 1
+[INFO: ] (Game 6) Yellow Card for lachie_banks from team google_workers
+[INFO: ] (Game 6) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 2
+[INFO: ] (Game 6) Fault by lachie_banks from team google_workers
+[INFO: ]          Google Workers | The Breaking Bad Bois
+[INFO: ] score   :       2       |        3       
+[INFO: ] cards   :       2       |        0       
+[INFO: ] timeouts:      -1       |       -1       
+[INFO: ] (Game 6) Point Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 3
+[INFO: ] (Game 6) Point Scored by will_prozerska from team google_workers. Score is 2 - 4
+[INFO: ] (Game 6) Timeout called by google_workers
+[INFO: ] (Game 6) Timeout called by google_workers
+[INFO: ] (Game 6) Point Scored by will_prozerska from team google_workers. Score is 3 - 4
+[INFO: ] (Game 6) Point Scored by james_sharpham from team breaking_bad_bois. Score is 4 - 4
+[INFO: ] (Game 6) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 4 - 5
+[INFO: ] (Game 6) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 4 - 6
+[INFO: ] (Game 6) Ace Scored by lachie_banks from team google_workers. Score is 4 - 7
+[INFO: ] (Game 6) Point Scored by lachie_banks from team google_workers. Score is 5 - 7
+[INFO: ] (Game 6) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 6 - 7
+[INFO: ] (Game 6) Timeout called by breaking_bad_bois
+[INFO: ] (Game 6) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 6 - 8
+[INFO: ] (Game 6) Timeout called by breaking_bad_bois
+[INFO: ] (Game 6) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 6 - 9
+[INFO: ] (Game 6) Yellow Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 6) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 6 - 10
+[INFO: ] (Game 6) game 6 is over! Winner was breaking_bad_bois, Best Player is will_prozerska
+[INFO: ] (Game 7) Started, olivia_stronach serving from team simps
+[INFO: ] (Game 7) Fault by olivia_stronach from team simps
+[INFO: ]               Simps     |    Seanitha    
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 7) Point Scored by tabitha_blechynden from team seanitha. Score is 0 - 0
+[INFO: ] (Game 7) Ace Scored by sean_robinson from team seanitha. Score is 0 - 1
+[INFO: ] (Game 7) Ace Scored by olivia_stronach from team simps. Score is 0 - 2
+[INFO: ] (Game 7) Red Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 7) Ace Scored by tabitha_blechynden from team seanitha. Score is 1 - 2
+[INFO: ] (Game 7) Point Scored by tabitha_blechynden from team seanitha. Score is 1 - 3
+[INFO: ] (Game 7) Ace Scored by a_random_hinge_guy from team simps. Score is 1 - 4
+[INFO: ] (Game 7) Ace Scored by olivia_stronach from team simps. Score is 2 - 4
+[INFO: ] (Game 7) Point Scored by tabitha_blechynden from team seanitha. Score is 3 - 4
+[INFO: ] (Game 7) Point Scored by sean_robinson from team seanitha. Score is 3 - 5
+[INFO: ] (Game 7) Timeout called by simps
+[INFO: ] (Game 7) Timeout called by simps
+[INFO: ] (Game 7) Timeout called by seanitha
+[INFO: ] (Game 7) Point Scored by sean_robinson from team seanitha. Score is 3 - 6
+[INFO: ] (Game 7) Green Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 7) Ace Scored by olivia_stronach from team simps. Score is 3 - 7
+[INFO: ] (Game 7) Yellow Card for olivia_stronach from team simps
+[INFO: ] (Game 7) Point Scored by tabitha_blechynden from team seanitha. Score is 4 - 7
+[INFO: ] (Game 7) Ace Scored by sean_robinson from team seanitha. Score is 4 - 8
+[INFO: ] (Game 7) Point Scored by a_random_hinge_guy from team simps. Score is 4 - 9
+[INFO: ] (Game 7) Ace Scored by a_random_hinge_guy from team simps. Score is 5 - 9
+[INFO: ] (Game 7) Point Scored by olivia_stronach from team simps. Score is 6 - 9
+[INFO: ] (Game 7) Point Scored by olivia_stronach from team simps. Score is 7 - 9
+[INFO: ] (Game 7) Ace Scored by olivia_stronach from team simps. Score is 8 - 9
+[INFO: ] (Game 7) Point Scored by tabitha_blechynden from team seanitha. Score is 9 - 9
+[INFO: ] (Game 7) Fault by sean_robinson from team seanitha
+[INFO: ]               Simps     |    Seanitha    
+[INFO: ] score   :       9       |       10       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:      -1       |        0       
+[INFO: ] (Game 7) Point Scored by sean_robinson from team seanitha. Score is 9 - 10
+[INFO: ] (Game 7) game 7 is over! Winner was seanitha, Best Player is olivia_stronach
+[INFO: ] (Game 8) Started, eva_hajigabriel serving from team blaaergh
+[INFO: ] (Game 8) Point Scored by michael_russ from team whipped. Score is 0 - 0
+[INFO: ] (Game 8) Ace Scored by dora_wan from team whipped. Score is 0 - 1
+[INFO: ] (Game 8) Point Scored by liam_cooper from team blaaergh. Score is 0 - 2
+[INFO: ] (Game 8) Timeout called by whipped
+[INFO: ] (Game 8) Ace Scored by liam_cooper from team blaaergh. Score is 1 - 2
+[INFO: ] (Game 8) Ace Scored by eva_hajigabriel from team blaaergh. Score is 2 - 2
+[INFO: ] (Game 8) Point Scored by michael_russ from team whipped. Score is 3 - 2
+[INFO: ] (Game 8) Red Card for michael_russ from team whipped
+[INFO: ] (Game 8) Point Scored by liam_cooper from team blaaergh. Score is 3 - 3
+[INFO: ] (Game 8) Point Scored by michael_russ from team whipped. Score is 4 - 3
+[INFO: ] (Game 8) Point Scored by eva_hajigabriel from team blaaergh. Score is 4 - 4
+[INFO: ] (Game 8) Ace Scored by michael_russ from team whipped. Score is 5 - 4
+[INFO: ] (Game 8) Point Scored by michael_russ from team whipped. Score is 5 - 5
+[INFO: ] (Game 8) Timeout called by whipped
+[INFO: ] (Game 8) Ace Scored by liam_cooper from team blaaergh. Score is 5 - 6
+[INFO: ] (Game 8) Yellow Card for michael_russ from team whipped
+[INFO: ] (Game 8) Ace Scored by eva_hajigabriel from team blaaergh. Score is 6 - 6
+[INFO: ] (Game 8) Point Scored by eva_hajigabriel from team blaaergh. Score is 7 - 6
+[INFO: ] (Game 8) Ace Scored by dora_wan from team whipped. Score is 8 - 6
+[INFO: ] (Game 8) Green Card for eva_hajigabriel from team blaaergh
+[INFO: ] (Game 8) Point Scored by dora_wan from team whipped. Score is 8 - 7
+[INFO: ] (Game 8) Point Scored by dora_wan from team whipped. Score is 8 - 8
+[INFO: ] (Game 8) Ace Scored by dora_wan from team whipped. Score is 8 - 9
+[INFO: ] (Game 8) Fault by eva_hajigabriel from team blaaergh
+[INFO: ]             Blaaergh    |     Whipped    
+[INFO: ] score   :       8       |       10       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       1       |       -1       
+[INFO: ] (Game 8) Ace Scored by michael_russ from team whipped. Score is 8 - 10
+[INFO: ] (Game 8) game 8 is over! Winner was whipped, Best Player is eva_hajigabriel
+[INFO: ] (Game 9) Started, james_saunders serving from team sleeby
+[INFO: ] (Game 9) Point Scored by tristan_nel from team satnavs. Score is 0 - 0
+[INFO: ] (Game 9) Ace Scored by nick_burvil from team satnavs. Score is 0 - 1
+[INFO: ] (Game 9) Ace Scored by tristan_nel from team satnavs. Score is 0 - 2
+[INFO: ] (Game 9) Ace Scored by jamie_dymmott from team sleeby. Score is 0 - 3
+[INFO: ] (Game 9) Red Card for jamie_dymmott from team sleeby
+[INFO: ] (Game 9) Fault by nick_burvil from team satnavs
+[INFO: ]              Sleeby     |     Satnavs    
+[INFO: ] score   :       1       |        3       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 9) Ace Scored by james_saunders from team sleeby. Score is 1 - 3
+[INFO: ] (Game 9) Green Card for tristan_nel from team satnavs
+[INFO: ] (Game 9) Green Card for nick_burvil from team satnavs
+[INFO: ] (Game 9) Timeout called by satnavs
+[INFO: ] (Game 9) Point Scored by nick_burvil from team satnavs. Score is 2 - 3
+[INFO: ] (Game 9) Ace Scored by tristan_nel from team satnavs. Score is 2 - 4
+[INFO: ] (Game 9) Fault by tristan_nel from team satnavs
+[INFO: ]              Sleeby     |     Satnavs    
+[INFO: ] score   :       2       |        5       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 9) Point Scored by nick_burvil from team satnavs. Score is 2 - 5
+[INFO: ] (Game 9) Point Scored by james_saunders from team sleeby. Score is 2 - 6
+[INFO: ] (Game 9) Ace Scored by james_saunders from team sleeby. Score is 3 - 6
+[INFO: ] (Game 9) Green Card for jamie_dymmott from team sleeby
+[INFO: ] (Game 9) Point Scored by nick_burvil from team satnavs. Score is 4 - 6
+[INFO: ] (Game 9) Green Card for jamie_dymmott from team sleeby
+[INFO: ] (Game 9) Ace Scored by nick_burvil from team satnavs. Score is 4 - 7
+[INFO: ] (Game 9) Fault by nick_burvil from team satnavs
+[INFO: ]              Sleeby     |     Satnavs    
+[INFO: ] score   :       4       |        8       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 9) Ace Scored by james_saunders from team sleeby. Score is 4 - 8
+[INFO: ] (Game 9) Yellow Card for nick_burvil from team satnavs
+[INFO: ] (Game 9) Point Scored by jamie_dymmott from team sleeby. Score is 5 - 8
+[INFO: ] (Game 9) Green Card for nick_burvil from team satnavs
+[INFO: ] (Game 9) Ace Scored by tristan_nel from team satnavs. Score is 6 - 8
+[INFO: ] (Game 9) Timeout called by sleeby
+[INFO: ] (Game 9) Ace Scored by jamie_dymmott from team sleeby. Score is 6 - 9
+[INFO: ] (Game 9) Ace Scored by james_saunders from team sleeby. Score is 7 - 9
+[INFO: ] (Game 9) Point Scored by nick_burvil from team satnavs. Score is 8 - 9
+[INFO: ] (Game 9) Timeout called by sleeby
+[INFO: ] (Game 9) Ace Scored by nick_burvil from team satnavs. Score is 8 - 10
+[INFO: ] (Game 9) game 9 is over! Winner was satnavs, Best Player is james_saunders
+[INFO: ] (Game 10) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[INFO: ] (Game 10) Red Card for tristan_nel from team satnavs
+[INFO: ] (Game 10) Red Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 10) Point Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 10) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 1 - 0
+[INFO: ] (Game 10) Ace Scored by nick_burvil from team satnavs. Score is 2 - 0
+[INFO: ] (Game 10) Ace Scored by tristan_nel from team satnavs. Score is 2 - 1
+[INFO: ] (Game 10) Ace Scored by tristan_nel from team satnavs. Score is 2 - 2
+[INFO: ] (Game 10) Green Card for nick_burvil from team satnavs
+[INFO: ] (Game 10) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 2 - 3
+[INFO: ] (Game 10) Green Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 10) Ace Scored by tristan_nel from team satnavs. Score is 3 - 3
+[INFO: ] (Game 10) Green Card for tristan_nel from team satnavs
+[INFO: ] (Game 10) Point Scored by tristan_nel from team satnavs. Score is 3 - 4
+[INFO: ] (Game 10) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 3 - 5
+[INFO: ] (Game 10) Point Scored by tristan_nel from team satnavs. Score is 4 - 5
+[INFO: ] (Game 10) Fault by tristan_nel from team satnavs
+[INFO: ]          The Breaking Bad Bois|     Satnavs    
+[INFO: ] score   :       4       |        6       
+[INFO: ] cards   :      -1       |       -1       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 10) Point Scored by nick_burvil from team satnavs. Score is 4 - 6
+[INFO: ] (Game 10) Ace Scored by tristan_nel from team satnavs. Score is 4 - 7
+[INFO: ] (Game 10) Point Scored by nick_burvil from team satnavs. Score is 4 - 8
+[INFO: ] (Game 10) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 4 - 9
+[INFO: ] (Game 10) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 5 - 9
+[INFO: ] (Game 10) Ace Scored by james_sharpham from team breaking_bad_bois. Score is 6 - 9
+[INFO: ] (Game 10) Point Scored by nick_burvil from team satnavs. Score is 7 - 9
+[INFO: ] (Game 10) Fault by nick_burvil from team satnavs
+[INFO: ]          The Breaking Bad Bois|     Satnavs    
+[INFO: ] score   :       7       |       10       
+[INFO: ] cards   :      -1       |       -1       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 10) Point Scored by james_sharpham from team breaking_bad_bois. Score is 7 - 10
+[INFO: ] (Game 10) Point Scored by nick_burvil from team satnavs. Score is 8 - 10
+[INFO: ] (Game 10) game 10 is over! Winner was satnavs, Best Player is brigitte_gredziuk
+[INFO: ] (Game 11) Started, olivia_stronach serving from team simps
+[INFO: ] (Game 11) Ace Scored by zebiah_peaker from team tradies. Score is 0 - 0
+[INFO: ] (Game 11) Ace Scored by ethan_dal_molin from team tradies. Score is 0 - 1
+[INFO: ] (Game 11) Point Scored by ethan_dal_molin from team tradies. Score is 0 - 2
+[INFO: ] (Game 11) Point Scored by ethan_dal_molin from team tradies. Score is 0 - 3
+[INFO: ] (Game 11) Fault by olivia_stronach from team simps
+[INFO: ]               Simps     |   The Tradies  
+[INFO: ] score   :       0       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 11) Ace Scored by zebiah_peaker from team tradies. Score is 0 - 4
+[INFO: ] (Game 11) Green Card for zebiah_peaker from team tradies
+[INFO: ] (Game 11) Timeout called by simps
+[INFO: ] (Game 11) Fault by olivia_stronach from team simps
+[INFO: ]               Simps     |   The Tradies  
+[INFO: ] score   :       0       |        5       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 11) Ace Scored by olivia_stronach from team simps. Score is 0 - 5
+[INFO: ] (Game 11) Ace Scored by a_random_hinge_guy from team simps. Score is 1 - 5
+[INFO: ] (Game 11) Ace Scored by olivia_stronach from team simps. Score is 2 - 5
+[INFO: ] (Game 11) Point Scored by ethan_dal_molin from team tradies. Score is 3 - 5
+[INFO: ] (Game 11) Timeout called by tradies
+[INFO: ] (Game 11) Fault by ethan_dal_molin from team tradies
+[INFO: ]               Simps     |   The Tradies  
+[INFO: ] score   :       3       |        6       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        0       
+[INFO: ] (Game 11) Green Card for zebiah_peaker from team tradies
+[INFO: ] (Game 11) Ace Scored by a_random_hinge_guy from team simps. Score is 3 - 6
+[INFO: ] (Game 11) Ace Scored by olivia_stronach from team simps. Score is 4 - 6
+[INFO: ] (Game 11) Ace Scored by zebiah_peaker from team tradies. Score is 5 - 6
+[INFO: ] (Game 11) Ace Scored by a_random_hinge_guy from team simps. Score is 5 - 7
+[INFO: ] (Game 11) Point Scored by ethan_dal_molin from team tradies. Score is 6 - 7
+[INFO: ] (Game 11) Green Card for ethan_dal_molin from team tradies
+[INFO: ] (Game 11) Ace Scored by a_random_hinge_guy from team simps. Score is 6 - 8
+[INFO: ] (Game 11) Point Scored by olivia_stronach from team simps. Score is 7 - 8
+[INFO: ] (Game 11) Fault by olivia_stronach from team simps
+[INFO: ]               Simps     |   The Tradies  
+[INFO: ] score   :       8       |        8       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        0       
+[INFO: ] (Game 11) Timeout called by simps
+[INFO: ] (Game 11) Point Scored by olivia_stronach from team simps. Score is 8 - 8
+[INFO: ] (Game 11) Point Scored by olivia_stronach from team simps. Score is 9 - 8
+[INFO: ] (Game 11) Point Scored by olivia_stronach from team simps. Score is 10 - 8
+[INFO: ] (Game 11) game 11 is over! Winner was simps, Best Player is olivia_stronach
+[INFO: ] (Game 12) Started, liam_cooper serving from team blaaergh
+[INFO: ] (Game 12) Point Scored by sean_robinson from team seanitha. Score is 0 - 0
+[INFO: ] (Game 12) Point Scored by tabitha_blechynden from team seanitha. Score is 1 - 0
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 2 - 0
+[INFO: ] (Game 12) Green Card for eva_hajigabriel from team blaaergh
+[INFO: ] (Game 12) Fault by eva_hajigabriel from team blaaergh
+[INFO: ]             Seanitha    |    Blaaergh    
+[INFO: ] score   :       2       |        1       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 12) Green Card for liam_cooper from team blaaergh
+[INFO: ] (Game 12) Point Scored by liam_cooper from team blaaergh. Score is 2 - 1
+[INFO: ] (Game 12) Ace Scored by eva_hajigabriel from team blaaergh. Score is 2 - 2
+[INFO: ] (Game 12) Yellow Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 12) Ace Scored by tabitha_blechynden from team seanitha. Score is 2 - 3
+[INFO: ] (Game 12) Point Scored by sean_robinson from team seanitha. Score is 3 - 3
+[INFO: ] (Game 12) Fault by eva_hajigabriel from team blaaergh
+[INFO: ]             Seanitha    |    Blaaergh    
+[INFO: ] score   :       4       |        3       
+[INFO: ] cards   :       1       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 4 - 3
+[INFO: ] (Game 12) Green Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 12) Point Scored by tabitha_blechynden from team seanitha. Score is 4 - 4
+[INFO: ] (Game 12) Ace Scored by liam_cooper from team blaaergh. Score is 5 - 4
+[INFO: ] (Game 12) Ace Scored by sean_robinson from team seanitha. Score is 5 - 5
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 6 - 5
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 6 - 6
+[INFO: ] (Game 12) Point Scored by sean_robinson from team seanitha. Score is 6 - 7
+[INFO: ] (Game 12) Point Scored by eva_hajigabriel from team blaaergh. Score is 7 - 7
+[INFO: ] (Game 12) Fault by eva_hajigabriel from team blaaergh
+[INFO: ]             Seanitha    |    Blaaergh    
+[INFO: ] score   :       7       |        8       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 12) Ace Scored by tabitha_blechynden from team seanitha. Score is 7 - 8
+[INFO: ] (Game 12) Ace Scored by eva_hajigabriel from team blaaergh. Score is 8 - 8
+[INFO: ] (Game 12) Point Scored by sean_robinson from team seanitha. Score is 8 - 9
+[INFO: ] (Game 12) Point Scored by tabitha_blechynden from team seanitha. Score is 9 - 9
+[INFO: ] (Game 12) Ace Scored by sean_robinson from team seanitha. Score is 10 - 9
+[INFO: ] (Game 12) game 12 is over! Winner was seanitha, Best Player is tabitha_blechynden
+[INFO: ] (Game 13) Started, james_saunders serving from team sleeby
+[INFO: ] (Game 13) Ace Scored by james_saunders from team sleeby. Score is 0 - 0
+[INFO: ] (Game 13) Ace Scored by alex_soudure from team officials. Score is 1 - 0
+[INFO: ] (Game 13) Timeout called by officials
+[INFO: ] (Game 13) Green Card for james_saunders from team sleeby
+[INFO: ] (Game 13) Ace Scored by jared_healy from team officials. Score is 1 - 1
+[INFO: ] (Game 13) Red Card for jamie_dymmott from team sleeby
+[INFO: ] (Game 13) Ace Scored by alex_soudure from team officials. Score is 1 - 2
+[INFO: ] (Game 13) Fault by jared_healy from team officials
+[INFO: ]              Sleeby     |  The Officials 
+[INFO: ] score   :       1       |        3       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 13) Point Scored by james_saunders from team sleeby. Score is 1 - 3
+[INFO: ] (Game 13) Ace Scored by james_saunders from team sleeby. Score is 2 - 3
+[INFO: ] (Game 13) Point Scored by alex_soudure from team officials. Score is 3 - 3
+[INFO: ] (Game 13) Point Scored by jared_healy from team officials. Score is 3 - 4
+[INFO: ] (Game 13) Yellow Card for jared_healy from team officials
+[INFO: ] (Game 13) Point Scored by jared_healy from team officials. Score is 3 - 5
+[INFO: ] (Game 13) Timeout called by officials
+[INFO: ] (Game 13) Ace Scored by james_saunders from team sleeby. Score is 3 - 6
+[INFO: ] (Game 13) Point Scored by jamie_dymmott from team sleeby. Score is 4 - 6
+[INFO: ] (Game 13) Ace Scored by jared_healy from team officials. Score is 5 - 6
+[INFO: ] (Game 13) Point Scored by james_saunders from team sleeby. Score is 5 - 7
+[INFO: ] (Game 13) Point Scored by james_saunders from team sleeby. Score is 6 - 7
+[INFO: ] (Game 13) Point Scored by jamie_dymmott from team sleeby. Score is 7 - 7
+[INFO: ] (Game 13) Ace Scored by james_saunders from team sleeby. Score is 8 - 7
+[INFO: ] (Game 13) Point Scored by james_saunders from team sleeby. Score is 9 - 7
+[INFO: ] (Game 13) Fault by jared_healy from team officials
+[INFO: ]              Sleeby     |  The Officials 
+[INFO: ] score   :      10       |        7       
+[INFO: ] cards   :      -1       |        0       
+[INFO: ] timeouts:       1       |       -1       
+[INFO: ] (Game 13) Ace Scored by alex_soudure from team officials. Score is 10 - 7
+[INFO: ] (Game 13) Point Scored by alex_soudure from team officials. Score is 10 - 8
+[INFO: ] (Game 13) Point Scored by alex_soudure from team officials. Score is 10 - 9
+[INFO: ] (Game 13) Point Scored by alex_soudure from team officials. Score is 10 - 10
+[INFO: ] (Game 13) Ace Scored by jared_healy from team officials. Score is 10 - 11
+[INFO: ] (Game 13) game 13 is over! Winner was officials, Best Player is james_saunders
+[INFO: ] (Game 14) Started, lachie_banks serving from team google_workers
+[INFO: ] (Game 14) Point Scored by michael_russ from team whipped. Score is 0 - 0
+[INFO: ] (Game 14) Point Scored by will_prozerska from team google_workers. Score is 0 - 1
+[INFO: ] (Game 14) Ace Scored by will_prozerska from team google_workers. Score is 1 - 1
+[INFO: ] (Game 14) Yellow Card for dora_wan from team whipped
+[INFO: ] (Game 14) Yellow Card for will_prozerska from team google_workers
+[INFO: ] (Game 14) Point Scored by dora_wan from team whipped. Score is 2 - 1
+[INFO: ] (Game 14) Point Scored by lachie_banks from team google_workers. Score is 2 - 2
+[INFO: ] (Game 14) Point Scored by lachie_banks from team google_workers. Score is 3 - 2
+[INFO: ] (Game 14) Point Scored by lachie_banks from team google_workers. Score is 4 - 2
+[INFO: ] (Game 14) Ace Scored by michael_russ from team whipped. Score is 5 - 2
+[INFO: ] (Game 14) Point Scored by will_prozerska from team google_workers. Score is 5 - 3
+[INFO: ] (Game 14) Point Scored by dora_wan from team whipped. Score is 6 - 3
+[INFO: ] (Game 14) Green Card for lachie_banks from team google_workers
+[INFO: ] (Game 14) Point Scored by lachie_banks from team google_workers. Score is 6 - 4
+[INFO: ] (Game 14) Yellow Card for will_prozerska from team google_workers
+[INFO: ] (Game 14) Ace Scored by dora_wan from team whipped. Score is 7 - 4
+[INFO: ] (Game 14) Ace Scored by dora_wan from team whipped. Score is 7 - 5
+[INFO: ] (Game 14) Ace Scored by michael_russ from team whipped. Score is 7 - 6
+[INFO: ] (Game 14) Point Scored by michael_russ from team whipped. Score is 7 - 7
+[INFO: ] (Game 14) Ace Scored by michael_russ from team whipped. Score is 7 - 8
+[INFO: ] (Game 14) Green Card for michael_russ from team whipped
+[INFO: ] (Game 14) Point Scored by lachie_banks from team google_workers. Score is 7 - 9
+[INFO: ] (Game 14) Fault by will_prozerska from team google_workers
+[INFO: ]          Google Workers |     Whipped    
+[INFO: ] score   :       8       |        9       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 14) Point Scored by will_prozerska from team google_workers. Score is 8 - 9
+[INFO: ] (Game 14) Point Scored by lachie_banks from team google_workers. Score is 9 - 9
+[INFO: ] (Game 14) Ace Scored by will_prozerska from team google_workers. Score is 10 - 9
+[INFO: ] (Game 14) game 14 is over! Winner was google_workers, Best Player is lachie_banks
+[INFO: ] (Game 15) Started, liam_cooper serving from team blaaergh
+[INFO: ] (Game 15) Fault by brigitte_gredziuk from team breaking_bad_bois
+[INFO: ]             Blaaergh    | The Breaking Bad Bois
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 15) Timeout called by breaking_bad_bois
+[INFO: ] (Game 15) Point Scored by james_sharpham from team breaking_bad_bois. Score is 0 - 0
+[INFO: ] (Game 15) Point Scored by liam_cooper from team blaaergh. Score is 0 - 1
+[INFO: ] (Game 15) Red Card for liam_cooper from team blaaergh
+[INFO: ] (Game 15) Point Scored by james_sharpham from team breaking_bad_bois. Score is 1 - 1
+[INFO: ] (Game 15) Ace Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 1 - 2
+[INFO: ] (Game 15) Point Scored by eva_hajigabriel from team blaaergh. Score is 1 - 3
+[INFO: ] (Game 15) Point Scored by eva_hajigabriel from team blaaergh. Score is 2 - 3
+[INFO: ] (Game 15) Ace Scored by liam_cooper from team blaaergh. Score is 3 - 3
+[INFO: ] (Game 15) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 4 - 3
+[INFO: ] (Game 15) Green Card for eva_hajigabriel from team blaaergh
+[INFO: ] (Game 15) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 15) Green Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 15) Green Card for liam_cooper from team blaaergh
+[INFO: ] (Game 15) Red Card for brigitte_gredziuk from team breaking_bad_bois
+[INFO: ] (Game 15) Ace Scored by liam_cooper from team blaaergh. Score is 4 - 4
+[INFO: ] (Game 15) Point Scored by brigitte_gredziuk from team breaking_bad_bois. Score is 5 - 4
+[INFO: ] (Game 15) Ace Scored by eva_hajigabriel from team blaaergh. Score is 5 - 5
+[INFO: ] (Game 15) Point Scored by eva_hajigabriel from team blaaergh. Score is 6 - 5
+[INFO: ] (Game 15) Point Scored by liam_cooper from team blaaergh. Score is 7 - 5
+[INFO: ] (Game 15) Point Scored by james_sharpham from team breaking_bad_bois. Score is 8 - 5
+[INFO: ] (Game 15) Ace Scored by eva_hajigabriel from team blaaergh. Score is 8 - 6
+[INFO: ] (Game 15) Ace Scored by liam_cooper from team blaaergh. Score is 9 - 6
+[INFO: ] (Game 15) Point Scored by liam_cooper from team blaaergh. Score is 10 - 6
+[INFO: ] (Game 15) game 15 is over! Winner was blaaergh, Best Player is liam_cooper
+[INFO: ] (Game 16) Started, tristan_nel serving from team satnavs
+[INFO: ] (Game 16) Yellow Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 16) Ace Scored by a_random_hinge_guy from team simps. Score is 0 - 0
+[INFO: ] (Game 16) Point Scored by tristan_nel from team satnavs. Score is 0 - 1
+[INFO: ] (Game 16) Point Scored by olivia_stronach from team simps. Score is 1 - 1
+[INFO: ] (Game 16) Fault by a_random_hinge_guy from team simps
+[INFO: ]              Satnavs    |      Simps     
+[INFO: ] score   :       1       |        2       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 16) Ace Scored by tristan_nel from team satnavs. Score is 1 - 2
+[INFO: ] (Game 16) Green Card for olivia_stronach from team simps
+[INFO: ] (Game 16) Timeout called by satnavs
+[INFO: ] (Game 16) Point Scored by tristan_nel from team satnavs. Score is 2 - 2
+[INFO: ] (Game 16) Ace Scored by tristan_nel from team satnavs. Score is 3 - 2
+[INFO: ] (Game 16) Point Scored by tristan_nel from team satnavs. Score is 4 - 2
+[INFO: ] (Game 16) Point Scored by a_random_hinge_guy from team simps. Score is 5 - 2
+[INFO: ] (Game 16) Ace Scored by tristan_nel from team satnavs. Score is 5 - 3
+[INFO: ] (Game 16) Ace Scored by tristan_nel from team satnavs. Score is 6 - 3
+[INFO: ] (Game 16) Ace Scored by tristan_nel from team satnavs. Score is 7 - 3
+[INFO: ] (Game 16) Green Card for a_random_hinge_guy from team simps
+[INFO: ] (Game 16) Ace Scored by nick_burvil from team satnavs. Score is 8 - 3
+[INFO: ] (Game 16) Fault by nick_burvil from team satnavs
+[INFO: ]              Satnavs    |      Simps     
+[INFO: ] score   :       9       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       0       |        1       
+[INFO: ] (Game 16) Point Scored by tristan_nel from team satnavs. Score is 9 - 3
+[INFO: ] (Game 16) Point Scored by a_random_hinge_guy from team simps. Score is 10 - 3
+[INFO: ] (Game 16) Point Scored by nick_burvil from team satnavs. Score is 10 - 4
+[INFO: ] (Game 16) game 16 is over! Winner was satnavs, Best Player is tristan_nel
+[INFO: ] (Game 17) Started, michael_russ serving from team whipped
+[INFO: ] (Game 17) Ace Scored by ethan_dal_molin from team tradies. Score is 0 - 0
+[INFO: ] (Game 17) Point Scored by zebiah_peaker from team tradies. Score is 0 - 1
+[INFO: ] (Game 17) Point Scored by zebiah_peaker from team tradies. Score is 0 - 2
+[INFO: ] (Game 17) Point Scored by michael_russ from team whipped. Score is 0 - 3
+[INFO: ] (Game 17) Ace Scored by dora_wan from team whipped. Score is 1 - 3
+[INFO: ] (Game 17) Ace Scored by dora_wan from team whipped. Score is 2 - 3
+[INFO: ] (Game 17) Ace Scored by dora_wan from team whipped. Score is 3 - 3
+[INFO: ] (Game 17) Fault by dora_wan from team whipped
+[INFO: ]              Whipped    |   The Tradies  
+[INFO: ] score   :       4       |        3       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 17) Yellow Card for michael_russ from team whipped
+[INFO: ] (Game 17) Point Scored by ethan_dal_molin from team tradies. Score is 4 - 3
+[INFO: ] (Game 17) Ace Scored by michael_russ from team whipped. Score is 4 - 4
+[INFO: ] (Game 17) Point Scored by zebiah_peaker from team tradies. Score is 5 - 4
+[INFO: ] (Game 17) Ace Scored by zebiah_peaker from team tradies. Score is 5 - 5
+[INFO: ] (Game 17) Ace Scored by michael_russ from team whipped. Score is 5 - 6
+[INFO: ] (Game 17) Point Scored by ethan_dal_molin from team tradies. Score is 6 - 6
+[INFO: ] (Game 17) Ace Scored by michael_russ from team whipped. Score is 6 - 7
+[INFO: ] (Game 17) Timeout called by whipped
+[INFO: ] (Game 17) Green Card for michael_russ from team whipped
+[INFO: ] (Game 17) Yellow Card for dora_wan from team whipped
+[INFO: ] (Game 17) Timeout called by whipped
+[INFO: ] (Game 17) Red Card for michael_russ from team whipped
+[INFO: ] (Game 17) Penalty Point Awarded to team tradies.  Score is 7 - 7
+[INFO: ] (Game 17) Penalty Point Awarded to team tradies.  Score is 7 - 8
+[INFO: ] (Game 17) Penalty Point Awarded to team tradies.  Score is 7 - 9
+[INFO: ] (Game 17) Ace Scored by ethan_dal_molin from team tradies. Score is 7 - 10
+[INFO: ] (Game 17) game 17 is over! Winner was tradies, Best Player is michael_russ
+[INFO: ] (Game 18) Started, sean_robinson serving from team seanitha
+[INFO: ] (Game 18) Point Scored by jamie_dymmott from team sleeby. Score is 0 - 0
+[INFO: ] (Game 18) Ace Scored by tabitha_blechynden from team seanitha. Score is 0 - 1
+[INFO: ] (Game 18) Ace Scored by tabitha_blechynden from team seanitha. Score is 1 - 1
+[INFO: ] (Game 18) Yellow Card for sean_robinson from team seanitha
+[INFO: ] (Game 18) Ace Scored by jamie_dymmott from team sleeby. Score is 2 - 1
+[INFO: ] (Game 18) Fault by tabitha_blechynden from team seanitha
+[INFO: ]             Seanitha    |     Sleeby     
+[INFO: ] score   :       2       |        2       
+[INFO: ] cards   :       2       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] (Game 18) Timeout called by sleeby
+[INFO: ] (Game 18) Green Card for sean_robinson from team seanitha
+[INFO: ] (Game 18) Green Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 18) Ace Scored by james_saunders from team sleeby. Score is 2 - 2
+[INFO: ] (Game 18) Yellow Card for james_saunders from team sleeby
+[INFO: ] (Game 18) Ace Scored by sean_robinson from team seanitha. Score is 2 - 3
+[INFO: ] (Game 18) Point Scored by tabitha_blechynden from team seanitha. Score is 3 - 3
+[INFO: ] (Game 18) Point Scored by tabitha_blechynden from team seanitha. Score is 4 - 3
+[INFO: ] (Game 18) Yellow Card for tabitha_blechynden from team seanitha
+[INFO: ] (Game 18) Fault by jamie_dymmott from team sleeby
+[INFO: ]             Seanitha    |     Sleeby     
+[INFO: ] score   :       5       |        3       
+[INFO: ] cards   :       3       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 18) Ace Scored by sean_robinson from team seanitha. Score is 5 - 3
+[INFO: ] (Game 18) Ace Scored by james_saunders from team sleeby. Score is 6 - 3
+[INFO: ] (Game 18) Ace Scored by tabitha_blechynden from team seanitha. Score is 6 - 4
+[INFO: ] (Game 18) Fault by tabitha_blechynden from team seanitha
+[INFO: ]             Seanitha    |     Sleeby     
+[INFO: ] score   :       7       |        4       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        0       
+[INFO: ] (Game 18) Ace Scored by tabitha_blechynden from team seanitha. Score is 7 - 4
+[INFO: ] (Game 18) Point Scored by tabitha_blechynden from team seanitha. Score is 8 - 4
+[INFO: ] (Game 18) Timeout called by seanitha
+[INFO: ] (Game 18) Ace Scored by jamie_dymmott from team sleeby. Score is 9 - 4
+[INFO: ] (Game 18) Ace Scored by tabitha_blechynden from team seanitha. Score is 9 - 5
+[INFO: ] (Game 18) Ace Scored by james_saunders from team sleeby. Score is 10 - 5
+[INFO: ] (Game 18) Ace Scored by tabitha_blechynden from team seanitha. Score is 10 - 6
+[INFO: ] (Game 18) game 18 is over! Winner was seanitha, Best Player is sean_robinson
+[INFO: ] (Game 19) Started, will_prozerska serving from team google_workers
+[INFO: ] (Game 19) Red Card for jared_healy from team officials
+[INFO: ] (Game 19) Point Scored by will_prozerska from team google_workers. Score is 0 - 0
+[INFO: ] (Game 19) Red Card for alex_soudure from team officials
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 1 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 2 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 3 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 4 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 5 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 6 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 7 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 8 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 9 - 0
+[INFO: ] (Game 19) Penalty Point Awarded to team google_workers.  Score is 10 - 0
+[INFO: ] (Game 19) game 19 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 20) Started, tristan_nel serving from team satnavs
+[INFO: ] (Game 0) Started, sean_robinson serving from team seanitha
+[WARN: ] Game Whipped vs Seanitha has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 0) game 0 is over! Winner was whipped, Best Player is michael_russ
+[INFO: ] (Game 1) Started, jamie_dymmott serving from team sleeby
+[WARN: ] Game The Breaking Bad Bois vs Sleeby has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 1) game 1 is over! Winner was breaking_bad_bois, Best Player is brigitte_gredziuk
+[INFO: ] (Game 2) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Blaaergh vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 2) game 2 is over! Winner was simps, Best Player is eva_hajigabriel
+[INFO: ] (Game 3) Started, zebiah_peaker serving from team tradies
+[WARN: ] Game The Tradies vs Google Workers has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 3) game 3 is over! Winner was tradies, Best Player is zebiah_peaker
+[INFO: ] (Game 4) Started, tristan_nel serving from team satnavs
+[WARN: ] Game The Officials vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 4) game 4 is over! Winner was officials, Best Player is jared_healy
+[INFO: ] (Game 5) Started, zebiah_peaker serving from team tradies
+[WARN: ] Game The Officials vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 5) game 5 is over! Winner was officials, Best Player is alex_soudure
+[INFO: ] (Game 6) Started, lachie_banks serving from team google_workers
+[WARN: ] Game Google Workers vs The Breaking Bad Bois has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 6) game 6 is over! Winner was breaking_bad_bois, Best Player is lachie_banks
+[INFO: ] (Game 7) Started, tabitha_blechynden serving from team seanitha
+[WARN: ] Game Simps vs Seanitha has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 7) game 7 is over! Winner was seanitha, Best Player is a_random_hinge_guy
+[INFO: ] (Game 8) Started, liam_cooper serving from team blaaergh
+[WARN: ] Game Blaaergh vs Whipped has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 8) game 8 is over! Winner was whipped, Best Player is liam_cooper
+[INFO: ] (Game 9) Started, tristan_nel serving from team satnavs
+[WARN: ] Game Sleeby vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 9) game 9 is over! Winner was satnavs, Best Player is james_saunders
+[INFO: ] (Game 10) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[WARN: ] Game The Breaking Bad Bois vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 10) game 10 is over! Winner was satnavs, Best Player is brigitte_gredziuk
+[INFO: ] (Game 11) Started, a_random_hinge_guy serving from team simps
+[WARN: ] Game Simps vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 11) game 11 is over! Winner was simps, Best Player is a_random_hinge_guy
+[INFO: ] (Game 12) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Seanitha vs Blaaergh has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 12) game 12 is over! Winner was seanitha, Best Player is tabitha_blechynden
+[INFO: ] (Game 13) Started, jamie_dymmott serving from team sleeby
+[WARN: ] Game Sleeby vs The Officials has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 13) game 13 is over! Winner was officials, Best Player is jamie_dymmott
+[INFO: ] (Game 14) Started, michael_russ serving from team whipped
+[WARN: ] Game Google Workers vs Whipped has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 14) game 14 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 15) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Blaaergh vs The Breaking Bad Bois has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 15) game 15 is over! Winner was blaaergh, Best Player is eva_hajigabriel
+[INFO: ] (Game 16) Started, tristan_nel serving from team satnavs
+[WARN: ] Game Satnavs vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 16) game 16 is over! Winner was satnavs, Best Player is tristan_nel
+[INFO: ] (Game 17) Started, dora_wan serving from team whipped
+[WARN: ] Game Whipped vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 17) game 17 is over! Winner was tradies, Best Player is dora_wan
+[INFO: ] (Game 18) Started, tabitha_blechynden serving from team seanitha
+[WARN: ] Game Seanitha vs Sleeby has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 18) game 18 is over! Winner was seanitha, Best Player is tabitha_blechynden
+[INFO: ] (Game 19) Started, lachie_banks serving from team google_workers
+[INFO: ] (Game 19) game 19 is over! Winner was google_workers, Best Player is lachie_banks
+[INFO: ] (Game 20) Started, tristan_nel serving from team satnavs
+[INFO: ] (Game 0) Started, sean_robinson serving from team seanitha
+[WARN: ] Game Whipped vs Seanitha has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 0) game 0 is over! Winner was whipped, Best Player is michael_russ
+[INFO: ] (Game 1) Started, james_saunders serving from team sleeby
+[WARN: ] Game The Breaking Bad Bois vs Sleeby has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 1) game 1 is over! Winner was breaking_bad_bois, Best Player is james_sharpham
+[INFO: ] (Game 2) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Blaaergh vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 2) game 2 is over! Winner was simps, Best Player is eva_hajigabriel
+[INFO: ] (Game 3) Started, will_prozerska serving from team google_workers
+[WARN: ] Game The Tradies vs Google Workers has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 3) game 3 is over! Winner was tradies, Best Player is ethan_dal_molin
+[INFO: ] (Game 4) Started, nick_burvil serving from team satnavs
+[WARN: ] Game The Officials vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 4) game 4 is over! Winner was officials, Best Player is jared_healy
+[INFO: ] (Game 5) Started, zebiah_peaker serving from team tradies
+[WARN: ] Game The Officials vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 5) game 5 is over! Winner was officials, Best Player is jared_healy
+[INFO: ] (Game 6) Started, will_prozerska serving from team google_workers
+[WARN: ] Game Google Workers vs The Breaking Bad Bois has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 6) game 6 is over! Winner was breaking_bad_bois, Best Player is will_prozerska
+[INFO: ] (Game 7) Started, tabitha_blechynden serving from team seanitha
+[WARN: ] Game Simps vs Seanitha has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 7) game 7 is over! Winner was seanitha, Best Player is a_random_hinge_guy
+[INFO: ] (Game 8) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Blaaergh vs Whipped has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 8) game 8 is over! Winner was whipped, Best Player is eva_hajigabriel
+[INFO: ] (Game 9) Started, nick_burvil serving from team satnavs
+[WARN: ] Game Sleeby vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 9) game 9 is over! Winner was satnavs, Best Player is james_saunders
+[INFO: ] (Game 10) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[WARN: ] Game The Breaking Bad Bois vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 10) game 10 is over! Winner was satnavs, Best Player is brigitte_gredziuk
+[INFO: ] (Game 11) Started, zebiah_peaker serving from team tradies
+[WARN: ] Game Simps vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 11) game 11 is over! Winner was simps, Best Player is a_random_hinge_guy
+[INFO: ] (Game 12) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Seanitha vs Blaaergh has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 12) game 12 is over! Winner was seanitha, Best Player is sean_robinson
+[INFO: ] (Game 13) Started, jared_healy serving from team officials
+[WARN: ] Game Sleeby vs The Officials has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 13) game 13 is over! Winner was officials, Best Player is jamie_dymmott
+[INFO: ] (Game 14) Started, michael_russ serving from team whipped
+[WARN: ] Game Google Workers vs Whipped has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 14) game 14 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 15) Started, james_sharpham serving from team breaking_bad_bois
+[WARN: ] Game Blaaergh vs The Breaking Bad Bois has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 15) game 15 is over! Winner was blaaergh, Best Player is eva_hajigabriel
+[INFO: ] (Game 16) Started, nick_burvil serving from team satnavs
+[WARN: ] Game Satnavs vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 16) game 16 is over! Winner was satnavs, Best Player is nick_burvil
+[INFO: ] (Game 17) Started, zebiah_peaker serving from team tradies
+[WARN: ] Game Whipped vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 17) game 17 is over! Winner was tradies, Best Player is dora_wan
+[INFO: ] (Game 18) Started, tabitha_blechynden serving from team seanitha
+[WARN: ] Game Seanitha vs Sleeby has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 18) game 18 is over! Winner was seanitha, Best Player is tabitha_blechynden
+[INFO: ] (Game 19) Started, will_prozerska serving from team google_workers
+[INFO: ] (Game 19) game 19 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 20) Started, sean_robinson serving from team seanitha
+[INFO: ] (Game 0) Started, michael_russ serving from team whipped
+[WARN: ] Game Whipped vs Seanitha has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 0) game 0 is over! Winner was whipped, Best Player is michael_russ
+[INFO: ] (Game 1) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[WARN: ] Game The Breaking Bad Bois vs Sleeby has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 1) game 1 is over! Winner was breaking_bad_bois, Best Player is brigitte_gredziuk
+[INFO: ] (Game 2) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Blaaergh vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 2) game 2 is over! Winner was simps, Best Player is eva_hajigabriel
+[INFO: ] (Game 3) Started, lachie_banks serving from team google_workers
+[WARN: ] Game The Tradies vs Google Workers has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 3) game 3 is over! Winner was tradies, Best Player is ethan_dal_molin
+[INFO: ] (Game 4) Started, jared_healy serving from team officials
+[WARN: ] Game The Officials vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 4) game 4 is over! Winner was officials, Best Player is jared_healy
+[INFO: ] (Game 5) Started, alex_soudure serving from team officials
+[WARN: ] Game The Officials vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 5) game 5 is over! Winner was officials, Best Player is alex_soudure
+[INFO: ] (Game 6) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[WARN: ] Game Google Workers vs The Breaking Bad Bois has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 6) game 6 is over! Winner was breaking_bad_bois, Best Player is lachie_banks
+[INFO: ] (Game 7) Started, sean_robinson serving from team seanitha
+[WARN: ] Game Simps vs Seanitha has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 7) game 7 is over! Winner was seanitha, Best Player is olivia_stronach
+[INFO: ] (Game 8) Started, michael_russ serving from team whipped
+[WARN: ] Game Blaaergh vs Whipped has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 8) game 8 is over! Winner was whipped, Best Player is eva_hajigabriel
+[INFO: ] (Game 9) Started, james_saunders serving from team sleeby
+[WARN: ] Game Sleeby vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 9) game 9 is over! Winner was satnavs, Best Player is james_saunders
+[INFO: ] (Game 10) Started, tristan_nel serving from team satnavs
+[WARN: ] Game The Breaking Bad Bois vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 10) game 10 is over! Winner was satnavs, Best Player is brigitte_gredziuk
+[INFO: ] (Game 11) Started, ethan_dal_molin serving from team tradies
+[WARN: ] Game Simps vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 11) game 11 is over! Winner was simps, Best Player is a_random_hinge_guy
+[INFO: ] (Game 12) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Seanitha vs Blaaergh has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 12) game 12 is over! Winner was seanitha, Best Player is sean_robinson
+[INFO: ] (Game 13) Started, james_saunders serving from team sleeby
+[WARN: ] Game Sleeby vs The Officials has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 13) game 13 is over! Winner was officials, Best Player is james_saunders
+[INFO: ] (Game 14) Started, will_prozerska serving from team google_workers
+[WARN: ] Game Google Workers vs Whipped has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 14) game 14 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 15) Started, james_sharpham serving from team breaking_bad_bois
+[WARN: ] Game Blaaergh vs The Breaking Bad Bois has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 15) game 15 is over! Winner was blaaergh, Best Player is eva_hajigabriel
+[INFO: ] (Game 16) Started, nick_burvil serving from team satnavs
+[WARN: ] Game Satnavs vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 16) game 16 is over! Winner was satnavs, Best Player is nick_burvil
+[INFO: ] (Game 17) Started, zebiah_peaker serving from team tradies
+[WARN: ] Game Whipped vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 17) game 17 is over! Winner was tradies, Best Player is dora_wan
+[INFO: ] (Game 18) Started, tabitha_blechynden serving from team seanitha
+[WARN: ] Game Seanitha vs Sleeby has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 18) game 18 is over! Winner was seanitha, Best Player is tabitha_blechynden
+[INFO: ] (Game 19) Started, will_prozerska serving from team google_workers
+[INFO: ] (Game 19) game 19 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 20) Started, tristan_nel serving from team satnavs
+[INFO: ] (Game 0) Started, tabitha_blechynden serving from team seanitha
+[WARN: ] Game Whipped vs Seanitha has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 0) game 0 is over! Winner was whipped, Best Player is michael_russ
+[INFO: ] (Game 1) Started, brigitte_gredziuk serving from team breaking_bad_bois
+[WARN: ] Game The Breaking Bad Bois vs Sleeby has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 1) game 1 is over! Winner was breaking_bad_bois, Best Player is brigitte_gredziuk
+[INFO: ] (Game 2) Started, eva_hajigabriel serving from team blaaergh
+[WARN: ] Game Blaaergh vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 2) game 2 is over! Winner was simps, Best Player is eva_hajigabriel
+[INFO: ] (Game 3) Started, zebiah_peaker serving from team tradies
+[WARN: ] Game The Tradies vs Google Workers has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 3) game 3 is over! Winner was tradies, Best Player is zebiah_peaker
+[INFO: ] (Game 4) Started, jared_healy serving from team officials
+[WARN: ] Game The Officials vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 4) game 4 is over! Winner was officials, Best Player is jared_healy
+[INFO: ] (Game 5) Started, alex_soudure serving from team officials
+[WARN: ] Game The Officials vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 5) game 5 is over! Winner was officials, Best Player is alex_soudure
+[INFO: ] (Game 6) Started, will_prozerska serving from team google_workers
+[WARN: ] Game Google Workers vs The Breaking Bad Bois has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 6) game 6 is over! Winner was breaking_bad_bois, Best Player is will_prozerska
+[INFO: ] (Game 7) Started, olivia_stronach serving from team simps
+[WARN: ] Game Simps vs Seanitha has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 7) game 7 is over! Winner was seanitha, Best Player is olivia_stronach
+[INFO: ] (Game 8) Started, liam_cooper serving from team blaaergh
+[WARN: ] Game Blaaergh vs Whipped has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 8) game 8 is over! Winner was whipped, Best Player is liam_cooper
+[INFO: ] (Game 9) Started, jamie_dymmott serving from team sleeby
+[WARN: ] Game Sleeby vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 9) game 9 is over! Winner was satnavs, Best Player is jamie_dymmott
+[INFO: ] (Game 10) Started, nick_burvil serving from team satnavs
+[WARN: ] Game The Breaking Bad Bois vs Satnavs has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 10) game 10 is over! Winner was satnavs, Best Player is brigitte_gredziuk
+[INFO: ] (Game 11) Started, zebiah_peaker serving from team tradies
+[WARN: ] Game Simps vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 11) game 11 is over! Winner was simps, Best Player is olivia_stronach
+[INFO: ] (Game 12) Started, liam_cooper serving from team blaaergh
+[WARN: ] Game Seanitha vs Blaaergh has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 12) game 12 is over! Winner was seanitha, Best Player is sean_robinson
+[INFO: ] (Game 13) Started, alex_soudure serving from team officials
+[WARN: ] Game Sleeby vs The Officials has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 13) game 13 is over! Winner was officials, Best Player is james_saunders
+[INFO: ] (Game 14) Started, dora_wan serving from team whipped
+[WARN: ] Game Google Workers vs Whipped has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 14) game 14 is over! Winner was google_workers, Best Player is lachie_banks
+[INFO: ] (Game 15) Started, liam_cooper serving from team blaaergh
+[WARN: ] Game Blaaergh vs The Breaking Bad Bois has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 15) game 15 is over! Winner was blaaergh, Best Player is liam_cooper
+[INFO: ] (Game 16) Started, a_random_hinge_guy serving from team simps
+[WARN: ] Game Satnavs vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 16) game 16 is over! Winner was satnavs, Best Player is tristan_nel
+[INFO: ] (Game 17) Started, ethan_dal_molin serving from team tradies
+[WARN: ] Game Whipped vs The Tradies has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 17) game 17 is over! Winner was tradies, Best Player is dora_wan
+[INFO: ] (Game 18) Started, tabitha_blechynden serving from team seanitha
+[WARN: ] Game Seanitha vs Sleeby has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ] (Game 18) game 18 is over! Winner was seanitha, Best Player is tabitha_blechynden
+[INFO: ] (Game 19) Started, jared_healy serving from team officials
+[INFO: ] (Game 19) game 19 is over! Winner was google_workers, Best Player is will_prozerska
+[INFO: ] (Game 20) Started, tristan_nel serving from team satnavs

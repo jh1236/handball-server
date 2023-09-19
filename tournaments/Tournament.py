@@ -21,6 +21,7 @@ class Tournament:
 
     def dump(self):
         self.fixtures.dump()
+        self.load()
 
     def save(self):
         self.fixtures.save()
@@ -28,4 +29,5 @@ class Tournament:
     def load(self):
         for i in self.teams:
             i.reset()
+        self.officials: Officials = Officials(self)
         self.fixtures.load()

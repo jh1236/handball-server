@@ -4,7 +4,7 @@ from structure.Player import GamePlayer
 from util import chunks_sized, get_console
 
 if typing.TYPE_CHECKING:
-    from structure.Team import Team, GameTeam
+    from structure.Team import GameTeam
 
 con = get_console()
 
@@ -94,7 +94,6 @@ class Game:
                 for i in self.players():
                     if i.name == best_player:
                         self.best_player = i
-                        i.best_player()
                         break
                 self.tournament.save()
                 self.tournament.load()
@@ -108,7 +107,8 @@ class Game:
                 [i.end() for i in self.teams]
                 self.primary_official.games_umpired += 1
                 self.primary_official.rounds_umpired += self.rounds
-            self.info(f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}")
+            self.info(
+                f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}")
 
     def in_progress(self):
         return self.started and not self.best_player
@@ -118,11 +118,19 @@ class Game:
 
     def undo(self):
         if self.game_string == "":
+            self.info(f"Undoing Game start")
             self.started = False
+        elif self.best_player:
+            con.warn(f"Re-entering Game: This reloads the entire tournament, try and avoid.")
+            self.best_player = None
+            self.game_string = self.game_string[:-2]
+            self.load_from_string(self.game_string)
+            self.tournament.save()
+            self.tournament.load()
         else:
             self.game_string = self.game_string[:-2]
-            print(f"'{self.game_string}'")
             self.load_from_string(self.game_string)
+            self.info(f"Undoing... game string is now {self.game_string}")
 
     def as_map(self):
         dct = {
