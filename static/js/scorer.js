@@ -1,6 +1,8 @@
 id = 0
 setId = newId => id = newId
 
+let timeoutTime = -1
+
 function score(firstTeam, firstPlayer) {
     fetch("/api/games/update/score", {
         method: "POST", body: JSON.stringify({
@@ -33,14 +35,25 @@ function card(firstTeam, firstPlayer, color) {
 }
 
 function timeout(firstTeam) {
+    timeoutTime = Date.now() + 30000
+    document.getElementById("myNav").style.width = "100%";
+    setInterval(function (x) {
+        if (timeoutTime < 0) {
+            document.getElementById("myNav").style.width = "0%";
+            return
+        }
+        document.getElementById("timeoutClock").textContent = "" + Math.round((timeoutTime - Date.now() )/ 100) / 10
+    }, 100)
+
     fetch("/api/games/update/timeout", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam,
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    });
 }
+
 
 function fault(firstTeam) {
     fetch("/api/games/update/fault", {
