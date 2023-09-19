@@ -95,6 +95,8 @@ img.team_logo {
 /* Position the content inside the overlay */
 .overlay-content {
     position: relative;
+    color:white;
+    font-size: 100px;
     top: 25%; /* 25% from the top */
     width: 100%; /* 100% width */
     text-align: center; /* Centered text/links */
@@ -106,4 +108,9 @@ img.team_logo {
     top: 20px;
     right: 45px;
     font-size: 60px;
+}
+
+.stop-scrolling {
+    height: 100%;
+    overflow: hidden;
 }

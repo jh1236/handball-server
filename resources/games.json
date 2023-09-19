@@ -952,23 +952,23 @@
         },
         {
             "firstTeamServed": true,
-            "game": "TTTTTTTTTTTTTTTTTTTTTT",
+            "game": "",
             "id": 39,
             "official": "Lachlan Banks",
             "started": true,
             "teamOne": {
                 "name": "Satnavs",
                 "players": [
-                    "Tristan Nel",
-                    "Nick Burvil"
+                    "Nick Burvil",
+                    "Tristan Nel"
                 ],
                 "score": 0
             },
             "teamTwo": {
                 "name": "The Officials",
                 "players": [
-                    "Alex Soudure",
-                    "Jared Healy"
+                    "Jared Healy",
+                    "Alex Soudure"
                 ],
                 "score": 0
             }

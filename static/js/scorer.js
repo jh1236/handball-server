@@ -37,12 +37,21 @@ function card(firstTeam, firstPlayer, color) {
 function timeout(firstTeam) {
     timeoutTime = Date.now() + 30000
     document.getElementById("myNav").style.width = "100%";
+    window.onscroll = function () {
+        window.scrollTo(0, 100);
+    };
     setInterval(function (x) {
         if (timeoutTime < 0) {
+            window.onscroll = function () {
+            };
             document.getElementById("myNav").style.width = "0%";
             return
+        } else if (timeoutTime - Date.now() < 0) {
+            document.getElementById("timeoutClock").style = "color:red;"
+        } else {
+            document.getElementById("timeoutClock").style = ""
         }
-        document.getElementById("timeoutClock").textContent = "" + Math.round((timeoutTime - Date.now() )/ 100) / 10
+        document.getElementById("timeoutClock").textContent = "" + Math.round((timeoutTime - Date.now()) / 100) / 10
     }, 100)
 
     fetch("/api/games/update/timeout", {
