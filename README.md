@@ -1,2 +1,2 @@
-Why are we still here
+Why are we still here\n
 Just to suffer?
