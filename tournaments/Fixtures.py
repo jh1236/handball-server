@@ -8,7 +8,6 @@ class Fixtures:
     def __init__(self, tournament):
         self.tournament = tournament
         self.rounds: list[list[Game]] = []
-        self.generator = self.generate_round()
         self.load()
 
     def games_to_list(self) -> list[Game]:
