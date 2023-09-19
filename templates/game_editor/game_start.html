@@ -13,21 +13,21 @@
 <h1>{{teams[0].name}} vs {{teams[1].name}} </h1>
 <h1 class="big">{{teams[0].score}} - {{teams[1].score}}</h1>
 <p><b>Match Official:</b> <a class="hide"
-                             href="http://handball-tourney.zapto.org/officials/{{game.primary_official.nice_name()}}"><i>{{game.primary_official}}</i></a>
+                             href="/officials/{{game.primary_official.nice_name()}}"><i>{{game.primary_official}}</i></a>
 </p>
 <br>
 
 <table class="table">
     <tr>
-        <th><a href="http://handball-tourney.zapto.org/teams/{{teams[0].nice_name()}}"
+        <th><a href="/teams/{{teams[0].nice_name()}}"
                class="hide"><img
-                src="http://handball-tourney.zapto.org/api/teams/image?name={{teams[0].nice_name()}}"
+                src="/api/teams/image?name={{teams[0].nice_name()}}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></a></th>
         <th style="color:#e0ffe0">spacer..</th>
-        <th><a href="http://handball-tourney.zapto.org/teams/{{teams[1].nice_name()}}"
+        <th><a href="/teams/{{teams[1].nice_name()}}"
                class="hide"><img
-                src="http://handball-tourney.zapto.org/api/teams/image?name={{teams[1].nice_name()}}"
+                src="/api/teams/image?name={{teams[1].nice_name()}}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></a></th>
     </tr>

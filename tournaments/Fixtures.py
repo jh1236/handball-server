@@ -1,8 +1,9 @@
 import json
 
 from structure.Game import Game
+from util import get_console
 
-
+con = get_console()
 class Fixtures:
     def __init__(self, tournament):
         self.tournament = tournament
@@ -15,7 +16,6 @@ class Fixtures:
 
     def get_game(self, game_id: int) -> Game:
         while len(self.games_to_list()) <= game_id:
-            print("called gen")
             self.rounds.append(next(self.generator))
         if all([i.best_player for i in self.rounds[-1]]):
             try:
@@ -33,7 +33,7 @@ class Fixtures:
         raise NotImplementedError()
 
     def save(self):
-        print("Saving...")
+        con.info("Saving...")
         with open("./resources/games.json", "w+") as fp:
             json.dump([[j.as_map() for j in i if j.started] for i in self.rounds], fp, indent=4, sort_keys=True)
 
@@ -70,7 +70,6 @@ class Fixtures:
                 if prev and prev.primary_official == p: continue
                 if p.team and p.team in teams:
                     continue
-                print(p.name, p.games_officiated, game)
                 game.set_primary_official(p)
                 break
 

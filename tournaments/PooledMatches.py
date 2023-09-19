@@ -18,7 +18,6 @@ class PooledMatches(Fixtures):
                     i.append(None)
                 else:
                     del i[-1]
-        print(self.pools)
         super().__init__()
 
     def next_round(self) -> list[Game]:

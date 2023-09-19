@@ -2,7 +2,7 @@ id = 0
 setId = newId => id = newId
 
 function score(firstTeam, firstPlayer) {
-    fetch("http://handball-tourney.zapto.org/api/games/update/score", {
+    fetch("/api/games/update/score", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam, firstPlayer: firstPlayer, ace: false
         }), headers: {
@@ -12,7 +12,7 @@ function score(firstTeam, firstPlayer) {
 }
 
 function ace(firstTeam) {
-    fetch("http://handball-tourney.zapto.org/api/games/update/ace", {
+    fetch("/api/games/update/ace", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam,
         }), headers: {
@@ -23,7 +23,7 @@ function ace(firstTeam) {
 
 
 function card(firstTeam, firstPlayer, color) {
-    fetch("http://handball-tourney.zapto.org/api/games/update/card", {
+    fetch("/api/games/update/card", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam, firstPlayer: firstPlayer, color: color, time: 3
         }), headers: {
@@ -33,7 +33,7 @@ function card(firstTeam, firstPlayer, color) {
 }
 
 function timeout(firstTeam) {
-    fetch("http://handball-tourney.zapto.org/api/games/update/timeout", {
+    fetch("/api/games/update/timeout", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam,
         }), headers: {
@@ -43,7 +43,7 @@ function timeout(firstTeam) {
 }
 
 function fault(firstTeam) {
-    fetch("http://handball-tourney.zapto.org/api/games/update/fault", {
+    fetch("/api/games/update/fault", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam,
         }), headers: {
@@ -53,7 +53,7 @@ function fault(firstTeam) {
 }
 
 function undo() {
-    fetch("http://handball-tourney.zapto.org/api/games/update/undo", {
+    fetch("/api/games/update/undo", {
         method: "POST", body: JSON.stringify({id: id}), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }

@@ -217,7 +217,6 @@ class Game:
                 if c == '0':
                     team.yellow_card(first, 10)
                 else:
-                    print(int(c))
                     team.yellow_card(first, int(c))
         self.game_string = game_string
 

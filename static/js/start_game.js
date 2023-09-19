@@ -26,7 +26,7 @@ setTeamServing = (i, s) => {
 }
 
 function start() {
-    fetch("http://handball-tourney.zapto.org/api/games/update/start", {
+    fetch("/api/games/update/start", {
         method: "POST",
         body: JSON.stringify({id: id, firstTeamServed: first_serves, swapTeamOne: left, swapTeamTwo: right}),
         headers: {
@@ -36,18 +36,18 @@ function start() {
 }
 
 function finish() {
-    fetch("http://handball-tourney.zapto.org/api/games/update/end", {
+    fetch("/api/games/update/end", {
         method: "POST",
         body: JSON.stringify({id: id, bestPlayer: best}),
         headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location.href = "http://handball-tourney.zapto.org/games/" + id + "/");
+    }).then(() => document.location.href = "/games/" + id + "/");
 }
 
 
 function undo() {
-    fetch("http://handball-tourney.zapto.org/api/games/update/undo", {
+    fetch("/api/games/update/undo", {
         method: "POST", body: JSON.stringify({id: id}), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }

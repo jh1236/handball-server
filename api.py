@@ -244,7 +244,6 @@ def players_site():
     all_players = []
     for i in sorted(competition.teams, key=lambda a: a.nice_name()):
         all_players += sorted(i.players, key=lambda a: a.name)
-    print(all_players)
     players = [(i.name, i.team.nice_name(), [(v, priority[k]) for k, v in i.get_stats().items()]) for i in all_players]
     headers = ["Name"] + [i for i in competition.teams[0].players[0].get_stats()]
     return render_template("players.html", headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
@@ -314,5 +313,5 @@ def game_editor(game_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80, debug=True)
+    app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)
     # 5000: arbitrary port but one with higher value, lower ones might be reserved

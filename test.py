@@ -2,6 +2,7 @@ from random import Random
 
 import api
 from tournaments.Tournament import Tournament
+from util import get_console
 
 competition: Tournament = api.competition
 competition.load()
@@ -78,8 +79,8 @@ competition.dump()
 game_id = 0
 random = Random()
 game_count = 40
-
-
+con = get_console()
+con.print = False
 def r_bool():
     return bool(random.randint(0, 1))
 
@@ -103,7 +104,9 @@ while game_id < (game_count - 1):
         timeout(game_id, r_bool())
     elif code == 11:
         fault(game_id, r_bool())
+print("-" * 20)
 for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
-    print(f"{i}: {t.name}")
-
-api.app.run(host="0.0.0.0", port=80, debug=True)
+    print(f"{i + 1}: {t.name}")
+print("-" * 20)
+con.print = True
+api.app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)

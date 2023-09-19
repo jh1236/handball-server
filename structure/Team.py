@@ -127,7 +127,6 @@ class GameTeam:
         [i.reset() for i in self.players]
 
     def start(self, serve_first: bool, swap_players: bool):
-        print(f"swapped is {swap_players}")
         self.swapped = swap_players
         # Guaranteed to work, just trust the process
         self.opponent: GameTeam = [i for i in self.game.teams if i.name != self.name][0]
@@ -218,7 +217,6 @@ class GameTeam:
     def end(self):
         [i.end() for i in self.players]
         self.team.points_for += self.score
-        print(self.name + " :" + str(self.opponent.score))
         self.team.points_against += self.opponent.score
         self.team.games_played += 1
         self.team.games_won += self.game.winner() == self.team
