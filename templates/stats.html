@@ -3,22 +3,23 @@
 <head>
     <title>Teams List</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<h1>Teams</h1>
+<h1><a href="/teams/" class="hide">Teams</a></h1>
 {% for team in teams %}
 <table class="table">
     <tr>
-        <td style="width:100px;"><a href="http://handball-tourney.zapto.org/teams/{{team[1]}}"
+        <td style="width:100px;"><a href="/teams/{{team[1]}}"
                                     class="hide"><img
-                src="http://handball-tourney.zapto.org/api/teams/image?name={{team[1]}}" class="team_logo"
+                src="/api/teams/image?name={{team[1]}}" class="team_logo"
                 style="width: 75px; height: 75px;"
         ></a></td>
 
 
-        <td style="width:200px;"><a href="http://handball-tourney.zapto.org/teams/{{team[1]}}" class="hide"><h3>{{team[0]}}</h3></a></td>
+        <td style="width:200px;"><a href="/teams/{{team[1]}}" class="hide"><h3>{{team[0]}}</h3></a></td>
     </tr>
 </table>
 

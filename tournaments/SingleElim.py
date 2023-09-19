@@ -2,7 +2,6 @@ import math
 
 from structure.Game import Game
 from tournaments.Fixtures import Fixtures
-from util import chunks_sized
 
 
 class SingleElim(Fixtures):

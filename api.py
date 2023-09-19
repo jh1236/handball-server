@@ -259,7 +259,7 @@ def official_site(nice_name):
         if official != i.primary_official:
             continue
         recent_games.append((f"Round {i.round_number + 1}: {repr(i)} ({i.score_string()})", i.id))
-    return render_template("official.html", name=official.name,
+    return render_template("official.html", name=official.name, link=official.nice_name(),
                            stats=[(k, v) for k, v in official.get_stats().items()], games=recent_games), 200
 
 
@@ -284,6 +284,9 @@ def log():
 def code_of_conduct():
     return send_file("./resources/code_of_conduct.pdf"), 200
 
+@app.get('/favicon.ico')
+def icon():
+    return send_file("static/favicon.ico")
 
 @app.get('/games/<game_id>/edit')
 def game_editor(game_id):

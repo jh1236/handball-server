@@ -3,11 +3,12 @@
 <head>
     <title>Handball Tournament</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<h1>Fixtures</h1>
+<h1><a href="/" class="hide">Fixtures</a></h1>
 <table class="table">
     <thead>
     <tr>
@@ -26,10 +27,10 @@
     {% for game in round %}
 
     <tr>
-        <td><a href="http://handball-tourney.zapto.org/games/{{game[3]}}" class="hide">{{ game[0] }}</a></td>
-        <td><a href="http://handball-tourney.zapto.org/games/{{game[3]}}" class="hide"> vs</a></td>
-        <td><a href="http://handball-tourney.zapto.org/games/{{game[3]}}" class="hide">{{ game[1] }}</a></td>
-        <td><a href="http://handball-tourney.zapto.org/games/{{game[3]}}" class="hide">{{ game[2] }}</a></td>
+        <td><a href="/games/{{game[3]}}" class="hide">{{ game[0] }}</a></td>
+        <td><a href="/games/{{game[3]}}" class="hide"> vs</a></td>
+        <td><a href="/games/{{game[3]}}" class="hide">{{ game[1] }}</a></td>
+        <td><a href="/games/{{game[3]}}" class="hide">{{ game[2] }}</a></td>
     </tr>
     {% endfor %}
     {% endfor %}

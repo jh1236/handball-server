@@ -6,8 +6,8 @@ let para = document.createElement("p")
 let a = document.createElement('a');
 let image = document.createElement("img")
 image.style = "display:inline"
-a.href = "http://handball-tourney.zapto.org/"
-image.src = "http://handball-tourney.zapto.org/api/teams/image?name=SUSS"
+a.href = "/"
+image.src = "/api/teams/image?name=SUSS"
 image.className = "logo"
 a.append(image)
 para.append(a)
@@ -26,10 +26,11 @@ function addToNavBar(display, link) {
     para.append(a2)
 }
 
-addToNavBar("Home", "http://handball-tourney.zapto.org/")
-addToNavBar("Teams", "http://handball-tourney.zapto.org/teams")
-addToNavBar("Ladder", "http://handball-tourney.zapto.org/ladder")
-addToNavBar("Players", "http://handball-tourney.zapto.org/players")
-addToNavBar("Officials", "http://handball-tourney.zapto.org/officials")
-addToNavBar("Rules", "http://handball-tourney.zapto.org/rules")
-addToNavBar("Code Of Conduct", "http://handball-tourney.zapto.org/code_of_conduct")
+addToNavBar("Home", "/")
+addToNavBar("Teams", "/teams")
+addToNavBar("Ladder", "/ladder")
+addToNavBar("Players", "/players")
+addToNavBar("Officials", "/officials")
+addToNavBar("U.Q.P.", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+addToNavBar("Rules", "/rules")
+addToNavBar("Code Of Conduct", "/code_of_conduct")

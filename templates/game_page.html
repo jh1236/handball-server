@@ -3,31 +3,32 @@
 <head>
     <title>{{teams[0].name}} vs {{teams[1].name}}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <h1>{{teams[0].name}} vs {{teams[1].name}}</h1>
+    <h1><a href="/games/{{game.id}}" class="hide">{{teams[0].name}} vs {{teams[1].name}}</a></h1>
     <h1 class="big">{{game.score_string()}}</h1>
     <p><b>Round:</b> <i>{{roundNumber}}</i></p>
-    <p><b>Match Official:</b> <a class = "hide" href = "http://handball-tourney.zapto.org/officials/{{official.nice_name()}}"><i>{{official}}</i></a></p>
-    <p><a href="http://handball-tourney.zapto.org/games/{{game.id}}/edit" class = "hide"><b>Status:</b></a> <i>{{status}}</i></p>
+    <p><b>Match Official:</b> <a class = "hide" href = "/officials/{{official.nice_name()}}"><i>{{official}}</i></a></p>
+    <p><a href="/games/{{game.id}}/edit" class = "hide"><b>Status:</b></a> <i>{{status}}</i></p>
     {% if game.best_player %}
     <p><b>Best on Court:</b> <i>{{best}}</i></p>
     {% endif %}
     <br>
     <table class="table">
         <tr>
-            <th><a href="http://handball-tourney.zapto.org/teams/{{teams[0].nice_name()}}"
+            <th><a href="/teams/{{teams[0].nice_name()}}"
                    class="hide"><img
-                    src="http://handball-tourney.zapto.org/api/teams/image?name={{teams[0].nice_name()}}"
+                    src="/api/teams/image?name={{teams[0].nice_name()}}"
                     class="team_logo"
                     style="display: inline;left:70%;vertical-align:middle;"></a></th>
             <th style="color:#e0ffe0">Another spacer..</th>
-            <th><a href="http://handball-tourney.zapto.org/teams/{{teams[1].nice_name()}}"
+            <th><a href="/teams/{{teams[1].nice_name()}}"
                    class="hide"><img
-                    src="http://handball-tourney.zapto.org/api/teams/image?name={{teams[1].nice_name()}}"
+                    src="/api/teams/image?name={{teams[1].nice_name()}}"
                     class="team_logo"
                     style="display: inline;left:70%;vertical-align:middle;"></a></th>
         </tr>
@@ -38,9 +39,9 @@
     <table class="table">
         <tr>
             <td></td>
-            <th colspan="2"><b><a href="http://handball-tourney.zapto.org/teams/{{teams[0].nice_name()}}"
+            <th colspan="2"><b><a href="/teams/{{teams[0].nice_name()}}"
                                   class="hide">{{teams[0].name}}</a></b></th>
-            <th colspan="2"><b><a href="http://handball-tourney.zapto.org/teams/{{teams[1].nice_name()}}"
+            <th colspan="2"><b><a href="/teams/{{teams[1].nice_name()}}"
                                   class="hide">{{teams[1].name}}</a></b></th>
             <th style="color:#e0ffe0">Spacerrrrrrr</th>
         </tr>
