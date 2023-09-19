@@ -39,6 +39,10 @@ class Console:
 
         return x
 
+    def clear(self):
+        with open(self.file, "w+") as fp:
+            fp.write("")
+
 
 con: Console = Console()
 

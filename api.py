@@ -8,7 +8,7 @@ from util import get_console
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 con = get_console()
-
+con.clear()
 competition = Tournament()
 
 
