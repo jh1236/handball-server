@@ -6,7 +6,7 @@ from tournaments.Fixtures import Fixtures
 
 
 class Swiss(Fixtures):
-    def __init__(self, tournament, rounds=6):
+    def __init__(self, tournament, rounds=8):
 
         self.teams_fixed = tournament.teams.copy()
         if len(self.teams_fixed) % 2 == 1:

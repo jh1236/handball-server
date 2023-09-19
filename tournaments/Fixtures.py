@@ -18,7 +18,11 @@ class Fixtures:
             print("called gen")
             self.rounds.append(next(self.generator))
         if all([i.best_player for i in self.rounds[-1]]):
-            self.rounds.append(next(self.generator))
+            try:
+                self.rounds.append(next(self.generator))
+            except Exception:
+                pass
+
         self.appoint_umpires()
         self.assign_rounds()
         self.assign_ids()
@@ -35,8 +39,8 @@ class Fixtures:
 
     def load(self):
         self.rounds = []
-        self.get_game(0)  # used to initialise the first round
         self.generator = self.generate_round()
+        self.get_game(0)  # used to initialise the first round
         with open("./resources/games.json") as fp:
             rounds = [[Game.from_map(j, self.tournament) for j in i] for i in json.load(fp)]
         for i, r in enumerate(rounds):

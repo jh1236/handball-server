@@ -74,9 +74,10 @@ def fault(game_id, first_team):
     return "", 204
 
 
+competition.dump()
 game_id = 0
 random = Random()
-game_count = 20
+game_count = 40
 
 
 def r_bool():
@@ -84,7 +85,7 @@ def r_bool():
 
 
 competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
-while game_id < game_count:
+while game_id < (game_count - 1):
     game = competition.fixtures.get_game(game_id)
     if competition.fixtures.get_game(game_id).game_ended():
         game.end(game.players()[0].name)

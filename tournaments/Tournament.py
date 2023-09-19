@@ -21,6 +21,7 @@ class Tournament:
 
     def dump(self):
         self.fixtures.dump()
+        self.fixtures = Swiss(self)
         self.load()
 
     def save(self):
