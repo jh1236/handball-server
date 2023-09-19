@@ -3,7 +3,7 @@
         {
             "bestPlayer": "Brigitte Gredziuk",
             "firstTeamServed": true,
-            "game": "vrvl",
+            "game": "VLVR",
             "id": 0,
             "official": "Jared Healy",
             "started": true,
@@ -13,7 +13,7 @@
                     "Brigitte Gredziuk",
                     "James Sharpham"
                 ],
-                "score": 11
+                "score": 0
             },
             "teamTwo": {
                 "name": "Simps",
@@ -21,7 +21,7 @@
                     "Olivia Stronach",
                     "A Random Hinge Guy"
                 ],
-                "score": 0
+                "score": 11
             }
         }
     ]

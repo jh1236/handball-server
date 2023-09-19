@@ -285,8 +285,10 @@ def game_editor(game_id):
     teams = game.teams
     key = request.args.get("key", None)
     players = [i for i in game.players()]
-    if key not in [game.primary_official.key, "admin"]:
-        return "Wrong Code", 403
+    if key is None:
+        return render_template("game_editor/no_access.html", error="You did not enter a password"), 403
+    elif key not in [game.primary_official.key, "admin"]:
+        return render_template("game_editor/no_access.html", error="The password you entered is not correct"), 403
     if not game.started:
         return render_template("game_editor/game_start.html", players=[i.tidy_name() for i in players],
                                teams=teams, game=game), 200
@@ -297,7 +299,7 @@ def game_editor(game_id):
         return render_template("game_editor/finalise.html", players=[i.tidy_name() for i in players],
                                teams=teams, game=game), 200
     else:
-        return "This game is already completed!", 400
+        return render_template("game_editor/game_done.html", error="This game has already been completed!"), 400
 
 
 if __name__ == "__main__":

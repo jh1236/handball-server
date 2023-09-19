@@ -1,26 +1,27 @@
-[INFO: ] Request for start: {'id': 0, 'firstTeamServed': True, 'swapTeamOne': False, 'swapTeamTwo': False}
+[INFO: ] Request for card: {'id': 0, 'firstTeam': True, 'firstPlayer': True, 'color': 'red', 'time': 3}
+[INFO: ] (Game 0) Red Card for brigitte_gredziuk from team breaking_bad_bois
 [INFO: ]          The Breaking Bad Bois|      Simps     
 [INFO: ] score   :       0       |        0       
-[INFO: ] cards   :       0       |        0       
+[INFO: ] cards   :      -1       |        0       
 [INFO: ] timeouts:       1       |        1       
-[INFO: ] Request for card: {'id': 0, 'firstTeam': False, 'firstPlayer': False, 'color': 'red', 'time': 3}
+[INFO: ] Request for card: {'id': 0, 'firstTeam': True, 'firstPlayer': False, 'color': 'red', 'time': 3}
+[INFO: ] (Game 0) Red Card for james_sharpham from team breaking_bad_bois
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 0
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 1
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 2
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 3
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 4
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 5
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 6
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 7
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 8
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 9
+[INFO: ] (Game 0) Penalty Point Awarded to team simps.  Score is 0 - 10
 [INFO: ]          The Breaking Bad Bois|      Simps     
-[INFO: ] score   :       0       |        0       
-[INFO: ] cards   :       0       |       -1       
-[INFO: ] timeouts:       1       |        1       
-[INFO: ] Request for card: {'id': 0, 'firstTeam': False, 'firstPlayer': True, 'color': 'red', 'time': 3}
-[INFO: ]          The Breaking Bad Bois|      Simps     
-[INFO: ] score   :      11       |        0       
-[INFO: ] cards   :       0       |       -1       
+[INFO: ] score   :       0       |       11       
+[INFO: ] cards   :      -1       |        0       
 [INFO: ] timeouts:       1       |        1       
 [INFO: ] Request for end: {'id': 0, 'bestPlayer': 'James Sharpham'}
-[INFO: ]          The Breaking Bad Bois|      Simps     
-[INFO: ] score   :      11       |        0       
-[INFO: ] cards   :       0       |       -1       
-[INFO: ] timeouts:       1       |        1       
 [INFO: ] Request for end: {'id': 0, 'bestPlayer': 'Brigitte Gredziuk'}
-[WARN: ] Game The Breaking Bad Bois vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
-[INFO: ]          The Breaking Bad Bois|      Simps     
-[INFO: ] score   :      11       |        0       
-[INFO: ] cards   :       0       |       -1       
-[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for end: {'id': 0, 'bestPlayer': 'Brigitte Gredziuk'}
+[INFO: ] (Game 0) game 0 is over! Winner was simps, Best Player is brigitte_gredziuk

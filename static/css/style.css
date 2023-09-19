@@ -53,7 +53,6 @@ a.hide {
 }
 
 img.logo {
-
     width: 100px;
     height: 100px;
 }
@@ -63,12 +62,12 @@ img.logo {
 }
 
 .button {
-    background-color: #018786; /* Green */
+    background-color: #659cce;
     border: none;
     color: white;
     padding: 15px 32px;
     width: 220px;
-    height: 60px;
+    min-height: 70px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -81,7 +80,7 @@ img.logo {
     color: white;
     padding: 15px 32px;
     width: 220px;
-    height: 60px;
+    min-height: 70px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -94,7 +93,7 @@ img.logo {
     color: white;
     padding: 15px 32px;
     width: 220px;
-    height: 60px;
+    min-height: 70px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -107,7 +106,7 @@ img.logo {
     color: white;
     padding: 15px 32px;
     width: 220px;
-    height: 60px;
+    min-height: 70px;
     text-align: center;
     text-decoration: none;
     display: inline-block;

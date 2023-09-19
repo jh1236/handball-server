@@ -9,9 +9,14 @@ from tournaments.Swiss import Swiss
 
 class Tournament:
     def __init__(self):
-        self.teams = []
-        self.officials: Officials = None
-        self.fixtures: Fixtures = None
+        with open("./resources/teams.json") as fp:
+            self.teams = [Team(k, [Player(i) for i in v]) for k, v in json.load(fp).items()]
+        for i in self.teams:
+            i.tournament = self
+            for j in i.players:
+                j.tournament = self
+        self.officials: Officials = Officials(self)
+        self.fixtures: Fixtures = Swiss(self)
         self.load()
 
     def dump(self):
@@ -21,11 +26,6 @@ class Tournament:
         self.fixtures.save()
 
     def load(self):
-        with open("./resources/teams.json") as fp:
-            self.teams = [Team(k, [Player(i) for i in v]) for k, v in json.load(fp).items()]
-            for i in self.teams:
-                i.tournament = self
-                for j in i.players:
-                    j.tournament = self
-        self.officials: Officials = Officials(self)
-        self.fixtures: Fixtures = Swiss(self)
+        for i in self.teams:
+            i.reset()
+        self.fixtures.load()

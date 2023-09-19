@@ -8,7 +8,11 @@
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/scorer.js') }}"></script>
-<script> setId({{game.id}})</script>
+<script> setId({
+{
+    game.id
+}
+})</script>
 <h1>{{teams[0].name}} vs {{teams[1].name}}</h1>
 <h1 class="big">{{teams[0].score}} - {{teams[1].score}}</h1>
 <p><b>Round:</b> <i>{{game.rounds}}</i></p>
@@ -22,7 +26,8 @@
 
     <tr>
         {% if teams[1].serving %}
-        <td></td><td></td>
+        <td></td>
+        <td></td>
         {% endif %}
         {% if game.team_serving().faulted %}
         <td style="color: #ff0000"><i>{{game.server().name}}</i></td>
@@ -46,7 +51,8 @@
     <tr>
         <td>
             {% if teams[0].card_time() > 0 %}
-            <div class="rectangle" style="background-color: #FCCE6E;width:{{100*(teams[0].card_time()) / teams[0].card_duration()}}%"></div>
+            <div class="rectangle"
+                 style="background-color: #FCCE6E;width:{{100*(teams[0].card_time()) / teams[0].card_duration()}}%"></div>
             {% endif %}
             {% if teams[0].card_time() < 0 %}
             <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
@@ -55,7 +61,8 @@
         <td></td>
         <td>
             {% if teams[1].card_time() > 0 %}
-            <div class="rectangle" style="background-color: #FCCE6E;width:{{100*(teams[1].card_time()) / teams[1].card_duration()}}%"></div>
+            <div class="rectangle"
+                 style="background-color: #FCCE6E;width:{{100*(teams[1].card_time()) / teams[1].card_duration()}}%"></div>
             {% endif %}
             {% if teams[1].card_time() < 0 %}
             <div class="rectangle" style="background-color: #EC4A4A"></div>
@@ -99,6 +106,18 @@
         <td></td>
         <td>
             <button onclick="fault(false)" class="button">Fault {{teams[1].name}}</button>
+        </td>
+    </tr>
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <td>
+            <button onclick="timeout(true)" class="button">Timeout {{teams[0].name}}</button>
+        </td>
+        <td></td>
+        <td>
+            <button onclick="timeout(false)" class="button">Timeout {{teams[1].name}}</button>
         </td>
     </tr>
     <tr>
@@ -173,20 +192,8 @@
             </div>
         </td>
     </tr>
-    <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td>
-            <button onclick="timeout(true)" class="button">Timeout {{teams[0].name}}</button>
-        </td>
-        <td></td>
-        <td>
-            <button onclick="timeout(false)" class="button">Timeout {{teams[1].name}}</button>
-        </td>
-    </tr>
 </table>
 <br>
-<button class="button" onclick="undo()">Undo</button>
+<button class="button" onclick="undo()" style="background-color: #2a5d88;">Undo</button>
 </body>
 </html>

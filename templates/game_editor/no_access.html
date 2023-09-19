@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unauthorised Access: {{error}}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/password.js') }}"></script>
+<h1>{{error}}</h1>
+<img src="https://securitystbk.com/wp-content/uploads/2018/11/Padlock-PNG-Transparent-Image.png">
+<br>
+<label>Enter a password:
+    <input type="password" id="pword">
+</label>
+<br>
+<br>
+<br>
+<button class="button" onclick="runPassword()">Submit</button>
+</body>
+</html>

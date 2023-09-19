@@ -80,14 +80,13 @@ class Game:
         con.info(f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}")
 
     def start(self, team_one_serves, swap_team_one, swap_team_two):
-        con.info(f"game {self.id} has {self.server()} serving from team {self.team_serving()}")
         self.started = True
         self.teams[0].start(team_one_serves, swap_team_one)
         self.teams[1].start(not team_one_serves, swap_team_two)
         self.first_team_serves = team_one_serves
+        self.info(f"Started, {self.server().nice_name()} serving from team {self.team_serving().nice_name()}")
 
     def end(self, best_player: str):
-        con.info(f"game {self.id} is over! Winner was {self.winner()}, Best Player is {self.best_player}")
         if self.game_ended():
             if self.best_player:
                 con.warn(
@@ -109,6 +108,7 @@ class Game:
                 [i.end() for i in self.teams]
                 self.primary_official.games_umpired += 1
                 self.primary_official.rounds_umpired += self.rounds
+            self.info(f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}")
 
     def in_progress(self):
         return self.started and not self.best_player
@@ -221,3 +221,8 @@ class Game:
 
     def score_string(self):
         return f"{self.teams[0].score} - {self.teams[1].score}"
+
+    def info(self, message):
+        if self.id < 0:
+            return
+        con.info(f"(Game {self.id}) {message}")
