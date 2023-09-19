@@ -12,7 +12,7 @@
 <img src="https://securitystbk.com/wp-content/uploads/2018/11/Padlock-PNG-Transparent-Image.png">
 <br>
 <label>Enter a password:
-    <input type="password" id="pword">
+    <input type="password" onkeydown="if (event.keyCode === 13) runPassword()" id="pword">
 </label>
 <br>
 <br>
