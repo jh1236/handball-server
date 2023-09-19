@@ -1,5 +1,12 @@
+import typing
+
 from structure.Player import GamePlayer
-from util import chunks_sized
+from util import chunks_sized, get_console
+
+if typing.TYPE_CHECKING:
+    from structure.Team import Team, GameTeam
+
+con = get_console()
 
 
 class Game:
@@ -31,7 +38,7 @@ class Game:
         self.rounds: int = 0
         self.started: bool = False
         self.best_player: GamePlayer | None = None
-        self.teams: list = [team_one.get_game_team(self), team_two.get_game_team(self)]
+        self.teams: list[GameTeam] = [team_one.get_game_team(self), team_two.get_game_team(self)]
         self.first_team_serves: bool = False
         self.primary_official = None
         self.round_number: int = 0
@@ -48,34 +55,60 @@ class Game:
 
     def next_point(self):
         self.rounds += 1
-
         [i.next_point() for i in self.teams]
 
-    def players(self):
+    def team_serving(self):
+        return [i for i in self.teams if i.serving][0]
+
+    def server(self):
+        serving_team = self.team_serving()
+        server = serving_team.players[not serving_team.first_player_serves]
+        if server.is_carded():
+            server = serving_team.players[serving_team.first_player_serves]
+        return server
+
+    def players(self) -> list[GamePlayer]:
         return [*self.teams[0].players, *self.teams[1].players]
 
     def winner(self):
         return max(self.teams, key=lambda a: a.score).team
 
     def print_gamestate(self):
-        print(f"         {self.teams[0].__repr__():^15}| {self.teams[1].__repr__():^15}")
-        print(f"score   :{self.teams[0].score:^15}| {self.teams[1].score:^15}")
-        print(f"cards   :{self.teams[0].card_time():^15}| {self.teams[1].card_time():^15}")
-        print(f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}")
+        con.info(f"         {self.teams[0].__repr__():^15}| {self.teams[1].__repr__():^15}")
+        con.info(f"score   :{self.teams[0].score:^15}| {self.teams[1].score:^15}")
+        con.info(f"cards   :{self.teams[0].card_time():^15}| {self.teams[1].card_time():^15}")
+        con.info(f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}")
 
     def start(self, team_one_serves, swap_team_one, swap_team_two):
+        con.info(f"game {self.id} has {self.server()} serving from team {self.team_serving()}")
         self.started = True
         self.teams[0].start(team_one_serves, swap_team_one)
         self.teams[1].start(not team_one_serves, swap_team_two)
         self.first_team_serves = team_one_serves
 
     def end(self, best_player: str):
+        con.info(f"game {self.id} is over! Winner was {self.winner()}, Best Player is {self.best_player}")
         if self.game_ended():
-            self.best_player = [i for i in self.players() if i.name == best_player][0]
-            self.best_player.best_player()
-            [i.end() for i in self.teams]
-            self.primary_official.games_umpired += 1
-            self.primary_official.rounds_umpired += self.rounds
+            if self.best_player:
+                con.warn(
+                    f"Game {self} has already been submitted, reloading the entire tournament (try to avoid doing this)")
+                for i in self.players():
+                    if i.name == best_player:
+                        self.best_player = i
+                        i.best_player()
+                        break
+                self.tournament.save()
+                self.tournament.load()
+            else:
+                self.best_player = []
+                for i in self.players():
+                    if i.name == best_player:
+                        self.best_player = i
+                        i.best_player()
+                        break
+                [i.end() for i in self.teams]
+                self.primary_official.games_umpired += 1
+                self.primary_official.rounds_umpired += self.rounds
 
     def in_progress(self):
         return self.started and not self.best_player
@@ -152,6 +185,7 @@ class Game:
     def load_from_string(self, game_string: str):
         j: str
         [i.reset() for i in self.teams]
+        self.rounds = 0
         self.teams[not self.first_team_serves].serving = True
         for j in chunks_sized(game_string, 2):
             team = self.teams[not j[1].isupper()]

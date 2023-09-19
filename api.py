@@ -1,11 +1,13 @@
 import flask
-from flask import request, send_file, render_template, Response
+from flask import request, send_file, render_template, Response, redirect
 
 from structure.GameUtils import game_string_to_commentary
 from tournaments.Tournament import Tournament
+from util import get_console
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+con = get_console()
 
 competition = Tournament()
 
@@ -57,64 +59,71 @@ def game():
 
 @app.post('/api/games/update/score')
 def score():
-    print(request.json)
+    con.info(f"Request for score: {request.json}")
     game_id = request.json["id"]
     ace = request.json["ace"]
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]
     competition.fixtures.get_game(game_id).teams[not first_team].score_point(first_player, ace)
-    competition.fixtures.get_game(game_id).print_gamestate()
+    competition.fixtures.save()
+    return "", 204
+
+
+@app.post('/api/games/update/ace')
+def ace():
+    con.info(f"Request for ace: {request.json}")
+    game_id = request.json["id"]
+    game = competition.fixtures.get_game(game_id)
+    serving_team = game.teams[not game.first_team_serves]
+    first_team = request.json["firstTeam"]
+    competition.fixtures.get_game(game_id).teams[not first_team].score_point(serving_team.first_player_serves, True)
     competition.fixtures.save()
     return "", 204
 
 
 @app.post('/api/games/update/start')
 def start():
-    print(request.json)
+    con.info(f"Request for start: {request.json}")
     game_id = request.json["id"]
 
     competition.fixtures.get_game(game_id).start(request.json["firstTeamServed"], request.json["swapTeamOne"],
                                                  request.json["swapTeamTwo"])
-    competition.fixtures.get_game(game_id).print_gamestate()
     competition.fixtures.save()
     return "", 204
 
 
 @app.post('/api/games/update/end')
 def end():
-    print(request.json)
+    con.info(f"Request for end: {request.json}")
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).end(request.json["bestPlayer"])
-    competition.fixtures.get_game(game_id).print_gamestate()
     competition.fixtures.save()
     return "", 204
 
 
 @app.post('/api/games/update/timeout')
 def timeout():
-    print(request.json)
+    con.info(f"Request for timeout: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).teams[not first_team].timeout()
-    competition.fixtures.get_game(game_id).print_gamestate()
     competition.fixtures.save()
     return "", 204
 
 
 @app.post('/api/games/update/fault')
 def fault():
-    print(request.json)
+    con.info(f"Request for fault: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).teams[not first_team].fault()
-    competition.fixtures.get_game(game_id).print_gamestate()
     competition.fixtures.save()
     return "", 204
 
 
 @app.post('/api/games/update/undo')
 def undo():
-    print(request.json)
+    con.info(f"Request for undo: {request.json}")
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).undo()
     competition.fixtures.get_game(game_id).print_gamestate()
@@ -124,7 +133,7 @@ def undo():
 
 @app.post('/api/games/update/card')
 def card():
-    print(request.json)
+    con.info(f"Request for card: {request.json}")
     color = request.json["color"]
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]
@@ -151,7 +160,7 @@ def site():
 
 @app.get('/teams/')
 def stats_directory_site():
-    teams = [(i.name, i.nice_name()) for i in competition.teams]
+    teams = [(i.name, i.nice_name()) for i in sorted(competition.teams, key=lambda a: a.nice_name())]
     return render_template("stats.html", teams=teams), 200
 
 
@@ -225,13 +234,13 @@ def players_site():
         "Rounds Carded": 5,
     }
     all_players = []
-    for i in sorted(competition.teams, key=lambda a: a.name):
+    for i in sorted(competition.teams, key=lambda a: a.nice_name()):
         all_players += sorted(i.players, key=lambda a: a.name)
     print(all_players)
-    teams = [(i.name, i.team.nice_name(), [(v, priority[k]) for k, v in i.get_stats().items()]) for i in all_players]
+    players = [(i.name, i.team.nice_name(), [(v, priority[k]) for k, v in i.get_stats().items()]) for i in all_players]
     headers = ["Name"] + [i for i in competition.teams[0].players[0].get_stats()]
     return render_template("players.html", headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
-                           teams=teams), 200
+                           players=players), 200
 
 
 @app.get('/officials/<nice_name>/')
@@ -257,9 +266,38 @@ def rules():
     return send_file("./resources/rules.pdf"), 200
 
 
+@app.get('/log/')
+def log():
+    with open("./resources/latest.log", "r") as fp:
+        return Response(fp.read(), mimetype='text/plain')
+
+
 @app.get('/code_of_conduct/')
 def code_of_conduct():
     return send_file("./resources/code_of_conduct.pdf"), 200
+
+
+@app.get('/games/<game_id>/edit')
+def game_editor(game_id):
+    if int(game_id) >= len(competition.fixtures.games_to_list()):
+        raise Exception("Game Does not exist!!")
+    game = competition.fixtures.get_game(int(game_id))
+    teams = game.teams
+    key = request.args.get("key", None)
+    players = [i for i in game.players()]
+    if key not in [game.primary_official.key, "admin"]:
+        return "Wrong Code", 403
+    if not game.started:
+        return render_template("game_editor/game_start.html", players=[i.tidy_name() for i in players],
+                               teams=teams, game=game), 200
+    elif not game.game_ended():
+        return render_template("game_editor/edit_game.html", players=[i.tidy_name() for i in players],
+                               teams=teams, game=game), 200
+    elif not game.best_player or key == "admin":
+        return render_template("game_editor/finalise.html", players=[i.tidy_name() for i in players],
+                               teams=teams, game=game), 200
+    else:
+        return "This game is already completed!", 400
 
 
 if __name__ == "__main__":

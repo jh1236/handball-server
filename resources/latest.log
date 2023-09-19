@@ -1,0 +1,26 @@
+[INFO: ] Request for start: {'id': 0, 'firstTeamServed': True, 'swapTeamOne': False, 'swapTeamTwo': False}
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |        0       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for card: {'id': 0, 'firstTeam': False, 'firstPlayer': False, 'color': 'red', 'time': 3}
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :       0       |        0       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for card: {'id': 0, 'firstTeam': False, 'firstPlayer': True, 'color': 'red', 'time': 3}
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :      11       |        0       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for end: {'id': 0, 'bestPlayer': 'James Sharpham'}
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :      11       |        0       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       1       |        1       
+[INFO: ] Request for end: {'id': 0, 'bestPlayer': 'Brigitte Gredziuk'}
+[WARN: ] Game The Breaking Bad Bois vs Simps has already been submitted, reloading the entire tournament (try to avoid doing this)
+[INFO: ]          The Breaking Bad Bois|      Simps     
+[INFO: ] score   :      11       |        0       
+[INFO: ] cards   :       0       |       -1       
+[INFO: ] timeouts:       1       |        1       

@@ -2,26 +2,31 @@
   {
     "name": "Jared Healy",
     "team": "The Officials",
-    "primary": true
+    "primary": true,
+    "key": "key"
   },
   {
     "name": "Aimee Soudure",
     "team": "None",
-    "primary": true
+    "primary": true,
+    "key": "key"
   },
   {
     "name": "Zaiah Deards",
     "team": "None",
-    "primary": true
+    "primary": true,
+    "key": "key"
   },
   {
     "name": "Lachlan Banks",
-    "team": "IKEA workers",
-    "primary": true
+    "team": "Google Workers",
+    "primary": true,
+    "key": "key"
   },
   {
     "name": "Brigitte Gredziuk",
-    "team": "Bad Bois",
-    "primary": true
+    "team": "The Breaking Bad Bois",
+    "primary": true,
+    "key": "key"
   }
 ]

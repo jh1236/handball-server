@@ -8,7 +8,6 @@ class Fixtures:
         self.tournament = tournament
         self.rounds: list[list[Game]] = []
         self.generator = self.generate_round()
-        self.get_game(0)  # used to initialise the first round
         self.load()
 
     def games_to_list(self) -> list[Game]:
@@ -32,9 +31,12 @@ class Fixtures:
     def save(self):
         print("Saving...")
         with open("./resources/games.json", "w+") as fp:
-            json.dump([[j.as_map() for j in i] for i in self.rounds], fp, indent=4, sort_keys=True)
+            json.dump([[j.as_map() for j in i if j.started] for i in self.rounds], fp, indent=4, sort_keys=True)
 
     def load(self):
+        self.rounds = []
+        self.get_game(0)  # used to initialise the first round
+        self.generator = self.generate_round()
         with open("./resources/games.json") as fp:
             rounds = [[Game.from_map(j, self.tournament) for j in i] for i in json.load(fp)]
         for i, r in enumerate(rounds):

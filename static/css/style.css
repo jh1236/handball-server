@@ -61,3 +61,55 @@ img.logo {
 .nav {
     text-align: left;
 }
+
+.button {
+    background-color: #018786; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    height: 60px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.green_button {
+    background-color: #84AA63; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    height: 60px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.yellow_button {
+    background-color: #FCCE6E;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    height: 60px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.red_button {
+    background-color: #EC4A4A; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    height: 60px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}

@@ -1,5 +1,8 @@
 from structure.Game import Game
 from structure.Player import Player, GamePlayer
+from util import get_console
+
+con = get_console()
 
 
 class Team:
@@ -62,7 +65,7 @@ class Team:
         return d
 
     def nice_name(self):
-        return self.name.lower().replace(" ", "_")
+        return self.name.lower().replace(" ", "_").replace("the_", "")
 
 
 BYE = Team("BYE", [])
@@ -97,6 +100,7 @@ class GameTeam:
         self.green_carded = False
         self.score = 0
         self.serving = False
+        self.faulted = False
         self.timeouts = 1
         self.green_cards = 0
         self.yellow_cards = 0
@@ -123,7 +127,16 @@ class GameTeam:
 
     def score_point(self, first_player: bool | None = None, ace: bool = False):
         if first_player is not None:
+            if ace:
+                con.info(
+                    f"(Game {self.game.id}) Ace Scored by {self.players[not first_player]} from team {self.name}. Score is {self.game.score_string()}")
+            else:
+                con.info(
+                    f"(Game {self.game.id}) Point Scored by {self.players[not first_player]} from team {self.name}. Score is {self.game.score_string()}")
             self.players[not first_player].score_point(ace)
+        else:
+            con.info(
+                f"(Game {self.game.id}) Penalty Point Awarded to team {self.name}.  Score is {self.game.score_string()}")
         self.score += 1
         self.opponent.lost_point()
         if not self.serving:
@@ -136,6 +149,7 @@ class GameTeam:
         self.game.next_point()
 
     def fault(self):
+        con.info(f"(Game {self.game.id}) Fault by {self.players[not self.first_player_serves]} from team {self.name}")
         self.players[not self.first_player_serves].fault()
         self.game.add_to_game_string("f" + ("l" if self.first_player_serves else "r"), self)
         self.faults += 1
@@ -146,12 +160,14 @@ class GameTeam:
             self.faulted = True
 
     def green_card(self, first_player: bool):
+        con.info(f"(Game {self.game.id}) Green Card for {self.players[not first_player]} from team {self.name}")
         self.green_carded = True
         self.green_cards += 1
         self.players[not first_player].green_card()
         self.game.add_to_game_string("g" + ("l" if first_player else "r"), self)
 
     def yellow_card(self, first_player: bool, time: int = 3):
+        con.info(f"(Game {self.game.id}) Yellow Card for {self.players[not first_player]} from team {self.name}")
         self.yellow_cards += 1
         self.players[not first_player].yellow_card(time)
         if time == 3:
@@ -162,6 +178,7 @@ class GameTeam:
             self.opponent.score_point()
 
     def red_card(self, first_player: bool):
+        con.info(f"(Game {self.game.id}) Red Card for {self.players[not first_player]} from team {self.name}")
         self.red_cards += 1
         self.players[not first_player].red_card()
         self.game.add_to_game_string(f"v{'l' if first_player else 'r'}", self)
@@ -169,6 +186,7 @@ class GameTeam:
             self.opponent.score_point()
 
     def timeout(self):
+        con.info(f"(Game {self.game.id}) Timeout called by {self.name}")
         self.game.add_to_game_string(f"tt", self)
         self.timeouts -= 1
 

@@ -4,10 +4,11 @@ from structure.Team import Team
 
 
 class Official:
-    def __init__(self, name: str, team: Team | None, primary: bool = False):
+    def __init__(self, name: str, key: str, team: Team | None, primary: bool = False):
         self.name: str = name
         self.team: Team | None = team
         self.games_officiated: int = 0
+        self.key: str = key
         self.primary: bool = primary
         self.games_umpired = 0
         self.faults: int = 0
@@ -44,7 +45,7 @@ class Officials:
         with open("./resources/officials.json") as fp:
             for i in json.load(fp):
                 team = ([j for j in self.tournament.teams if j.name == i["team"]] + [None])[0]
-                o = Official(i["name"], team)
+                o = Official(i["name"], i["key"], team)
                 if i["primary"]:
                     self.primary.append(o)
                 self.officials.append(o)

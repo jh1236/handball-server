@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Handball Tournament</title>
+    <title>Details for {{name}}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
 </head>
 <body>
@@ -10,13 +10,10 @@
 <a href="http://handball-tourney.zapto.org/officials/">
     <img src="http://handball-tourney.zapto.org/api/teams/image?name=umpire" class="team_logo"></a>
 <h1>Statistics for {{name}}</h1>
-<table class="table">
-    <tbody>
-    {% for stat in stats %}
-    <p><b>{{ stat[0] }}:</b> {{ stat[1] }}</p>
-    {% endfor %}
-    </tbody>
-</table>
+{% for stat in stats %}
+<p><b>{{ stat[0] }}:</b> {{ stat[1] }}</p>
+{% endfor %}
+
 <br>
 <br>
 <br>

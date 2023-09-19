@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Teams List</title>
+    <title>{{teams[0].name}} vs {{teams[1].name}}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
 </head>
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <h1>{{teams[0].name}} vs {{teams[1].name}} </h1>
+    <h1>{{teams[0].name}} vs {{teams[1].name}}</h1>
     <h1 class="big">{{teams[0].score}} - {{teams[1].score}}</h1>
     <p><b>Round:</b> <i>{{roundNumber}}</i></p>
     <p><b>Match Official:</b> <a class = "hide" href = "http://handball-tourney.zapto.org/officials/{{official.nice_name()}}"><i>{{official}}</i></a></p>
