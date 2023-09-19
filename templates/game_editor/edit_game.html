@@ -10,6 +10,16 @@
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/scorer.js') }}"></script>
 <script> setId({{game.id}})</script>
+<div id="myNav" class="overlay">
+
+    <!-- Button to close the overlay navigation -->
+    <a href="javascript:void(0)" class="closebtn" onclick="timeoutTime = -1">&times;</a>
+
+    <!-- Overlay content -->
+    <h1 class="overlay-content" id = "timeoutClock"></h1>
+
+</div>
+
 <h1>{{teams[0].name}} vs {{teams[1].name}}</h1>
 <h1 class="big">{{teams[0].score}} - {{teams[1].score}}</h1>
 <p><b>Round:</b> <i>{{game.rounds}}</i></p>

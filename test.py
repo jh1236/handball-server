@@ -81,6 +81,8 @@ random = Random()
 game_count = 40
 con = get_console()
 con.print = False
+
+
 def r_bool():
     return bool(random.randint(0, 1))
 
