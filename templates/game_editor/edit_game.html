@@ -8,11 +8,7 @@
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/scorer.js') }}"></script>
-<script> setId({
-{
-    game.id
-}
-})</script>
+<script> setId({{game.id}})</script>
 <h1>{{teams[0].name}} vs {{teams[1].name}}</h1>
 <h1 class="big">{{teams[0].score}} - {{teams[1].score}}</h1>
 <p><b>Round:</b> <i>{{game.rounds}}</i></p>
