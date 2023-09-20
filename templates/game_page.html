@@ -12,10 +12,17 @@
     <h1><a href="/games/{{game.id}}" class="hide">{{teams[0].name}} vs {{teams[1].name}}</a></h1>
     <h1 class="big">{{game.score_string()}}</h1>
     <p><b>Round:</b> <i>{{roundNumber}}</i></p>
-    <p><b>Match Official:</b> <a class = "hide" href = "/officials/{{official.nice_name()}}"><i>{{official}}</i></a></p>
-    <p><a href="/games/{{game.id}}/edit" class = "hide"><b>Status:</b></a> <i>{{status}}</i></p>
+    <p><b>Match Official:</b> <a class="hide" href="/officials/{{official.nice_name()}}"><i>{{official}}</i></a></p>
+    <p><a href="/games/{{game.id}}/edit" class="hide"><b>Status:</b></a> <i>{{status}}</i></p>
     {% if game.best_player %}
     <p><b>Best on Court:</b> <i>{{best}}</i></p>
+    {% endif %}
+    {% if game.in_progress() %}
+    {% if game.team_serving().faulted %}
+    <p><b>Serving:</b> <i style="color:#ff0000">{{game.server().tidy_name()}}</i></p>
+    {% else %}
+    <p><b>Serving:</b> <i>{{game.server().tidy_name()}}</i></p>
+    {% endif %}
     {% endif %}
     <br>
     <table class="table">

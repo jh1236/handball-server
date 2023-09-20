@@ -37,10 +37,11 @@ function card(firstTeam, firstPlayer, color) {
 function timeout(firstTeam) {
     timeoutTime = Date.now() + 30000
     document.getElementById("myNav").style.width = "100%";
+    const y = window.scrollY
     window.onscroll = function () {
-        window.scrollTo(0, 100);
+        window.scrollTo(0, y);
     };
-    setInterval(function (x) {
+    setInterval(() => {
         if (timeoutTime < 0) {
             window.onscroll = function () {
             };
@@ -51,7 +52,12 @@ function timeout(firstTeam) {
         } else {
             document.getElementById("timeoutClock").style = ""
         }
-        document.getElementById("timeoutClock").textContent = "" + Math.round((timeoutTime - Date.now()) / 100) / 10
+        const str = "" + Math.round((timeoutTime - Date.now()) / 100) / 10
+        if (str.includes(".")) {
+            document.getElementById("timeoutClock").textContent = "" + Math.round((timeoutTime - Date.now()) / 100) / 10
+        } else {
+            document.getElementById("timeoutClock").textContent = ("" + Math.round((timeoutTime - Date.now()) / 100) / 10) + ".0"
+        }
     }, 100)
 
     fetch("/api/games/update/timeout", {

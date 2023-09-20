@@ -6,18 +6,6 @@
     "key": "***REMOVED***"
   },
   {
-    "name": "Aimee Soudure",
-    "team": "None",
-    "primary": true,
-    "key": "key"
-  },
-  {
-    "name": "Zaiah Deards",
-    "team": "None",
-    "primary": true,
-    "key": "2645"
-  },
-  {
     "name": "Lachlan Banks",
     "team": "Google Workers",
     "primary": true,
@@ -28,5 +16,17 @@
     "team": "The Breaking Bad Bois",
     "primary": true,
     "key": "key"
+  },
+  {
+    "name": "Aimee Soudure",
+    "team": "None",
+    "primary": true,
+    "key": "key"
+  },
+  {
+    "name": "Zaiah Deards",
+    "team": "None",
+    "primary": true,
+    "key": "2645"
   }
 ]
