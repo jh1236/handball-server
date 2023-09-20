@@ -75,10 +75,7 @@ def fault(game_id, first_team):
     return "", 204
 
 
-competition.dump()
-game_id = 0
 random = Random()
-game_count = 40
 con = get_console()
 con.print = False
 
@@ -87,25 +84,29 @@ def r_bool():
     return bool(random.randint(0, 1))
 
 
-competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
-while game_id < (game_count - 1):
-    game = competition.fixtures.get_game(game_id)
-    if competition.fixtures.get_game(game_id).game_ended():
-        game.end(game.players()[0].name)
-        game_id += 1
-        competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
-        continue
-    competition.fixtures.get_game(game_id)
-    code = random.randint(0, 11)
-    if code <= 7:
-        score(game_id, r_bool(), r_bool(), r_bool())
-    elif code <= 9:
-        choice = random.choice(["green", "yellow"] * 2 + ["red"])
-        card(game_id, choice, r_bool(), r_bool())
-    elif code == 10:
-        timeout(game_id, r_bool())
-    elif code == 11:
-        fault(game_id, r_bool())
+while not sorted(competition.teams, key=lambda a: -a.games_won)[0].name == "The Officials":
+    competition.dump()
+    game_id = 0
+    game_count = 40
+    competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
+    while game_id < (game_count - 1):
+        game = competition.fixtures.get_game(game_id)
+        if competition.fixtures.get_game(game_id).game_ended():
+            game.end(game.players()[0].name)
+            game_id += 1
+            competition.fixtures.get_game(game_id).start(r_bool(), r_bool(), r_bool())
+            continue
+        competition.fixtures.get_game(game_id)
+        code = random.randint(0, 11)
+        if code <= 7:
+            score(game_id, r_bool(), r_bool(), r_bool())
+        elif code <= 9:
+            choice = random.choice(["green", "yellow"] * 2 + ["red"])
+            card(game_id, choice, r_bool(), r_bool())
+        elif code == 10:
+            timeout(game_id, r_bool())
+        elif code == 11:
+            fault(game_id, r_bool())
 print("-" * 20)
 for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
     print(f"{i + 1}: {t.name} [{t.first_ratio()}]")
