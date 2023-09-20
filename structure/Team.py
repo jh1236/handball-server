@@ -22,6 +22,7 @@ class Team:
         self.red_cards: int = 0
         self.faults: int = 0
         self.timeouts: int = 0
+        self.listed_first: int = 0
 
     def get_game_team(self, game: Game):
         return GameTeam(self, game)
@@ -37,6 +38,7 @@ class Team:
         [i.reset() for i in self.players]
         self.points_against: int = 0
         self.points_for: int = 0
+        self.listed_first: int = 0
         self.games_won: int = 0
         self.games_played: int = 0
         self.green_cards: int = 0
@@ -79,6 +81,9 @@ class Team:
 
     def nice_name(self):
         return self.name.lower().replace(" ", "_").replace("the_", "")
+
+    def first_ratio(self):
+        return self.listed_first / (self.games_played or 1)
 
 
 BYE = Team("BYE", [])

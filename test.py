@@ -108,7 +108,7 @@ while game_id < (game_count - 1):
         fault(game_id, r_bool())
 print("-" * 20)
 for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
-    print(f"{i + 1}: {t.name}")
+    print(f"{i + 1}: {t.name} [{t.first_ratio()}]")
 print("-" * 20)
 con.print = True
 api.app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)

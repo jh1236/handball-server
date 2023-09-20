@@ -39,6 +39,8 @@ class Game:
         self.started: bool = False
         self.best_player: GamePlayer | None = None
         self.teams: list[GameTeam] = [team_one.get_game_team(self), team_two.get_game_team(self)]
+        if self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio():
+            self.teams.reverse()
         self.first_team_serves: bool = False
         self.primary_official = None
         self.round_number: int = 0
@@ -88,27 +90,24 @@ class Game:
 
     def end(self, best_player: str):
         if self.game_ended():
-            if self.best_player:
-                con.warn(
-                    f"Game {self} has already been submitted, reloading the entire tournament (try to avoid doing this)")
-                for i in self.players():
-                    if i.name == best_player:
-                        self.best_player = i
-                        break
-                self.tournament.save()
-                self.tournament.load()
-            else:
-                self.best_player = []
-                for i in self.players():
-                    if i.name == best_player:
-                        self.best_player = i
-                        i.best_player()
-                        break
-                [i.end() for i in self.teams]
-                self.primary_official.games_umpired += 1
-                self.primary_official.rounds_umpired += self.rounds
+            should_dump = self.best_player
+            self.teams[0].team.listed_first += 1
+            self.best_player = []
+            for i in self.players():
+                if i.name == best_player:
+                    self.best_player = i
+                    i.best_player()
+                    break
+            [i.end() for i in self.teams]
+            self.primary_official.games_umpired += 1
+            self.primary_official.rounds_umpired += self.rounds
             self.info(
                 f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}")
+            if should_dump:
+                con.warn(
+                    f"Game {self} has already been submitted, reloading the entire tournament (try to avoid doing this)")
+                self.tournament.save()
+                self.tournament.load()
 
     def in_progress(self):
         return self.started and not self.best_player
