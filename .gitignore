@@ -1,6 +1,7 @@
 __pycache__/
-*.py[cod]
-*$py.class
-*.pyc
+.py[cod]
+$py.class
+.pyc
 __pypackages__/
-*.json
+resources/latest.log
+resources/games.json
