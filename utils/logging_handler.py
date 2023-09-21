@@ -5,8 +5,12 @@ from logging import StreamHandler
 from typing import Union
 
 
+logger = logging.getLogger("SUSS")
+logger.setLevel(logging.DEBUG)
+
+
 def get_SUSS_handler() -> Union[StreamHandler, False]:
-    for handler in logging.getLogger().handlers:
+    for handler in logging.getLogger("SUSS").handlers:
         if handler.get_name() == "SUSS_handler":
             return handler
     return False
@@ -27,5 +31,6 @@ logging_handler.setFormatter(
     )
 )
 
+logging.getLogger("SUSS").addHandler(logging_handler)
 logging.getLogger().addHandler(logging_handler)
 logging.debug("SUSS logging handler added")

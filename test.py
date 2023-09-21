@@ -2,13 +2,12 @@ from random import Random
 
 import api
 from tournaments.Tournament import Tournament
-import logging
+from utils.logging_handler import logger
 
 competition: Tournament = api.competition
 competition.load()
 
-logging.debug(competition.teams)
-
+logger.debug(competition.teams)
 
 def teams():
     return {i.name: [j.name for j in i.players] for i in competition.teams}

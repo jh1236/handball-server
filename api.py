@@ -1,9 +1,8 @@
 import flask
-from flask import request, send_file, render_template, Response, redirect
-import logging
+from flask import request, send_file, render_template, Response
 from structure.GameUtils import game_string_to_commentary
 from tournaments.Tournament import Tournament
-from utils.logger import get_SUSS_handler
+from utils.logging_handler import logger, get_SUSS_handler
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -57,7 +56,7 @@ def game():
 
 @app.post('/api/games/update/score')
 def score():
-    logging.info(f"Request for score: {request.json}")
+    logger.info(f"Request for score: {request.json}")
     game_id = request.json["id"]
     ace = request.json["ace"]
     first_team = request.json["firstTeam"]
@@ -69,7 +68,7 @@ def score():
 
 @app.post('/api/games/update/ace')
 def ace():
-    logging.info(f"Request for ace: {request.json}")
+    logger.info(f"Request for ace: {request.json}")
     game_id = request.json["id"]
     game = competition.fixtures.get_game(game_id)
     serving_team = game.teams[not game.first_team_serves]
@@ -81,7 +80,7 @@ def ace():
 
 @app.post('/api/games/update/start')
 def start():
-    logging.info(f"Request for start: {request.json}")
+    logger.info(f"Request for start: {request.json}")
     game_id = request.json["id"]
 
     competition.fixtures.get_game(game_id).start(request.json["firstTeamServed"], request.json["swapTeamOne"],
@@ -92,7 +91,7 @@ def start():
 
 @app.post('/api/games/update/end')
 def end():
-    logging.info(f"Request for end: {request.json}")
+    logger.info(f"Request for end: {request.json}")
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).end(request.json["bestPlayer"])
     competition.fixtures.save()
@@ -101,7 +100,8 @@ def end():
 
 @app.post('/api/games/update/timeout')
 def timeout():
-    logging.info(f"Request for timeout: {request.json}")
+    print("timeout")
+    logger.info(f"Request for timeout: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).teams[not first_team].timeout()
@@ -111,7 +111,8 @@ def timeout():
 
 @app.post('/api/games/update/fault')
 def fault():
-    logging.info(f"Request for fault: {request.json}")
+    print("fault")
+    logger.info(f"Request for fault: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).teams[not first_team].fault()
@@ -121,7 +122,7 @@ def fault():
 
 @app.post('/api/games/update/undo')
 def undo():
-    logging.info(f"Request for undo: {request.json}")
+    logger.info(f"Request for undo: {request.json}")
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).undo()
     competition.fixtures.get_game(game_id).print_gamestate()
@@ -131,7 +132,7 @@ def undo():
 
 @app.post('/api/games/update/card')
 def card():
-    logging.info(f"Request for card: {request.json}")
+    logger.info(f"Request for card: {request.json}")
     color = request.json["color"]
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]

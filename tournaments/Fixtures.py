@@ -1,7 +1,7 @@
 import json
 
 from structure.Game import Game
-import logging
+from utils.logging_handler import logger
 
 class Fixtures:
     def __init__(self, tournament):
@@ -31,7 +31,7 @@ class Fixtures:
         raise NotImplementedError()
 
     def save(self):
-        logging.info("Saving...")
+        logger.info("Saving...")
         with open("./resources/games.json", "w+") as fp:
             json.dump([[j.as_map() for j in i if j.started] for i in self.rounds], fp, indent=4, sort_keys=True)
 

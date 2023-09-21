@@ -3,7 +3,7 @@ from structure.Team import BYE, Team
 from tournaments.Fixtures import Fixtures
 from collections import defaultdict
 from typing import List, Dict, Tuple
-import logging
+from utils.logging_handler import logger
 
 class Swiss(Fixtures):
     def __init__(self, tournament, rounds=8):
@@ -61,7 +61,7 @@ class Swiss(Fixtures):
                 unfilled = False
         
         if not roster: # if some-how we end up here, just pair the best performing teams together.
-            logging.critical("COULD NOT GENERATE UNIQUE MATCH. PAIRING BEST TEAMS")
+            logger.error("COULD NOT GENERATE UNIQUE MATCH. PAIRING BEST TEAMS")
             unfilled = sorted(self.teams_fixed, key=lambda x: (x.games_won, x.points_for-x.points_against))
             roster = [unfilled[a:a+2]for a in range(0, len(unfilled), 2)]
             

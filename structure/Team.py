@@ -1,6 +1,6 @@
 from structure.Game import Game
 from structure.Player import Player, GamePlayer
-import logging
+from utils.logging_handler import logger
 
 class Team:
     def __init__(self, name: str, players: list[Player]):
@@ -111,7 +111,7 @@ class GameTeam:
     def info(self, text: str):
         if self.game.id < 0:
             return
-        logging.info(f"(Game {self.game.id}) {text}")
+        logger.info(f"(Game {self.game.id}) {text}")
 
     def __repr__(self):
         return repr(self.team)
