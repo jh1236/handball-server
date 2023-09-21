@@ -2,7 +2,7 @@ import json
 from random import Random
 
 from structure.Game import Game
-from util import chunks_sized
+from utils.util import chunks_sized
 
 with open("./resources/taunts.json") as fp:
     taunts = json.load(fp)

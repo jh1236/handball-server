@@ -1,5 +1,4 @@
 from structure.Game import Game
-from structure.Team import Team
 from tournaments.Fixtures import Fixtures
 
 

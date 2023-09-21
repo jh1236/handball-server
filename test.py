@@ -2,11 +2,12 @@ from random import Random
 
 import api
 from tournaments.Tournament import Tournament
-from util import get_console
+import logging
 
 competition: Tournament = api.competition
 competition.load()
-print(competition.teams)
+
+logging.debug(competition.teams)
 
 
 def teams():
@@ -76,8 +77,6 @@ def fault(game_id, first_team):
 
 
 random = Random()
-con = get_console()
-con.print = False
 
 
 def r_bool():
@@ -109,9 +108,9 @@ while not sorted(competition.teams, key=lambda a: -a.games_won)[0].name == "The 
             timeout(game_id, r_bool())
         elif code == 11:
             fault(game_id, r_bool())
+            
 print("-" * 20)
 for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
     print(f"{i + 1}: {t.name} [{t.first_ratio()}]")
 print("-" * 20)
-con.print = True
 api.app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)

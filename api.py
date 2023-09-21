@@ -1,14 +1,12 @@
 import flask
 from flask import request, send_file, render_template, Response, redirect
-
+import logging
 from structure.GameUtils import game_string_to_commentary
 from tournaments.Tournament import Tournament
-from util import get_console
+from utils.logger import get_SUSS_handler
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
-con = get_console()
-con.clear()
 competition = Tournament()
 
 
@@ -59,7 +57,7 @@ def game():
 
 @app.post('/api/games/update/score')
 def score():
-    con.info(f"Request for score: {request.json}")
+    logging.info(f"Request for score: {request.json}")
     game_id = request.json["id"]
     ace = request.json["ace"]
     first_team = request.json["firstTeam"]
@@ -71,7 +69,7 @@ def score():
 
 @app.post('/api/games/update/ace')
 def ace():
-    con.info(f"Request for ace: {request.json}")
+    logging.info(f"Request for ace: {request.json}")
     game_id = request.json["id"]
     game = competition.fixtures.get_game(game_id)
     serving_team = game.teams[not game.first_team_serves]
@@ -83,7 +81,7 @@ def ace():
 
 @app.post('/api/games/update/start')
 def start():
-    con.info(f"Request for start: {request.json}")
+    logging.info(f"Request for start: {request.json}")
     game_id = request.json["id"]
 
     competition.fixtures.get_game(game_id).start(request.json["firstTeamServed"], request.json["swapTeamOne"],
@@ -94,7 +92,7 @@ def start():
 
 @app.post('/api/games/update/end')
 def end():
-    con.info(f"Request for end: {request.json}")
+    logging.info(f"Request for end: {request.json}")
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).end(request.json["bestPlayer"])
     competition.fixtures.save()
@@ -103,7 +101,7 @@ def end():
 
 @app.post('/api/games/update/timeout')
 def timeout():
-    con.info(f"Request for timeout: {request.json}")
+    logging.info(f"Request for timeout: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).teams[not first_team].timeout()
@@ -113,7 +111,7 @@ def timeout():
 
 @app.post('/api/games/update/fault')
 def fault():
-    con.info(f"Request for fault: {request.json}")
+    logging.info(f"Request for fault: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).teams[not first_team].fault()
@@ -123,7 +121,7 @@ def fault():
 
 @app.post('/api/games/update/undo')
 def undo():
-    con.info(f"Request for undo: {request.json}")
+    logging.info(f"Request for undo: {request.json}")
     game_id = request.json["id"]
     competition.fixtures.get_game(game_id).undo()
     competition.fixtures.get_game(game_id).print_gamestate()
@@ -133,7 +131,7 @@ def undo():
 
 @app.post('/api/games/update/card')
 def card():
-    con.info(f"Request for card: {request.json}")
+    logging.info(f"Request for card: {request.json}")
     color = request.json["color"]
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]
@@ -274,9 +272,11 @@ def rules():
 
 
 @app.get('/log/')
-def log():
-    with open("./resources/latest.log", "r") as fp:
-        return Response(fp.read(), mimetype='text/plain')
+def log(): 
+    handler = get_SUSS_handler()
+    handler.flush() # make sure everything has gone through to the stream
+    handler.stream.seek(0)
+    return Response(handler.stream.read(), mimetype='text/plain')
 
 
 @app.get('/code_of_conduct/')

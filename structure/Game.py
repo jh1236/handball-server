@@ -1,12 +1,11 @@
 import typing
 
 from structure.Player import GamePlayer
-from util import chunks_sized, get_console
-
+from utils.util import chunks_sized
+import logging
 if typing.TYPE_CHECKING:
     from structure.Team import GameTeam
 
-con = get_console()
 
 
 class Game:
@@ -76,10 +75,10 @@ class Game:
         return max(self.teams, key=lambda a: a.score).team
 
     def print_gamestate(self):
-        con.info(f"         {self.teams[0].__repr__():^15}| {self.teams[1].__repr__():^15}")
-        con.info(f"score   :{self.teams[0].score:^15}| {self.teams[1].score:^15}")
-        con.info(f"cards   :{self.teams[0].card_time():^15}| {self.teams[1].card_time():^15}")
-        con.info(f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}")
+        logging.info(f"         {self.teams[0].__repr__():^15}| {self.teams[1].__repr__():^15}")
+        logging.info(f"score   :{self.teams[0].score:^15}| {self.teams[1].score:^15}")
+        logging.info(f"cards   :{self.teams[0].card_time():^15}| {self.teams[1].card_time():^15}")
+        logging.info(f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}")
 
     def start(self, team_one_serves, swap_team_one, swap_team_two):
         self.started = True
@@ -104,7 +103,7 @@ class Game:
             self.info(
                 f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}")
             if should_dump:
-                con.warn(
+                logging.warn(
                     f"Game {self} has already been submitted, reloading the entire tournament (try to avoid doing this)")
                 self.tournament.save()
                 self.tournament.load()
@@ -120,7 +119,7 @@ class Game:
             self.info(f"Undoing Game start")
             self.started = False
         elif self.best_player:
-            con.warn(f"Re-entering Game: This reloads the entire tournament, try and avoid.")
+            logging.warn(f"Re-entering Game: This reloads the entire tournament, try and avoid.")
             self.best_player = None
             self.game_string = self.game_string[:-2]
             self.load_from_string(self.game_string)
@@ -231,4 +230,4 @@ class Game:
     def info(self, message):
         if self.id < 0:
             return
-        con.info(f"(Game {self.id}) {message}")
+        logging.info(f"(Game {self.id}) {message}")

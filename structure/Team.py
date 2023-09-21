@@ -1,9 +1,6 @@
 from structure.Game import Game
 from structure.Player import Player, GamePlayer
-from util import get_console
-
-con = get_console()
-
+import logging
 
 class Team:
     def __init__(self, name: str, players: list[Player]):
@@ -114,7 +111,7 @@ class GameTeam:
     def info(self, text: str):
         if self.game.id < 0:
             return
-        con.info(f"(Game {self.game.id}) {text}")
+        logging.info(f"(Game {self.game.id}) {text}")
 
     def __repr__(self):
         return repr(self.team)

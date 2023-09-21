@@ -1,6 +1,6 @@
 from structure.Game import Game
 from tournaments.Fixtures import Fixtures
-from util import n_chunks
+from utils.util import n_chunks
 from itertools import zip_longest
 
 
