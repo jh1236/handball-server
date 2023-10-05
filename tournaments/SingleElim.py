@@ -1,14 +1,14 @@
 import math
 
 from structure.Game import Game
-from tournaments.Fixtures import Fixtures
+from tournaments.FixturesOld import FixturesOld
 
 
-class SingleElim(Fixtures):
-    def __init__(self, tournament):
+class SingleElim(FixturesOld):
+    def __init__(self, tournament, filename):
         self.teams = tournament.teams
         self.games: list[Game] = []
-        super().__init__(tournament)
+        super().__init__(tournament, filename)
 
     def generate_round(self):
         # check to see if we have a power of two number of teams

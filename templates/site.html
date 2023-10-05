@@ -20,7 +20,9 @@
     </thead>
     <tbody>
     {% for i, round in fixtures %}
-    <tr><td><br></td></tr>
+    <tr>
+        <td><br></td>
+    </tr>
     <tr>
         <th colspan="3">Round {{i + 1}}</th>
     </tr>
@@ -34,6 +36,32 @@
     </tr>
     {% endfor %}
     {% endfor %}
+    {% if finals %}
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <th colspan="3"><b>Finals:</b></th>
+    </tr>
+
+    {% for i, round in finals %}
+    <tr>
+        <th colspan="3">Round {{i + 1}}</th>
+    </tr>
+    {% for game in round %}
+    <tr>
+        <td><a href="/games/{{game[3]}}" class="hide">{{ game[0] }}</a></td>
+        <td><a href="/games/{{game[3]}}" class="hide"> vs</a></td>
+        <td><a href="/games/{{game[3]}}" class="hide">{{ game[1] }}</a></td>
+        <td><a href="/games/{{game[3]}}" class="hide">{{ game[2] }}</a></td>
+    </tr>
+
+    {% endfor %}
+    <tr>
+        <td><br></td>
+    </tr>
+    {% endfor %}
+    {% endif %}
     </tbody>
 </table>
 </body>

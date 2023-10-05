@@ -132,7 +132,9 @@ class GamePlayer:
         self.yellow_cards = 0
         self.red_cards = 0
 
-    def end(self):
+    def end(self, final=False):
+        if final:
+            return
         self.player.points_scored += self.points_scored
         self.player.aces_scored += self.aces_scored
         self.player.time_on_court += self.time_on_court
@@ -143,6 +145,18 @@ class GamePlayer:
         self.player.faults += self.faults
         self.player.double_faults += self.double_faults
         self.player.votes += self.best
+
+    def undo_end(self):
+        self.player.points_scored -= self.points_scored
+        self.player.aces_scored -= self.aces_scored
+        self.player.time_on_court -= self.time_on_court
+        self.player.time_carded -= self.time_carded
+        self.player.green_cards -= self.green_cards
+        self.player.yellow_cards -= self.yellow_cards
+        self.player.red_cards -= self.red_cards
+        self.player.faults -= self.faults
+        self.player.double_faults -= self.double_faults
+        self.player.votes -= self.best
 
     def tidy_name(self):
         first, second = self.name.split(" ", 1)

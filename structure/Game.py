@@ -3,9 +3,9 @@ import typing
 from structure.Player import GamePlayer
 from utils.util import chunks_sized
 from utils.logging_handler import logger
+
 if typing.TYPE_CHECKING:
     from structure.Team import GameTeam
-
 
 
 class Game:
@@ -30,7 +30,7 @@ class Game:
         Game.record_stats = True
         return game
 
-    def __init__(self, team_one, team_two, tournament):
+    def __init__(self, team_one, team_two, tournament, final: bool = False):
         self.tournament = tournament
         self.id: int = -1
         self.game_string: str = ""
@@ -38,7 +38,8 @@ class Game:
         self.started: bool = False
         self.best_player: GamePlayer | None = None
         self.teams: list[GameTeam] = [team_one.get_game_team(self), team_two.get_game_team(self)]
-        if self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio():
+        self.is_final = final
+        if not final and self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio():
             self.teams.reverse()
         self.first_team_serves: bool = False
         self.primary_official = None
@@ -74,6 +75,9 @@ class Game:
     def winner(self):
         return max(self.teams, key=lambda a: a.score).team
 
+    def loser(self):
+        return min(self.teams, key=lambda a: a.score).team
+
     def print_gamestate(self):
         logger.info(f"         {self.teams[0].__repr__():^15}| {self.teams[1].__repr__():^15}")
         logger.info(f"score   :{self.teams[0].score:^15}| {self.teams[1].score:^15}")
@@ -89,7 +93,10 @@ class Game:
 
     def end(self, best_player: str):
         if self.game_ended():
-            should_dump = self.best_player
+            if self.best_player:
+                [i.undo_end() for i in self.teams]
+                self.primary_official.games_umpired -= 1
+                self.primary_official.rounds_umpired -= self.rounds
             self.teams[0].team.listed_first += 1
             self.best_player = []
             for i in self.players():
@@ -97,16 +104,12 @@ class Game:
                     self.best_player = i
                     i.best_player()
                     break
-            [i.end() for i in self.teams]
+            [i.end(self.is_final) for i in self.teams]
             self.primary_official.games_umpired += 1
             self.primary_official.rounds_umpired += self.rounds
             self.info(
                 f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}")
-            if should_dump:
-                logger.warn(
-                    f"Game {self} has already been submitted, reloading the entire tournament (try to avoid doing this)")
-                self.tournament.save()
-                self.tournament.load()
+            self.tournament.fixtures.update_games()
 
     def in_progress(self):
         return self.started and not self.best_player
@@ -119,12 +122,13 @@ class Game:
             self.info(f"Undoing Game start")
             self.started = False
         elif self.best_player:
-            logger.warn(f"Re-entering Game: This reloads the entire tournament, try and avoid.")
+            [i.undo_end() for i in self.teams]
             self.best_player = None
+            self.primary_official.games_umpired -= 1
+            self.primary_official.rounds_umpired -= self.rounds
             self.game_string = self.game_string[:-2]
             self.load_from_string(self.game_string)
-            self.tournament.save()
-            self.tournament.load()
+            logger.info(f"Undoing Game End... game string is now {self.game_string}")
         else:
             self.game_string = self.game_string[:-2]
             self.load_from_string(self.game_string)

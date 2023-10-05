@@ -1,9 +1,12 @@
 from structure.Game import Game
 from structure.Player import Player, GamePlayer
 from utils.logging_handler import logger
+from utils.util import calc_elo
+
 
 class Team:
     def __init__(self, name: str, players: list[Player]):
+        self.elo = 1000
         self.name = name
         self.players: list[Player] = players
         for i in players:
@@ -39,6 +42,7 @@ class Team:
         self.games_won: int = 0
         self.games_played: int = 0
         self.green_cards: int = 0
+        self.elo = 1000
         self.yellow_cards: int = 0
         self.red_cards: int = 0
         self.faults: int = 0
@@ -60,6 +64,7 @@ class Team:
         timeouts = self.timeouts + sum([(1 - i.timeouts) for i in game_teams])
         faults = self.faults + sum([i.faults for i in game_teams])
         d = {
+            "ELO": round(self.elo),
             "Games Played": self.games_played,
             "Games Won": self.games_won,
             "Games Lost": self.games_played - self.games_won,
@@ -70,7 +75,8 @@ class Team:
             "Timeouts Called": timeouts,
             "Points For": points_for,
             "Points Against": points_against,
-            "Point Difference": dif
+            "Point Difference": dif,
+
         }
         if include_players:
             d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]
@@ -98,6 +104,7 @@ class GameTeam:
         self.red_cards: int = 0
         self.timeouts: int = 1
         self.green_carded: bool = False
+        self.elo_delta = None
         self.serving: bool = False
         self.score: int = 0
         self.faults: int = 0
@@ -123,6 +130,7 @@ class GameTeam:
         self.faulted = False
         self.timeouts = 1
         self.green_cards = 0
+        self.elo_delta = None
         self.yellow_cards = 0
         self.red_cards = 0
         self.faults = 0
@@ -216,22 +224,49 @@ class GameTeam:
     def card_duration(self):
         return max(self.players, key=lambda a: a.card_time_remaining).card_duration
 
-    def end(self):
-        [i.end() for i in self.players]
-        self.team.points_for += self.score
-        self.team.points_against += self.opponent.score
-        self.team.games_played += 1
-        self.team.games_won += self.game.winner() == self.team
-        self.team.teams_played.append(self.opponent.team)
-        self.team.green_cards += self.green_cards
-        self.team.yellow_cards += self.yellow_cards
-        self.team.red_cards += self.red_cards
-        self.team.faults += self.faults
-        self.team.timeouts += (1 - self.timeouts)
-        self.game.primary_official.green_cards += self.green_cards
-        self.game.primary_official.yellow_cards += self.yellow_cards
-        self.game.primary_official.red_cards += self.red_cards
-        self.game.primary_official.faults += self.faults
+    def end(self, final=False):
+        won = self.game.winner() == self.team
+        [i.end(final) for i in self.players]
+        if not final:
+            self.team.points_for += self.score
+            self.team.points_against += self.opponent.score
+            self.team.games_played += 1
+            self.team.games_won += won
+            self.team.teams_played.append(self.opponent.team)
+            self.team.green_cards += self.green_cards
+            self.team.yellow_cards += self.yellow_cards
+            self.team.red_cards += self.red_cards
+            self.team.faults += self.faults
+            self.team.timeouts += (1 - self.timeouts)
+            self.game.primary_official.green_cards += self.green_cards
+            self.game.primary_official.yellow_cards += self.yellow_cards
+            self.game.primary_official.red_cards += self.red_cards
+            self.game.primary_official.faults += self.faults
+
+        # either elo is not set, or it is positive, and we lost or negative, and we won
+        # meaning that the result of the game was changed
+        if not self.elo_delta or self.elo_delta > 0 != won:
+            self.elo_delta = calc_elo(self.team, self.opponent.team, won)
+        self.team.elo += self.elo_delta
+        logger.info(f"Elo change is {self.elo_delta}, leaving total equal to {self.team.elo}")
+
+    def undo_end(self):
+        [i.undo_end() for i in self.players]
+        self.team.points_for -= self.score
+        self.team.elo -= self.elo_delta
+        self.team.points_against -= self.opponent.score
+        self.team.games_played -= 1
+        self.team.games_won -= self.game.winner() == self.team
+        self.team.teams_played.remove(self.opponent.team)
+        self.team.green_cards -= self.green_cards
+        self.team.yellow_cards -= self.yellow_cards
+        self.team.red_cards -= self.red_cards
+        self.team.faults -= self.faults
+        self.team.timeouts -= (1 - self.timeouts)
+        self.game.primary_official.green_cards -= self.green_cards
+        self.game.primary_official.yellow_cards -= self.yellow_cards
+        self.game.primary_official.red_cards -= self.red_cards
+        self.game.primary_official.faults -= self.faults
 
     def nice_name(self):
         return self.team.nice_name()

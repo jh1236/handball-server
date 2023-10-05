@@ -4,12 +4,11 @@ import io
 from logging import StreamHandler
 from typing import Union
 
-
 logger = logging.getLogger("SUSS")
 logger.setLevel(logging.DEBUG)
 
 
-def get_SUSS_handler() -> Union[StreamHandler, False]:
+def get_SUSS_handler() -> StreamHandler | None:
     for handler in logging.getLogger("SUSS").handlers:
         if handler.get_name() == "SUSS_handler":
             return handler

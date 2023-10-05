@@ -1,20 +1,19 @@
 from structure.Game import Game
 from structure.Team import BYE, Team
-from tournaments.Fixtures import Fixtures
+from tournaments.FixturesOld import FixturesOld
 from collections import defaultdict
 from typing import List, Dict, Tuple
 from utils.logging_handler import logger
 
-class Swiss(Fixtures):
-    def __init__(self, tournament, rounds=8):
 
+class Swiss:
+    def __init__(self, tournament, rounds=8):
+        self.tournament = tournament
         self.teams_fixed = tournament.teams.copy()
         if len(self.teams_fixed) % 2 == 1:
             self.teams_fixed.append(BYE)
         self.round_count = rounds
         self.max_rounds = len(self.teams_fixed) - 1
-
-        super().__init__(tournament)
 
     def generate_round(self):
         """Generates each round of the competition
@@ -24,8 +23,6 @@ class Swiss(Fixtures):
         """
         for _ in range(self.round_count):
             yield self.match_make()
-                
-            
 
     def match_make(self) -> List[Game]:
         """
@@ -42,7 +39,7 @@ class Swiss(Fixtures):
 
         unfilled = sorted(self.teams_fixed, key=lambda x: (x.games_won, x.points_for - x.points_against))
 
-        counter = 0 # used to count how many attempts are made before we turn to the fallback method.
+        counter = 0  # used to count how many attempts are made before we turn to the fallback method.
         while unfilled:
             target = unfilled.pop(0)
 
@@ -59,19 +56,18 @@ class Swiss(Fixtures):
             if counter > (len(self.teams_fixed) * 2):
                 roster = self.fallback()
                 unfilled = False
-        
-        if not roster: # if some-how we end up here, just pair the best performing teams together.
+
+        if not roster:  # if some-how we end up here, just pair the best performing teams together.
             logger.error("COULD NOT GENERATE UNIQUE MATCH. PAIRING BEST TEAMS")
-            unfilled = sorted(self.teams_fixed, key=lambda x: (x.games_won, x.points_for-x.points_against))
-            roster = [unfilled[a:a+2]for a in range(0, len(unfilled), 2)]
-            
+            unfilled = sorted(self.teams_fixed, key=lambda x: (x.games_won, x.points_for - x.points_against))
+            roster = [unfilled[a:a + 2] for a in range(0, len(unfilled), 2)]
+
         # turn the proposed games into game objects
         final_roster = []
         for j in roster:
-            final_roster.append(Game(j[0], j[1], self))
+            final_roster.append(Game(j[0], j[1], self.tournament))
 
         return final_roster
-
 
     def get_possible_pairs(self) -> Dict[Team, List[Team]]:
         """finds all teams that have not played eachother yet.
@@ -85,7 +81,7 @@ class Swiss(Fixtures):
                 if not j.has_played(k) and j != k:
                     possible_pairs[j].append(k)
         return possible_pairs
-            
+
     def fallback(self) -> Tuple[Team, Team]:
         """Starter function for the fallback method of finding matches, equivilant to round robin
 
@@ -93,12 +89,11 @@ class Swiss(Fixtures):
             Tuple[Team, Team]: the array of matches to be sent to self.match_make(), to be converted to Game objects
         """
         possible_pairs = self.get_possible_pairs()
-        
+
         used = []
         games = []
         self.find_unique_recursive(games, used, possible_pairs)
         return games
-    
 
     def get_available_teams(self, used: List[Team], teams: List[Team] = None) -> List[Team]:
         """filters out teams which are already being used, allowing for simpler code and a small amount of
@@ -114,9 +109,9 @@ class Swiss(Fixtures):
         if teams == None:
             teams = self.teams_fixed
         return [team for team in teams if team not in used]
-        
-    
-    def find_unique_recursive(self, games: List[Tuple[Team, Team]], used: List[Team], possible_pairs: Dict[Team, List[Team]]) -> None:
+
+    def find_unique_recursive(self, games: List[Tuple[Team, Team]], used: List[Team],
+                              possible_pairs: Dict[Team, List[Team]]) -> None:
         """brute forces all combinations of possible matches to find one that has not been played before
 
         Args:

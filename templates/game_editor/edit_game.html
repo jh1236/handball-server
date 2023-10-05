@@ -87,7 +87,9 @@
                 <div class="dropdown-content">
                     <p onclick="score(true, true)">{{teams[0].players[0].name}}</p>
                     <p onclick="score(true, false)">{{teams[0].players[1].name}}</p>
+                    {% if teams[0].serving %}
                     <p onclick="ace(true)">Ace</p>
+                    {% endif %}
                 </div>
             </div>
         </td>
@@ -98,7 +100,9 @@
                 <div class="dropdown-content">
                     <p onclick="score(false, true)">{{teams[1].players[0].name}}</p>
                     <p onclick="score(false, false)">{{teams[1].players[1].name}}</p>
+                    {% if teams[1].serving %}
                     <p onclick="ace(false)">Ace</p>
+                    {% endif %}
                 </div>
             </div>
         </td>
