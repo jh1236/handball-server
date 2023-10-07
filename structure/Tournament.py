@@ -1,27 +1,28 @@
 import json
-from typing import Generator, Callable, Any
+from typing import Generator, Type
 
 from structure.Game import Game
 from structure.OfficiatingBody import Officials
 from structure.Player import Player
 from structure.Team import Team
+from tournaments.FixtureMaker import FixtureMaker, get_type_from_name
 from utils.logging_handler import logger
 
 
-class Fixtures:
-    def __init__(self, file: str, fixtures: Callable[[Any], Generator[list[Game], None, None]],
-                 finals: Callable[[Any], Generator[list[Game], None, None]]):
+class Tournament:
+    def __init__(self, file: str, fixtures: Type[FixtureMaker],
+                 finals: Type[FixtureMaker]):
         # TODO: move this to the constructor
         self.filename = f"./resources/tournaments/{file}"
         self.in_finals: bool = False
-        self.create_fixtures: Callable[[Any], Generator[list[Game], None, None]] = fixtures
-        self.create_finals: Callable[[Any], Generator[list[Game], None, None]] = finals
         self.teams = []
         self.fixtures: list[list[Game]] = []
         self.finals: list[list[Game]] = []
-        self.load_teams()
-        self.fixtures_gen: Generator[list[Game]] = self.create_fixtures(self)
-        self.finals_gen: Generator[list[Game]] = self.create_finals(self)
+        self.fixtures_class = None
+        self.finals_class = None
+        self.initial_load()
+        self.fixtures_gen: Generator[list[Game]] = None
+        self.finals_gen: Generator[list[Game]] = None
         self.officials: Officials = Officials(self)
         self.load()
 
@@ -81,6 +82,10 @@ class Fixtures:
     def save(self):
         logger.info("Saving...")
         d = {
+            "details": {
+                "fixture_generator": self.fixtures_class.get_name(),
+                "finals_generator": self.finals_class.get_name(),
+            },
             "games": [[j.as_map() for j in i if j.started] for i in self.fixtures],
             "finals": [[j.as_map() for j in i if j.started] for i in self.finals],
             "teams": {i.name: [j.name for j in i.players] for i in self.teams}
@@ -97,13 +102,13 @@ class Fixtures:
 
     def load(self):
         [i.reset() for i in self.teams]
-        self.fixtures_gen = self.create_fixtures(self)
-        self.finals_gen = self.create_finals(self)
+        self.fixtures_gen: Generator[list[Game]] = self.fixtures_class.get_generator()
+        self.finals_gen: Generator[list[Game]] = self.finals_class.get_generator()
         self.fixtures = []
         self.in_finals = False
-        self.update_games()  # used to initialise the first round
         with open(f"{self.filename}", "r+") as fp:
             data = json.load(fp)
+        self.update_games()  # used to initialise the first round
         for i, r in enumerate([[Game.from_map(j, self) for j in i] for i in data.get("games", [])]):
             for j, g in enumerate(r):
                 self.fixtures[i][j] = g
@@ -117,12 +122,14 @@ class Fixtures:
         self.appoint_umpires()
         self.update_games()
 
-    def load_teams(self):
+    def initial_load(self):
         self.teams = []
         with open(f"{self.filename}", "r+") as fp:
             data = json.load(fp)
-            self.teams = [Team(k, [Player(i) for i in v]) for k, v in data["teams"].items()]
+            self.teams = [Team(k, [Player(i) for i in v]) for k, v in data["details"]["teams"].items()]
             for i in self.teams:
                 i.tournament = self
                 for j in i.players:
                     j.tournament = self
+            self.fixtures_class = get_type_from_name(data["details"]["fixtures_generator"])(self)
+            self.finals_class = get_type_from_name(data["details"]["finals_generator"])(self)

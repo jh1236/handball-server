@@ -6,7 +6,7 @@ let para = document.createElement("p")
 let a = document.createElement('a');
 let image = document.createElement("img")
 a.href = "/"
-image.src = "/api/teams/image?name=SUSS"
+image.src = "/api/image?name=SUSS"
 image.className = "logo"
 a.append(image)
 para.append(a)
@@ -14,7 +14,7 @@ para.append(document.createElement("br"))
 a = document.createElement('a');
 image = document.createElement("img")
 a.href = "/"
-image.src = "/api/teams/image?name=SUSS_2"
+image.src = "/api/image?name=SUSS_2"
 image.className = "logo2"
 a.append(image)
 para.append(a)

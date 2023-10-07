@@ -107,7 +107,7 @@ def init_api(app, competition):
     def official_site(nice_name):
         official = [i for i in competition.officials.officials if i.nice_name() == nice_name][0]
         recent_games = []
-        for i in competition.fixtures.games_to_list():
+        for i in competition.games_to_list():
             if official != i.primary_official:
                 continue
             recent_games.append((f"Round {i.round_number + 1}: {repr(i)} ({i.score_string()})", i.id))

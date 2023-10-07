@@ -3,19 +3,20 @@ from typing import List, Dict, Tuple
 
 from structure.Game import Game
 from structure.Team import BYE, Team
+from tournaments.FixtureMaker import FixtureMaker
 from utils.logging_handler import logger
 
 
-class Swiss:
+class Swiss(FixtureMaker):
     def __init__(self, tournament, rounds=8):
-        self.tournament = tournament
+        super().__init__(tournament)
         self.teams_fixed = tournament.teams.copy()
         if len(self.teams_fixed) % 2 == 1:
             self.teams_fixed.append(BYE)
         self.round_count = rounds
         self.max_rounds = len(self.teams_fixed) - 1
 
-    def generate_round(self):
+    def get_generator(self):
         """Generates each round of the competition
 
         Yields:
@@ -131,6 +132,3 @@ class Swiss:
                 used.pop()
                 games.pop()
             used.pop()
-
-def swiss(tournament):
-    return Swiss(tournament).generate_round()

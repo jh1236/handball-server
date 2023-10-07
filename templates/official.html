@@ -9,7 +9,7 @@
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <a href="/officials/">
-    <img src="/api/teams/image?name=umpire" class="team_logo"></a>
+    <img src="/api/image?name=umpire" class="team_logo"></a>
 <h1><a href="/officials/{{link}}" class="hide">Statistics for {{name}}</a></h1>
 {% for stat in stats %}
 <p><b>{{ stat[0] }}:</b> {{ stat[1] }}</p>

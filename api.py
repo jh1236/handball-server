@@ -1,15 +1,15 @@
 import flask
 from flask import request, send_file
 
-from Finals.SecondChanceFinals import second_chance_finals
-from tournaments.Fixtures import Fixtures
-from tournaments.Swiss import swiss
+from structure.Tournament import Tournament
+from tournaments.SecondChanceFinals import SecondChanceFinals
+from tournaments.Swiss import Swiss
 from utils.logging_handler import logger
 from website import init_api
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
-competition = Fixtures("games.json", swiss, second_chance_finals)
+competition = Tournament("games.json", Swiss, SecondChanceFinals)
 
 
 # Team related endpoints
@@ -19,6 +19,12 @@ def teams():
 
 
 @app.get('/api/teams/image')
+def team_image():
+    team = request.args.get("name", type=str)
+    return send_file(f"./resources/images/teams/{team}.png", mimetype='image/png')
+
+
+@app.get('/api/image')
 def image():
     team = request.args.get("name", type=str)
     return send_file(f"./resources/images/{team}.png", mimetype='image/png')
@@ -55,6 +61,20 @@ def game():
     return competition.get_game(game_id).as_map()
 
 
+# testing related endpoints
+@app.get('/api/mirror')
+def mirror():
+    logger.info(f"Request for score: {request.args}")
+    d = dict(request.args)
+    if not d:
+        d = {
+            "All these webs on me": " You think I'm Spiderman",
+            "Shout out": "martin luther King",
+            "this is the sound of a robot": "ELELALAELE-BING-ALELILLELALE"
+        }
+    return str(d), 200
+
+
 # gameplay related endpoints
 
 @app.post('/api/games/update/score')
@@ -87,7 +107,7 @@ def start():
     game_id = request.json["id"]
 
     competition.get_game(game_id).start(request.json["firstTeamServed"], request.json["swapTeamOne"],
-                                                 request.json["swapTeamTwo"])
+                                        request.json["swapTeamTwo"])
     competition.save()
     return "", 204
 

@@ -1,16 +1,16 @@
 import math
 
 from structure.Game import Game
-from tournaments.FixturesOld import FixturesOld
+from tournaments.FixtureMaker import FixtureMaker
 
 
-class SingleElim(FixturesOld):
-    def __init__(self, tournament, filename):
+class SingleElim(FixtureMaker):
+    def __init__(self, tournament):
         self.teams = tournament.teams
         self.games: list[Game] = []
-        super().__init__(tournament, filename)
+        super().__init__(tournament)
 
-    def generate_round(self):
+    def get_generator(self):
         # check to see if we have a power of two number of teams
         r = []
         pre_play_offs = 2 ** round(math.log2(len(self.teams)) % 1)
