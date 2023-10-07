@@ -1,6 +1,6 @@
 class Finals:
     def __init__(self, tournament):
-        self.tournament = tournament
+        self = tournament
 
 
     def generate_round(self):

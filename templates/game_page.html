@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{teams[0].name}} vs {{teams[1].name}}</title>
+    <title>{{ teams[0].name }} vs {{ teams[1].name }}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
@@ -9,28 +9,33 @@
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <h1><a href="/games/{{game.id}}" class="hide">{{teams[0].name}} vs {{teams[1].name}}</a></h1>
-    <h1 class="big">{{game.score_string()}}</h1>
-    <p><b>Round:</b> <i>{{roundNumber}}</i></p>
-    <p><b>Match Official:</b> <a class = "hide" href = "/officials/{{official.nice_name()}}"><i>{{official}}</i></a></p>
-    <p><a href="/games/{{game.id}}/edit" class = "hide"><b>Status:</b></a> <i>{{status}}</i></p>
+    <h1><a href="/games/{{ game.id }}" class="hide">{{ teams[0].name }} vs {{ teams[1].name }}</a></h1>
+    <h1 class="big">{{ game.score_string() }}</h1>
+    <p><b>Round:</b> <i>{{ roundNumber }}</i></p>
+    <p><b>Match Official:</b>
+        {% if official %}
+
+            <a class="hide" href="/officials/{{ official.nice_name() }}">{% endif %} <i>{{ official }}</i></a></p>
+    <p>{% if official %}<a href="/games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>{% if official %}</a>{% endif %} <i>{{ status }}</i></p>
+
     {% if game.best_player %}
-    <p><b>Best on Court:</b> <i>{{best}}</i></p>
+        <p><b>Best on Court:</b> <i>{{ best }}</i></p>
     {% endif %}
     <br>
     <table class="table">
         <tr>
-            <th><a href="/teams/{{teams[0].nice_name()}}"
+            <th><a href="/teams/{{ teams[0].nice_name() }}"
                    class="hide"><img
-                    src="/api/teams/image?name={{teams[0].nice_name()}}"
+                    src="/api/teams/image?name={{ teams[0].nice_name() }}"
                     class="team_logo"
                     style="display: inline;left:70%;vertical-align:middle;"></a></th>
             <th style="color:#e0ffe0">Another spacer..</th>
-            <th><a href="/teams/{{teams[1].nice_name()}}"
-                   class="hide"><img
-                    src="/api/teams/image?name={{teams[1].nice_name()}}"
+            <th>
+                {% if official %}<a href="/teams/{{ teams[1].nice_name() }}"
+                   class="hide">{% endif %}<img
+                    src="/api/teams/image?name={{ teams[1].nice_name() }}"
                     class="team_logo"
-                    style="display: inline;left:70%;vertical-align:middle;"></a></th>
+                    style="display: inline;left:70%;vertical-align:middle;">{% if official %}</a>{% endif %}</th>
         </tr>
     </table>
     <br>
@@ -39,44 +44,44 @@
     <table class="table">
         <tr>
             <td></td>
-            <th colspan="2"><b><a href="/teams/{{teams[0].nice_name()}}"
-                                  class="hide">{{teams[0].name}}</a></b></th>
-            <th colspan="2"><b><a href="/teams/{{teams[1].nice_name()}}"
-                                  class="hide">{{teams[1].name}}</a></b></th>
+            <th colspan="2"><b><a href="/teams/{{ teams[0].nice_name() }}"
+                                  class="hide">{{ teams[0].name }}</a></b></th>
+            <th colspan="2"><b>{% if official %}<a href="/teams/{{ teams[1].nice_name() }}"
+                                  class="hide">{% endif %}{{ teams[1].name }}{% if official %}</a>{% endif %}</b></th>
             <th style="color:#e0ffe0">Spacerrrrrrr</th>
         </tr>
         {% for stat in stats %}
-        <tr>
-            <th>{{stat[0]}}:</th>
-            <td colspan="2">{{stat[1]}}</td>
-            <td colspan="2">{{stat[2]}}</td>
-        </tr>
+            <tr>
+                <th>{{ stat[0] }}:</th>
+                <td colspan="2">{{ stat[1] }}</td>
+                <td colspan="2">{{ stat[2] }}</td>
+            </tr>
 
 
         {% endfor %}
 
         <tr>
             <td></td>
-            <th>{{players[0]}}</th>
-            <th>{{players[1]}}</th>
-            <th>{{players[2]}}</th>
-            <th>{{players[3]}}</th>
+            <th>{{ players[0] }}</th>
+            <th>{{ players[1] }}</th>
+            <th>{{ players[2] }}</th>
+            <th>{{ players[3] }}</th>
         </tr>
         {% for player in player_stats %}
-        <tr>
-            <th>{{player[0]}}:</th>
-            <td>{{player[1]}}</td>
-            <td>{{player[2]}}</td>
-            <td>{{player[3]}}</td>
-            <td>{{player[4]}}</td>
-        </tr>
+            <tr>
+                <th>{{ player[0] }}:</th>
+                <td>{{ player[1] }}</td>
+                <td>{{ player[2] }}</td>
+                <td>{{ player[3] }}</td>
+                <td>{{ player[4] }}</td>
+            </tr>
         {% endfor %}
     </table>
 </div>
 <div style="top:70px;left:66% ; position: absolute;width: 33%">
     <h2>Commentary</h2>
     {% for line in commentary %}
-    <p style="color: black;">{{line}}</p>
+        <p style="color: black;">{{ line }}</p>
     {% endfor %}
 </div>
 </body>

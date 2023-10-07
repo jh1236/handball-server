@@ -1,4 +1,3 @@
-from structure.Game import Game
 from structure.Player import Player, GamePlayer
 from utils.logging_handler import logger
 from utils.util import calc_elo
@@ -24,7 +23,7 @@ class Team:
         self.timeouts: int = 0
         self.listed_first: int = 0
 
-    def get_game_team(self, game: Game):
+    def get_game_team(self, game):
         return GameTeam(self, game)
 
     def has_played(self, other):
@@ -50,7 +49,7 @@ class Team:
 
     def get_stats(self, include_players=False):
         game_teams: list[GameTeam] = []
-        for i in self.tournament.fixtures.games_to_list():
+        for i in self.tournament.games_to_list():
             team_names = [j.name for j in i.teams]
             if i.in_progress() and self.name in team_names:
                 game_teams.append(i.teams[team_names.index(self.name)])
@@ -89,12 +88,12 @@ class Team:
         return self.listed_first / (self.games_played or 1)
 
 
-BYE = Team("BYE", [])
+BYE = Team("BYE", [Player("None")])
 
 
 class GameTeam:
-    def __init__(self, team: Team, game: Game):
-        self.game: Game = game
+    def __init__(self, team: Team, game):
+        self.game = game
         self.opponent: GameTeam | None = None
         self.team: Team = team
         self.name: str = self.team.name

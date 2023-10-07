@@ -14,6 +14,8 @@ def copy_case(string: str, other: str) -> str:
 
 
 def game_string_to_commentary(game: Game) -> list[str]:
+    if game.bye:
+        return [f"Game is bye, {game.teams[0]} wins!"]
     rand = Random(game.id)
     out = []
     char_to_taunt = {

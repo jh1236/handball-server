@@ -17,7 +17,7 @@ class FixturesOld:
         return [game for r in self.rounds for game in r]
 
     def ladder(self):
-        return sorted(self.tournament.teams, key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])))
+        return sorted(self.teams, key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])))
 
     def get_game(self, game_id: int) -> Game:
         while len(self.games_to_list()) <= game_id:
@@ -49,7 +49,7 @@ class FixturesOld:
         self.generator = self.generate_round()
         self.get_game(0)  # used to initialise the first round
         with open(self.filename, "r+") as fp:
-            rounds = [[Game.from_map(j, self.tournament) for j in i] for i in json.load(fp)]
+            rounds = [[Game.from_map(j, self) for j in i] for i in json.load(fp)]
         for i, r in enumerate(rounds):
             for j, g in enumerate(r):
                 self.get_game(g.id)
@@ -73,7 +73,7 @@ class FixturesOld:
                                     self.games_to_list()[1:] + [None]):
             if game.primary_official is not None: continue
             teams = [i.team for i in game.teams] + ([] if not next else [i.team for i in next.teams])
-            for p in self.tournament.officials.get_primary_officials():
+            for p in self.officials.get_primary_officials():
                 if prev and prev.primary_official == p: continue
                 if p.team and p.team in teams: continue
                 game.set_primary_official(p)

@@ -1,3 +1,5 @@
+import random
+
 from flask import render_template, send_file, request, Response
 
 from structure.GameUtils import game_string_to_commentary
@@ -7,8 +9,8 @@ from utils.logging_handler import logger
 def init_api(app, competition):
     @app.get('/')
     def site():
-        fixtures = [(n, [i.fixture_to_table_row() for i in j]) for n, j in enumerate(competition.fixtures.fixtures)]
-        finals = [(n, [i.fixture_to_table_row() for i in j]) for n, j in enumerate(competition.fixtures.finals)]
+        fixtures = [(n, [i.fixture_to_table_row() for i in j]) for n, j in enumerate(competition.fixtures)]
+        finals = [(n, [i.fixture_to_table_row() for i in j]) for n, j in enumerate(competition.finals)]
         return render_template("site.html", fixtures=fixtures, finals=finals), 200
 
     @app.get('/teams/')
@@ -20,7 +22,7 @@ def init_api(app, competition):
     def stats_site(team_name):
         team = [i for i in competition.teams if team_name == i.nice_name()][0]
         recent_games = []
-        for i in competition.fixtures.games_to_list():
+        for i in competition.games_to_list():
             if team not in [j.team for j in i.teams] or not i.started:
                 continue
             recent_games.append((repr(i) + f" ({i.score_string()})", i.id))
@@ -32,15 +34,15 @@ def init_api(app, competition):
 
     @app.get('/games/<game_id>/')
     def game_site(game_id):
-        if int(game_id) >= len(competition.fixtures.games_to_list()):
+        if int(game_id) >= len(competition.games_to_list()):
             raise Exception("Game Does not exist!!")
-        game = competition.fixtures.get_game(int(game_id))
+        game = competition.get_game(int(game_id))
         teams = game.teams
         team_dicts = [i.get_stats() for i in teams]
         stats = [(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]]
         best = game.best_player.tidy_name() if game.best_player else "TBD"
-        players = [i for i in game.players()]
-        roundNumber = game.round_number + 1
+        players = game.players()
+        round_number = game.round_number + 1
         if not game.started:
             status = "Waiting for toss"
         elif not game.game_ended():
@@ -52,7 +54,7 @@ def init_api(app, competition):
         player_stats = [(i, *[j.get_stats()[i] for j in players]) for i in players[0].get_stats()]
         return render_template("game_page.html", game=game, status=status, players=[i.tidy_name() for i in players],
                                teams=teams, stats=stats, player_stats=player_stats, official=game.primary_official,
-                               commentary=game_string_to_commentary(game), best=best, roundNumber=roundNumber), 200
+                               commentary=game_string_to_commentary(game), best=best, roundNumber=round_number), 200
 
     @app.get('/ladder/')
     def ladder_site():
@@ -142,6 +144,9 @@ def init_api(app, competition):
 
     @app.get('/code_of_conduct/')
     def code_of_conduct():
+        rand = random.Random()
+        if rand.randrange(0, 10):
+            return send_file("./resources/code_of_conduct_2.pdf"), 200
         return send_file("./resources/code_of_conduct.pdf"), 200
 
     @app.get('/favicon.ico')
@@ -150,9 +155,9 @@ def init_api(app, competition):
 
     @app.get('/games/<game_id>/edit')
     def game_editor(game_id):
-        if int(game_id) >= len(competition.fixtures.games_to_list()):
+        if int(game_id) >= len(competition.games_to_list()):
             raise Exception("Game Does not exist!!")
-        game = competition.fixtures.get_game(int(game_id))
+        game = competition.get_game(int(game_id))
         teams = game.teams
         key = request.args.get("key", None)
         players = [i for i in game.players()]

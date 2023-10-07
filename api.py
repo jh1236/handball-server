@@ -1,18 +1,15 @@
 import flask
-from flask import request, send_file, render_template, Response, redirect
+from flask import request, send_file
 
-from Finals.BasicFinals import BasicFinals
-from Finals.SecondChanceFinals import SecondChanceFinals
+from Finals.SecondChanceFinals import second_chance_finals
 from tournaments.Fixtures import Fixtures
-from tournaments.Swiss import Swiss
+from tournaments.Swiss import swiss
+from utils.logging_handler import logger
 from website import init_api
-from structure.GameUtils import game_string_to_commentary
-from tournaments.Tournament import Tournament
-from utils.logging_handler import logger, get_SUSS_handler
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
-competition = Tournament(lambda a: Fixtures(a, Swiss(a).generate_round(), SecondChanceFinals(a).generate_round()))
+competition = Fixtures("games.json", swiss, second_chance_finals)
 
 
 # Team related endpoints
@@ -38,24 +35,24 @@ def stats():
 
 @app.get('/api/games/current_round')
 def current_round():
-    return [i.as_map() for i in competition.fixtures.games_to_list() if not i.best_player]
+    return [i.as_map() for i in competition.games_to_list() if not i.best_player]
 
 
 @app.get('/api/games/fixtures')
 def all_fixtures():
-    return [i.as_map() for i in competition.fixtures.games_to_list()]
+    return [i.as_map() for i in competition.games_to_list()]
 
 
 @app.get('/api/games/display')
 def display():
     game_id = int(request.args["id"])
-    return competition.fixtures.get_game(game_id).display_map()
+    return competition.get_game(game_id).display_map()
 
 
 @app.get('/api/games/game')
 def game():
     game_id = int(request.args["id"])
-    return competition.fixtures.get_game(game_id).as_map()
+    return competition.get_game(game_id).as_map()
 
 
 # gameplay related endpoints
@@ -67,8 +64,8 @@ def score():
     ace = request.json["ace"]
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]
-    competition.fixtures.get_game(game_id).teams[not first_team].score_point(first_player, ace)
-    competition.fixtures.save()
+    competition.get_game(game_id).teams[not first_team].score_point(first_player, ace)
+    competition.save()
     return "", 204
 
 
@@ -76,11 +73,11 @@ def score():
 def ace():
     logger.info(f"Request for ace: {request.json}")
     game_id = request.json["id"]
-    game = competition.fixtures.get_game(game_id)
+    game = competition.get_game(game_id)
     serving_team = game.teams[not game.first_team_serves]
     first_team = request.json["firstTeam"]
-    competition.fixtures.get_game(game_id).teams[not first_team].score_point(serving_team.first_player_serves, True)
-    competition.fixtures.save()
+    competition.get_game(game_id).teams[not first_team].score_point(serving_team.first_player_serves, True)
+    competition.save()
     return "", 204
 
 
@@ -89,9 +86,9 @@ def start():
     logger.info(f"Request for start: {request.json}")
     game_id = request.json["id"]
 
-    competition.fixtures.get_game(game_id).start(request.json["firstTeamServed"], request.json["swapTeamOne"],
+    competition.get_game(game_id).start(request.json["firstTeamServed"], request.json["swapTeamOne"],
                                                  request.json["swapTeamTwo"])
-    competition.fixtures.save()
+    competition.save()
     return "", 204
 
 
@@ -99,8 +96,8 @@ def start():
 def end():
     logger.info(f"Request for end: {request.json}")
     game_id = request.json["id"]
-    competition.fixtures.get_game(game_id).end(request.json["bestPlayer"])
-    competition.fixtures.save()
+    competition.get_game(game_id).end(request.json["bestPlayer"])
+    competition.save()
     return "", 204
 
 
@@ -109,8 +106,8 @@ def timeout():
     logger.info(f"Request for timeout: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
-    competition.fixtures.get_game(game_id).teams[not first_team].timeout()
-    competition.fixtures.save()
+    competition.get_game(game_id).teams[not first_team].timeout()
+    competition.save()
     return "", 204
 
 
@@ -119,8 +116,8 @@ def fault():
     logger.info(f"Request for fault: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
-    competition.fixtures.get_game(game_id).teams[not first_team].fault()
-    competition.fixtures.save()
+    competition.get_game(game_id).teams[not first_team].fault()
+    competition.save()
     return "", 204
 
 
@@ -128,9 +125,9 @@ def fault():
 def undo():
     logger.info(f"Request for undo: {request.json}")
     game_id = request.json["id"]
-    competition.fixtures.get_game(game_id).undo()
-    competition.fixtures.get_game(game_id).print_gamestate()
-    competition.fixtures.save()
+    competition.get_game(game_id).undo()
+    competition.get_game(game_id).print_gamestate()
+    competition.save()
     return "", 204
 
 
@@ -142,14 +139,14 @@ def card():
     first_player = request.json["firstPlayer"]
     game_id = request.json["id"]
     if color == "green":
-        competition.fixtures.get_game(game_id, ).teams[not first_team].green_card(first_player)
+        competition.get_game(game_id, ).teams[not first_team].green_card(first_player)
     elif color == "yellow":
-        competition.fixtures.get_game(game_id).teams[not first_team].yellow_card(first_player, request.json["time"])
+        competition.get_game(game_id).teams[not first_team].yellow_card(first_player, request.json["time"])
     elif color == "red":
-        competition.fixtures.get_game(game_id).teams[not first_team].red_card(first_player)
+        competition.get_game(game_id).teams[not first_team].red_card(first_player)
 
-    competition.fixtures.get_game(game_id).print_gamestate()
-    competition.fixtures.save()
+    competition.get_game(game_id).print_gamestate()
+    competition.save()
     return "", 204
 
 

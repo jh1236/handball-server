@@ -21,7 +21,7 @@ class Player:
 
     def get_stats(self):
         game_teams: list[GamePlayer] = []
-        for i in self.tournament.fixtures.games_to_list():
+        for i in self.tournament.games_to_list():
             player_names = [j.name for j in i.players()]
             if i.in_progress() and self.name in player_names:
                 game_teams.append(i.players()[player_names.index(self.name)])
@@ -159,6 +159,7 @@ class GamePlayer:
         self.player.votes -= self.best
 
     def tidy_name(self):
+        if not " " in self.name: return self.name
         first, second = self.name.split(" ", 1)
         second = " " + second[0] + "."
         return first + second

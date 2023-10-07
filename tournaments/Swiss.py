@@ -1,8 +1,8 @@
-from structure.Game import Game
-from structure.Team import BYE, Team
-from tournaments.FixturesOld import FixturesOld
 from collections import defaultdict
 from typing import List, Dict, Tuple
+
+from structure.Game import Game
+from structure.Team import BYE, Team
 from utils.logging_handler import logger
 
 
@@ -104,9 +104,9 @@ class Swiss:
             teams (List[Team], optional): The teams that are to be chosen from. Defaults to all aeams.
 
         Returns:
-            List[Team]: All the teams that are "available" to be chose
+            List[Team]: All the teams that are "available" to be chosen
         """
-        if teams == None:
+        if teams is None:
             teams = self.teams_fixed
         return [team for team in teams if team not in used]
 
@@ -131,3 +131,6 @@ class Swiss:
                 used.pop()
                 games.pop()
             used.pop()
+
+def swiss(tournament):
+    return Swiss(tournament).generate_round()

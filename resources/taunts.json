@@ -20,7 +20,8 @@
   "green": [
     "%p was green carded.",
     "%p thought green meant go?",
-    "%p, YOU cANT SAy tHAT!"
+    "%p, YOU cANT SAy tHAT!",
+    "First warning for %p..."
   ],
   "yellow": [
     "%p was yellow carded.",
@@ -45,6 +46,8 @@
   "fault": [
     "%p faulted.",
     "%p didn't know that you're meant to serve diagonal.",
-    "Just reminding you %p, the ball needs to land in the court."
+    "Just reminding you %p, the ball needs to land *in* the court.",
+    "FAULT!!",
+    "Keep that arm above your waist %p"
   ]
 }

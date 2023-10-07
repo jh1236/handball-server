@@ -3,6 +3,7 @@ import typing
 from structure.Player import GamePlayer
 from utils.util import chunks_sized
 from utils.logging_handler import logger
+from structure.Team import BYE
 
 if typing.TYPE_CHECKING:
     from structure.Team import GameTeam
@@ -13,12 +14,20 @@ class Game:
 
     @classmethod
     def from_map(cls, game_map, tournament):
+        print(game_map["teamOne"]["name"])
         team_one = [i for i in tournament.teams if i.name == game_map["teamOne"]["name"]][0]
-        team_two = [i for i in tournament.teams if i.name == game_map["teamTwo"]["name"]][0]
+        if game_map["teamTwo"]["name"] == "BYE":
+            team_two = BYE
+        else:
+            team_two = [i for i in tournament.teams if i.name == game_map["teamTwo"]["name"]][0]
         swapped = game_map["firstTeamServed"]
         game = Game(team_one, team_two, tournament)
+        if game.bye:
+            return game
+
         team_one_swap = team_one.players[0].name != game_map["teamOne"]["players"][0]
         team_two_swap = team_two.players[0].name != game_map["teamTwo"]["players"][0]
+
         game.set_primary_official(
             [i for i in tournament.officials.get_primary_officials() if i.name == game_map["official"]][0])
         if not game_map["started"]: return game
@@ -39,13 +48,23 @@ class Game:
         self.best_player: GamePlayer | None = None
         self.teams: list[GameTeam] = [team_one.get_game_team(self), team_two.get_game_team(self)]
         self.is_final = final
+        self.bye = False
         if not final and self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio():
             self.teams.reverse()
+        print(f"{self.teams} ({BYE in [i.team for i in self.teams]})")
+        if BYE in [i.team for i in self.teams]:
+            self.bye = True
+            self.teams = [i for i in self.teams if i.team != BYE] + [BYE.get_game_team(self)]
+            self.best_player = self.teams[1].players[0]
+            self.started = True
+            self.teams[0].score = 11
         self.first_team_serves: bool = False
         self.primary_official = None
         self.round_number: int = 0
 
     def set_primary_official(self, o):
+        if self.bye:
+            raise LookupError(f"Game {self.id} is a bye!")
         o.games_officiated += 1
         self.primary_official = o
 
@@ -55,27 +74,38 @@ class Game:
         else:
             self.game_string += string.lower()
 
+    def bye_check(self):
+        if self.bye:
+            raise LookupError(f"Game {self.id} is a bye!")
+
     def next_point(self):
+        self.bye_check()
         self.rounds += 1
         [i.next_point() for i in self.teams]
 
     def team_serving(self):
+        if self.bye: return None
         return [i for i in self.teams if i.serving][0]
 
     def server(self):
+        if self.bye: return None
         serving_team = self.team_serving()
+        print(self)
         server = serving_team.players[not serving_team.first_player_serves]
         if server.is_carded():
             server = serving_team.players[serving_team.first_player_serves]
         return server
 
     def players(self) -> list[GamePlayer]:
+        if self.bye: return [*self.teams[0].players, self.teams[1].players[0], self.teams[1].players[0]]
         return [*self.teams[0].players, *self.teams[1].players]
 
     def winner(self):
+        if self.bye: return self.teams[0]
         return max(self.teams, key=lambda a: a.score).team
 
     def loser(self):
+        if self.bye: return self.teams[1]
         return min(self.teams, key=lambda a: a.score).team
 
     def print_gamestate(self):
@@ -85,6 +115,7 @@ class Game:
         logger.info(f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}")
 
     def start(self, team_one_serves, swap_team_one, swap_team_two):
+        self.bye_check()
         self.started = True
         self.teams[0].start(team_one_serves, swap_team_one)
         self.teams[1].start(not team_one_serves, swap_team_two)
@@ -92,6 +123,7 @@ class Game:
         self.info(f"Started, {self.server().nice_name()} serving from team {self.team_serving().nice_name()}")
 
     def end(self, best_player: str):
+        self.bye_check()
         if self.game_ended():
             if self.best_player:
                 [i.undo_end() for i in self.teams]
@@ -109,15 +141,18 @@ class Game:
             self.primary_official.rounds_umpired += self.rounds
             self.info(
                 f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}")
-            self.tournament.fixtures.update_games()
+            self.tournament.update_games()
 
     def in_progress(self):
+        if self.bye: return False
         return self.started and not self.best_player
 
     def game_ended(self):
+        if self.bye: return True
         return max([i.score for i in self.teams]) >= 11 and abs(self.teams[0].score - self.teams[1].score) >= 2
 
     def undo(self):
+        self.bye_check()
         if self.game_string == "":
             self.info(f"Undoing Game start")
             self.started = False
@@ -150,7 +185,7 @@ class Game:
             "started": self.started,
             "id": self.id,
             "firstTeamServed": self.first_team_serves,
-            "official": self.primary_official.name
+            "official": self.primary_official.name if self.primary_official else "None"
         }
         if self.best_player:  # game has been submitted and finalised
             dct["bestPlayer"] = self.best_player.name
@@ -193,6 +228,7 @@ class Game:
         return dct
 
     def load_from_string(self, game_string: str):
+        if self.bye: return
         j: str
         [i.reset() for i in self.teams]
         self.rounds = 0
