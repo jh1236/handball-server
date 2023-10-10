@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Game</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script>load("{{tournament}}")</script>
+
+<script src="{{ url_for('static', filename='js/start_game.js') }}"></script>
+<script>
+    setTournament("{{tournament}}")
+    setId({{id}})
+</script>
+<h1>Create Game </h1>
+<p onclick="document.location.href = document.location.href.replace('create','createPlayers')"><i>Choose Players Instead</i></p>
+<table class="table">
+    <tr>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" class="button dropbtn" id="teamOne">Team One</button>
+                <div class="dropdown-content">
+                    {% for team in teams %}
+                    <p onclick="setTeamOne('{{team.nice_name()}}', '{{team.name}}')">{{team.name}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </td>
+        <td></td>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo">Team Two</button>
+                <div class="dropdown-content">
+                    {% for team in teams %}
+                    <p onclick="setTeamTwo('{{team.nice_name()}}', '{{team.name}}')">{{team.name}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+<br>
+<div class="dropdown">
+    <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
+    <div class="dropdown-content">
+        {% for i in officials %}
+        <p onclick="setOfficial('{{i.nice_name()}}', '{{i.tidy_name()}}')">{{i.tidy_name()}}</p>
+        {% endfor %}
+    </div>
+</div>
+<br>
+<br>
+<button onclick="createTeams()" class="button">Start</button>
+<br>
+<br>
+</body>
+</html>

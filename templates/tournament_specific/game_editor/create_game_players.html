@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Game</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script>load("{{tournament}}")</script>
+
+<script src="{{ url_for('static', filename='js/start_game.js') }}"></script>
+<script>
+    setTournament("{{tournament}}")
+    setId({{id}})
+</script>
+<h1>Create Game </h1>
+<p onclick="document.location.href = document.location.href.replace('createPlayers','create')"><i>Choose Teams Instead</i></p>
+<table class="table">
+    <tr>
+        <th><label>Team One: <input type="text" id="nameOne"></label></th>
+        <td></td>
+        <th><label>Team Two: <input type="text" id="nameTwo"></label></th>
+    </tr>
+
+    <tr>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" class="button dropbtn" id="teamOne0">Player One</button>
+                <div class="dropdown-content">
+                    {% for p in players %}
+                    <p onclick="setTeamListOne('{{p.nice_name()}}', '{{p}}', 0)">{{p}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </td>
+        <td></td>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo0">Player One</button>
+                <div class="dropdown-content">
+                    {% for p in players %}
+                    <p onclick="setTeamListTwo('{{p.nice_name()}}', '{{p}}', 0)">{{p}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" class="button dropbtn" id="teamOne1">Player Two</button>
+                <div class="dropdown-content">
+                    {% for p in players %}
+                    <p onclick="setTeamListOne('{{p.nice_name()}}', '{{p}}', 1)">{{p}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </td>
+        <td></td>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo1">Player Two</button>
+                <div class="dropdown-content">
+                    {% for p in players %}
+                    <p onclick="setTeamListTwo('{{p.nice_name()}}', '{{p}}', 1)">{{p}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+<br>
+<div class="dropdown">
+    <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
+    <div class="dropdown-content">
+        {% for i in officials %}
+        <p onclick="setOfficial('{{i.nice_name()}}', '{{i.tidy_name()}}')">{{i.tidy_name()}}</p>
+        {% endfor %}
+    </div>
+</div>
+<br>
+<br>
+<button onclick="createPlayers()" class="button">Start</button>
+<br>
+<br>
+</body>
+</html>

@@ -18,6 +18,9 @@ class Official:
         self.rounds_umpired: int = 0
 
     def __repr__(self):
+        return self.tidy_name()
+
+    def tidy_name(self):
         first, second = self.name.split(" ")
         first = first[0] + ". "
         return first + second
@@ -37,21 +40,16 @@ class Official:
         }
 
 
-class Officials:
-    def __init__(self, tournament):
-        self.officials: list[Official] = []
-        self.tournament = tournament
-        self.primary: list[Official] = []
-        with open("./resources/officials.json") as fp:
-            for i in json.load(fp):
-                team = ([j for j in self.tournament.teams if j.name == i["team"]] + [None])[0]
-                o = Official(i["name"], i["key"], team)
-                if i["primary"]:
-                    self.primary.append(o)
-                self.officials.append(o)
+NoOfficial = Official("None one", "", None)
 
-    def get_primary_officials(self):
-        return sorted(self.primary, key=lambda it: it.games_officiated)
+def get_officials(tournament) -> list[Official]:
+    officials: list[Official] = []
+    with open("./config/officials.json", "r") as fp:
 
-    def get_officials(self):
-        return sorted(self.officials, key=lambda it: it.games_officiated)
+        for n, v in json.load(fp).items():
+            team = ([j for j in tournament.teams if j.name == v["team"]] + [None])[0]
+            o = Official(n, v["key"], team)
+
+            if tournament.details["officials"] == "all" or n in tournament.details["officials"]:
+                officials.append(o)
+    return officials

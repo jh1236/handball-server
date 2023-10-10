@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class Player:
     def __init__(self, name: str):
         self.tournament = None
@@ -18,6 +21,18 @@ class Player:
 
     def __repr__(self):
         return self.name
+
+    def total_cards(self):
+        total = 0
+        game_teams: list[GamePlayer] = []
+        for i in self.tournament.games_to_list():
+            player_names = [j.name for j in i.players()]
+            if i.in_progress() and self.name in player_names:
+                game_teams.append(i.players()[player_names.index(self.name)])
+        total += self.green_cards + sum([i.green_cards for i in game_teams])
+        total += self.yellow_cards + sum([i.yellow_cards for i in game_teams])
+        total += self.red_cards + sum([i.red_cards for i in game_teams])
+        return total
 
     def get_stats(self):
         game_teams: list[GamePlayer] = []
@@ -48,6 +63,18 @@ class Player:
             "Rounds Carded": time_carded,
         }
 
+    def add_stats(self, d: dict[str, Any]):
+        self.votes += d.get("B&F Votes", 0)
+        self.points_scored += d.get("Points scored", 0)
+        self.aces_scored += d.get("Aces scored", 0)
+        self.faults += d.get("Faults", 0)
+        self.faults += d.get("Double Faults", 0)
+        self.green_cards += d.get("Green Cards", 0)
+        self.yellow_cards += d.get("Yellow Cards", 0)
+        self.red_cards += d.get("Red Cards", 0)
+        self.time_on_court += d.get("Rounds on Court", 0)
+        self.time_carded += d.get("Rounds Carded", 0)
+
     def nice_name(self):
         return self.name.lower().replace(" ", "_")
 
@@ -67,6 +94,13 @@ class Player:
         self.time_carded = 0
         self.rounds_played = 0
         self.rounds_carded = 0
+
+    @classmethod
+    def find_or_create(cls, tournament, name):
+        for i in tournament.players():
+            if i.name == name:
+                return i
+        return cls(name)
 
 
 class GamePlayer:

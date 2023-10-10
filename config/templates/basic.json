@@ -1,0 +1,23 @@
+{
+  "fixtures_generator": "Swiss",
+  "finals_generator": "BasicFinals",
+  "name": "The Third SUSS Championship",
+  "officials": [
+    "Jared Healy",
+    "Lachlan Banks",
+    "Aimee Soudure",
+    "Brigitte Gredziuk",
+    "Zaiah Deards"
+  ],
+  "teams": [
+    "Breaking Bad Bois",
+    "BarbenHeimer",
+    "Blaaergh",
+    "IKEA Workers",
+    "Satnavs",
+    "Seanitha",
+    "Iggy Squad",
+    "Digbiah",
+    "The Officials"
+  ]
+}

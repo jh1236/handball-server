@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tournaments</title>
+    <title>Officials</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("")</script>
-<h1><a href="/" class="hide">Tournaments</a></h1>
-{% for tournament in comps %}
+<script>load("{{tournament}}")</script>
+
+<h1><a href="/officials/" class="hide">Officials</a></h1>
+{% for official in officials %}
 <table class="table">
     <tr>
-        <td style="width:100px;"><a href="/{{tournament.nice_name()}}/"
+        <td style="width:100px;"><a href="/{{tournament}}officials/{{official[1]}}"
                                     class="hide"><img
-                src="/api/tournaments/image?name={{tournament.nice_name()}}" class="team_logo"
+                src="/api/image?name=umpire" class="team_logo"
                 style="width: 75px; height: 75px;"
         ></a></td>
 
 
-        <td style="width:200px;"><a href="/{{tournament.nice_name()}}/" class="hide"><h3>{{tournament.name}}</h3></a></td>
+        <td style="width:200px;"><a href="/{{tournament}}officials/{{official[1]}}" class="hide"><h3>{{official[0]}}</h3></a></td>
     </tr>
 </table>
 

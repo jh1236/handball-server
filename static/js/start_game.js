@@ -1,16 +1,47 @@
-id = 0
-setId = newId => id = newId
-
+let id = 0
+let tournament = "";
+let setId = newId => id = newId
+let setTournament = t => tournament = t
 let best = ""
 setBest = (i, s) => {
     best = i
     document.getElementById("rename").textContent = "Fairest And Best: " + s
 }
 
+let teamOne = ""
+let setTeamOne = (i, s) => {
+    teamOne = i
+    document.getElementById("teamOne").textContent = "Team One: " + s
+}
+
+let teamTwo = ""
+let setTeamTwo = (i, s) => {
+    teamTwo = i
+    document.getElementById("teamTwo").textContent = "Team Two: " + s
+}
+
+let official = ""
+let setOfficial = (i, s) => {
+    official = i
+    document.getElementById("umpire").textContent = "Official: " + s
+}
+
+let lookup = ["One", "Two"]
+
+let teamListOne = ["", ""]
+let teamListTwo = ["", ""]
+let setTeamListOne = (d, s, i) => {
+    teamListOne[i] = d
+    document.getElementById("teamOne" + i).textContent = `Player ${lookup[i]}: ${s}`
+}
+
+let setTeamListTwo = (d, s, i) => {
+    teamListTwo[i] = d
+    document.getElementById("teamTwo" + i).textContent = `Player ${lookup[i]}: ${s}`
+}
 let left = false
 let right = false
 let first_serves = true
-
 
 setLeft = (i, s) => {
     left = i
@@ -28,27 +59,73 @@ setTeamServing = (i, s) => {
 function start() {
     fetch("/api/games/update/start", {
         method: "POST",
-        body: JSON.stringify({id: id, firstTeamServed: first_serves, swapTeamOne: left, swapTeamTwo: right}),
+        body: JSON.stringify({
+            id: id,
+            firstTeamServed: first_serves,
+            swapTeamOne: left,
+            swapTeamTwo: right,
+            tournament: tournament.replace("/", "")
+        }),
         headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
     }).then(() => location.reload());
 }
 
-function finish() {
-    fetch("/api/games/update/end", {
+function createPlayers() {
+    fetch("/api/games/update/create", {
         method: "POST",
-        body: JSON.stringify({id: id, bestPlayer: best}),
+        body: JSON.stringify({
+            teamOne: document.getElementById("nameOne").value,
+            teamTwo: document.getElementById("nameTwo").value,
+            playersOne: teamListOne,
+            playersTwo: teamListTwo,
+            official: official,
+            tournament: tournament.replace("/", "")
+        }),
         headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location.href = "/games/" + id + "/");
+    }).then(() => document.location.href = `/${tournament}games/` + id + "/"
+    );
+}
+function createTeams() {
+    fetch("/api/games/update/create", {
+        method: "POST",
+        body: JSON.stringify({
+            teamOne: teamOne,
+            teamTwo: teamTwo,
+            official: official,
+            tournament: tournament.replace("/", "")
+        }),
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(() => document.location.href = `/${tournament}games/` + id + "/"
+    );
+}
+
+function finish() {
+    fetch("/api/games/update/end", {
+        method: "POST",
+        body: JSON.stringify({
+            id: id,
+            tournament: tournament.replace("/", ""),
+            bestPlayer: best
+        }),
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(() => document.location.href = `/${tournament}games/` + id + "/");
 }
 
 
 function undo() {
     fetch("/api/games/update/undo", {
-        method: "POST", body: JSON.stringify({id: id}), headers: {
+        method: "POST", body: JSON.stringify({
+            tournament: tournament.replace("/", ""),
+            id: id
+        }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
     }).then(() => location.reload());

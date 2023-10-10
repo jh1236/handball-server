@@ -1,8 +1,6 @@
-import logging
 import io
-
+import logging
 from logging import StreamHandler
-from typing import Union
 
 logger = logging.getLogger("SUSS")
 logger.setLevel(logging.DEBUG)

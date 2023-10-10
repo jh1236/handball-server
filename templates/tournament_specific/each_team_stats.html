@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Statistics for {{teamName}}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script>load("{{tournament}}")</script>
+
+<div style="top:0;left:0;bottom: 100%;width: 66%">
+    <a href="/{{tournament}}teams/{{teamNameClean}}">
+        <img src="/api/teams/image?name={{teamNameClean}}" class="team_logo"></a>
+    <h1><a href="/{{tournament}}teams/{{teamNameClean}}" class="hide">Statistics for {{teamName}}</a></h1>
+    <table class="table">
+        <tbody>
+        {% for stat in stats %}
+        <tr>
+            <th>{{ stat[0] }}:</th>
+            <td></td>
+            <td>{{ stat[1] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% for player in players %}
+    <h3>Statistics for {{player[0]}}</h3>
+    <table class="table">
+        <tbody>
+        {% for stat in player[1] %}
+        <tr>
+            <th>{{ stat[0] }}:</th>
+            <td></td>
+            <td>{{ stat[1] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+</div>
+<div style="top:70px;left:66% ; position: absolute;width: 33%">
+    <div style="min-height: 400px">
+    <h2>Recent Matches</h2>
+    {% for line in recent_games %}
+    <p style="color: black;"><a class = "hide" href="/{{line[2]}}/games/{{line[1]}}">{{line[0]}}</a></p>
+    {% endfor %}
+    </div>
+    <div>
+        <h2>Upcoming Matches</h2>
+        {% for line in upcoming_games %}
+        <p style="color: black;"><a class = "hide" href="/{{line[2]}}/games/{{line[1]}}">{{line[0]}}</a></p>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>

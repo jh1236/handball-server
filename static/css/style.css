@@ -120,3 +120,8 @@ img.logo2 {
     display: inline-block;
     font-size: 16px;
 }
+
+img.title_logo {
+    width: 150px;
+    height: 150px;
+}

@@ -1,3 +1,5 @@
+from typing import Any
+
 from structure.Player import Player, GamePlayer
 from utils.logging_handler import logger
 from utils.util import calc_elo
@@ -21,7 +23,9 @@ class Team:
         self.red_cards: int = 0
         self.faults: int = 0
         self.timeouts: int = 0
+
         self.listed_first: int = 0
+        self.court_one: int = 0
 
     def get_game_team(self, game):
         return GameTeam(self, game)
@@ -38,6 +42,7 @@ class Team:
         self.points_against: int = 0
         self.points_for: int = 0
         self.listed_first: int = 0
+        self.court_one: int = 0
         self.games_won: int = 0
         self.games_played: int = 0
         self.green_cards: int = 0
@@ -62,9 +67,10 @@ class Team:
         red_cards = self.red_cards + sum([i.red_cards for i in game_teams])
         timeouts = self.timeouts + sum([(1 - i.timeouts) for i in game_teams])
         faults = self.faults + sum([i.faults for i in game_teams])
+        games_played = self.games_played + len(game_teams)
         d = {
-            "ELO": round(self.elo),
-            "Games Played": self.games_played,
+            # "ELO": round(self.elo),
+            "Games Played": games_played,
             "Games Won": self.games_won,
             "Games Lost": self.games_played - self.games_won,
             "Green Cards": green_cards,
@@ -75,17 +81,36 @@ class Team:
             "Points For": points_for,
             "Points Against": points_against,
             "Point Difference": dif,
-
         }
         if include_players:
             d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]
         return d
+
+    def add_stats(self, d: dict[str, Any]):
+        self.games_played += d.get("Games Played", 0)
+        self.games_won += d.get("Games Won", 0)
+        self.green_cards += d.get("Green Cards", 0)
+        self.yellow_cards += d.get("Yellow Cards", 0)
+        self.red_cards += d.get("Red Cards", 0)
+        self.faults += d.get("Faults", 0)
+        self.timeouts += d.get("Timeouts Called", 0)
+        self.points_for += d.get("Points For", 0)
+        self.points_against += d.get("Points Against", 0)
+        for p, i in zip(self.players, d.get("players", [])):
+            p.add_stats(i)
 
     def nice_name(self):
         return self.name.lower().replace(" ", "_").replace("the_", "")
 
     def first_ratio(self):
         return self.listed_first / (self.games_played or 1)
+
+    @classmethod
+    def find_or_create(cls, tournament, name, players):
+        for i in tournament.teams:
+            if [j.name for j in players] == [j.name for j in i.players]:
+                return i
+        return cls(name, players)
 
 
 BYE = Team("BYE", [Player("None")])
@@ -152,14 +177,17 @@ class GameTeam:
         self.serving = False
 
     def score_point(self, first_player: bool | None = None, ace: bool = False):
-        if first_player is not None:
-            if ace:
-                self.info(
-                    f"Ace Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}")
+        if ace:
+            self.info(
+                f"Ace Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}")
+            if first_player is None:
+                self.server().score_point(True)
             else:
-                self.info(
-                    f"Point Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}")
-            self.players[not first_player].score_point(ace)
+                self.players[not first_player].score_point(True)
+        elif first_player is not None:
+            self.info(
+                f"Point Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}")
+            self.players[not first_player].score_point(False)
         else:
             self.info(f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string()}")
         self.score += 1
@@ -173,9 +201,15 @@ class GameTeam:
             self.game.add_to_game_string(string, self)
         self.game.next_point()
 
+    def server(self) -> GamePlayer:
+        server = self.players[not self.first_player_serves]
+        if server.is_carded():
+            return self.players[self.first_player_serves]
+        return server
+
     def fault(self):
         self.info(f"Fault by {self.players[not self.first_player_serves].nice_name()} from team {self.nice_name()}")
-        self.players[not self.first_player_serves].fault()
+        self.server().fault()
         self.game.add_to_game_string("f" + ("l" if self.first_player_serves else "r"), self)
         self.faults += 1
         if self.faulted:
@@ -244,8 +278,10 @@ class GameTeam:
 
         # either elo is not set, or it is positive, and we lost or negative, and we won
         # meaning that the result of the game was changed
-        if not self.elo_delta or self.elo_delta > 0 != won:
+        if not self.elo_delta or (self.elo_delta > 0 and not won) or (self.elo_delta < 0 and won):
             self.elo_delta = calc_elo(self.team, self.opponent.team, won)
+            self.opponent.elo_delta = calc_elo(self.opponent.team, self.team, not won)
+            print(f"{self.elo_delta} - {self.opponent.elo_delta}")
         self.team.elo += self.elo_delta
         logger.info(f"Elo change is {self.elo_delta}, leaving total equal to {self.team.elo}")
 

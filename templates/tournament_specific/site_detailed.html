@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Handball Tournament</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script>load("{{tournament}}")</script>
+
+<h1><a href="/{{tournament}}fixtures/detailed" class="hide">Fixtures</a></h1>
+<p><i><a href="/{{tournament}}fixtures" class="hide">Show Less</a></i></p>
+<table class="table">
+    <thead>
+    <tr>
+        <th><b>First Team</b></th>
+        <th></th>
+        <th><b>Second Team</b></th>
+        <th><b>Umpire</b></th>
+        <th><b>Court</b></th>
+        <th><b>Result</b></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i, round in fixtures %}
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <th colspan="6">Round {{i + 1}}</th>
+    </tr>
+    {% for game in round %}
+
+    <tr>
+        <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.teams[0] }}</a></td>
+        <td><a href="/{{tournament}}games/{{game.id}}" class="hide"> vs</a></td>
+        <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.teams[1] }}</a></td>
+        <td><a href="/{{tournament}}officials/{{game.primary_official.nice_name()}}" class="hide"><i>{{ game.primary_official }}</i></a></td>
+        <td><a href="/{{tournament}}fixtures/detailed?court={{game.court}}" class="hide">{{ game.court_display() }}</a></td>
+        <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.score_string() }}</a></td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+    {% if finals %}
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <th colspan="6"><b>Finals:</b></th>
+    </tr>
+
+    {% for i, round in finals %}
+    <tr>
+        <th colspan="6">Round {{i + 1}}</th>
+    </tr>
+    {% for game in round %}
+    <tr>
+        <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.teams[0] }}</a></td>
+        <td><a href="/{{tournament}}games/{{game.id}}" class="hide"> vs</a></td>
+        <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.teams[1] }}</a></td>
+        <td><a href="/{{tournament}}officials/{{game.primary_official.nice_name()}}" class="hide"><i>{{ game.primary_official }}</i></a></td>
+        <td><a href="/{{tournament}}fixtures/detailed?court={{game.court}}" class="hide">{{ game.court_display() }}</a></td>
+        <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.score_string() }}</a></td>
+    </tr>
+
+    {% endfor %}
+    <tr>
+        <td><br></td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
+</body>
+</html>

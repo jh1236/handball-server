@@ -1,25 +1,35 @@
 import typing
 
-from structure.Player import GamePlayer
-from utils.util import chunks_sized
+from structure.OfficiatingBody import NoOfficial
+from structure.Player import GamePlayer, Player
+from structure.Team import BYE, Team
 from utils.logging_handler import logger
-from structure.Team import BYE
+from utils.util import chunks_sized
 
 if typing.TYPE_CHECKING:
     from structure.Team import GameTeam
 
 
 class Game:
-    record_stats = True
 
     @classmethod
     def from_map(cls, game_map, tournament):
-        print(game_map["teamOne"]["name"])
-        team_one = [i for i in tournament.teams if i.name == game_map["teamOne"]["name"]][0]
+        if game_map["teamOne"]["name"] == "BYE":
+            team_one = BYE
+        else:
+            team_one = [i for i in tournament.teams if i.name == game_map["teamOne"]["name"]]
+            if not team_one:
+                team_one = Team.find_or_create(game_map["teamOne"]["name"], [Player.find_or_create(tournament, i) for i in game_map["teamOne"]["players"]])
+            else:
+                team_one = team_one[0]
         if game_map["teamTwo"]["name"] == "BYE":
             team_two = BYE
         else:
-            team_two = [i for i in tournament.teams if i.name == game_map["teamTwo"]["name"]][0]
+            team_two = [i for i in tournament.teams if i.name == game_map["teamTwo"]["name"]]
+            if not team_two:
+                team_two = Team.find_or_create(game_map["teamTwo"]["name"], [Player.find_or_create(tournament, i) for i in game_map["teamTwo"]["players"]])
+            else:
+                team_two = team_two[0]
         swapped = game_map["firstTeamServed"]
         game = Game(team_one, team_two, tournament)
         if game.bye:
@@ -29,38 +39,56 @@ class Game:
         team_two_swap = team_two.players[0].name != game_map["teamTwo"]["players"][0]
 
         game.set_primary_official(
-            [i for i in tournament.officials.get_primary_officials() if i.name == game_map["official"]][0])
+            [i for i in tournament.officials if i.name == game_map["official"]][0])
+        game.court = game_map["court"]
+        game.id = game_map["id"]
         if not game_map["started"]: return game
         game.start(swapped, team_one_swap, team_two_swap)
         game.load_from_string(game_map["game"])
         if game_map.get("bestPlayer", False):
             game.end(game_map["bestPlayer"])
 
-        Game.record_stats = True
         return game
 
     def __init__(self, team_one, team_two, tournament, final: bool = False):
         self.tournament = tournament
         self.id: int = -1
+        self.court: int = -1
         self.game_string: str = ""
         self.rounds: int = 0
         self.started: bool = False
+        self.super_bye = False
         self.best_player: GamePlayer | None = None
         self.teams: list[GameTeam] = [team_one.get_game_team(self), team_two.get_game_team(self)]
         self.is_final = final
         self.bye = False
         if not final and self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio():
             self.teams.reverse()
-        print(f"{self.teams} ({BYE in [i.team for i in self.teams]})")
+        if team_one not in tournament.teams:
+            self.tournament.add_team(team_one)
+        if team_two not in tournament.teams:
+            self.tournament.add_team(team_two)
         if BYE in [i.team for i in self.teams]:
             self.bye = True
-            self.teams = [i for i in self.teams if i.team != BYE] + [BYE.get_game_team(self)]
-            self.best_player = self.teams[1].players[0]
+            self.teams = ([i for i in self.teams if i.team != BYE] + [BYE.get_game_team(self),
+                                                                      BYE.get_game_team(self)])[0:2]
+            self.teams[0].team.teams_played.append(BYE)
+            BYE.teams_played.append(self.teams[0].team)
             self.started = True
-            self.teams[0].score = 11
+            if self.teams[1] != BYE:
+                self.started = False
+                self.best_player = self.teams[1].players[0]
+                self.teams[0].score = 11
+            else:
+                self.super_bye = True
         self.first_team_serves: bool = False
-        self.primary_official = None
+        self.primary_official = NoOfficial
         self.round_number: int = 0
+
+    def court_display(self) -> str:
+        if self.court > -1:
+            return f"Court {self.court + 1}"
+        return "-"
 
     def set_primary_official(self, o):
         if self.bye:
@@ -90,7 +118,7 @@ class Game:
     def server(self):
         if self.bye: return None
         serving_team = self.team_serving()
-        print(self)
+
         server = serving_team.players[not serving_team.first_player_serves]
         if server.is_carded():
             server = serving_team.players[serving_team.first_player_serves]
@@ -129,7 +157,11 @@ class Game:
                 [i.undo_end() for i in self.teams]
                 self.primary_official.games_umpired -= 1
                 self.primary_official.rounds_umpired -= self.rounds
-            self.teams[0].team.listed_first += 1
+            if not self.is_final:
+                self.teams[0].team.listed_first += 1
+                if self.court == 0:
+                    for i in self.teams:
+                        i.team.court_one += 1
             self.best_player = []
             for i in self.players():
                 if i.name == best_player:
@@ -181,6 +213,7 @@ class Game:
                 "score": self.teams[1].score,
                 "players": [i.name for i in self.teams[1].players]
             },
+            "court": self.court,
             "game": self.game_string,
             "started": self.started,
             "id": self.id,
@@ -224,6 +257,7 @@ class Game:
             "game": self.game_string,
             "started": self.started,
             "rounds": self.rounds,
+            "court": self.court
         }
         return dct
 
@@ -240,7 +274,7 @@ class Game:
             if c == 's':
                 team.score_point(first)
             elif c == 'a':
-                team.score_point(first, True)
+                team.score_point(None, True)
             elif c == 'g':
                 team.green_card(first)
             elif c == 'y':
@@ -265,6 +299,8 @@ class Game:
         return f"{self.teams[0]} vs {self.teams[1]}"
 
     def score_string(self):
+        if self.bye or not self.started:
+            return "-"
         return f"{self.teams[0].score} - {self.teams[1].score}"
 
     def info(self, message):

@@ -3,4 +3,5 @@ __pycache__/
 $py.class
 .pyc
 __pypackages__/
-resources/tournaments/games.json
+config/tournaments/*.*
+config/password.txt

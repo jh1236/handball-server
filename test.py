@@ -1,10 +1,9 @@
 from random import Random
 
-from api import competition, app
+from api import comps, app
 from utils.logging_handler import logger
 
-competition.load()
-print(competition.teams)
+competition = comps["second_suss_championship"]
 
 logger.debug(competition.teams)
 
@@ -83,9 +82,8 @@ if __name__ == "__main__":
         return bool(random.randint(0, 1))
 
 
-    print(competition.get_game(-1).winner().name)
     once = False
-    winners = False
+    winners = True
     while not once or ("Official" not in competition.get_game(-1).winner().name and winners):
         once = True
         print(f"Winner was {sorted(competition.teams, key=lambda a: -a.games_won)[0].name}, rejecting")
@@ -104,21 +102,22 @@ if __name__ == "__main__":
                     competition.get_game(game_id).start(r_bool(), r_bool(), r_bool())
                     continue
                 competition.update_games()
-                code = random.randint(0, 11)
-                if code <= 7:
-                    score(game_id, r_bool(), r_bool(), r_bool())
-                elif code <= 9:
+                code = random.randint(0, 20)
+                if code <= 10:
+                    ace = r_bool()
+                    score(game_id, r_bool(), None if ace else r_bool(), ace)
+                elif code <= 15:
+                    fault(game_id, r_bool())
+                elif code == 17:
+                    timeout(game_id, r_bool())
+                else:
                     choice = random.choice(["green", "yellow"] * 2 + ["red"])
                     card(game_id, choice, r_bool(), r_bool())
-                elif code == 10:
-                    timeout(game_id, r_bool())
-                elif code == 11:
-                    fault(game_id, r_bool())
             except ValueError:
                 print("Error")
                 break
     print("-" * 20)
     for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
-        print(f"{i + 1}: {t.name} [{t.first_ratio()}]")
+        print(f"{i + 1}: {t.name} [{t.first_ratio()}] [{t.court_one}]")
     print("-" * 20)
     app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)

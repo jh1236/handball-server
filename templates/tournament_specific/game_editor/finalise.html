@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Finalise Game {{teams[0].name}} vs {{teams[1].name}}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script>load("{{tournament}}")</script>
+
+<script src="{{ url_for('static', filename='js/start_game.js') }}"></script>
+<script>
+    setId({{game.id}})
+    setTournament("{{tournament}}")
+</script>
+<h1>{{teams[0].name}} vs {{teams[1].name}} </h1>
+<h1 class="big">{{teams[0].score}} - {{teams[1].score}}</h1>
+<p><b>Round:</b> <i>{{game.rounds}}</i></p>
+<p><b>Match Official:</b> <a class="hide"
+                             href="/{{tournament}}officials/{{game.primary_official.nice_name()}}"><i>{{game.primary_official}}</i></a>
+</p>
+<br>
+
+<table class="table">
+    <tr>
+        <th><a href="/{{tournament}}teams/{{teams[0].nice_name()}}"
+               class="hide"><img
+                src="/api/teams/image?name={{teams[0].nice_name()}}"
+                class="team_logo"
+                style="display: inline;left:70%;vertical-align:middle;"></a></th>
+        <th style="color:#e0ffe0">spacer..</th>
+        <th><a href="/{{tournament}}teams/{{teams[1].nice_name()}}"
+               class="hide"><img
+                src="/api/teams/image?name={{teams[1].nice_name()}}"
+                class="team_logo"
+                style="display: inline;left:70%;vertical-align:middle;"></a></th>
+    </tr>
+    <tr>
+        <td><br></td>
+    </tr>
+</table>
+<button class="button" onclick="undo()">Undo</button>
+<br>
+<br>
+<div class="dropdown">
+    {% if game.best_player %}
+    <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And Best: {{game.best_player.tidy_name()}}</button>
+    {% else %}
+    <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And Best</button>
+    {% endif %}
+    <div class="dropdown-content">
+        {% for i in game.players() %}
+        <p onclick="setBest('{{i.name}}', '{{i.tidy_name()}}')">{{i.tidy_name()}}</p>
+        {% endfor %}
+    </div>
+</div>
+<br>
+<br>
+<button onclick="finish()" class="button">Finalise</button>
+
+<br>
+</body>
+</html>

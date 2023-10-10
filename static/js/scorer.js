@@ -1,12 +1,18 @@
-id = 0
+let id = 0
+let tournament = ""
 setId = newId => id = newId
+setTournament = t => tournament = t
 
 let timeoutTime = -1
 
 function score(firstTeam, firstPlayer) {
     fetch("/api/games/update/score", {
         method: "POST", body: JSON.stringify({
-            id: id, firstTeam: firstTeam, firstPlayer: firstPlayer, ace: false
+            id: id,
+            firstTeam: Boolean(firstTeam),
+            tournament: tournament.replace("/", ""),
+            firstPlayer: firstPlayer,
+            ace: false
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -16,7 +22,9 @@ function score(firstTeam, firstPlayer) {
 function ace(firstTeam) {
     fetch("/api/games/update/ace", {
         method: "POST", body: JSON.stringify({
-            id: id, firstTeam: firstTeam,
+            id: id,
+            firstTeam: firstTeam,
+            tournament: tournament.replace("/", "")
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -27,7 +35,11 @@ function ace(firstTeam) {
 function card(firstTeam, firstPlayer, color) {
     fetch("/api/games/update/card", {
         method: "POST", body: JSON.stringify({
-            id: id, firstTeam: firstTeam, firstPlayer: firstPlayer, color: color, time: 3
+            id: id,
+            tournament: tournament.replace("/", ""),
+            firstTeam: Boolean(firstTeam),
+            firstPlayer: firstPlayer,
+            color: color, time: 3
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -57,6 +69,7 @@ function timeout(firstTeam) {
     fetch("/api/games/update/timeout", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam,
+            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -68,6 +81,7 @@ function fault(firstTeam) {
     fetch("/api/games/update/fault", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam,
+            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -76,7 +90,10 @@ function fault(firstTeam) {
 
 function undo() {
     fetch("/api/games/update/undo", {
-        method: "POST", body: JSON.stringify({id: id}), headers: {
+        method: "POST", body: JSON.stringify({
+            tournament: tournament.replace("/", ""),
+            id: id
+        }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
     }).then(() => location.reload());
