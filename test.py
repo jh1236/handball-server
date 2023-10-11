@@ -3,7 +3,7 @@ from random import Random
 from api import comps, app
 from utils.logging_handler import logger
 
-competition = comps["second_suss_championship"]
+competition = comps["third_suss_championship"]
 
 logger.debug(competition.teams)
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
 
     once = False
-    winners = True
+    winners = False
     while not once or ("Official" not in competition.get_game(-1).winner().name and winners):
         once = True
         print(f"Winner was {sorted(competition.teams, key=lambda a: -a.games_won)[0].name}, rejecting")
@@ -119,5 +119,8 @@ if __name__ == "__main__":
     print("-" * 20)
     for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):
         print(f"{i + 1}: {t.name} [{t.first_ratio()}] [{t.court_one}]")
+    print("-" * 20)
+    for t in competition.officials:
+        print(f": {t.name} [{t.games_court_one / t.games_umpired}]")
     print("-" * 20)
     app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)

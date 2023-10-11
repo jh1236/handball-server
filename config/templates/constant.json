@@ -3,5 +3,6 @@
   "finals_generator": "None",
   "name": "The SUSS Practice Games",
   "officials": "all",
-  "teams": "all"
+  "teams": "all",
+  "twoCourts": false
 }

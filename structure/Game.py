@@ -19,7 +19,9 @@ class Game:
         else:
             team_one = [i for i in tournament.teams if i.name == game_map["teamOne"]["name"]]
             if not team_one:
-                team_one = Team.find_or_create(game_map["teamOne"]["name"], [Player.find_or_create(tournament, i) for i in game_map["teamOne"]["players"]])
+                team_one = Team.find_or_create(tournament, game_map["teamOne"]["name"],
+                                               [Player.find_or_create(tournament, i) for i in
+                                                game_map["teamOne"]["players"]])
             else:
                 team_one = team_one[0]
         if game_map["teamTwo"]["name"] == "BYE":
@@ -27,7 +29,9 @@ class Game:
         else:
             team_two = [i for i in tournament.teams if i.name == game_map["teamTwo"]["name"]]
             if not team_two:
-                team_two = Team.find_or_create(game_map["teamTwo"]["name"], [Player.find_or_create(tournament, i) for i in game_map["teamTwo"]["players"]])
+                team_two = Team.find_or_create(tournament, game_map["teamTwo"]["name"],
+                                               [Player.find_or_create(tournament, i) for i in
+                                                game_map["teamTwo"]["players"]])
             else:
                 team_two = team_two[0]
         swapped = game_map["firstTeamServed"]
@@ -37,7 +41,6 @@ class Game:
 
         team_one_swap = team_one.players[0].name != game_map["teamOne"]["players"][0]
         team_two_swap = team_two.players[0].name != game_map["teamTwo"]["players"][0]
-
         game.set_primary_official(
             [i for i in tournament.officials if i.name == game_map["official"]][0])
         game.court = game_map["court"]
@@ -162,6 +165,7 @@ class Game:
                 if self.court == 0:
                     for i in self.teams:
                         i.team.court_one += 1
+                    self.primary_official.games_court_one += 1
             self.best_player = []
             for i in self.players():
                 if i.name == best_player:

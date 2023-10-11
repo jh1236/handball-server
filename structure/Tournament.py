@@ -1,6 +1,8 @@
 import json
 import os
+import time
 from typing import Generator, Any
+from itertools import zip_longest
 
 from FixtureMakers.FixtureMaker import get_type_from_name
 from structure.Game import Game
@@ -22,9 +24,10 @@ class Tournament:
         self.finals: list[list[Game]] = []
         self.fixtures_class = None
         self.finals_class = None
-        self.officials = None
+        self.officials: list[Official] = []
         self.name = ""
         self.notes = []
+        self.two_courts = False
         if not self.filename:
             return
         self.details = {}
@@ -49,6 +52,7 @@ class Tournament:
         team.tournament = self
         for i in team.players:
             i.tournament = self
+        self.teams.sort(key=lambda a: a.nice_name())
 
     def update_games(self):
         if not self.in_finals:
@@ -58,6 +62,7 @@ class Tournament:
                     if n is not None:
                         self.fixtures.append(n)
                 except Exception as e:  # this has to be broad because of lachies code >:(
+                    logger.info(e.args)
                     logger.info("Entering Finals!")
                     self.in_finals = True
                     n = next(self.finals_gen)
@@ -88,16 +93,22 @@ class Tournament:
             g.id = i
 
     def appoint_umpires(self):
-        for prev, game, next in zip([None] + self.games_to_list()[:-1], self.games_to_list(),
-                                    self.games_to_list()[1:] + [None]):
-            if game.bye: continue
-            if game.primary_official != NoOfficial: continue
-            teams = [i.team for i in game.teams] + ([] if not next else [i.team for i in next.teams])
-            for p in sorted(self.officials, key=lambda it: it.games_officiated):
-                if prev and prev.primary_official == p: continue
-                if p.team and p.team in teams: continue
-                game.set_primary_official(p)
-                break
+        for r in self.fixtures + self.finals:
+            court_one_games = [i for i in r if i.court == 0]
+            court_two_games = [i for i in r if i.court == 1]
+            for c1, c2 in zip_longest(court_one_games, court_two_games):
+                times_run = 0
+                while times_run < 2 and c1:
+                    if c1.primary_official == NoOfficial:
+                        teams = [i.team for i in c1.teams] + ([i.team for i in c2.teams] if c2 else [])
+                        for p in sorted(self.officials,
+                                        key=lambda it: (it.games_officiated, 1 - 2 * times_run * it.games_court_one)):
+                            if any([i in teams for i in p.team]): continue
+                            if c2 and c2.primary_official == p: continue
+                            c1.set_primary_official(p)
+                            break
+                    c1, c2 = c2, c1
+                    times_run += 1
 
     def assign_rounds(self):
         for i, r in enumerate(self.fixtures):
@@ -108,8 +119,9 @@ class Tournament:
         for r in self.fixtures:
             if r[0].court != -1:
                 continue
-            court_one_games = sorted(r, key=lambda a: sum([i.team.court_one for i in a.teams]))
-            # court_one_games = sorted(r, key=lambda a: sum([i.team.games_won for i in a.teams]))  use for preferential treatment of wins
+            # court_one_games = sorted(r, key=lambda a: sum([i.team.court_one for i in a.teams]))
+            court_one_games = sorted(r, key=lambda a: -sum(
+                [i.team.games_won for i in a.teams]))  # use for preferential treatment of wins
             court_one_games = [i for i in court_one_games if not i.bye]
             halfway = False
             for i, g in enumerate(court_one_games):
@@ -117,7 +129,7 @@ class Tournament:
                     g.court = 0
                 else:
                     g.court = 1
-                halfway = i + 1 >= (len(court_one_games) / 2)
+                halfway = i + 1 >= (len(court_one_games) / 2) and self.two_courts
         for r in self.finals:
             for g in r:
                 g.court = 0
@@ -148,7 +160,8 @@ class Tournament:
                 "finals_generator": self.finals_class.get_name(),
                 "name": self.name,
                 "teams": [i.name for i in self.teams],
-                "officials": [i.name for i in self.officials]
+                "officials": [i.name for i in self.officials],
+                "twoCourts": self.two_courts
             }
         with open(self.filename, "w+") as fp:
             json.dump(d, fp, indent=4, sort_keys=True)
@@ -172,9 +185,11 @@ class Tournament:
             data = json.load(fp)
         self.update_games()
         for i, r in enumerate(data.get("games", [])):
-            for j, g in enumerate([Game.from_map(j, self) for j in r]):
+            for j, m in enumerate(r):
+                g = Game.from_map(m, self)
                 self.update_games()
                 self.fixtures[i][j] = g
+
 
         for i, r in enumerate([[Game.from_map(j, self) for j in i] for i in data.get("finals", [])]):
             for j, g in enumerate(r):
@@ -201,13 +216,15 @@ class Tournament:
             teams = json.load(fp)
 
             if self.details["teams"] == "all":
-                self.teams = [Team.find_or_create(self, k, [Player.find_or_create(self, j) for j in v]) for k, v in teams.items()]
+                self.teams = [Team.find_or_create(self, k, [Player.find_or_create(self, j) for j in v]) for k, v in
+                              teams.items()]
             else:
                 self.teams = []
                 for i in self.details["teams"]:
                     players = [Player.find_or_create(self, i) for i in teams[i]]
                     self.teams.append(Team.find_or_create(self, i, players))
-
+        self.teams.sort(key=lambda a: a.nice_name())
+        self.two_courts = self.details["twoCourts"]
         self.officials: list[Official] = get_officials(self)
 
         for i in self.teams:

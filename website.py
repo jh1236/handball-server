@@ -93,7 +93,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         fixtures = [i for i in fixtures if i[1]]
         finals = [i for i in finals if i[1]]
         return render_template("tournament_specific/site_detailed.html", fixtures=fixtures, finals=finals,
-                               tournament=f"{tournament}/"), 200
+                               tournament=f"{tournament}/", t = comps[tournament]), 200
 
     @app.get('/<tournament>/teams/')
     def stats_directory_site(tournament):
@@ -102,6 +102,9 @@ def tournament_specific(app, comps: dict[str, Tournament]):
 
     @app.get('/<tournament>/teams/<team_name>/')
     def stats_site(tournament, team_name):
+        if team_name not in [i.nice_name() for i in comps[tournament].teams]:
+            return render_template("tournament_specific/game_editor/game_done.html",
+                                   error="This is not a real team"), 400
         team = [i for i in comps[tournament].teams if team_name == i.nice_name()][0]
         recent_games = []
         upcoming_games = []
@@ -123,7 +126,8 @@ def tournament_specific(app, comps: dict[str, Tournament]):
     @app.get('/<tournament>/games/<game_id>/')
     def game_site(tournament, game_id):
         if int(game_id) >= len(comps[tournament].games_to_list()):
-            raise Exception("Game Does not exist!!")
+            return render_template("tournament_specific/game_editor/game_done.html",
+                                   error="Game Does not exist"), 400
         game = comps[tournament].get_game(int(game_id))
         teams = game.teams
         team_dicts = [i.get_stats() for i in teams]
@@ -204,6 +208,9 @@ def tournament_specific(app, comps: dict[str, Tournament]):
 
     @app.get('/<tournament>/officials/<nice_name>/')
     def official_site(tournament, nice_name):
+        if nice_name not in [i.nice_name() for i in comps[tournament].officials]:
+            return render_template("tournament_specific/game_editor/game_done.html",
+                                   error="Official Does not exist"), 400
         official = [i for i in comps[tournament].officials if i.nice_name() == nice_name][0]
         recent_games = []
         for i in comps[tournament].games_to_list():
