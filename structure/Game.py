@@ -1,3 +1,4 @@
+import time
 import typing
 
 from structure.OfficiatingBody import NoOfficial
@@ -11,7 +12,6 @@ if typing.TYPE_CHECKING:
 
 
 class Game:
-
     @classmethod
     def from_map(cls, game_map, tournament, final=False):
         if game_map["teamOne"]["name"] == "BYE":
@@ -36,7 +36,7 @@ class Game:
                 team_two = team_two[0]
         swapped = game_map["firstTeamServed"]
         game = Game(team_one, team_two, tournament, final, attempt_rebalance=False)
-        if game.bye:
+        if game.bye or game.super_bye:
             game.start(None, None, None)
             return game
 
@@ -46,6 +46,7 @@ class Game:
             game.set_primary_official([i for i in tournament.officials if i.name == game_map["official"]][0])
         except Exception:
             print(game_map["official"])
+            print(game_map)
             exit()
         game.court = game_map["court"]
         game.id = game_map["id"]
@@ -188,7 +189,7 @@ class Game:
         return self.started and not self.best_player
 
     def in_timeout(self):
-        return any([i.in_timeout for i in self.teams])
+        return any([i.time_out_time > 0 for i in self.teams])
 
     def game_ended(self):
         if self.bye: return True
@@ -236,40 +237,51 @@ class Game:
         return dct
 
     def display_map(self):
-        serving_team = [*[i for i in self.teams if i.serving]]
-        if serving_team:
-            serving_team = serving_team[0]
-            server = serving_team.players[not serving_team.first_player_serves]
-            if server.is_carded():
-                server = serving_team.players[serving_team.first_player_serves].name
-            else:
-                server = server.name
-        else:
-            server = "None"
         dct = {
-            "server": server,
-            "teamOne": {
-                "name": self.teams[0].name,
-                "players": [i.name for i in self.teams[0].players],
+            "leftTeam": {
+                "team": self.teams[0].name,
                 "score": self.teams[0].score,
-                "cards": self.teams[0].card_time(),
-                "greenCard": self.teams[0].green_carded,
-                "cardDuration": self.teams[0].card_duration(),
-                "inTimeout": self.teams[0].in_timeout
+                "timeout": time.time() - self.teams[0].time_out_time if self.teams[0].time_out_time > 0 else self.teams[
+                                                                                                                 0].timeouts - 1,
+                "players": [i.name for i in self.teams[0].players],
+                "captain": {
+                    "name": self.teams[0].captain().name,
+                    "green": self.teams[0].captain().green_carded,
+                    "yellow": self.teams[0].captain().card_time_remaining > 0,
+                    "isYellowLong": self.teams[0].captain().card_duration > 3,
+                    "red": self.teams[0].captain().card_time_remaining < 0
+                },
+                "notCaptain": {
+                    "name": self.teams[0].not_captain().name,
+                    "green": self.teams[0].not_captain().green_carded,
+                    "yellow": self.teams[0].not_captain().card_time_remaining > 0,
+                    "isYellowLong": self.teams[0].not_captain().card_duration > 3,
+                    "red": self.teams[0].not_captain().card_time_remaining < 0
+                },
             },
-            "teamTwo": {
-                "name": self.teams[1].name,
-                "players": [i.name for i in self.teams[1].players],
+            "rightTeam": {
+                "team": self.teams[1].name,
                 "score": self.teams[1].score,
-                "cards": self.teams[1].card_time(),
-                "greenCard": self.teams[1].green_carded,
-                "cardDuration": self.teams[1].card_duration(),
-                "inTimeout": self.teams[1].in_timeout
+                "timeout": time.time() - self.teams[1].time_out_time if self.teams[1].time_out_time > 0 else self.teams[
+                                                                                                                 1].timeouts - 1,
+                "players": [i.name for i in self.teams[1].players],
+                "captain": {
+                    "name": self.teams[1].captain().name,
+                    "green": self.teams[1].captain().green_carded,
+                    "yellow": self.teams[1].captain().card_time_remaining > 0,
+                    "isYellowLong": self.teams[1].captain().card_duration > 3,
+                    "red": self.teams[1].captain().card_time_remaining < 0
+                },
+                "notCaptain": {
+                    "name": self.teams[1].not_captain().name,
+                    "green": self.teams[1].not_captain().green_carded,
+                    "yellow": self.teams[1].not_captain().card_time_remaining > 0,
+                    "isYellowLong": self.teams[1].not_captain().card_duration > 3,
+                    "red": self.teams[1].not_captain().card_time_remaining < 0
+                },
             },
-            "firstTeamServing": self.teams[0].serving,
-            "game": self.game_string,
-            "started": self.started,
             "rounds": self.rounds,
+            "umpire": self.primary_official,
             "court": self.court
         }
         return dct
@@ -282,7 +294,7 @@ class Game:
         self.teams[not self.first_team_serves].serving = True
         for j in chunks_sized(game_string, 2):
             for i in self.teams:
-                i.in_timeout = False
+                i.time_out_time = -1
             team = self.teams[not j[1].isupper()]
             first = j[1].upper() == 'L'
             c = j[0].lower()
@@ -301,8 +313,8 @@ class Game:
             elif c == 't':
                 team.timeout()
             elif c.isdigit():
-                if c == '0':
-                    team.yellow_card(first, 10)
+                if int(c) <= 3:
+                    team.yellow_card(first, int(c) + 10)
                 else:
                     team.yellow_card(first, int(c))
         self.game_string = game_string

@@ -1,3 +1,4 @@
+import time
 from typing import Any
 
 from structure.Player import Player, GamePlayer
@@ -118,12 +119,12 @@ BYE = Team("BYE", [Player("None")])
 
 class GameTeam:
     def __init__(self, team: Team, game):
-        self.in_timeout = None
+        self.time_out_time = -1
         self.game = game
         self.opponent: GameTeam | None = None
         self.team: Team = team
         self.name: str = self.team.name
-        self.players: list[GamePlayer] = [i.game_player() for i in team.players]
+        self.players: list[GamePlayer] = [i.game_player(1 - c) for c, i in enumerate(team.players)]
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
@@ -167,8 +168,9 @@ class GameTeam:
         self.opponent: GameTeam = [i for i in self.game.teams if i.name != self.name][0]
         self.serving = serve_first
         self.first_player_serves = serve_first
-        players = reversed(self.team.players) if swap_players else self.team.players
-        self.players = [i.game_player() for i in players]
+        self.players = [i.game_player(1 - c) for c, i in enumerate(self.team.players)]
+        if swap_players:
+            self.players.reverse()
 
     def next_point(self):
         self.faulted = False
@@ -207,6 +209,12 @@ class GameTeam:
         if server.is_carded():
             return self.players[self.first_player_serves]
         return server
+
+    def captain(self) -> GamePlayer:
+        return [i for i in self.players if i.captain][0]
+
+    def not_captain(self) -> GamePlayer:
+        return [i for i in self.players if not i.captain][0]
 
     def fault(self):
         self.info(f"Fault by {self.players[not self.first_player_serves].nice_name()} from team {self.nice_name()}")
@@ -248,8 +256,11 @@ class GameTeam:
     def timeout(self):
         self.info(f"Timeout called by {self.nice_name()}")
         self.game.add_to_game_string(f"tt", self)
-        self.in_timeout = True
+        self.time_out_time = time.time()
         self.timeouts -= 1
+
+    def end_timeout(self):
+        self.time_out_time = -1
 
     def card_time(self):
         if 0 > min(self.players, key=lambda a: a.card_time_remaining).card_time_remaining:

@@ -186,6 +186,9 @@
                         {% if p.is_carded() %} </i></s> {% endif %}
                     </p>
                     {% endfor %}
+                    <p onclick="customCard(true, {% for i in teamOnePlayers %}"{{i[0]}}",{% endfor %}})">
+                        Custom
+                    </p>
                 </div>
             </div>
         </td>

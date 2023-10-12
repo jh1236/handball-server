@@ -45,7 +45,7 @@ def timeout(game_id, first_team):
 
 
 def endTimeout(game_id, first_team):
-    competition.get_game(game_id).teams[not first_team].in_timeout = False
+    competition.get_game(game_id).teams[not first_team].end_timeout()
     competition.save()
 
 

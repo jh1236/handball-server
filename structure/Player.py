@@ -78,8 +78,8 @@ class Player:
     def nice_name(self):
         return self.name.lower().replace(" ", "_")
 
-    def game_player(self):
-        return GamePlayer(self)
+    def game_player(self, captain):
+        return GamePlayer(self, captain)
 
     def reset(self):
         self.faults = 0
@@ -104,7 +104,7 @@ class Player:
 
 
 class GamePlayer:
-    def __init__(self, player: Player):
+    def __init__(self, player: Player, captain):
         self.double_faults: int = 0
         self.player: Player = player
         self.name: str = self.player.name
@@ -112,12 +112,14 @@ class GamePlayer:
         self.points_scored: int = 0
         self.aces_scored: int = 0
         self.time_on_court: int = 0
+        self.captain = captain
         self.time_carded: int = 0
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
         self.card_time_remaining: int = 0  # how many rounds the player is carded for (-1 is infinite)
         self.card_duration: int = 0  # total time the player is carded for (used for progress bar in app)
+        self.green_carded: bool = False
         self.best: bool = False
 
     def score_point(self, ace: bool):
@@ -132,6 +134,7 @@ class GamePlayer:
         return self.player.nice_name()
 
     def green_card(self):
+        self.green_carded = True
         self.green_cards += 1
 
     def yellow_card(self, time):
@@ -165,6 +168,8 @@ class GamePlayer:
         self.green_cards = 0
         self.yellow_cards = 0
         self.red_cards = 0
+        self.green_carded = False
+
 
     def end(self, final=False):
         if final:
@@ -216,3 +221,6 @@ class GamePlayer:
 
     def double_fault(self):
         self.double_faults += 1
+
+    def __repr__(self):
+        return self.name

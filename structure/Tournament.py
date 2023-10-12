@@ -224,12 +224,12 @@ class Tournament:
             teams = json.load(fp)
 
             if self.details["teams"] == "all":
-                self.teams = [Team.find_or_create(self, k, [Player.find_or_create(self, j) for j in v]) for k, v in
+                self.teams = [Team.find_or_create(self, k, [Player.find_or_create(self, j) for c, j in enumerate(v)]) for k, v in
                               teams.items()]
             else:
                 self.teams = []
                 for i in self.details["teams"]:
-                    players = [Player.find_or_create(self, i) for i in teams[i]]
+                    players = [Player.find_or_create(self, j) for c, j in enumerate(teams[i])]
                     self.teams.append(Team.find_or_create(self, i, players))
         self.teams.sort(key=lambda a: a.nice_name())
         self.two_courts = self.details["twoCourts"]

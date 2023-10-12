@@ -218,7 +218,7 @@ def end_timeout():
     logger.info(f"Request for endTimeout: {request.json}")
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
-    comps[tournament].get_game(game_id).teams[not first_team].in_timeout = False
+    comps[tournament].get_game(game_id).teams[not first_team].end_timeout()
     comps[tournament].save()
     return "", 204
 

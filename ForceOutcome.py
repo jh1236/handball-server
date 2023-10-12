@@ -12,11 +12,7 @@ def check(competition):
     target_ladder = ["officials", "whipped", "satnavs", "seanitha", "idk", "barbenheimer", "tradies", "ikea_workers",
                      "sleeby"]
 
-    print(f"{'actual':^20}\t|\t{'expected':^20}")
     ladders = [i.nice_name() == j for i, j in zip(competition.ladder(), target_ladder)]
-    for (i, j) in zip(competition.ladder(), target_ladder):
-        print(f"{i.nice_name():<20}\t|\t{j:<20}")
-
     print(f"{9 - sum(ladders)} teams were wrong (best {9 - best_so_far})")
     if sum(ladders) > best_so_far:
         competition.save("./config/tournaments/best.json")

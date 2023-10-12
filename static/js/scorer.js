@@ -46,6 +46,22 @@ function card(firstTeam, firstPlayer, color) {
     }).then(() => location.reload());
 }
 
+function customCard(firstTeam, players) {
+    alert(players)
+    return
+    fetch("/api/games/update/card", {
+        method: "POST", body: JSON.stringify({
+            id: id,
+            tournament: tournament.replace("/", ""),
+            firstTeam: Boolean(firstTeam),
+            firstPlayer: firstPlayer,
+            color: color, time: 3
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(() => location.reload());
+}
+
 function timeout(firstTeam) {
     timeoutTime = Date.now() + 30000
     document.getElementById("myNav").style.width = "100%";
