@@ -118,6 +118,7 @@ BYE = Team("BYE", [Player("None")])
 
 class GameTeam:
     def __init__(self, team: Team, game):
+        self.in_timeout = None
         self.game = game
         self.opponent: GameTeam | None = None
         self.team: Team = team
@@ -195,7 +196,7 @@ class GameTeam:
         if not self.serving:
             self.first_player_serves = not self.first_player_serves
             self.serving = True
-        if first_player is not None:
+        if first_player is not None or ace:
             string = "a" if ace else "s"
             string += "l" if first_player else "r"
             self.game.add_to_game_string(string, self)
@@ -247,6 +248,7 @@ class GameTeam:
     def timeout(self):
         self.info(f"Timeout called by {self.nice_name()}")
         self.game.add_to_game_string(f"tt", self)
+        self.in_timeout = True
         self.timeouts -= 1
 
     def card_time(self):
@@ -281,9 +283,7 @@ class GameTeam:
         if not self.elo_delta or (self.elo_delta > 0 and not won) or (self.elo_delta < 0 and won):
             self.elo_delta = calc_elo(self.team, self.opponent.team, won)
             self.opponent.elo_delta = calc_elo(self.opponent.team, self.team, not won)
-            print(f"{self.elo_delta} - {self.opponent.elo_delta}")
         self.team.elo += self.elo_delta
-        logger.info(f"Elo change is {self.elo_delta}, leaving total equal to {self.team.elo}")
 
     def undo_end(self):
         [i.undo_end() for i in self.players]

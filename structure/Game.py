@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
 class Game:
 
     @classmethod
-    def from_map(cls, game_map, tournament):
+    def from_map(cls, game_map, tournament, final=False):
         if game_map["teamOne"]["name"] == "BYE":
             team_one = BYE
         else:
@@ -35,14 +35,18 @@ class Game:
             else:
                 team_two = team_two[0]
         swapped = game_map["firstTeamServed"]
-        game = Game(team_one, team_two, tournament)
+        game = Game(team_one, team_two, tournament, final, attempt_rebalance=False)
         if game.bye:
+            game.start(None, None, None)
             return game
 
         team_one_swap = team_one.players[0].name != game_map["teamOne"]["players"][0]
         team_two_swap = team_two.players[0].name != game_map["teamTwo"]["players"][0]
-        game.set_primary_official(
-            [i for i in tournament.officials if i.name == game_map["official"]][0])
+        try:
+            game.set_primary_official([i for i in tournament.officials if i.name == game_map["official"]][0])
+        except Exception:
+            print(game_map["official"])
+            exit()
         game.court = game_map["court"]
         game.id = game_map["id"]
         if not game_map["started"]: return game
@@ -53,7 +57,7 @@ class Game:
 
         return game
 
-    def __init__(self, team_one, team_two, tournament, final: bool = False):
+    def __init__(self, team_one, team_two, tournament, final: bool = False, attempt_rebalance: bool = True):
         self.tournament = tournament
         self.id: int = -1
         self.court: int = -1
@@ -65,7 +69,7 @@ class Game:
         self.teams: list[GameTeam] = [team_one.get_game_team(self), team_two.get_game_team(self)]
         self.is_final = final
         self.bye = False
-        if not final and self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio():
+        if attempt_rebalance and not final and self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio():
             self.teams.reverse()
         if team_one not in tournament.teams:
             self.tournament.add_team(team_one)
@@ -75,9 +79,6 @@ class Game:
             self.bye = True
             self.teams = ([i for i in self.teams if i.team != BYE] + [BYE.get_game_team(self),
                                                                       BYE.get_game_team(self)])[0:2]
-            self.teams[0].team.teams_played.append(BYE)
-            BYE.teams_played.append(self.teams[0].team)
-            self.started = True
             if self.teams[1] != BYE:
                 self.started = False
                 self.best_player = self.teams[1].players[0]
@@ -106,7 +107,7 @@ class Game:
             self.game_string += string.lower()
 
     def bye_check(self):
-        if self.bye:
+        if self.bye or self.super_bye:
             raise LookupError(f"Game {self.id} is a bye!")
 
     def next_point(self):
@@ -146,8 +147,11 @@ class Game:
         logger.info(f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}")
 
     def start(self, team_one_serves, swap_team_one, swap_team_two):
-        self.bye_check()
         self.started = True
+        if self.bye:
+            self.teams[0].team.teams_played.append(BYE)
+            BYE.teams_played.append(self.teams[0].team)
+            return
         self.teams[0].start(team_one_serves, swap_team_one)
         self.teams[1].start(not team_one_serves, swap_team_two)
         self.first_team_serves = team_one_serves
@@ -182,6 +186,9 @@ class Game:
     def in_progress(self):
         if self.bye: return False
         return self.started and not self.best_player
+
+    def in_timeout(self):
+        return any([i.in_timeout for i in self.teams])
 
     def game_ended(self):
         if self.bye: return True
@@ -248,6 +255,7 @@ class Game:
                 "cards": self.teams[0].card_time(),
                 "greenCard": self.teams[0].green_carded,
                 "cardDuration": self.teams[0].card_duration(),
+                "inTimeout": self.teams[0].in_timeout
             },
             "teamTwo": {
                 "name": self.teams[1].name,
@@ -256,6 +264,7 @@ class Game:
                 "cards": self.teams[1].card_time(),
                 "greenCard": self.teams[1].green_carded,
                 "cardDuration": self.teams[1].card_duration(),
+                "inTimeout": self.teams[1].in_timeout
             },
             "firstTeamServing": self.teams[0].serving,
             "game": self.game_string,
@@ -272,6 +281,8 @@ class Game:
         self.rounds = 0
         self.teams[not self.first_team_serves].serving = True
         for j in chunks_sized(game_string, 2):
+            for i in self.teams:
+                i.in_timeout = False
             team = self.teams[not j[1].isupper()]
             first = j[1].upper() == 'L'
             c = j[0].lower()

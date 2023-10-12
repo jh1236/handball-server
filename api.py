@@ -1,3 +1,4 @@
+import logging
 import os
 
 import flask
@@ -10,9 +11,11 @@ from structure.Tournament import load_all_tournaments
 from utils.logging_handler import logger
 from website import init_api
 
+logger.setLevel(logging.CRITICAL)
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 comps = load_all_tournaments()
+
 
 with open("./config/password.txt", "r") as fp:
     admin_password = fp.read()
@@ -205,6 +208,17 @@ def timeout():
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
     comps[tournament].get_game(game_id).teams[not first_team].timeout()
+    comps[tournament].save()
+    return "", 204
+
+
+@app.post('/api/games/update/endTimeout')
+def end_timeout():
+    tournament = request.json["tournament"]
+    logger.info(f"Request for endTimeout: {request.json}")
+    first_team = request.json["firstTeam"]
+    game_id = request.json["id"]
+    comps[tournament].get_game(game_id).teams[not first_team].in_timeout = False
     comps[tournament].save()
     return "", 204
 

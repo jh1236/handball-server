@@ -3,7 +3,7 @@ from random import Random
 from api import comps, app
 from utils.logging_handler import logger
 
-competition = comps["third_suss_championship"]
+competition = comps["second_suss_championship"]
 
 logger.debug(competition.teams)
 
@@ -27,31 +27,31 @@ def display(game_id):
 def score(game_id, ace, first_team, first_player):
     competition.get_game(game_id).teams[not first_team].score_point(first_player, ace)
     competition.save()
-    return "", 204
 
 
 def start(game_id, first_team_served, swap_team_one, swap_team_two):
     competition.get_game(game_id).start(first_team_served, swap_team_one, swap_team_two)
     competition.save()
-    return "", 204
 
 
 def end(game_id, best_player):
     competition.get_game(game_id).end()
     competition.save()
-    return "", 204
 
 
 def timeout(game_id, first_team):
     competition.get_game(game_id).teams[not first_team].timeout()
     competition.save()
-    return "", 204
+
+
+def endTimeout(game_id, first_team):
+    competition.get_game(game_id).teams[not first_team].in_timeout = False
+    competition.save()
 
 
 def undo(game_id):
     competition.get_game(game_id).undo()
     competition.save()
-    return "", 204
 
 
 def card(game_id, color, first_team, first_player, time=3):
@@ -64,14 +64,12 @@ def card(game_id, color, first_team, first_player, time=3):
     else:
         raise Exception(f"Illegal argument {color}")
     competition.save()
-    return "", 204
 
 
 def fault(game_id, first_team):
     competition.get_game(game_id).teams[not first_team].fault()
     competition.get_game(game_id).print_gamestate()
     competition.save()
-    return "", 204
 
 
 if __name__ == "__main__":
@@ -109,7 +107,9 @@ if __name__ == "__main__":
                 elif code <= 15:
                     fault(game_id, r_bool())
                 elif code == 17:
-                    timeout(game_id, r_bool())
+                    t = r_bool()
+                    timeout(game_id, t)
+                    endTimeout(game_id, t)
                 else:
                     choice = random.choice(["green", "yellow"] * 2 + ["red"])
                     card(game_id, choice, r_bool(), r_bool())

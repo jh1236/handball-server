@@ -143,6 +143,8 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         prev_matches = prev_matches or [("No other matches", -1, game.tournament)]
         if not game.started:
             status = "Waiting for toss"
+        elif game.in_timeout():
+            status = "In Timeout"
         elif not game.game_ended():
             status = "Game in Progress"
         elif not game.best_player:

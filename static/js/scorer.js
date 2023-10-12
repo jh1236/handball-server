@@ -52,16 +52,20 @@ function timeout(firstTeam) {
     window.onscroll = function () {
         window.scrollTo(0, 100);
     };
-    setInterval(function (x) {
+    setTimeout(function named(x) {
         if (timeoutTime < 0) {
             window.onscroll = function () {
             };
+            endTimeout(firstTeam)
             document.getElementById("myNav").style.width = "0%";
             return
-        } else if (timeoutTime - Date.now() < 0) {
-            document.getElementById("timeoutClock").style = "color:red;"
         } else {
-            document.getElementById("timeoutClock").style = ""
+            if (timeoutTime - Date.now() < 0) {
+                document.getElementById("timeoutClock").style = "color:red;"
+            } else {
+                document.getElementById("timeoutClock").style = ""
+            }
+            setTimeout(named, 100)
         }
         document.getElementById("timeoutClock").textContent = "" + Math.round((timeoutTime - Date.now()) / 100) / 10
     }, 100)
@@ -69,6 +73,18 @@ function timeout(firstTeam) {
     fetch("/api/games/update/timeout", {
         method: "POST", body: JSON.stringify({
             id: id, firstTeam: firstTeam,
+            tournament: tournament.replace("/", ""),
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    });
+}
+
+function endTimeout(firstTeam) {
+    fetch("/api/games/update/endTimeout", {
+        method: "POST", body: JSON.stringify({
+            id: id,
+            firstTeam: firstTeam,
             tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"

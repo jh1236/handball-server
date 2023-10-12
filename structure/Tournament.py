@@ -1,8 +1,8 @@
 import json
 import os
-import time
-from typing import Generator, Any
+from inspect import getframeinfo, stack
 from itertools import zip_longest
+from typing import Generator, Any
 
 from FixtureMakers.FixtureMaker import get_type_from_name
 from structure.Game import Game
@@ -17,7 +17,8 @@ class Tournament:
         if file != "-":
             self.filename = f"./config/tournaments/{file}"
         else:
-            self.filename = None
+            self.filename = False
+        self.loading = True
         self.in_finals: bool = False
         self.teams = []
         self.fixtures: list[list[Game]] = []
@@ -59,6 +60,10 @@ class Tournament:
             if not self.fixtures or all([i.best_player for i in self.fixtures[-1]]):
                 try:
                     n = next(self.fixtures_gen)
+                    if not self.loading:
+                        for i in self.games_to_list():
+                            if i.bye and not i.super_bye:
+                                i.start(None, None, None)
                     if n is not None:
                         self.fixtures.append(n)
                 except Exception as e:  # this has to be broad because of lachies code >:(
@@ -144,8 +149,10 @@ class Tournament:
                     names.append(p.name)
         return players
 
-    def save(self):
-        if not self.filename:
+    def save(self, location=None):
+        if location is None:
+            location = self.filename
+        if not location:
             return
         logger.info("Saving...")
         d: dict[str, Any] = {
@@ -163,7 +170,7 @@ class Tournament:
                 "officials": [i.name for i in self.officials],
                 "twoCourts": self.two_courts
             }
-        with open(self.filename, "w+") as fp:
+        with open(location, "w+") as fp:
             json.dump(d, fp, indent=4, sort_keys=True)
 
     def dump(self):
@@ -175,6 +182,7 @@ class Tournament:
     def load(self):
         if not self.filename:
             return
+        self.loading = True
         [i.reset() for i in self.teams]
         self.fixtures_gen: Generator[list[Game]] = self.fixtures_class.get_generator()
         self.finals_gen: Generator[list[Game]] = self.finals_class.get_generator()
@@ -189,16 +197,16 @@ class Tournament:
                 g = Game.from_map(m, self)
                 self.update_games()
                 self.fixtures[i][j] = g
-
-
-        for i, r in enumerate([[Game.from_map(j, self) for j in i] for i in data.get("finals", [])]):
-            for j, g in enumerate(r):
-                self.finals[i][j] = g
+        for i, r in enumerate(data.get("finals", [])):
+            for j, m in enumerate(r):
+                g = Game.from_map(m, self, True)
                 self.update_games()
+                self.finals[i][j] = g
         self.assign_ids()
         self.assign_rounds()
         self.assign_courts()
         self.appoint_umpires()
+        self.loading = False
         self.update_games()
 
     def initial_load(self):
