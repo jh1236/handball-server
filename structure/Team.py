@@ -241,7 +241,7 @@ class GameTeam:
         if time == 3:
             self.game.add_to_game_string("y" + ("l" if first_player else "r"), self)
         else:
-            self.game.add_to_game_string(f"{time}{'l' if first_player else 'r'}", self)
+            self.game.add_to_game_string(f"{time % 10}{'l' if first_player else 'r'}", self)
         while all([i.is_carded() for i in self.players]) and not self.game.game_ended():
             self.opponent.score_point()
 

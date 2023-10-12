@@ -52,7 +52,7 @@ setRight = (i, s) => {
     document.getElementById("right").textContent = "Left Player: " + s
 }
 setTeamServing = (i, s) => {
-    right = i
+    first_serves = i
     document.getElementById("team").textContent = "Team Serving: " + s
 }
 

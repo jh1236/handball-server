@@ -2,16 +2,14 @@ import logging
 import os
 
 import flask
-from flask import request, send_file, jsonify
+from flask import request, send_file
 
 from structure.Game import Game
-from structure.Player import Player
 from structure.Team import Team
 from structure.Tournament import load_all_tournaments
 from utils.logging_handler import logger
 from website import init_api
 
-logger.setLevel(logging.CRITICAL)
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 comps = load_all_tournaments()
@@ -169,7 +167,8 @@ def create():
             players += [j for j in tournament.players() if j.nice_name() == i]
 
         team_one = Team.find_or_create(tournament, request.json["teamOne"], players)
-        tournament.add_team(team_one)
+        if team_one not in tournament.teams:
+            tournament.add_team(team_one)
     else:
         team_one = [i for i in tournament.teams if request.json["teamOne"] in [i.nice_name(), i.name]][0]
     if "playersTwo" in request.json:
@@ -177,7 +176,8 @@ def create():
         for i in request.json["playersTwo"]:
             players += [j for j in tournament.players() if j.nice_name() == i]
         team_two = Team.find_or_create(tournament, request.json["teamTwo"], players)
-        tournament.add_team(team_two)
+        if team_two not in tournament.teams:
+            tournament.add_team(team_two)
     else:
         team_two = [i for i in tournament.teams if request.json["teamTwo"] in [i.nice_name(), i.name]][0]
     official = [i for i in tournament.officials if request.json["official"] in [i.nice_name(), i.name]][0]
@@ -253,10 +253,13 @@ def card():
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]
     game_id = request.json["id"]
+    time = request.json["time"]
+    if time < 3:
+        time += 10
     if color == "green":
         comps[tournament].get_game(game_id, ).teams[not first_team].green_card(first_player)
     elif color == "yellow":
-        comps[tournament].get_game(game_id).teams[not first_team].yellow_card(first_player, request.json["time"])
+        comps[tournament].get_game(game_id).teams[not first_team].yellow_card(first_player, time)
     elif color == "red":
         comps[tournament].get_game(game_id).teams[not first_team].red_card(first_player)
 

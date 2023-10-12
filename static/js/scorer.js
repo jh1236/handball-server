@@ -46,21 +46,61 @@ function card(firstTeam, firstPlayer, color) {
     }).then(() => location.reload());
 }
 
-function customCard(firstTeam, players) {
-    alert(players)
-    return
+
+let firstPlayerSelected = true
+let firstTeamSelected = true
+
+function selectTwo() {
+    firstPlayerSelected = false
+    document.getElementById("nameTwo").style = "color:green;"
+    document.getElementById("nameOne").style = "color:white;"
+}
+
+function selectOne() {
+    firstPlayerSelected = true
+    document.getElementById("nameTwo").style = "color:white;"
+    document.getElementById("nameOne").style = "color:green;"
+}
+
+
+let added = false
+
+function openCustomCard(firstTeam, playerOne, playerTwo) {
+    firstTeamSelected = firstTeam
+    document.getElementById("nameOne").textContent = playerOne
+    document.getElementById("nameTwo").textContent = playerTwo
+    document.getElementById("cardSelect").style.width = "100%";
+    document.getElementById("duration").value = "4"
+    document.getElementById("durationText").textContent = "Duration (4)"
+    window.scrollTo(0, 0);
+    window.onscroll = function () {
+        window.scrollTo(0, 0);
+    };
+    if (!added) {
+        added = true
+        console.warn("found!")
+        document.getElementById("duration").addEventListener("input", (event) => {
+            document.getElementById("durationText").textContent = `Duration (${event.target.value})`;
+        });
+    }
+}
+
+function sendCustomCard() {
     fetch("/api/games/update/card", {
         method: "POST", body: JSON.stringify({
             id: id,
             tournament: tournament.replace("/", ""),
-            firstTeam: Boolean(firstTeam),
-            firstPlayer: firstPlayer,
-            color: color, time: 3
+            firstTeam: firstTeamSelected,
+            firstPlayer: firstPlayerSelected,
+            color: "yellow",
+            time: +(document.getElementById("duration").value) % 10
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
     }).then(() => location.reload());
 }
+
+
 
 function timeout(firstTeam) {
     timeoutTime = Date.now() + 30000

@@ -241,47 +241,50 @@ class Game:
             "leftTeam": {
                 "team": self.teams[0].name,
                 "score": self.teams[0].score,
-                "timeout": time.time() - self.teams[0].time_out_time if self.teams[0].time_out_time > 0 else self.teams[
-                                                                                                                 0].timeouts - 1,
+                "timeout": 30 - (time.time() - self.teams[0].time_out_time) if self.teams[0].time_out_time > 0 else self.teams[0].timeouts - 1,
                 "players": [i.name for i in self.teams[0].players],
                 "captain": {
                     "name": self.teams[0].captain().name,
                     "green": self.teams[0].captain().green_carded,
                     "yellow": self.teams[0].captain().card_time_remaining > 0,
-                    "isYellowLong": self.teams[0].captain().card_duration > 3,
-                    "red": self.teams[0].captain().card_time_remaining < 0
+                    "receivedYellow": self.teams[0].captain().yellow_cards > 0,
+                    "red": self.teams[0].captain().card_time_remaining < 0,
+                    "serving": self.teams[0].captain().nice_name() == self.server().nice_name()
                 },
                 "notCaptain": {
                     "name": self.teams[0].not_captain().name,
                     "green": self.teams[0].not_captain().green_carded,
                     "yellow": self.teams[0].not_captain().card_time_remaining > 0,
-                    "isYellowLong": self.teams[0].not_captain().card_duration > 3,
-                    "red": self.teams[0].not_captain().card_time_remaining < 0
+                    "receivedYellow": self.teams[0].not_captain().yellow_cards > 0,
+                    "red": self.teams[0].not_captain().card_time_remaining < 0,
+                    "serving": self.teams[0].not_captain().nice_name() == self.server().nice_name()
                 },
             },
             "rightTeam": {
                 "team": self.teams[1].name,
                 "score": self.teams[1].score,
-                "timeout": time.time() - self.teams[1].time_out_time if self.teams[1].time_out_time > 0 else self.teams[
+                "timeout": 30 - (time.time() - self.teams[1].time_out_time) if self.teams[1].time_out_time > 0 else self.teams[
                                                                                                                  1].timeouts - 1,
                 "players": [i.name for i in self.teams[1].players],
                 "captain": {
                     "name": self.teams[1].captain().name,
                     "green": self.teams[1].captain().green_carded,
                     "yellow": self.teams[1].captain().card_time_remaining > 0,
-                    "isYellowLong": self.teams[1].captain().card_duration > 3,
-                    "red": self.teams[1].captain().card_time_remaining < 0
+                    "receivedYellow": self.teams[1].captain().yellow_cards > 0,
+                    "red": self.teams[1].captain().card_time_remaining < 0,
+                    "serving": self.teams[1].captain().nice_name() == self.server().nice_name()
                 },
                 "notCaptain": {
                     "name": self.teams[1].not_captain().name,
                     "green": self.teams[1].not_captain().green_carded,
                     "yellow": self.teams[1].not_captain().card_time_remaining > 0,
-                    "isYellowLong": self.teams[1].not_captain().card_duration > 3,
-                    "red": self.teams[1].not_captain().card_time_remaining < 0
+                    "receivedYellow": self.teams[1].not_captain().yellow_cards > 0,
+                    "red": self.teams[1].not_captain().card_time_remaining < 0,
+                    "serving": self.teams[1].not_captain().nice_name() == self.server().nice_name()
                 },
             },
             "rounds": self.rounds,
-            "umpire": self.primary_official,
+            "umpire": self.primary_official.name,
             "court": self.court
         }
         return dct
@@ -294,7 +297,7 @@ class Game:
         self.teams[not self.first_team_serves].serving = True
         for j in chunks_sized(game_string, 2):
             for i in self.teams:
-                i.time_out_time = -1
+                i.end_timeout()
             team = self.teams[not j[1].isupper()]
             first = j[1].upper() == 'L'
             c = j[0].lower()
