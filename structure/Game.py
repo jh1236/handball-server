@@ -133,6 +133,11 @@ class Game:
         o.games_officiated += 1
         self.primary_official = o
 
+    def process_if_bye(self):
+        if not self.bye:
+            return
+
+
     def add_to_game_string(self, string: str, team):
         if team == self.teams[0]:
             self.game_string += string.upper()
@@ -197,8 +202,6 @@ class Game:
     def start(self, team_one_serves, swap_team_one, swap_team_two):
         self.started = True
         if self.bye:
-            self.teams[0].team.teams_played.append(BYE)
-            BYE.teams_played.append(self.teams[0].team)
             return
         self.teams[0].start(team_one_serves, swap_team_one)
         self.teams[1].start(not team_one_serves, swap_team_two)

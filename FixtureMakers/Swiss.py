@@ -26,7 +26,10 @@ class Swiss(FixtureMaker):
 
         self.max_rounds = len(self.teams_fixed) - 1
         for _ in range(self.round_count):
-            yield self.match_make()
+            try:
+                yield self.match_make()
+            except StopIteration:
+                raise StopIteration()
 
     def match_make(self) -> List[Game]:
         """
@@ -37,7 +40,7 @@ class Swiss(FixtureMaker):
             List[Game]: A compilation of all matches for the given round.
         """
         if len(self.teams_fixed[0].teams_played) + 1 == len(self.teams_fixed):
-            raise Exception("All games have been played")
+            raise StopIteration("All games have been played")
 
         roster = []
 

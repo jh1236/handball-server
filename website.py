@@ -10,6 +10,7 @@ from structure.AllTournament import (
 )
 from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
+from utils.util import fixture_sorter
 
 
 def init_api(app, comps: dict[str, Tournament]):
@@ -80,7 +81,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             else comps[tournament].fixtures[-1]
         )
         if (
-            all([i.bye for i in current_round]) and len(comps[tournament].fixtures) > 1
+                all([i.bye for i in current_round]) and len(comps[tournament].fixtures) > 1
         ):  # basically just for home and aways
             current_round = comps[tournament].fixtures[-2]
         players = comps[tournament].players()
@@ -111,14 +112,14 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         finals = comps[tournament].finals
         fixtures = [
             (n, [i for i in j if not i.bye or i.best_player])
-            for n, j in enumerate(fixtures)
+            for n, j in enumerate(fixture_sorter(fixtures))
         ]
         finals = [
             (n, [i for i in j if not i.bye or i.best_player])
             for n, j in enumerate(finals)
         ]
-        fixtures = [i for i in fixtures if i[1]]
-        finals = [i for i in finals if i[1]]
+        fixtures = [i for i in fixtures if i]
+        finals = [i for i in finals if i]
         return (
             render_template(
                 "tournament_specific/site.html",
@@ -139,7 +140,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             finals = [[j for j in i if j.court == court] for i in finals]
         fixtures = [
             (n, [i for i in j if not i.bye or i.best_player])
-            for n, j in enumerate(fixtures)
+            for n, j in enumerate(fixture_sorter(fixtures))
         ]
         finals = [
             (n, [i for i in j if not i.bye or i.best_player])
@@ -234,10 +235,10 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         prev_matches = []
         for i in get_all_games(comps):
             if not all(
-                [
-                    k.nice_name() in [j.team.nice_name() for j in i.teams]
-                    for k in game.teams
-                ]
+                    [
+                        k.nice_name() in [j.team.nice_name() for j in i.teams]
+                        for k in game.teams
+                    ]
             ):
                 continue
             if i == game:
@@ -314,7 +315,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         headers = [
             (i, priority[i])
             for i in (
-                ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
+                    ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
             )
         ]
         return (
@@ -448,8 +449,6 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 403,
             )
         if not game.started:
-            for i in teams:
-                print(i.players)
             return (
                 render_template(
                     "tournament_specific/game_editor/game_start.html",
@@ -509,7 +508,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 400,
             )
         elif any(
-            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         ):
             return (
                 render_template(
@@ -565,7 +564,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 400,
             )
         elif any(
-            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         ):
             return (
                 render_template(

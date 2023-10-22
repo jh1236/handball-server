@@ -18,7 +18,6 @@ class Tournament:
             self.filename = f"./config/tournaments/{file}"
         else:
             self.filename = False
-        self.loading = True
         self.in_finals: bool = False
         self.teams = []
         self.fixtures: list[list[Game]] = []
@@ -57,16 +56,15 @@ class Tournament:
 
     def update_games(self):
         if not self.in_finals:
+            if self.fixtures:
+                for i in self.fixtures[-1]:
+                    i.process_if_bye()
             if not self.fixtures or all([i.best_player for i in self.fixtures[-1]]):
                 try:
                     n = next(self.fixtures_gen)
-                    if not self.loading:
-                        for i in self.games_to_list():
-                            if i.bye and not i.super_bye:
-                                i.start(None, None, None)
                     if n is not None:
                         self.fixtures.append(n)
-                except Exception as e:  # this has to be broad because of lachies code >:(
+                except StopIteration as e:  # this has to be broad because of lachies code >:(
                     logger.info(e.args)
                     logger.info("Entering Finals!")
                     self.in_finals = True
@@ -120,8 +118,7 @@ class Tournament:
                 if g.primary_official == NoOfficial:
                     for p in sorted(self.officials,
                                     key=lambda it: (it.games_officiated, 1 - 2 * times_run * it.games_court_one)):
-                        print(f"{p.team} in {teams}")
-                        if any([i in teams for i in p.team]):continue
+                        if any([i in teams for i in p.team]): continue
                         if not p.finals: continue
                         g.set_primary_official(p)
                         break
@@ -195,7 +192,6 @@ class Tournament:
     def load(self):
         if not self.filename:
             return
-        self.loading = True
         [i.reset() for i in self.teams]
         self.fixtures_gen: Generator[list[Game]] = self.fixtures_class.get_generator()
         self.finals_gen: Generator[list[Game]] = self.finals_class.get_generator()
@@ -219,7 +215,6 @@ class Tournament:
         self.assign_rounds()
         self.assign_courts()
         self.appoint_umpires()
-        self.loading = False
         self.update_games()
 
     def initial_load(self):

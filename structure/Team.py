@@ -13,7 +13,6 @@ class Team:
         self.name = name
         self.players: list[Player] = players
 
-        self.teams_played: list[Team] = []
         self.points_against: int = 0
         self.points_for: int = 0
         self.games_won: int = 0
@@ -38,8 +37,14 @@ class Team:
     def __repr__(self):
         return self.name
 
+    @property
+    def teams_played(self) -> list:
+        if not self.tournament:
+            return []
+        my_games = [i for i in self.tournament.games_to_list() if self in [j.team for j in i.teams] and i.best_player]
+        return [next(j.team for j in i.teams if j.team != self) for i in my_games]
+
     def reset(self):
-        self.teams_played: list[Team] = []
         [i.reset() for i in self.players]
         self.points_against: int = 0
         self.points_for: int = 0
@@ -282,7 +287,6 @@ class GameTeam:
             self.team.points_against += self.opponent.score
             self.team.games_played += 1
             self.team.games_won += won
-            self.team.teams_played.append(self.opponent.team)
             self.team.green_cards += self.green_cards
             self.team.yellow_cards += self.yellow_cards
             self.team.red_cards += self.red_cards
@@ -307,7 +311,6 @@ class GameTeam:
         self.team.points_against -= self.opponent.score
         self.team.games_played -= 1
         self.team.games_won -= self.game.winner() == self.team
-        self.team.teams_played.remove(self.opponent.team)
         self.team.green_cards -= self.green_cards
         self.team.yellow_cards -= self.yellow_cards
         self.team.red_cards -= self.red_cards
