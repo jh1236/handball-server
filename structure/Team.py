@@ -1,3 +1,4 @@
+import os
 import time
 from typing import Any
 
@@ -11,8 +12,7 @@ class Team:
         self.elo = 1000
         self.name = name
         self.players: list[Player] = players
-        for i in players:
-            i.team = self
+
         self.teams_played: list[Team] = []
         self.points_against: int = 0
         self.points_for: int = 0
@@ -27,6 +27,7 @@ class Team:
 
         self.listed_first: int = 0
         self.court_one: int = 0
+        self.has_photo = os.path.isfile(f"./resources/images/teams/{self.nice_name()}.png")
 
     def get_game_team(self, game):
         return GameTeam(self, game)
@@ -74,6 +75,7 @@ class Team:
             "Games Played": games_played,
             "Games Won": self.games_won,
             "Games Lost": self.games_played - self.games_won,
+            "Percentage": f"{100 * self.games_won / (self.games_played): .1f}%" if self.games_played > 0 else "-",
             "Green Cards": green_cards,
             "Yellow Cards": yellow_cards,
             "Red Cards": red_cards,
@@ -109,12 +111,12 @@ class Team:
     @classmethod
     def find_or_create(cls, tournament, name, players):
         for i in tournament.teams:
-            if [j.name for j in players] == [j.name for j in i.players]:
+            if sorted([j.name for j in players]) == sorted([j.name for j in i.players]):
                 return i
         return cls(name, players)
 
 
-BYE = Team("BYE", [Player("None")])
+BYE = Team("BYE", [Player("Goodbye"), Player("Goodbye")])
 
 
 class GameTeam:
@@ -124,7 +126,7 @@ class GameTeam:
         self.opponent: GameTeam | None = None
         self.team: Team = team
         self.name: str = self.team.name
-        self.players: list[GamePlayer] = [i.game_player(1 - c) for c, i in enumerate(team.players)]
+        self.players: list[GamePlayer] = [i.game_player(game, 1 - c) for c, i in enumerate(team.players)]
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
@@ -160,7 +162,10 @@ class GameTeam:
         self.yellow_cards = 0
         self.red_cards = 0
         self.faults = 0
-        [i.reset() for i in self.players]
+        self.players = [i.game_player(self.game, 1 - c) for c, i in enumerate(self.team.players)]
+        if self.swapped:
+            self.players.reverse()
+        # [i.reset() for i in self.players]
 
     def start(self, serve_first: bool, swap_players: bool):
         self.swapped = swap_players
@@ -168,7 +173,6 @@ class GameTeam:
         self.opponent: GameTeam = [i for i in self.game.teams if i.name != self.name][0]
         self.serving = serve_first
         self.first_player_serves = serve_first
-        self.players = [i.game_player(1 - c) for c, i in enumerate(self.team.players)]
         if swap_players:
             self.players.reverse()
 
@@ -272,7 +276,7 @@ class GameTeam:
 
     def end(self, final=False):
         won = self.game.winner() == self.team
-        [i.end(final) for i in self.players]
+        [i.end(won, final) for i in self.players]
         if not final:
             self.team.points_for += self.score
             self.team.points_against += self.opponent.score
@@ -297,7 +301,7 @@ class GameTeam:
         self.team.elo += self.elo_delta
 
     def undo_end(self):
-        [i.undo_end() for i in self.players]
+        [i.undo_end(self.game.winner() == self.team) for i in self.players]
         self.team.points_for -= self.score
         self.team.elo -= self.elo_delta
         self.team.points_against -= self.opponent.score

@@ -3,8 +3,8 @@ from typing import Any
 
 class Player:
     def __init__(self, name: str):
+        self._team = None
         self.tournament = None
-        self.team = None
         self.name = name
         self.faults: int = 0
         self.double_faults: int = 0
@@ -18,6 +18,24 @@ class Player:
         self.time_carded: int = 0
         self.rounds_played: int = 0
         self.rounds_carded: int = 0
+        self.played: int = 0
+        self.wins: int = 0
+
+    @property
+    def biggest_card(self):
+        if self.red_cards > 0:
+            return "red"
+        elif self.yellow_cards > 0:
+            return "yellow"
+        elif self.green_cards > 0:
+            return "green"
+        return None
+
+    @property
+    def team(self):
+        if self._team is not None:
+            return self._team
+        return sorted([i for i in self.tournament.teams if self in i.players], key=lambda a: not a.has_photo)[0]
 
     def __repr__(self):
         return self.name
@@ -36,10 +54,11 @@ class Player:
 
     def get_stats(self):
         game_teams: list[GamePlayer] = []
-        for i in self.tournament.games_to_list():
-            player_names = [j.name for j in i.players()]
-            if i.in_progress() and self.name in player_names:
-                game_teams.append(i.players()[player_names.index(self.name)])
+        if self.tournament:
+            for i in self.tournament.games_to_list():
+                player_names = [j.name for j in i.players()]
+                if i.in_progress() and self.name in player_names:
+                    game_teams.append(i.players()[player_names.index(self.name)])
 
         points_scored = self.points_scored + sum([i.points_scored for i in game_teams])
         aces_scored = self.aces_scored + sum([i.aces_scored for i in game_teams])
@@ -50,6 +69,7 @@ class Player:
         time_carded = self.time_carded + sum([i.time_carded for i in game_teams])
         faults = self.faults + sum([i.faults for i in game_teams])
         double_faults = self.double_faults + sum([i.double_faults for i in game_teams])
+        played = self.played + len(game_teams)
         return {
             "B&F Votes": self.votes,
             "Points scored": points_scored,
@@ -61,6 +81,8 @@ class Player:
             "Red Cards": red_cards,
             "Rounds on Court": time_on_court,
             "Rounds Carded": time_carded,
+            "Games Played": played,
+            "Games Won": self.wins
         }
 
     def add_stats(self, d: dict[str, Any]):
@@ -74,12 +96,14 @@ class Player:
         self.red_cards += d.get("Red Cards", 0)
         self.time_on_court += d.get("Rounds on Court", 0)
         self.time_carded += d.get("Rounds Carded", 0)
+        self.played += d.get("Games Played", 0)
+        self.wins += d.get("Games Won", 0)
 
     def nice_name(self):
         return self.name.lower().replace(" ", "_")
 
-    def game_player(self, captain):
-        return GamePlayer(self, captain)
+    def game_player(self, game, captain):
+        return GamePlayer(self, game, captain)
 
     def reset(self):
         self.faults = 0
@@ -104,7 +128,8 @@ class Player:
 
 
 class GamePlayer:
-    def __init__(self, player: Player, captain):
+    def __init__(self, player: Player, game, captain):
+        self.game = game
         self.double_faults: int = 0
         self.player: Player = player
         self.name: str = self.player.name
@@ -170,8 +195,7 @@ class GamePlayer:
         self.red_cards = 0
         self.green_carded = False
 
-
-    def end(self, final=False):
+    def end(self, won, final=False):
         if final:
             return
         self.player.points_scored += self.points_scored
@@ -184,8 +208,10 @@ class GamePlayer:
         self.player.faults += self.faults
         self.player.double_faults += self.double_faults
         self.player.votes += self.best
+        self.player.played += 1
+        self.player.wins += won
 
-    def undo_end(self):
+    def undo_end(self, won):
         self.player.points_scored -= self.points_scored
         self.player.aces_scored -= self.aces_scored
         self.player.time_on_court -= self.time_on_court
@@ -196,6 +222,8 @@ class GamePlayer:
         self.player.faults -= self.faults
         self.player.double_faults -= self.double_faults
         self.player.votes -= self.best
+        self.player.played -= 1
+        self.player.wins -= won
 
     def tidy_name(self):
         if not " " in self.name: return self.name
@@ -224,3 +252,6 @@ class GamePlayer:
 
     def __repr__(self):
         return self.name
+
+    def serving(self):
+        return bool(self.game.server()) and self.game.server().nice_name() == self.nice_name()

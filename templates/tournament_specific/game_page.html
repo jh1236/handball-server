@@ -30,11 +30,11 @@
                     style="display: inline;left:70%;vertical-align:middle;"></a></th>
             <th style="color:#e0ffe0">Another spacer..</th>
             <th>
-                {% if official %}<a href="/{{tournament}}teams/{{ teams[1].nice_name() }}"
+                {% if not game.bye %}<a href="/{{tournament}}teams/{{ teams[1].nice_name() }}"
                    class="hide">{% endif %}<img
                     src="/api/teams/image?name={{ teams[1].nice_name() }}"
                     class="team_logo"
-                    style="display: inline;left:70%;vertical-align:middle;">{% if official %}</a>{% endif %}</th>
+                    style="display: inline;left:70%;vertical-align:middle;">{% if not game.bye %}</a>{% endif %}</th>
         </tr>
     </table>
     <br>
@@ -45,8 +45,8 @@
             <td></td>
             <th colspan="2"><b><a href="/{{tournament}}teams/{{ teams[0].nice_name() }}"
                                   class="hide">{{ teams[0].name }}</a></b></th>
-            <th colspan="2"><b>{% if official %}<a href="/{{tournament}}teams/{{ teams[1].nice_name() }}"
-                                  class="hide">{% endif %}{{ teams[1].name }}{% if official %}</a>{% endif %}</b></th>
+            <th colspan="2"><b>{% if not game.bye %}<a href="/{{tournament}}teams/{{ teams[1].nice_name() }}"
+                                  class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}</a>{% endif %}</b></th>
             <th style="color:#e0ffe0">Spacerrrrrrr</th>
         </tr>
         {% for stat in stats %}

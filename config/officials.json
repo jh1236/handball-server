@@ -1,22 +1,32 @@
 {
   "Jared Healy": {
     "primary": true,
-    "key": "1236"
+    "key": "1236",
+    "finals": true
   },
   "Lachlan Banks": {
     "primary": true,
-    "key": "0118999881999119725-3"
+    "key": "1",
+    "finals": true
   },
   "Brigitte Gredziuk": {
     "primary": true,
-    "key": "key"
+    "key": "1397",
+    "finals": false
   },
   "Aimee Soudure": {
     "primary": true,
-    "key": "key"
+    "key": "balls",
+    "finals": true
   },
   "Zaiah Deards": {
     "primary": true,
-    "key": "2645"
+    "key": "2645",
+    "finals": false
+  },
+  "James Sharpham": {
+    "primary": true,
+    "key": "3636",
+    "finals": false
   }
 }

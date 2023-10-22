@@ -30,18 +30,20 @@ def get_all_players(comps: dict[str, Tournament]) -> list[Player]:
     for i in comps.values():
         for t in i.teams:
             for p in t.players:
-
-                if p.name in players:
-                    players[p.name].add_stats(p.get_stats())
-                else:
-                    players[p.name] = p
+                if p.name not in players:
+                    players[p.name] = Player(p.name)
+                    players[p.name]._team = t
+                if not p.team.has_photo and t.has_photo:
+                    players[p.name]._team = t
+                players[p.name].add_stats(p.get_stats())
     return list(players.values())
 
 
 def get_all_officials(comps: dict[str, Tournament]) -> list[Official]:
-    officials = []
-    names = []
+    officials = {}
     for i in comps.values():
-        officials += [j for j in i.officials if j.name not in names]
-        names += [j.name for j in i.officials if j.name not in names]
-    return officials
+        for j in i.officials:
+            if j.nice_name() not in officials:
+                officials[j.nice_name()] = Official(j.name, "", [])
+            officials[j.nice_name()].add_stats(j.get_stats())
+    return list(officials.values())

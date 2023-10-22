@@ -51,6 +51,12 @@ a.hide {
 .table tr td:nth-child(5) {
     width: 80px;
 }
+.table tr td:nth-child(6) {
+    width: 80px;
+}
+.table tr td:nth-child(7) {
+    width: 120px;
+}
 
 img.logo {
     width: 100px;

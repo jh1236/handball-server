@@ -10,7 +10,7 @@ function sortTable(n) {
     } else {
         x = rows[1].getElementsByTagName("TH")[1].innerHTML;
     }
-    if (!isNaN(x)) {
+    if (!isNaN(x) || x === "-" || x.endsWith("%")) {
         dir = "desc";
     } else {
         dir = "asc"
@@ -38,6 +38,18 @@ function sortTable(n) {
             } else {
                 x = rows[i].getElementsByTagName("TH")[1].innerHTML;
                 y = rows[i + 1].getElementsByTagName("TH")[1].innerHTML;
+            }
+            if (x.endsWith("%")) {
+                x = x.slice(0, -1)
+            }
+            if (y.endsWith("%")) {
+                y = y.slice(0, -1)
+            }
+            if (x === "-") {
+                x = -1
+            }
+            if (y === "-") {
+                y = -1
             }
             if (!isNaN(x)) {
                 x = Number(x)

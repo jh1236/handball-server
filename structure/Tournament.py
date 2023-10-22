@@ -98,7 +98,7 @@ class Tournament:
             g.id = i
 
     def appoint_umpires(self):
-        for r in self.fixtures + self.finals:
+        for r in self.fixtures:
             court_one_games = [i for i in r if i.court == 0]
             court_two_games = [i for i in r if i.court == 1]
             for c1, c2 in zip_longest(court_one_games, court_two_games):
@@ -114,6 +114,19 @@ class Tournament:
                             break
                     c1, c2 = c2, c1
                     times_run += 1
+        for r in self.finals:
+            teams = [gt.team for g in r for gt in g.teams]
+            for g in r:
+                if g.primary_official == NoOfficial:
+                    for p in sorted(self.officials,
+                                    key=lambda it: (it.games_officiated, 1 - 2 * times_run * it.games_court_one)):
+                        print(f"{p.team} in {teams}")
+                        if any([i in teams for i in p.team]):continue
+                        if not p.finals: continue
+                        g.set_primary_official(p)
+                        break
+                    if g.primary_official == NoOfficial:
+                        raise Exception("Out officials!!")
 
     def assign_rounds(self):
         for i, r in enumerate(self.fixtures):
@@ -224,7 +237,8 @@ class Tournament:
             teams = json.load(fp)
 
             if self.details["teams"] == "all":
-                self.teams = [Team.find_or_create(self, k, [Player.find_or_create(self, j) for c, j in enumerate(v)]) for k, v in
+                self.teams = [Team.find_or_create(self, k, [Player.find_or_create(self, j) for c, j in enumerate(v)])
+                              for k, v in
                               teams.items()]
             else:
                 self.teams = []

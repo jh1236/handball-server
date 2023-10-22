@@ -1,9 +1,10 @@
+import logging
 from random import Random
 
 from api import comps, app
 from utils.logging_handler import logger
 
-competition = comps["second_suss_championship"]
+competition = comps["third_suss_championship"]
 
 logger.debug(competition.teams)
 
@@ -74,7 +75,7 @@ def fault(game_id, first_team):
 
 if __name__ == "__main__":
     random = Random()
-
+    logger.setLevel(logging.CRITICAL)
 
     def r_bool():
         return bool(random.randint(0, 1))

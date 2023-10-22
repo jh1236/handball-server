@@ -1,4 +1,3 @@
-import logging
 import os
 
 import flask
@@ -20,18 +19,18 @@ with open("./config/password.txt", "r") as fp:
 
 
 # Team related endpoints
-@app.get('/api/teams')
+@app.get("/api/teams")
 def teams():
     tournament = request.args.get("tournament", type=str)
     return {i.name: [j.name for j in i.players] for i in comps[tournament].teams}
 
 
-@app.get('/api/tournaments')
+@app.get("/api/tournaments")
 def tournaments():
     return list(comps.values())
 
 
-@app.post('/api/tournaments/note')
+@app.get("/api/note")
 def note():
     tournament = request.args.get("tournament", type=str)
     note = request.args.get("note", type=str)
@@ -42,31 +41,33 @@ def note():
     return "", 204
 
 
-@app.get('/api/teams/image')
+@app.get("/api/teams/image")
 def team_image():
     team = request.args.get("name", type=str)
     if os.path.isfile(f"./resources/images/teams/{team}.png"):
-        return send_file(f"./resources/images/teams/{team}.png", mimetype='image/png')
+        return send_file(f"./resources/images/teams/{team}.png", mimetype="image/png")
     else:
-        return send_file(f"./resources/images/teams/blank.png", mimetype='image/png')
+        return send_file(f"./resources/images/teams/blank.png", mimetype="image/png")
 
 
-@app.get('/api/tournaments/image')
+@app.get("/api/tournaments/image")
 def tourney_image():
     tournament = request.args.get("name", type=str)
     if os.path.isfile(f"./resources/images/tournaments/{tournament}.png"):
-        return send_file(f"./resources/images/tournaments/{tournament}.png", mimetype='image/png')
+        return send_file(
+            f"./resources/images/tournaments/{tournament}.png", mimetype="image/png"
+        )
     else:
-        return send_file(f"./resources/images/teams/blank.png", mimetype='image/png')
+        return send_file(f"./resources/images/teams/blank.png", mimetype="image/png")
 
 
-@app.get('/api/image')
+@app.get("/api/image")
 def image():
     team = request.args.get("name", type=str)
-    return send_file(f"./resources/images/{team}.png", mimetype='image/png')
+    return send_file(f"./resources/images/{team}.png", mimetype="image/png")
 
 
-@app.get('/api/teams/stats')
+@app.get("/api/teams/stats")
 def stats():
     tournament = request.args.get("tournament", type=str)
     team_name = request.args.get("name", type=str)
@@ -76,26 +77,86 @@ def stats():
 
 # fixture related endpoints
 
-@app.get('/api/games/current_round')
+
+@app.get("/api/games/current_round")
 def current_round():
     tournament = request.args.get("tournament", type=str)
     return [i.as_map() for i in comps[tournament].games_to_list() if not i.best_player]
 
 
-@app.get('/api/games/fixtures')
+@app.get("/api/games/fixtures")
 def all_fixtures():
     tournament = request.args.get("tournament", type=str)
     return [i.as_map() for i in comps[tournament].games_to_list()]
 
 
-@app.get('/api/games/display')
+@app.get("/api/games/display")
 def display():
     tournament = request.args.get("tournament", type=str)
     game_id = int(request.args["id"])
-    return comps[tournament].get_game(game_id).display_map()
+    try:
+        return comps[tournament].get_game(game_id).display_map()
+    except ValueError:
+        return {
+            "leftTeam": {
+                "team": "TBD",
+                "score": 0,
+                "timeout": 0,
+                "players": ["None", "None"],
+                "captain": {
+                    "name": "None",
+                    "green": False,
+                    "yellow": False,
+                    "receivedYellow": False,
+                    "red": False,
+                    "serving": False,
+                    "fault": False,
+                    "cardPercent": 1,
+                },
+                "notCaptain": {
+                    "name": "None",
+                    "green": False,
+                    "yellow": False,
+                    "receivedYellow": False,
+                    "red": False,
+                    "serving": False,
+                    "fault": False,
+                    "cardPercent": 1,
+                }
+            },
+            "rightTeam": {
+                "team": "TBD",
+                "score": 0,
+                "timeout": 0,
+                "players": ["None", "None"],
+                "captain": {
+                    "name": "None",
+                    "green": False,
+                    "yellow": False,
+                    "receivedYellow": False,
+                    "red": False,
+                    "serving": False,
+                    "fault": False,
+                    "cardPercent": 1,
+                },
+                "notCaptain": {
+                    "name": "None",
+                    "green": False,
+                    "yellow": False,
+                    "receivedYellow": False,
+                    "red": False,
+                    "serving": False,
+                    "fault": False,
+                    "cardPercent": 1,
+                },
+            },
+            "rounds": 0,
+            "umpire": "TBD",
+            "court": "TBD",
+        }
 
 
-@app.get('/api/games/game')
+@app.get("/api/games/game")
 def game():
     tournament = request.args.get("tournament", type=str)
     game_id = int(request.args["id"])
@@ -103,7 +164,7 @@ def game():
 
 
 # testing related endpoints
-@app.get('/api/mirror')
+@app.get("/api/mirror")
 def mirror():
     logger.info(f"Request for score: {request.args}")
     d = dict(request.args)
@@ -111,14 +172,15 @@ def mirror():
         d = {
             "All these webs on me": " You think I'm Spiderman",
             "Shout out": "martin luther King",
-            "this is the sound of a robot": "ELELALAELE-BING-ALELILLELALE"
+            "this is the sound of a robot": "ELELALAELE-BING-ALELILLELALE",
         }
     return str(d), 200
 
 
 # gameplay related endpoints
 
-@app.post('/api/games/update/score')
+
+@app.post("/api/games/update/score")
 def score():
     tournament = request.json["tournament"]
     logger.info(f"Request for score: {request.json}")
@@ -126,12 +188,14 @@ def score():
     ace = request.json["ace"]
     first_team = request.json["firstTeam"]
     first_player = request.json["firstPlayer"]
-    comps[tournament].get_game(game_id).teams[not first_team].score_point(first_player, ace)
+    comps[tournament].get_game(game_id).teams[not first_team].score_point(
+        first_player, ace
+    )
     comps[tournament].save()
     return "", 204
 
 
-@app.post('/api/games/update/ace')
+@app.post("/api/games/update/ace")
 def ace():
     tournament = request.json["tournament"]
     logger.info(f"Request for ace: {request.json}")
@@ -142,19 +206,22 @@ def ace():
     return "", 204
 
 
-@app.post('/api/games/update/start')
+@app.post("/api/games/update/start")
 def start():
     tournament = request.json["tournament"]
     logger.info(f"Request for start: {request.json}")
     game_id = request.json["id"]
 
-    comps[tournament].get_game(game_id).start(request.json["firstTeamServed"], request.json["swapTeamOne"],
-                                              request.json["swapTeamTwo"])
+    comps[tournament].get_game(game_id).start(
+        request.json["firstTeamServed"],
+        request.json["swapTeamOne"],
+        request.json["swapTeamTwo"],
+    )
     comps[tournament].save()
     return "", 204
 
 
-@app.post('/api/games/update/create')
+@app.post("/api/games/update/create")
 def create():
     tournament = comps[request.json["tournament"]]
     if not tournament.fixtures_class.manual_allowed():
@@ -170,7 +237,11 @@ def create():
         if team_one not in tournament.teams:
             tournament.add_team(team_one)
     else:
-        team_one = [i for i in tournament.teams if request.json["teamOne"] in [i.nice_name(), i.name]][0]
+        team_one = [
+            i
+            for i in tournament.teams
+            if request.json["teamOne"] in [i.nice_name(), i.name]
+        ][0]
     if "playersTwo" in request.json:
         players = []
         for i in request.json["playersTwo"]:
@@ -179,8 +250,16 @@ def create():
         if team_two not in tournament.teams:
             tournament.add_team(team_two)
     else:
-        team_two = [i for i in tournament.teams if request.json["teamTwo"] in [i.nice_name(), i.name]][0]
-    official = [i for i in tournament.officials if request.json["official"] in [i.nice_name(), i.name]][0]
+        team_two = [
+            i
+            for i in tournament.teams
+            if request.json["teamTwo"] in [i.nice_name(), i.name]
+        ][0]
+    official = [
+        i
+        for i in tournament.officials
+        if request.json["official"] in [i.nice_name(), i.name]
+    ][0]
     g = Game(team_one, team_two, tournament)
     g.court = 0
     if official:
@@ -191,7 +270,7 @@ def create():
     return "", 204
 
 
-@app.post('/api/games/update/end')
+@app.post("/api/games/update/end")
 def end():
     tournament = request.json["tournament"]
     logger.info(f"Request for end: {request.json}")
@@ -201,7 +280,7 @@ def end():
     return "", 204
 
 
-@app.post('/api/games/update/timeout')
+@app.post("/api/games/update/timeout")
 def timeout():
     tournament = request.json["tournament"]
     logger.info(f"Request for timeout: {request.json}")
@@ -212,7 +291,7 @@ def timeout():
     return "", 204
 
 
-@app.post('/api/games/update/endTimeout')
+@app.post("/api/games/update/endTimeout")
 def end_timeout():
     tournament = request.json["tournament"]
     logger.info(f"Request for endTimeout: {request.json}")
@@ -223,7 +302,7 @@ def end_timeout():
     return "", 204
 
 
-@app.post('/api/games/update/fault')
+@app.post("/api/games/update/fault")
 def fault():
     tournament = request.json["tournament"]
     logger.info(f"Request for fault: {request.json}")
@@ -234,7 +313,7 @@ def fault():
     return "", 204
 
 
-@app.post('/api/games/update/undo')
+@app.post("/api/games/update/undo")
 def undo():
     tournament = request.json["tournament"]
     logger.info(f"Request for undo: {request.json}")
@@ -245,7 +324,7 @@ def undo():
     return "", 204
 
 
-@app.post('/api/games/update/card')
+@app.post("/api/games/update/card")
 def card():
     tournament = request.json["tournament"]
     logger.info(f"Request for card: {request.json}")
@@ -257,9 +336,13 @@ def card():
     if time < 3:
         time += 10
     if color == "green":
-        comps[tournament].get_game(game_id, ).teams[not first_team].green_card(first_player)
+        comps[tournament].get_game(game_id,).teams[
+            not first_team
+        ].green_card(first_player)
     elif color == "yellow":
-        comps[tournament].get_game(game_id).teams[not first_team].yellow_card(first_player, time)
+        comps[tournament].get_game(game_id).teams[not first_team].yellow_card(
+            first_player, time
+        )
     elif color == "red":
         comps[tournament].get_game(game_id).teams[not first_team].red_card(first_player)
 

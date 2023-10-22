@@ -4,7 +4,8 @@ from structure.Team import Team
 
 
 class Official:
-    def __init__(self, name: str, key: str, team: list[Team], primary: bool = False):
+    def __init__(self, name: str, key: str, team: list[Team], primary: bool = False, finals: bool = False):
+        self.finals: bool = finals
         self.name: str = name
         self.team: list[Team] = team
         self.games_officiated: int = 0
@@ -40,8 +41,17 @@ class Official:
             "Rounds Umpired": self.rounds_umpired,
         }
 
+    def add_stats(self, d):
+        self.green_cards += d["Green Cards Given"]
+        self.yellow_cards += d["Yellow Cards Given"]
+        self.red_cards += d["Red Cards Given"]
+        self.faults += d["Faults Called"]
+        self.games_umpired += d["Games Umpired"]
+        self.rounds_umpired += d["Rounds Umpired"]
 
-NoOfficial = Official("None one", "", None)
+
+
+NoOfficial = Official("None one", "", [])
 
 
 def get_officials(tournament) -> list[Official]:
@@ -50,8 +60,7 @@ def get_officials(tournament) -> list[Official]:
 
         for n, v in json.load(fp).items():
             team = [j for j in tournament.teams if n in [k.name for k in j.players]]
-            o = Official(n, v["key"], team)
-
+            o = Official(n, v["key"], team, primary=v["primary"], finals=v["finals"])
             if tournament.details["officials"] == "all" or n in tournament.details["officials"]:
                 officials.append(o)
     return officials

@@ -1,6 +1,22 @@
 let id = 0
 let tournament = "";
-let setId = newId => id = newId
+let teamsSwapped = false
+
+let lxor = (a, b) => a ? !b : b
+
+let setup = (newId, newSwapped) => {
+    id = newId
+    teamsSwapped = newSwapped
+}
+
+function swap() {
+    if (document.location.href.includes("swap")) {
+        document.location.href = window.location.href.replace("swap=true", "").replaceAll("&", "")
+    } else {
+        document.location.href = window.location.href + "&swap=true"
+    }
+}
+
 let setTournament = t => tournament = t
 let best = ""
 setBest = (i, s) => {
@@ -41,14 +57,22 @@ let setTeamListTwo = (d, s, i) => {
 }
 let left = false
 let right = false
-let first_serves = true
+let first_serves = !teamsSwapped
 
 setLeft = (i, s) => {
-    left = i
+    if (teamsSwapped) {
+        right = i
+    } else {
+        left = i
+    }
     document.getElementById("left").textContent = "Left Player: " + s
 }
 setRight = (i, s) => {
-    right = i
+    if (teamsSwapped) {
+        left = i
+    } else {
+        right = i
+    }
     document.getElementById("right").textContent = "Left Player: " + s
 }
 setTeamServing = (i, s) => {
@@ -61,7 +85,7 @@ function start() {
         method: "POST",
         body: JSON.stringify({
             id: id,
-            firstTeamServed: first_serves,
+            firstTeamServed: lxor(first_serves, teamsSwapped),
             swapTeamOne: left,
             swapTeamTwo: right,
             tournament: tournament.replace("/", "")
@@ -89,6 +113,7 @@ function createPlayers() {
     }).then(() => document.location.href = `/${tournament}games/` + id + "/"
     );
 }
+
 function createTeams() {
     fetch("/api/games/update/create", {
         method: "POST",
@@ -118,7 +143,6 @@ function finish() {
         }
     }).then(() => document.location.href = `/${tournament}games/` + id + "/");
 }
-
 
 function undo() {
     fetch("/api/games/update/undo", {

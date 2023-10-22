@@ -1,7 +1,22 @@
 let id = 0
 let tournament = ""
-setId = newId => id = newId
+let teamsSwapped = false
+let setup = (newId, newSwapped) => {
+    id = newId
+    teamsSwapped = newSwapped
+}
 setTournament = t => tournament = t
+
+function swap() {
+    if (document.location.href.includes("swap")) {
+        document.location.href = window.location.href.replace("swap=true", "").replaceAll("&", "")
+    } else {
+        document.location.href = window.location.href + "&swap=true"
+    }
+}
+
+
+let lxor = (a, b) => a ? !b : b
 
 let timeoutTime = -1
 
@@ -9,7 +24,7 @@ function score(firstTeam, firstPlayer) {
     fetch("/api/games/update/score", {
         method: "POST", body: JSON.stringify({
             id: id,
-            firstTeam: Boolean(firstTeam),
+            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
             tournament: tournament.replace("/", ""),
             firstPlayer: firstPlayer,
             ace: false
@@ -23,7 +38,7 @@ function ace(firstTeam) {
     fetch("/api/games/update/ace", {
         method: "POST", body: JSON.stringify({
             id: id,
-            firstTeam: firstTeam,
+            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
             tournament: tournament.replace("/", "")
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -37,7 +52,7 @@ function card(firstTeam, firstPlayer, color) {
         method: "POST", body: JSON.stringify({
             id: id,
             tournament: tournament.replace("/", ""),
-            firstTeam: Boolean(firstTeam),
+            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
             firstPlayer: firstPlayer,
             color: color, time: 3
         }), headers: {
@@ -90,7 +105,7 @@ function sendCustomCard() {
         method: "POST", body: JSON.stringify({
             id: id,
             tournament: tournament.replace("/", ""),
-            firstTeam: firstTeamSelected,
+            firstTeam: lxor(firstTeamSelected, teamsSwapped),
             firstPlayer: firstPlayerSelected,
             color: "yellow",
             time: +(document.getElementById("duration").value) % 10
@@ -99,7 +114,6 @@ function sendCustomCard() {
         }
     }).then(() => location.reload());
 }
-
 
 
 function timeout(firstTeam) {
@@ -128,7 +142,8 @@ function timeout(firstTeam) {
 
     fetch("/api/games/update/timeout", {
         method: "POST", body: JSON.stringify({
-            id: id, firstTeam: firstTeam,
+            id: id,
+            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
             tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -140,7 +155,7 @@ function endTimeout(firstTeam) {
     fetch("/api/games/update/endTimeout", {
         method: "POST", body: JSON.stringify({
             id: id,
-            firstTeam: firstTeam,
+            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
             tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -152,7 +167,7 @@ function endTimeout(firstTeam) {
 function fault(firstTeam) {
     fetch("/api/games/update/fault", {
         method: "POST", body: JSON.stringify({
-            id: id, firstTeam: firstTeam,
+            id: id, firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
             tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
