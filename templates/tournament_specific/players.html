@@ -22,13 +22,13 @@
     </tr>
     </thead>
     <tbody>
-    {% for i, link, player in players %}
+    {% for i, image, link, player in players %}
     <tr>
-        <th><a href="/{{tournament}}teams/{{link}}" class="hide"
+        <th><a href="/{{tournament}}players/{{link}}" class="hide"
                style="left: 30%;"><img
-                src="/api/teams/image?name={{link}}" class="team_logo"
+                src="/api/teams/image?name={{image}}" class="team_logo"
                 style="display: inline;left:70%;width: 50px;height: 50px;vertical-align:middle;"></a></th>
-        <th style="text-align: left;"><a href="/{{tournament}}teams/{{link}}"
+        <th style="text-align: left;"><a href="/{{tournament}}players/{{link}}"
                                          class="hide">{{i}}</a>
         </th>
         {% for stat, p in player %}

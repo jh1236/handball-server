@@ -34,7 +34,7 @@ class Swiss(FixtureMaker):
     def match_make(self) -> List[Game]:
         """
         Raises:
-            Exception: When all games have been generated there are no options for any more.
+            Exception: When all games have been generated there are no options for anymore.
 
         Returns:
             List[Game]: A compilation of all matches for the given round.
@@ -44,7 +44,13 @@ class Swiss(FixtureMaker):
 
         roster = []
 
-        unfilled = sorted(self.teams_fixed, key=lambda x: (x.games_won, x.points_for - x.points_against))
+        unfilled = sorted(
+            self.teams_fixed,
+            key=lambda a: (
+                -(a.games_won / (a.games_played or 1)),
+                a.points_for - a.points_against,
+            ),
+        )
 
         counter = 0  # used to count how many attempts are made before we turn to the fallback method.
         while unfilled:
@@ -55,7 +61,7 @@ class Swiss(FixtureMaker):
                     roster.append(x := [target, unfilled.pop(i)])
                     break
             else:
-                # could not find a unique match, 
+                # could not find a unique match,
                 # put them on the end of the array.
                 unfilled.append(target)
 
@@ -64,10 +70,15 @@ class Swiss(FixtureMaker):
                 roster = self.fallback()
                 unfilled = False
 
-        if not roster:  # if some-how we end up here, just pair the best performing teams together.
+        if (
+            not roster
+        ):  # if some-how we end up here, just pair the best performing teams together.
             logger.error("COULD NOT GENERATE UNIQUE MATCH. PAIRING BEST TEAMS")
-            unfilled = sorted(self.teams_fixed, key=lambda x: (x.games_won, x.points_for - x.points_against))
-            roster = [unfilled[a:a + 2] for a in range(0, len(unfilled), 2)]
+            unfilled = sorted(
+                self.teams_fixed,
+                key=lambda x: (x.games_won, x.points_for - x.points_against),
+            )
+            roster = [unfilled[a : a + 2] for a in range(0, len(unfilled), 2)]
 
         # turn the proposed games into game objects
         final_roster = []
@@ -102,7 +113,9 @@ class Swiss(FixtureMaker):
         self.find_unique_recursive(games, used, possible_pairs)
         return games
 
-    def get_available_teams(self, used: List[Team], teams: List[Team] = None) -> List[Team]:
+    def get_available_teams(
+        self, used: List[Team], teams: List[Team] = None
+    ) -> List[Team]:
         """filters out teams which are already being used, allowing for simpler code and a small amount of
         optimisations
 
@@ -117,8 +130,12 @@ class Swiss(FixtureMaker):
             teams = self.teams_fixed
         return [team for team in teams if team not in used]
 
-    def find_unique_recursive(self, games: List[Tuple[Team, Team]], used: List[Team],
-                              possible_pairs: Dict[Team, List[Team]]) -> None:
+    def find_unique_recursive(
+        self,
+        games: List[Tuple[Team, Team]],
+        used: List[Team],
+        possible_pairs: Dict[Team, List[Team]],
+    ) -> None:
         """brute forces all combinations of possible matches to find one that has not been played before
 
         Args:

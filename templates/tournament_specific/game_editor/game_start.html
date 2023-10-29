@@ -74,7 +74,7 @@
         <td>
             {% for i in teams[0].players %}
                 {% if i.player.biggest_card %}
-                    <i>{{ i.tidy_name() }} has received a <a style="color: {{ i.player.biggest_card }}">{{ i.player.biggest_card }}</a> card</i>
+                    <i>{{ i.tidy_name() }} has received a <a style="color: {{ i.player.biggest_card_hex }}">{{ i.player.biggest_card }}</a> card</i>
                     <br>
                     <br>
                 {% endif %}
@@ -86,7 +86,7 @@
         <td>
             {% for i in teams[1].players %}
                 {% if i.player.biggest_card %}
-                    <i>{{ i.tidy_name() }} has received a <a style="color: {{ i.player.biggest_card }}">{{ i.player.biggest_card }}</a> card</i>
+                    <i>{{ i.tidy_name() }} has received a <a style="color: {{ i.player.biggest_card_hex }}">{{ i.player.biggest_card }}</a> card</i>
                     <br>
                     <br>
                 {% endif %}

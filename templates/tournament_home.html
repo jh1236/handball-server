@@ -109,12 +109,12 @@
             {% for p in players %}
             <tr>
                 <td style="width:300px"><a class="hide"
-                                           href="/{{tournament}}teams/{{p.team.nice_name()}}">{{p.name}}</a></td>
-                <td style="width:140px; text-align: center"><a class="hide" href="/{{tournament}}teams/{{p.team.nice_name()}}">{{p.votes}}</a>
+                                           href="/{{tournament}}players/{{p.nice_name()}}">{{p.name}}</a></td>
+                <td style="width:140px; text-align: center"><a class="hide" href="/{{tournament}}players/{{p.nice_name()}}">{{p.votes}}</a>
                 </td>
-                <td style="width:140px; text-align: center"><a class="hide" href="/{{tournament}}teams/{{p.team.nice_name()}}">{{p.get_stats()["Points scored"]}}</a></td>
-                <td style="width:140px"><a class="hide" href="/{{tournament}}teams/{{p.team.nice_name()}}">{{p.get_stats()["Aces scored"]}}</a></td>
-                <td style="width:140px"><a class="hide" href="/{{tournament}}teams/{{p.team.nice_name()}}">{{p.total_cards()}}</a>
+                <td style="width:140px; text-align: center"><a class="hide" href="/{{tournament}}players/{{p.nice_name()}}">{{p.get_stats()["Points scored"]}}</a></td>
+                <td style="width:140px"><a class="hide" href="/{{tournament}}players/{{p.nice_name()}}">{{p.get_stats()["Aces scored"]}}</a></td>
+                <td style="width:140px"><a class="hide" href="/{{tournament}}players/{{p.nice_name()}}">{{p.total_cards()}}</a>
                 </td>
             </tr>
             {% endfor %}

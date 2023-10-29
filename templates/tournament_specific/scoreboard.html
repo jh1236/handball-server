@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ teams[0].name }} vs {{ teams[1].name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/scoreboard.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/scoreboard.js') }}"></script>
+<script>main("{{tournament}}")</script>
+<script>
+    setup({{game.id}}, {{ update_count }})
+    setTournament("{{tournament}}")
+</script>
+<h1 style="font-size: 50px"><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ teams[0].name }}
+    vs {{ teams[1].name }}</a></h1>
+<p><b>Round:</b> <i>{{ roundNumber }}</i></p>
+<p><b>Court:</b> <a class="hide"
+                    href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court_display() }}</i></a>
+</p>
+<p><b>Match Official:</b>{% if not game.bye %}
+    <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %} <i>{{ official }}</i>
+    {% if not game.bye %}</a> {% endif %}</p>
+<h1 class="big">{{ game.score_string() }}</h1>
+
+<br>
+<table class="table">
+    <tr>
+        <th><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+               class="hide"><img
+                src="/api/teams/image?name={{ teams[0].nice_name() }}"
+                class="team_logo"
+                style="display: inline;left:70%;vertical-align:middle;"></a></th>
+        <th style="color:#000">Another spacer..</th>
+        <th>
+            {% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+                                    class="hide">{% endif %}<img
+                src="/api/teams/image?name={{ teams[1].nice_name() }}"
+                class="team_logo"
+                style="display: inline;left:70%;vertical-align:middle;">{% if not game.bye %}</a>{% endif %}</th>
+    </tr>
+    <tr>
+        <th><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+                  class="hide">{{ teams[0].name }}</a></b></th>
+        <td></td>
+        <th><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+                                       class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}</a>{% endif %}
+        </b></th>
+    </tr>
+</table>
+
+</body>
+</html>

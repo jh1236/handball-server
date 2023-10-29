@@ -56,9 +56,6 @@ class Tournament:
 
     def update_games(self):
         if not self.in_finals:
-            if self.fixtures:
-                for i in self.fixtures[-1]:
-                    i.process_if_bye()
             if not self.fixtures or all([i.best_player for i in self.fixtures[-1]]):
                 try:
                     n = next(self.fixtures_gen)
@@ -122,11 +119,12 @@ class Tournament:
                         if not p.finals: continue
                         g.set_primary_official(p)
                         break
-                    if g.primary_official == NoOfficial:
-                        raise Exception("Out officials!!")
 
     def assign_rounds(self):
         for i, r in enumerate(self.fixtures):
+            for j in r:
+                j.round_number = i
+        for i, r in enumerate(self.finals):
             for j in r:
                 j.round_number = i
 
@@ -150,14 +148,17 @@ class Tournament:
                 g.court = 0
 
     def players(self):
-        players = []
+        players = {}
         names = []
         for t in self.teams:
             for p in t.players:
                 if p.name not in names:
-                    players.append(p)
+                    p1 = Player(p.name)
+                    p1.tournament = self
+                    players[p.name] = p1
                     names.append(p.name)
-        return players
+                players[p.name].add_stats(p.get_stats_detailed())
+        return list(players.values())
 
     def save(self, location=None):
         if location is None:
@@ -232,13 +233,13 @@ class Tournament:
             teams = json.load(fp)
 
             if self.details["teams"] == "all":
-                self.teams = [Team.find_or_create(self, k, [Player.find_or_create(self, j) for c, j in enumerate(v)])
+                self.teams = [Team.find_or_create(self, k, [Player(j).set_tournament(self) for c, j in enumerate(v)])
                               for k, v in
                               teams.items()]
             else:
                 self.teams = []
                 for i in self.details["teams"]:
-                    players = [Player.find_or_create(self, j) for c, j in enumerate(teams[i])]
+                    players = [Player(j).set_tournament(self) for c, j in enumerate(teams[i])]
                     self.teams.append(Team.find_or_create(self, i, players))
         self.teams.sort(key=lambda a: a.nice_name())
         self.two_courts = self.details["twoCourts"]

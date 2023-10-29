@@ -70,7 +70,10 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         )
         ladder = sorted(
             comps[tournament].teams,
-            key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])),
+            key=lambda a: (
+                -(a.games_won / (a.games_played or 1)),
+                -(a.get_stats()["Point Difference"]),
+            ),
         )
         ongoing_games = [
             i for i in comps[tournament].games_to_list() if i.in_progress()
@@ -81,7 +84,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             else comps[tournament].fixtures[-1]
         )
         if (
-                all([i.bye for i in current_round]) and len(comps[tournament].fixtures) > 1
+            all([i.bye for i in current_round]) and len(comps[tournament].fixtures) > 1
         ):  # basically just for home and aways
             current_round = comps[tournament].fixtures[-2]
         players = comps[tournament].players()
@@ -195,11 +198,10 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                     (repr(i) + f" ({i.score_string()})", i.id, i.tournament.nice_name())
                 )
             else:
-                upcoming_games.append(
-                    (repr(i) + f" ({i.score_string()})", i.id, i.tournament.nice_name())
-                )
+                upcoming_games.append((repr(i), i.id, i.tournament.nice_name()))
         players = [
-            (i.name, [(k, v) for k, v in i.get_stats().items()]) for i in team.players
+            (i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()])
+            for i in team.players
         ]
         return (
             render_template(
@@ -210,6 +212,45 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 teamNameClean=team.nice_name(),
                 recent_games=recent_games,
                 upcoming_games=upcoming_games,
+                tournament=f"{tournament}/",
+            ),
+            200,
+        )
+
+    @app.get("/<tournament>/games/<game_id>/display")
+    def scoreboard(tournament, game_id):
+        if int(game_id) >= len(comps[tournament].games_to_list()):
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="Game Does not exist",
+                ),
+                400,
+            )
+        game = comps[tournament].get_game(int(game_id))
+        teams = game.teams
+        players = game.players()
+        round_number = game.round_number + 1
+        if not game.started:
+            status = "Waiting for toss"
+        elif game.in_timeout():
+            status = "In Timeout"
+        elif not game.game_ended():
+            status = "Game in Progress"
+        elif not game.best_player:
+            status = "Finished"
+        else:
+            status = "Official"
+        return (
+            render_template(
+                "tournament_specific/scoreboard.html",
+                game=game,
+                status=status,
+                players=players,
+                teams=teams,
+                official=game.primary_official,
+                roundNumber=round_number,
+                update_count=game.update_count,
                 tournament=f"{tournament}/",
             ),
             200,
@@ -235,10 +276,10 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         prev_matches = []
         for i in get_all_games(comps):
             if not all(
-                    [
-                        k.nice_name() in [j.team.nice_name() for j in i.teams]
-                        for k in game.teams
-                    ]
+                [
+                    k.nice_name() in [j.team.nice_name() for j in i.teams]
+                    for k in game.teams
+                ]
             ):
                 continue
             if i == game:
@@ -309,13 +350,16 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             )
             for i in sorted(
                 comps[tournament].teams,
-                key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])),
+                key=lambda a: (
+                    -(a.games_won / (a.games_played or 1)),
+                    -(a.get_stats()["Point Difference"]),
+                ),
             )
         ]
         headers = [
             (i, priority[i])
             for i in (
-                    ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
+                ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
             )
         ]
         return (
@@ -341,6 +385,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             "Yellow Cards": 3,
             "Red Cards": 3,
             "Rounds on Court": 5,
+            "Points served": 5,
             "Rounds Carded": 5,
             "Games Played": 5,
             "Games Won": 4,
@@ -349,6 +394,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             (
                 i.name,
                 i.team.nice_name(),
+                i.nice_name(),
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in comps[tournament].players()
@@ -361,6 +407,43 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 "tournament_specific/players.html",
                 headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
                 players=sorted(players),
+                tournament=f"{tournament}/",
+            ),
+            200,
+        )
+
+    @app.get("/<tournament>/players/<player_name>/")
+    def player_stats(tournament, player_name):
+        if player_name not in [i.nice_name() for i in comps[tournament].players()]:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="This is not a real player",
+                ),
+                400,
+            )
+        player = [
+            i for i in comps[tournament].players() if player_name == i.nice_name()
+        ][0]
+        recent_games = []
+        upcoming_games = []
+        for i in comps[tournament].games_to_list():
+            if player_name not in [j.nice_name() for j in i.players()] or i.bye:
+                continue
+            if i.started:
+                recent_games.append(
+                    (repr(i) + f" ({i.score_string()})", i.id, i.tournament.nice_name())
+                )
+            else:
+                upcoming_games.append((repr(i), i.id, i.tournament.nice_name()))
+        return (
+            render_template(
+                "tournament_specific/player_stats.html",
+                stats=[(k, v) for k, v in player.get_stats_detailed().items()],
+                name=player.name,
+                player=player,
+                recent_games=recent_games,
+                upcoming_games=upcoming_games,
                 tournament=f"{tournament}/",
             ),
             200,
@@ -426,12 +509,8 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             teams = list(reversed(teams))
         key = request.args.get("key", None)
         players = [i for i in game.players()]
-        team_one_players = [
-            ((1 - i), v) for i, v in enumerate(teams[0].players)
-        ]
-        team_two_players = [
-            ((1 - i), v) for i, v in enumerate(teams[1].players)
-        ]
+        team_one_players = [((1 - i), v) for i, v in enumerate(teams[0].players)]
+        team_two_players = [((1 - i), v) for i, v in enumerate(teams[1].players)]
         if key is None:
             return (
                 render_template(
@@ -508,7 +587,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 400,
             )
         elif any(
-                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         ):
             return (
                 render_template(
@@ -564,7 +643,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 400,
             )
         elif any(
-                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         ):
             return (
                 render_template(
@@ -644,20 +723,15 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 else:
                     upcoming_games.append(
                         (
-                            repr(i) + f" ({i.score_string()}) [{c.name}]",
+                            repr(i) + f" [{c.name}]",
                             i.id,
                             i.tournament.nice_name(),
                         )
                     )
 
         players = [
-            i
-            for i in get_all_players(comps)
-            if i.nice_name() in [j.nice_name() for j in team.players]
-        ]
-
-        players = [
-            (i.name, [(k, v) for k, v in i.get_stats().items()]) for i in players
+            (i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()])
+            for i in team.players
         ]
         return (
             render_template(
@@ -738,6 +812,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
             (
                 i.name,
                 i.team.nice_name(),
+                i.nice_name(),
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in all_players
@@ -749,6 +824,41 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
                 players=players,
                 tournament="",
+            ),
+            200,
+        )
+
+    @app.get("/players/<player_name>/")
+    def universal_player_stats(player_name):
+        if player_name not in [i.nice_name() for i in get_all_players(comps)]:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="This is not a real player",
+                ),
+                400,
+            )
+        player = [i for i in get_all_players(comps) if player_name == i.nice_name()][0]
+        recent_games = []
+        upcoming_games = []
+        for i in get_all_games(comps):
+            if player_name not in [j.nice_name() for j in i.players()] or i.bye:
+                continue
+            if i.started:
+                recent_games.append(
+                    (repr(i) + f" ({i.score_string()})", i.id, i.tournament.nice_name())
+                )
+            else:
+                upcoming_games.append((repr(i), i.id, i.tournament.nice_name()))
+        return (
+            render_template(
+                "tournament_specific/player_stats.html",
+                stats=[(k, v) for k, v in player.get_stats_detailed().items()],
+                name=player.name,
+                player=player,
+                recent_games=recent_games,
+                upcoming_games=upcoming_games,
+                tournament=f"",
             ),
             200,
         )

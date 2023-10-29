@@ -1,14 +1,14 @@
 import math
 from typing import TypeVar, Any
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def chunks_sized(lst: list[T], n: int) -> list[list[T]]:
     """Yield successive n-sized chunks from lst."""
     lizt = []
     for i in range(0, len(lst), n):
-        lizt.append(lst[i:i + n])
+        lizt.append(lst[i : i + n])
     return lizt
 
 
@@ -17,7 +17,7 @@ def probability(rating1, rating2):
 
 
 def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
-    """Yield n number of striped chunks from l. """
+    """Yield n number of striped chunks from l."""
     l = l.copy()
     while s and len(l) % n != 0:
         l.append(s)
@@ -41,7 +41,9 @@ def fixture_sorter(fixtures: list[list[Any]]) -> list[list[Any]]:
         court = False
         new_round = []
         while r:
-            new_round.append(r.pop(next((i for i, v in enumerate(r) if v.court == court), 0)))
+            new_round.append(
+                r.pop(next((i for i, v in enumerate(r) if v.court == court), 0))
+            )
             court = not court
         output.append(new_round)
     return output

@@ -26,10 +26,10 @@
         </tbody>
     </table>
     {% for player in players %}
-    <h3>Statistics for {{player[0]}}</h3>
+        <h3>Statistics for <a class="hide" href="/{{tournament}}players/{{player[1]}}">{{player[0]}}</a></h3>
     <table class="table">
         <tbody>
-        {% for stat in player[1] %}
+        {% for stat in player[2] %}
         <tr>
             <th>{{ stat[0] }}:</th>
             <td></td>

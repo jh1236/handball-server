@@ -1,7 +1,7 @@
 import os
 
 import flask
-from flask import request, send_file
+from flask import request, send_file, jsonify
 
 from structure.Game import Game
 from structure.Team import Team
@@ -122,7 +122,7 @@ def display():
                     "serving": False,
                     "fault": False,
                     "cardPercent": 1,
-                }
+                },
             },
             "rightTeam": {
                 "team": "TBD",
@@ -161,6 +161,13 @@ def game():
     tournament = request.args.get("tournament", type=str)
     game_id = int(request.args["id"])
     return comps[tournament].get_game(game_id).as_map()
+
+
+@app.get("/api/games/change_code")
+def change_code():
+    tournament = request.args.get("tournament", type=str)
+    game_id = int(request.args["id"])
+    return jsonify({"code": comps[tournament].get_game(game_id).update_count})
 
 
 # testing related endpoints

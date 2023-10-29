@@ -16,26 +16,27 @@ def get_all_teams(comps: dict[str, Tournament]) -> list[Team]:
     for i in comps.values():
         for t in i.teams:
             if t.name not in teams:
-                teams[t.name] = Team(t.name, [Player(j.name) for j in t.players])
-                for p, p1 in zip(teams[t.name].players, t.players):
-                    p.tournament = null_tournament
-                    p.add_stats(p1.get_stats())
-            teams[t.name].tournament = null_tournament
-            teams[t.name].add_stats(t.get_stats())
+                teams[t.name] = Team(t.name, [Player(j.name).set_tournament(null_tournament) for j in t.players])
+                teams[t.name].tournament = null_tournament
+            teams[t.name].add_stats(t.get_stats(True))
+            if t.name == "The Officials":
+                print(t.players[1].get_stats())
+                print(teams[t.name].players[1].get_stats())
     return list(teams.values())
 
 
 def get_all_players(comps: dict[str, Tournament]) -> list[Player]:
     players = {}
+    print(len(comps))
     for i in comps.values():
         for t in i.teams:
             for p in t.players:
                 if p.name not in players:
                     players[p.name] = Player(p.name)
                     players[p.name]._team = t
-                if not p.team.has_photo and t.has_photo:
+                if t.has_photo:
                     players[p.name]._team = t
-                players[p.name].add_stats(p.get_stats())
+                players[p.name].add_stats(p.get_stats_detailed())
     return list(players.values())
 
 

@@ -25,7 +25,7 @@ class Game:
                     tournament,
                     game_map["teamOne"]["name"],
                     [
-                        Player.find_or_create(tournament, i)
+                        Player(i).set_tournament(tournament)
                         for i in game_map["teamOne"]["players"]
                     ],
                 )
@@ -42,7 +42,7 @@ class Game:
                     tournament,
                     game_map["teamTwo"]["name"],
                     [
-                        Player.find_or_create(tournament, i)
+                        Player(i).set_tournament(tournament)
                         for i in game_map["teamTwo"]["players"]
                     ],
                 )
@@ -82,6 +82,7 @@ class Game:
         final: bool = False,
         attempt_rebalance: bool = True,
     ):
+        self.update_count: int = 0
         self.tournament = tournament
         self.id: int = -1
         self.court: int = -1
@@ -122,6 +123,9 @@ class Game:
         self.primary_official = NoOfficial
         self.round_number: int = 0
 
+    def event(self):
+        self.update_count += 1
+
     def court_display(self) -> str:
         if self.court > -1:
             return f"Court {self.court + 1}"
@@ -133,11 +137,6 @@ class Game:
         o.games_officiated += 1
         self.primary_official = o
 
-    def process_if_bye(self):
-        if not self.bye:
-            return
-
-
     def add_to_game_string(self, string: str, team):
         if team == self.teams[0]:
             self.game_string += string.upper()
@@ -148,8 +147,11 @@ class Game:
         if self.bye or self.super_bye:
             raise LookupError(f"Game {self.id} is a bye!")
 
-    def next_point(self):
+    def next_point(self, penalty_point: bool):
         self.bye_check()
+        self.event()
+        if not penalty_point:
+            self.server().serve()
         self.rounds += 1
         [i.next_point() for i in self.teams]
 

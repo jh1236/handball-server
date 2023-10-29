@@ -12,7 +12,6 @@ class Team:
         self.elo = 1000
         self.name = name
         self.players: list[Player] = players
-
         self.points_against: int = 0
         self.points_for: int = 0
         self.games_won: int = 0
@@ -118,7 +117,9 @@ class Team:
         for i in tournament.teams:
             if sorted([j.name for j in players]) == sorted([j.name for j in i.players]):
                 return i
-        return cls(name, players)
+        t = cls(name, players)
+        t.tournament = tournament
+        return t
 
 
 BYE = Team("BYE", [Player("Goodbye"), Player("Goodbye")])
@@ -203,6 +204,7 @@ class GameTeam:
         else:
             self.info(f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string()}")
         self.score += 1
+        self.game.next_point(first_player is None and not ace)
         self.opponent.lost_point()
         if not self.serving:
             self.first_player_serves = not self.first_player_serves
@@ -211,7 +213,6 @@ class GameTeam:
             string = "a" if ace else "s"
             string += "l" if first_player else "r"
             self.game.add_to_game_string(string, self)
-        self.game.next_point()
 
     def server(self) -> GamePlayer:
         server = self.players[not self.first_player_serves]
@@ -231,7 +232,7 @@ class GameTeam:
         self.game.add_to_game_string("f" + ("l" if self.first_player_serves else "r"), self)
         self.faults += 1
         if self.faulted:
-            self.players[not self.first_player_serves].double_fault()
+            self.server().double_fault()
             self.opponent.score_point()
         else:
             self.faulted = True
@@ -266,10 +267,12 @@ class GameTeam:
         self.info(f"Timeout called by {self.nice_name()}")
         self.game.add_to_game_string(f"tt", self)
         self.time_out_time = time.time()
+        self.game.event()
         self.timeouts -= 1
 
     def end_timeout(self):
         self.time_out_time = -1
+        self.game.event()
 
     def card_time(self):
         if 0 > min(self.players, key=lambda a: a.card_time_remaining).card_time_remaining:

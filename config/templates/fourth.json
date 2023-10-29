@@ -1,0 +1,25 @@
+{
+  "fixtures_generator": "Pooled",
+  "finals_generator": "BasicFinals",
+  "name": "The Fourth SUSS Championship",
+  "officials": [
+    "Jared Healy",
+    "Lachlan Banks",
+    "Aimee Soudure",
+    "Brigitte Gredziuk",
+    "Zaiah Deards",
+    "James Sharpham"
+  ],
+  "teams": [
+    "Breaking Bad Bois",
+    "Blaaergh",
+    "Bunbury Boys",
+    "Tourism New Zealand",
+    "AC Lads",
+    "GORGON WOOBT",
+    "Iggy Squad",
+    "The Officials",
+    "Riders Of Berk"
+  ],
+  "twoCourts": true
+}

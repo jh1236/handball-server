@@ -18,7 +18,7 @@
     <p>{% if not game.bye %}<a href="/{{tournament}}games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>{% if not game.bye %}</a>{% endif %} <i>{{ status }}</i></p>
 
     {% if game.best_player %}
-        <p><b>Best on Court:</b> <i>{{ best }}</i></p>
+        <p><b>Best on Court:</b> <a class = "hide" href="/{{tournament}}players/{{ game.best_player.nice_name() }}"><i>{{ best }}</i></a></p>
     {% endif %}
     <br>
     <table class="table">
@@ -61,10 +61,11 @@
 
         <tr>
             <td></td>
-            <th>{{ players[0] }}</th>
-            <th>{{ players[1] }}</th>
-            <th>{{ players[2] }}</th>
-            <th>{{ players[3] }}</th>
+            <th><a class = "hide" href="/{{tournament}}players/{{ game.players()[0].nice_name() }}">{{ players[0] }}</a></th>
+            <th><a class = "hide" href="/{{tournament}}players/{{ game.players()[1].nice_name() }}">{{ players[1] }}</a></th>
+            <th><a class = "hide" href="/{{tournament}}players/{{ game.players()[2].nice_name() }}">{{ players[2] }}</a></th>
+            <th><a class = "hide" href="/{{tournament}}players/{{ game.players()[3].nice_name() }}">{{ players[3] }}</a></th>
+
         </tr>
         {% for player in player_stats %}
             <tr>

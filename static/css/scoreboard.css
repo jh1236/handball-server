@@ -1,0 +1,147 @@
+/* Globals and general body */
+:root {
+    --font-family: "Lexend Deca", sans-serif;
+    --color-bg: #000;
+    --color-text: #c0ffc0;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+
+    padding: 50px;
+    margin: auto;
+    text-align: center;
+}
+
+/* Fixtures table and its contents */
+.table {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+a.hide {
+    text-decoration: none;
+    color: inherit;
+}
+
+.table tr td:first-child {
+    width: 120px;
+}
+
+.table tr td:nth-child(2) {
+    width: 30px;
+    text-align: left;
+}
+
+.table tr td:nth-child(3) {
+    width: 120px;
+}
+
+.table tr td:nth-child(4) {
+    width: 120px;
+}
+
+.table tr td:nth-child(5) {
+    width: 80px;
+}
+
+.table tr td:nth-child(6) {
+    width: 80px;
+}
+
+.table tr td:nth-child(7) {
+    width: 120px;
+}
+
+img.logo {
+    width: 100px;
+    height: 100px;
+    margin: 0;
+}
+
+img.logo2 {
+    width: 100px;
+    height: 50px;
+    margin: 0;
+
+}
+
+.nav {
+    text-align: left;
+}
+
+.button {
+    background-color: #659cce;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    min-height: 70px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.green_button {
+    background-color: #84AA63; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    min-height: 70px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.yellow_button {
+    background-color: #FCCE6E;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    min-height: 70px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.red_button {
+    background-color: #EC4A4A; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    min-height: 70px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+img.title_logo {
+    width: 150px;
+    height: 150px;
+}
+
+img.team_logo {
+    width: 200px;
+    height: 200px;
+    left: 50%;
+    top: 5%
+}
+
+h1.big {
+    font-size: 2000%;
+    margin: 0;
+}
