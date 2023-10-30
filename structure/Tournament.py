@@ -44,7 +44,10 @@ class Tournament:
         return [game for r in self.fixtures for game in r] + [game for r in self.finals for game in r]
 
     def ladder(self):
-        return sorted(self.teams, key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])))
+        return sorted(self.teams, key=lambda a: (
+            -(a.games_won / (a.games_played or 1)),
+            a.points_for - a.points_against,
+        ))
 
     def add_team(self, team):
         if team == BYE: return
@@ -59,7 +62,7 @@ class Tournament:
 
     def update_games(self, generator_value=None):
         if not self.in_finals:
-            while not self.fixtures or self.no_games_to_play() or generator_value is not None:
+            while (not self.fixtures or self.no_games_to_play() or generator_value is not None) and not self.in_finals:
                 try:
                     n = self.fixtures_gen.send(generator_value)
                     if n is not None:
@@ -68,15 +71,15 @@ class Tournament:
                     logger.info(e.args)
                     logger.info("Entering Finals!")
                     self.in_finals = True
-                    n = self.finals_gen.send(generator_value)
+                    n = next(self.finals_gen)
                     if n is not None:
                         self.finals.append(n)
                 generator_value = None
         else:
-            while all([i.best_player for i in self.finals[-1]]) or generator_value is not None:
+            if all([i.best_player for i in self.finals[-1]]) or generator_value is not None:
                 try:
                     logger.info("Next round of finals")
-                    n = self.finals_gen.send(generator_value)
+                    n = next(self.finals_gen)
                     if n is not None:
                         self.finals.append(n)
                     logger.info(self.finals[-1])

@@ -13,9 +13,17 @@
     setup({{game.id}}, {{ update_count }})
     setTournament("{{tournament}}")
 </script>
-<h1 style="font-size: 50px"><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ teams[0].name }}
-    vs {{ teams[1].name }}</a></h1>
+{#<h1 style="font-size: 50px"><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ teams[0].name }}#}
+{#    vs {{ teams[1].name }}</a></h1>#}
 <table class="table">
+
+    <tr>
+        <td><a class="hide" href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"><h1
+                style="font-size: 50px">{{ teams[0].name }}</h1></a></td>
+        <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide"><h1 style="font-size: 50px"> vs </h1></a></td>
+        <td><a class="hide" href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"><h1
+                style="font-size: 50px">{{ teams[1].name }} </h1></a></td>
+    </tr>
     <tr>
         <th><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
                class="hide"><img
@@ -26,7 +34,7 @@
             <p><b>Court:</b> <a class="hide"
                                 href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court + 1 }}</i></a>
             </p>
-            <p><b>Match Official:</b>{% if not game.bye %}
+            <p><b>Official:</b>{% if not game.bye %}
                 <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %}
                 <i>{{ official }}</i>
                 {% if not game.bye %}</a> {% endif %}</p>
@@ -39,8 +47,7 @@
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;">{% if not game.bye %}</a>{% endif %}</th>
     </tr>
-</table>
-<table class="table">
+
     <tr>
         <td>
             <h1 class="big">{{ teams[0].score }}</h1>
@@ -74,6 +81,7 @@
     {% for i in range(2) %}
         <tr>
             <td style="color: {{ teams[0].players[i].biggest_card_hex() }}; font-size: 25px">
+                <a class="hide" href="/{{ tournament }}players/{{ teams[0].players[i].nice_name() }}">
                 {% if not teams[0].players[i].serving() %}
                     <i>
                 {% else %}
@@ -91,9 +99,11 @@
                 {% else %}
                     </i>
                 {% endif %}
+                </a>
             </td>
             <td></td>
             <td style="color: {{ teams[1].players[i].biggest_card_hex() }}; font-size: 25px">
+                <a class="hide" href="/{{ tournament }}players/{{ teams[1].players[i].nice_name() }}">
                 {% if not teams[1].players[i].serving() %}
                     <i>
                 {% else %}
@@ -111,6 +121,7 @@
                 {% else %}
                     </i>
                 {% endif %}
+                </a>
             </td>
         </tr>
     {% endfor %}

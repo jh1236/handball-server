@@ -1,0 +1,745 @@
+{
+    "details": {
+        "ref": "constant"
+    },
+    "finals": [],
+    "games": [
+        [
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLFLgrsrarsrarSLSRsrTTslSRslsrararsr",
+                "id": 0,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "srSRslSRsrSRSRARSRglARsrylslsrSRSRsrsrsrSRAR",
+                "id": 1,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "james",
+                    "players": [
+                        "James Sharpham",
+                        "Alex Soudure"
+                    ],
+                    "score": 9
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SLslsrslsrSLSLsrslararTTslslSLSLSLSRSLsr",
+                "id": 2,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Bench Warmers",
+                    "players": [
+                        "Jared Healy",
+                        "James Sharpham"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "LAX",
+                    "players": [
+                        "Lachlan Banks",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLgrslarararfrfrFRARyrARslfrarfrarSLsrflarGRSLARSLGLsrar",
+                "id": 3,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Tristan Nel",
+                        "Zaiah Deards"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARSLSLARSLARslSLSLSLSLSL",
+                "id": 4,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "james",
+                    "players": [
+                        "James Sharpham",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 1
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLGRFLslSLslslSLslSLSLSLARSLslslsrslSLSLSL",
+                "id": 5,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Jay-Z",
+                    "players": [
+                        "Jared Healy",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "james",
+                    "players": [
+                        "James Sharpham",
+                        "Alex Soudure"
+                    ],
+                    "score": 8
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "YRslflslslflslSLVRSLslslslSLglSLSLsrslflslflSLsl",
+                "id": 6,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "T. Swift Song Inspo",
+                    "players": [
+                        "James Sharpham",
+                        "Zaiah Deards"
+                    ],
+                    "score": 6
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SRGRSLFLSLYRSLARARSLTTSLARARSL",
+                "id": 7,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "LAX",
+                    "players": [
+                        "Lachlan Banks",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "T. Swift Song Inspo",
+                    "players": [
+                        "James Sharpham",
+                        "Zaiah Deards"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Zaiah Deards",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "srsrarGLSLFLSLFLsrSRFRslsrSLslslSLARSLSLSLsrTTslttSLSLSL",
+                "id": 8,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Alex Soudure (oh Zaiah is here too ig)",
+                    "players": [
+                        "Alex Soudure",
+                        "Zaiah Deards"
+                    ],
+                    "score": 12
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 10
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "arSRARsrSRSLFRsrarslarSRARARsrSRFRFRflsrSLFLflslSRSLTTttTTFRTTSL",
+                "id": 9,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 12
+                },
+                "teamTwo": {
+                    "name": "Straight Ones",
+                    "players": [
+                        "James Sharpham",
+                        "Lachlan Banks"
+                    ],
+                    "score": 10
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "srarsrsrsrsrSLsrSLsrarsrflsr",
+                "id": 10,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "James Sharpham"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Jay-Z",
+                    "players": [
+                        "Jared Healy",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SRslararTTgrSRSRSRslSRSRslslSLSRsrslSRARslfrGLSR",
+                "id": 11,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Jumping Giraffes",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "T. Swift Song Inspo",
+                    "players": [
+                        "James Sharpham",
+                        "Zaiah Deards"
+                    ],
+                    "score": 9
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slslsrararSLsrsrslSRSRSLSRslarsr",
+                "id": 12,
+                "official": "Brigitte Gredziuk",
+                "started": true,
+                "teamOne": {
+                    "name": "ZL",
+                    "players": [
+                        "Lachlan Banks",
+                        "Zaiah Deards"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "Bench Warmers",
+                    "players": [
+                        "Jared Healy",
+                        "James Sharpham"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SRslSRslSRsrSRFRsrSLSLSRslSRSRARslSL",
+                "id": 13,
+                "official": "Brigitte Gredziuk",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "T. Swift Song Inspo",
+                    "players": [
+                        "James Sharpham",
+                        "Zaiah Deards"
+                    ],
+                    "score": 6
+                }
+            },
+            {
+                "bestPlayer": "Aimee Soudure",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARARslslsrFLSRflARSRSRARsrSRARSRslSR",
+                "id": 14,
+                "official": "Brigitte Gredziuk",
+                "started": true,
+                "teamOne": {
+                    "name": "Super Officials",
+                    "players": [
+                        "Aimee Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "ZL",
+                    "players": [
+                        "Lachlan Banks",
+                        "Zaiah Deards"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slslarararslSLsrarslarsr",
+                "id": 15,
+                "official": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "Laimee",
+                    "players": [
+                        "Lachlan Banks",
+                        "Aimee Soudure"
+                    ],
+                    "score": 1
+                },
+                "teamTwo": {
+                    "name": "Jay-Z",
+                    "players": [
+                        "Jared Healy",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "James Sharpham",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRsrSLSLFRsrSRSLSRslflSRFRslsrSRSRslSL",
+                "id": 16,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Bench Warmers",
+                    "players": [
+                        "James Sharpham",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "LAX",
+                    "players": [
+                        "Alex Soudure",
+                        "Lachlan Banks"
+                    ],
+                    "score": 6
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRSRslslSLsrSRSLslSLSLSRFRFRarsrFRarsrSRslflSLsrSRSLFLAR",
+                "id": 17,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 13
+                },
+                "teamTwo": {
+                    "name": "james",
+                    "players": [
+                        "Alex Soudure",
+                        "James Sharpham"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "srSLsrsrarsrslslsrsrfrsrar",
+                "id": 18,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Straight Ones",
+                    "players": [
+                        "James Sharpham",
+                        "Lachlan Banks"
+                    ],
+                    "score": 1
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Jared Healy",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "srslslsrsrSLsrsrSRslSRSRFRSRgrSRARSRsrSRslSRgrsrsr",
+                "id": 19,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Lovers",
+                    "players": [
+                        "Alex Soudure",
+                        "Tomasz Sawkowski"
+                    ],
+                    "score": 10
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 12
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRsrSRARFRSLsrSLSRslararSLFRsrsrSLARsrSLSL",
+                "id": 20,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Cringeiana Grande",
+                    "players": [
+                        "Jared Healy",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Lovers",
+                    "players": [
+                        "Alex Soudure",
+                        "Tomasz Sawkowski"
+                    ],
+                    "score": 8
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "FLslSLsrsrSRslSRslSLSLslSRSLSLsrsrSRSLSR",
+                "id": 21,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Lovers",
+                    "players": [
+                        "Alex Soudure",
+                        "Tomasz Sawkowski"
+                    ],
+                    "score": 8
+                }
+            },
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SLsrslarararararfrarfrarfrfrsrsr",
+                "id": 22,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "The Goblinoids",
+                    "players": [
+                        "Zaiah Deards",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Lovers",
+                    "players": [
+                        "Alex Soudure",
+                        "Tomasz Sawkowski"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slsrarttsrSLsrfrarSRsrSLslTTslSLSLsrar",
+                "id": 23,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Lovers",
+                    "players": [
+                        "Alex Soudure",
+                        "Tomasz Sawkowski"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SLsrsrGRsrSRSLsrsrYRsrSLSLslSRslSLSLsrSRARSR",
+                "id": 24,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Sharpy",
+                    "players": [
+                        "James Sharpham",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 9
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRslSRsrSRSRSRsrarslSLSRsrsrsrSRSLsrsrSRsrsr",
+                "id": 25,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Sharpy",
+                    "players": [
+                        "James Sharpham",
+                        "Tristan Nel"
+                    ],
+                    "score": 10
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 12
+                }
+            },
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "srslSRsrsrSLSRsrsrSLslsrslSRARslflSLARsr",
+                "id": 26,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "They Can't Decide",
+                    "players": [
+                        "James Sharpham",
+                        "Tomasz Sakowski"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLslSRsrsrsrslSLslslsrflSRSRslarar",
+                "id": 27,
+                "official": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "Trouble in Terrace Town",
+                    "players": [
+                        "Tristan Nel",
+                        "Tomasz Sakowski"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slSLSLsrslarSLSLslSRttSRSLvlFRSLARSLsrSR",
+                "id": 28,
+                "official": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Trouble in Terrace Town",
+                    "players": [
+                        "Tristan Nel",
+                        "Tomasz Sakowski"
+                    ],
+                    "score": 6
+                }
+            }
+        ]
+    ]
+}

@@ -286,6 +286,10 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 ]
             ):
                 continue
+            if not all(
+                    [j.team.nice_name() in [k.nice_name() for k in game.teams] for j in i.teams]
+            ):
+                continue
             if i == game:
                 continue
             prev_matches.append(

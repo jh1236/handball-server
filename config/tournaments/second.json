@@ -1,0 +1,1115 @@
+{
+    "details": {
+        "finals_generator": "BasicFinals",
+        "fixtures_generator": "Swiss",
+        "name": "The Second SUSS Championship",
+        "officials": [
+            "Jared Healy",
+            "Lachlan Banks",
+            "Aimee Soudure"
+        ],
+        "teams": [
+            "BarbenHeimer",
+            "IDK",
+            "IKEA Workers",
+            "The Officials",
+            "Satnavs",
+            "Seanitha",
+            "Sleeby",
+            "The Tradies",
+            "Whipped"
+        ],
+        "twoCourts": false
+    },
+    "finals": [
+        [
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slSLsrSRslSLsrSRslSLsrSRslSLsrSRSLSRSR",
+                "id": 40,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 8
+                }
+            },
+            {
+                "bestPlayer": "Nick Burvil",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLslsrSRSRsrslSLSLsrslSLSRslSLslslSLARsrarSLARSR",
+                "id": 41,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Whipped",
+                    "players": [
+                        "Dora Wan",
+                        "Michael Russ"
+                    ],
+                    "score": 13
+                },
+                "teamTwo": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLslslSRSRsrarSRSLsrarSLSRSRSRSLAR",
+                "id": 42,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Whipped",
+                    "players": [
+                        "Dora Wan",
+                        "Michael Russ"
+                    ],
+                    "score": 6
+                }
+            }
+        ]
+    ],
+    "games": [
+        [
+            {
+                "bestPlayer": "Eva Hajigabriel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slslsrsrsrsrararararar",
+                "id": 0,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "BarbenHeimer",
+                    "players": [
+                        "Olivia Stronach",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 0
+                },
+                "teamTwo": {
+                    "name": "IDK",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slsrslSLSRSRsrslsrSRSLsrsrsrsrsr",
+                "id": 1,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "IKEA Workers",
+                    "players": [
+                        "Will Prozerska",
+                        "Lachlan Banks"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRSRSRSRslslSRSRsrslSLARARAR",
+                "id": 2,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "James Sharpham",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLsrSRSLsrslSRSLslSRSRSLSRslsrslslSLslararar",
+                "id": 3,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Sleeby",
+                    "players": [
+                        "James Saunders",
+                        "Ruby Farrel"
+                    ],
+                    "score": 10
+                },
+                "teamTwo": {
+                    "name": "The Tradies",
+                    "players": [
+                        "James Sharpham",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 12
+                }
+            },
+            {
+                "bestPlayer": "None",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 4,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "Whipped",
+                    "players": [
+                        "Dora Wan",
+                        "Michael Russ"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "None"
+                    ],
+                    "score": 0
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Sean Robinson",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRARARSLARslSRARARslglSRAR",
+                "id": 5,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BarbenHeimer",
+                    "players": [
+                        "Olivia Stronach",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 2
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRslsrSRslfrsrSLSLSRsrSLSLttslSRSRSR",
+                "id": 6,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "IKEA Workers",
+                    "players": [
+                        "Will Prozerska",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Sleeby",
+                    "players": [
+                        "James Saunders",
+                        "Ruby Farrel"
+                    ],
+                    "score": 6
+                }
+            },
+            {
+                "bestPlayer": "Michael Russ",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRSRslarSLSRARSRslsrSLFLSRSLFLSR",
+                "id": 7,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Whipped",
+                    "players": [
+                        "Dora Wan",
+                        "Michael Russ"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "The Tradies",
+                    "players": [
+                        "James Sharpham",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "None",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 8,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "None"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Nick Burvil",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slslararsrararSLsrsrsrSLsr",
+                "id": 9,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "IDK",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Ethan Dal Molin",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRSLslslsrSLSRARARSLARSLslSLSL",
+                "id": 10,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "BarbenHeimer",
+                    "players": [
+                        "Olivia Stronach",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Sleeby",
+                    "players": [
+                        "James Saunders",
+                        "Ruby Farrel"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "None",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 11,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "The Tradies",
+                    "players": [
+                        "James Sharpham",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "None"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slSLsrararararSLSRslSLsrarsrSLsl",
+                "id": 12,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "IDK",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "IKEA Workers",
+                    "players": [
+                        "Will Prozerska",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSLSLsrSRARARslSLsrSRslSLSRAR",
+                "id": 13,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "Dora Wan",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slSLsrSRslSLslslSLSLsrararSLSLslSLSRSRslsrSLslar",
+                "id": 14,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Whipped",
+                    "players": [
+                        "Dora Wan",
+                        "Michael Russ"
+                    ],
+                    "score": 13
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "None",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 15,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "Sleeby",
+                    "players": [
+                        "James Saunders",
+                        "Ruby Farrel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "None"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Zebiah Peaker",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRSLslSRSLsrSRFLSLsrSLSRslSLSRSR",
+                "id": 16,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "The Tradies",
+                    "players": [
+                        "James Sharpham",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BarbenHeimer",
+                    "players": [
+                        "Olivia Stronach",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "Sean Robinson",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRslSLSRsrSLSRsrSLSRFRslSLSRslSL",
+                "id": 17,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "IDK",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Dora Wan",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARARARslSLARARsrararSLSRSLSRSL",
+                "id": 18,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Whipped",
+                    "players": [
+                        "Michael Russ",
+                        "Dora Wan"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "IKEA Workers",
+                    "players": [
+                        "Will Prozerska",
+                        "Lachlan Banks"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRARSLslsrsrSLSLslSRSLslSRARTTslSLslslslSL",
+                "id": 19,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 9
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Ruby Farrel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slsrslsrslsrSLsrslSRSRsrarar",
+                "id": 20,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Sleeby",
+                    "players": [
+                        "James Saunders",
+                        "Ruby Farrel"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "IDK",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "None",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 21,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "BarbenHeimer",
+                    "players": [
+                        "Olivia Stronach",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "None"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Sean Robinson",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slsrslsrsrslslSRslSRSRSLsrslar",
+                "id": 22,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "IKEA Workers",
+                    "players": [
+                        "Will Prozerska",
+                        "Lachlan Banks"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLslararararsrslsrSLSRsrSRGLsrsl",
+                "id": 23,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "The Tradies",
+                    "players": [
+                        "James Sharpham",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRARslsrSLslsrSLsrSRARsrslsrSLSRSRsrslSRslSRSR",
+                "id": 24,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 13
+                },
+                "teamTwo": {
+                    "name": "Whipped",
+                    "players": [
+                        "Dora Wan",
+                        "Michael Russ"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLsrarFLSRSLslarSLFLslsrarslSRslsrGLsr",
+                "id": 25,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "BarbenHeimer",
+                    "players": [
+                        "Olivia Stronach",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "IKEA Workers",
+                    "players": [
+                        "Will Prozerska",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "arararsrarslarSLSRsrarsrSLSRSLsr",
+                "id": 26,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "IDK",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "None",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 27,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "None"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Sean Robinson",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRSLSRSLSRslsrSLslSRsrsrSLttglSLAR",
+                "id": 28,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "The Tradies",
+                    "players": [
+                        "James Sharpham",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Michael Russ",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLsrslslarsrflsrsrslTTslflargrsl",
+                "id": 29,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Sleeby",
+                    "players": [
+                        "James Saunders",
+                        "Ruby Farrel"
+                    ],
+                    "score": 1
+                },
+                "teamTwo": {
+                    "name": "Whipped",
+                    "players": [
+                        "Michael Russ",
+                        "Dora Wan"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "srarsrsrarslsrarsrarsr",
+                "id": 30,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "BarbenHeimer",
+                    "players": [
+                        "Olivia Stronach",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 0
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Zebiah Peaker",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSLSRslsrSLSRSRSLARsrSLslslSLsrarSL",
+                "id": 31,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "The Tradies",
+                    "players": [
+                        "James Sharpham",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "IDK",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 7
+                }
+            },
+            {
+                "bestPlayer": "None",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 32,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "IKEA Workers",
+                    "players": [
+                        "Will Prozerska",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "None"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARARARSRARSRSLSRSRSLAR",
+                "id": 33,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Sleeby",
+                    "players": [
+                        "James Saunders",
+                        "Ruby Farrel"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Dora Wan",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRslsrSLSRslsrSLSRsrsrarSRSLSLSRSR",
+                "id": 34,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Whipped",
+                    "players": [
+                        "Dora Wan",
+                        "Michael Russ"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 7
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARARSRSRARARSRARARSLAR",
+                "id": 35,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Satnavs",
+                    "players": [
+                        "Nick Burvil",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BarbenHeimer",
+                    "players": [
+                        "Olivia Stronach",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Michael Russ",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSLSRsrsrarararsrsrslsrsrflar",
+                "id": 36,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "IDK",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Whipped",
+                    "players": [
+                        "Dora Wan",
+                        "Michael Russ"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "James Sharpham",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARslSLslSLARARsrarSRslTTGRYRslarfrarSRslSLFRARARSL",
+                "id": 37,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "IKEA Workers",
+                    "players": [
+                        "Lachlan Banks",
+                        "Will Prozerska"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "The Tradies",
+                    "players": [
+                        "Zebiah Peaker",
+                        "James Sharpham"
+                    ],
+                    "score": 9
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRSRSRSLSRSRSLSRSRSR",
+                "id": 38,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Sleeby",
+                    "players": [
+                        "James Saunders",
+                        "Ruby Farrel"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "None",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 39,
+                "official": "None one",
+                "started": false,
+                "teamOne": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "None"
+                    ],
+                    "score": 0
+                }
+            }
+        ]
+    ]
+}

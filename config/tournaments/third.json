@@ -1,0 +1,1104 @@
+{
+    "details": {
+        "ref": "third"
+    },
+    "finals": [
+        [
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "FLslSRslslSRSRslarSLFRSLSRSRARslSLTTFLglslslslarSLSRslSLslslSLslSRslSLslsl",
+                "id": 40,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 15
+                },
+                "teamTwo": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Tristan Nel",
+                        "Zaiah Deards"
+                    ],
+                    "score": 17
+                }
+            },
+            {
+                "bestPlayer": "Naveen Nimilan",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSLSRsrsrsrSLARFRARFRsrSLARSLSLttSR",
+                "id": 41,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Dora Wan",
+                        "Naveen Nimilan"
+                    ],
+                    "score": 4
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Declan Holloway",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "FLslslsrSLsrSLSLsrsrslSLSLFRsrarSLSLsrSLSLsl",
+                "id": 42,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Tristan Nel",
+                        "Zaiah Deards"
+                    ],
+                    "score": 9
+                },
+                "teamTwo": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 11
+                }
+            }
+        ]
+    ],
+    "games": [
+        [
+            {
+                "bestPlayer": "Liam Cooper",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSLSLsrGLGRSLSRSRSLsrSLFLARslarSLslsrslSL",
+                "id": 0,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Blaaergh",
+                    "players": [
+                        "Liam Cooper",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk"
+                    ],
+                    "score": 7
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARglSRylARARARSRSRTTARSLSRslSL",
+                "id": 1,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Bunbury Boys",
+                    "players": [
+                        "Lachlan Banks",
+                        "Eddie Smith"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 1
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "slslsrGRGRsrsrararsrarsrsl",
+                "id": 2,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Iggy Squad",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Olivia Stronach"
+                    ],
+                    "score": 0
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Jared Healy",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Sean Robinson",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "arSLslslSLsrarslsrsrslslsl",
+                "id": 3,
+                "official": "Brigitte Gredziuk",
+                "started": true,
+                "teamOne": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Dora Wan",
+                        "Naveen Nimilan"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Goodbye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 4,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Tristan Nel",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Goodbye",
+                        "Goodbye"
+                    ],
+                    "score": 0
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "SLslSLSLSLsrSLARslSLsrSLslylSLARSL",
+                "id": 5,
+                "official": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Iggy Squad",
+                    "players": [
+                        "Olivia Stronach",
+                        "Iggy Kreutz"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Dora Wan",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "srarslSRSRsrsrsrSRsrsrSLslslsl",
+                "id": 6,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Dora Wan",
+                        "Naveen Nimilan"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Goodbye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 7,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Tristan Nel",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Goodbye",
+                        "Goodbye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Declan Holloway",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "slarSLARSLSRSRttSRSRSLsrSLARslSR",
+                "id": 8,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Blaaergh",
+                    "players": [
+                        "Liam Cooper",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SRsrarSLsrSLSLSRFLSRARsrsrTTSRSLSRSR",
+                "id": 9,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Bunbury Boys",
+                    "players": [
+                        "Lachlan Banks",
+                        "Eddie Smith"
+                    ],
+                    "score": 5
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Brigitte Gredziuk",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "slSLsrsrsrarslararsl5Lsrsr",
+                "id": 10,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Iggy Squad",
+                    "players": [
+                        "Olivia Stronach",
+                        "Iggy Kreutz"
+                    ],
+                    "score": 1
+                },
+                "teamTwo": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "slslSRSRSLSRslSRSRSRSRslSRSLslSR",
+                "id": 11,
+                "official": "Brigitte Gredziuk",
+                "started": true,
+                "teamOne": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Zaiah Deards",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Goodbye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 12,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "Blaaergh",
+                    "players": [
+                        "Liam Cooper",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Goodbye",
+                        "Goodbye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Eddie Smith",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "srflSRSRFLslslslsrslTTslslslsrsl",
+                "id": 13,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Dora Wan",
+                        "Naveen Nimilan"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Bunbury Boys",
+                    "players": [
+                        "Lachlan Banks",
+                        "Eddie Smith"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLslSLsrfrslSLslflslarSLsrttfrSLslarflSLFRSRslSRSLsl",
+                "id": 14,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 9
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Liam Cooper",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SLslSRSRSRslarSLARSRFLSLslslSLsrSLsrSL",
+                "id": 15,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Bunbury Boys",
+                    "players": [
+                        "Lachlan Banks",
+                        "Eddie Smith"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Blaaergh",
+                    "players": [
+                        "Liam Cooper",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 7
+                }
+            },
+            {
+                "bestPlayer": "Brigitte Gredziuk",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "SLsrSRARSLSLARSLSRSRslslSRslSL",
+                "id": 16,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "Iggy Kreutz",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "ARFLVLsrarSRsrsrslsrslsrsrsrSRsr",
+                "id": 17,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Iggy Squad",
+                    "players": [
+                        "Olivia Stronach",
+                        "Iggy Kreutz"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Dora Wan",
+                        "Naveen Nimilan"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SLSRARslfrslfrarsrSRSLSRSRSLSLslSRTTAR",
+                "id": 18,
+                "official": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Tristan Nel",
+                        "Zaiah Deards"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Goodbye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 19,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Goodbye",
+                        "Goodbye"
+                    ],
+                    "score": 0
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "srSLSLslsrslSLSLGLsrSLARslsrsrarSLsrSLSLsr",
+                "id": 20,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 9
+                },
+                "teamTwo": {
+                    "name": "Blaaergh",
+                    "players": [
+                        "Liam Cooper",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Eddie Smith",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "arSRSRsrslararSRsrflsrSRslararSLsr",
+                "id": 21,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "Bunbury Boys",
+                    "players": [
+                        "Lachlan Banks",
+                        "Eddie Smith"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Declan Holloway",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "SLsrSLARSLARGLARSLsrarSLARslslslSLAR",
+                "id": 22,
+                "official": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Iggy Squad",
+                    "players": [
+                        "Olivia Stronach",
+                        "Iggy Kreutz"
+                    ],
+                    "score": 6
+                }
+            },
+            {
+                "bestPlayer": "Goodbye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 23,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Goodbye",
+                        "Goodbye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Naveen Nimilan",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SRFLFLSRsrslslSLARARslSRslsrarsrFRSLARFLSRFLARSR",
+                "id": 24,
+                "official": "Brigitte Gredziuk",
+                "started": true,
+                "teamOne": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Dora Wan",
+                        "Naveen Nimilan"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Zaiah Deards",
+                        "Tristan Nel"
+                    ],
+                    "score": 9
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Eva Hajigabriel",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "SRSLslSRSRSLSLARARSRSLSL",
+                "id": 25,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Blaaergh",
+                    "players": [
+                        "Liam Cooper",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Iggy Squad",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Olivia Stronach"
+                    ],
+                    "score": 1
+                }
+            },
+            {
+                "bestPlayer": "Brigitte Gredziuk",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SLSRslsrarsrslSRARSRSRFRSRSRSRSLAR",
+                "id": 26,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Jared Healy",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRSLSRsrarSLsrarararSLsrsrSLSLsrSLARSL",
+                "id": 27,
+                "official": "Brigitte Gredziuk",
+                "started": true,
+                "teamOne": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Tristan Nel",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Bunbury Boys",
+                    "players": [
+                        "Lachlan Banks",
+                        "Eddie Smith"
+                    ],
+                    "score": 9
+                }
+            },
+            {
+                "bestPlayer": "Declan Holloway",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "slarslarflSRslarSRsrslflslsrsl",
+                "id": 28,
+                "official": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Goodbye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 29,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Naveen Nimilan",
+                        "Dora Wan"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Goodbye",
+                        "Goodbye"
+                    ],
+                    "score": 0
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Goodbye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 30,
+                "official": "None one",
+                "started": true,
+                "teamOne": {
+                    "name": "Iggy Squad",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Olivia Stronach"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Goodbye",
+                        "Goodbye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "SLsrSLSLsrsrsrsrsrSLSRsrSLsrSLsrflsrsl",
+                "id": 31,
+                "official": "Brigitte Gredziuk",
+                "started": true,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 7
+                },
+                "teamTwo": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Dora Wan",
+                        "Naveen Nimilan"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "SLARsrsrsrsrsrfrSLFRSRsrarglSRsrSRARsrsrSRsr",
+                "id": 32,
+                "official": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Zaiah Deards",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "arslslSLslfrslararfrSLSRslSLttslSRSLARGRsrsr",
+                "id": 33,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Blaaergh",
+                    "players": [
+                        "Liam Cooper",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 7
+                },
+                "teamTwo": {
+                    "name": "The Officials",
+                    "players": [
+                        "Jared Healy",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Declan Holloway",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "flarSLFLARslSRsrSLslSRSRylSLSLsrslGRsrsrSRARttslararsr",
+                "id": 34,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Bunbury Boys",
+                    "players": [
+                        "Lachlan Banks",
+                        "Eddie Smith"
+                    ],
+                    "score": 10
+                },
+                "teamTwo": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 12
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Liam Cooper",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARSRsrsrSLsrSLslflSLsrSRARsrSRslsrSLSLslslsrTTsl",
+                "id": 35,
+                "official": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Blaaergh",
+                    "players": [
+                        "Liam Cooper",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 10
+                },
+                "teamTwo": {
+                    "name": "Riders Of Berk",
+                    "players": [
+                        "Dora Wan",
+                        "Naveen Nimilan"
+                    ],
+                    "score": 12
+                }
+            },
+            {
+                "bestPlayer": "Declan Holloway",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRsrSLslfrSRslSLSLFRslSRSLSRttslSLslfrSRSR",
+                "id": 36,
+                "official": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "AC Lads",
+                    "players": [
+                        "Sean Robinson",
+                        "Declan Holloway"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Breaking Bad Bois",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk"
+                    ],
+                    "score": 6
+                }
+            },
+            {
+                "bestPlayer": "Goodbye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 37,
+                "official": "None one",
+                "started": false,
+                "teamOne": {
+                    "name": "Bunbury Boys",
+                    "players": [
+                        "Lachlan Banks",
+                        "Eddie Smith"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Goodbye",
+                        "Goodbye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Alex Soudure",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "SLSLslSRARARARARFRFRSRFLSRslslttarSLSR",
+                "id": 38,
+                "official": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "The Officials",
+                    "players": [
+                        "Alex Soudure",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "SLSLARslarSLARSLsrglSLslSLSLSRsrSL",
+                "id": 39,
+                "official": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Tourism New Zealand",
+                    "players": [
+                        "Tristan Nel",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Iggy Squad",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Olivia Stronach"
+                    ],
+                    "score": 5
+                }
+            }
+        ]
+    ]
+}

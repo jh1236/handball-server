@@ -1,23 +1,26 @@
 from test import *
 
-competition = comps["second_suss_championship"]
+competition = comps["fourth_suss_championship"]
 
 best_so_far = -1
 
+#
+# def check(competition):
+#     global best_so_far
+#     target_ladder = ["officials", "whipped", "satnavs", "seanitha", "idk", "barbenheimer", "tradies", "ikea_workers",
+#                      "sleeby"]
+#
+#     ladders = [i.nice_name() == j for i, j in zip(competition.ladder(), target_ladder)]
+#     print(f"{9 - sum(ladders)} teams were wrong (best {9 - best_so_far})")
+#     if sum(ladders) > best_so_far:
+#         competition.save("./config/tournaments/best.json")
+#         print("That was our best tournament so far, saving to best")
+#         best_so_far = sum(ladders)
+#     return all(ladders)
+
 
 def check(competition):
-    global best_so_far
-    target_ladder = ["officials", "whipped", "satnavs", "seanitha", "idk", "barbenheimer", "tradies", "ikea_workers",
-                     "sleeby"]
-
-    ladders = [i.nice_name() == j for i, j in zip(competition.ladder(), target_ladder)]
-    print(f"{9 - sum(ladders)} teams were wrong (best {9 - best_so_far})")
-    if sum(ladders) > best_so_far:
-        competition.save("./config/tournaments/best.json")
-        print("That was our best tournament so far, saving to best")
-        best_so_far = sum(ladders)
-    return all(ladders)
-
+    return competition.ladder()[0].nice_name() == "bedwars_besties"
 
 if __name__ == "__main__":
     random = Random()
