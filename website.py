@@ -68,21 +68,22 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         in_progress = any(
             [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         )
-        ladder = sorted(
-            comps[tournament].teams,
-            key=lambda a: (
-                -(a.games_won / (a.games_played or 1)),
-                -(a.get_stats()["Point Difference"]),
-            ),
-        )
+        ladder = comps[tournament].ladder()
         ongoing_games = [
             i for i in comps[tournament].games_to_list() if i.in_progress()
         ]
-        current_round = (
-            [game for r in comps[tournament].finals for game in r if not game.super_bye]
-            if comps[tournament].in_finals
-            else comps[tournament].fixtures[-1]
-        )
+        current_round = fixture_sorter(
+            [
+                [
+                    game
+                    for r in comps[tournament].finals
+                    for game in r
+                    if not game.super_bye
+                ]
+                if comps[tournament].in_finals
+                else comps[tournament].fixtures[-1]
+            ]
+        )[0]
         if (
             all([i.bye for i in current_round]) and len(comps[tournament].fixtures) > 1
         ):  # basically just for home and aways
@@ -287,7 +288,10 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             ):
                 continue
             if not all(
-                    [j.team.nice_name() in [k.nice_name() for k in game.teams] for j in i.teams]
+                [
+                    j.team.nice_name() in [k.nice_name() for k in game.teams]
+                    for j in i.teams
+                ]
             ):
                 continue
             if i == game:
@@ -356,13 +360,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 i.nice_name(),
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
-            for i in sorted(
-                comps[tournament].teams,
-                key=lambda a: (
-                    -(a.games_won / (a.games_played or 1)),
-                    -(a.get_stats()["Point Difference"]),
-                ),
-            )
+            for i in comps[tournament].ladder()
         ]
         headers = [
             (i, priority[i])

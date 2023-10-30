@@ -10,19 +10,20 @@ let setup = (newId, change_id) => {
 setTournament = t => tournament = t
 
 function main() {
-    setInterval(async () => {
-        fetch(`/api/games/change_code?id=${id}&tournament=${tournament.replace("/", "")}`, {
-            method: "GET"
-        }).then((res) => {
-            res.json().then(
-                o => {
-                    if (updateCount !== Number(o.code)) {
-                        document.location.reload()
-                    }
+    fetch(`/api/games/change_code?id=${id}&tournament=${tournament.replace("/", "")}`, {
+        method: "GET"
+    }).then((res) => {
+        res.json().then(
+            o => {
+                if (updateCount !== Number(o.code)) {
+                    document.location.reload()
                 }
-            )
-        });
-    }, 2000)
+            }
+        )
+    });
+    if (updateCount >= 0) {
+        setTimeout(main, 2000)
+    }
 }
 
 function swap() {

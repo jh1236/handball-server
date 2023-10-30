@@ -1,10 +1,11 @@
 import logging
+import threading
 from random import Random
 
 from api import comps, app
 from utils.logging_handler import logger
 
-competition = comps["third_suss_championship"]
+competition = comps["fourth_suss_championship"]
 
 logger.debug(competition.teams)
 
@@ -59,7 +60,9 @@ def card(game_id, color, first_team, first_player, time=3):
     if color == "green":
         competition.get_game(game_id).teams[not first_team].green_card(first_player)
     elif color == "yellow":
-        competition.get_game(game_id).teams[not first_team].yellow_card(first_player, time)
+        competition.get_game(game_id).teams[not first_team].yellow_card(
+            first_player, time
+        )
     elif color == "red":
         competition.get_game(game_id).teams[not first_team].red_card(first_player)
     else:
@@ -74,18 +77,22 @@ def fault(game_id, first_team):
 
 
 if __name__ == "__main__":
+    threading.Thread(target = lambda: app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)).start()
     random = Random()
     logger.setLevel(logging.CRITICAL)
 
     def r_bool():
         return bool(random.randint(0, 1))
 
-
     once = False
     winners = False
-    while not once or ("Official" not in competition.get_game(-1).winner().name and winners):
+    while not once or (
+        "Bedwars" not in competition.get_game(-1).winner().name and winners
+    ):
         once = True
-        print(f"Winner was {sorted(competition.teams, key=lambda a: -a.games_won)[0].name}, rejecting")
+        print(
+            f"Winner was {competition.get_game(-1).winner().name}, rejecting"
+        )
         competition.dump()
         game_id = 0
         game_count = 40
@@ -93,6 +100,10 @@ if __name__ == "__main__":
         while True:
             try:
                 game = competition.get_game(game_id)
+                if game.bye:
+                    game_id += 1
+                    competition.get_game(game_id).start(r_bool(), r_bool(), r_bool())
+                    continue
                 if competition.get_game(game_id).game_ended():
                     game.end(game.players()[0].name)
                     game_id += 1
@@ -112,7 +123,7 @@ if __name__ == "__main__":
                     timeout(game_id, t)
                     endTimeout(game_id, t)
                 else:
-                    choice = random.choice(["green", "yellow"] * 2 + ["red"])
+                    choice = random.choice(["green", "yellow"])
                     card(game_id, choice, r_bool(), r_bool())
             except ValueError:
                 print("Error")
@@ -122,6 +133,6 @@ if __name__ == "__main__":
         print(f"{i + 1}: {t.name} [{t.first_ratio()}] [{t.court_one}]")
     print("-" * 20)
     for t in competition.officials:
-        print(f": {t.name} [{t.games_court_one / t.games_umpired}]")
+        print(f": {t.name} [{t.games_umpired}] [{t.games_court_one / t.games_umpired}]")
     print("-" * 20)
-    app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)
+

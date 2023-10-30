@@ -150,6 +150,8 @@ class Player:
 
     def reset(self):
         self.faults = 0
+        self.wins = 0
+        self.played = 0
         self.double_faults = 0
         self.points_scored = 0
         self.aces_scored = 0

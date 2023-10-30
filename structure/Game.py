@@ -113,7 +113,8 @@ class Game:
                                                                       BYE.get_game_team(self)])[0:2]
             self.started = False
             self.best_player = self.teams[1].players[0]
-            if self.teams[1].team != BYE:
+            if self.teams[0].team != BYE:
+                self.update_count = -1
                 self.teams[0].score = 11
             else:
                 self.super_bye = True
@@ -122,7 +123,8 @@ class Game:
         self.round_number: int = 0
 
     def event(self):
-        self.update_count += 1
+        if not self.bye:
+            self.update_count += 1
 
     def court_display(self) -> str:
         if self.court > -1:
@@ -231,6 +233,7 @@ class Game:
                     self.best_player = i
                     i.best_player()
                     break
+            self.update_count = -1
             [i.end(self.is_final) for i in self.teams]
             self.primary_official.games_umpired += 1
             self.primary_official.rounds_umpired += self.rounds

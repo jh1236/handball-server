@@ -8,11 +8,11 @@
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/scoreboard.js') }}"></script>
-<script>main("{{tournament}}")</script>
 <script>
     setup({{game.id}}, {{ update_count }})
     setTournament("{{tournament}}")
 </script>
+<script>main("{{tournament}}")</script>
 {#<h1 style="font-size: 50px"><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ teams[0].name }}#}
 {#    vs {{ teams[1].name }}</a></h1>#}
 <table class="table">

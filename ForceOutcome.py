@@ -20,16 +20,16 @@ best_so_far = -1
 
 
 def check(competition):
+    print(f"Winner is {competition.ladder()[0]}")
     return competition.ladder()[0].nice_name() == "bedwars_besties"
+
 
 if __name__ == "__main__":
     random = Random()
     logger.setLevel(logging.CRITICAL)
 
-
     def r_bool():
         return bool(random.randint(0, 1))
-
 
     once = False
     winners = False
@@ -41,6 +41,11 @@ if __name__ == "__main__":
         competition.get_game(game_id).start(r_bool(), r_bool(), r_bool())
         while not competition.in_finals:
             game = competition.get_game(game_id)
+            if game.bye:
+                game_id += 1
+                competition.get_game(game_id).start(r_bool(), r_bool(), r_bool())
+                continue
+            print(game_id)
             if competition.get_game(game_id).game_ended():
                 game.end(game.players()[0].name)
                 game_id += 1
@@ -60,7 +65,7 @@ if __name__ == "__main__":
                 timeout(game_id, t)
                 endTimeout(game_id, t)
             else:
-                choice = random.choice(["green", "yellow"] * 2 + ["red"])
+                choice = random.choice(["green", "yellow"])
                 card(game_id, choice, r_bool(), r_bool())
     print("-" * 20)
     for i, t in enumerate(sorted(competition.teams, key=lambda a: -a.games_won)):

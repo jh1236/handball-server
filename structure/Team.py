@@ -25,10 +25,24 @@ class Team:
 
         self.listed_first: int = 0
         self.court_one: int = 0
-        self.has_photo = os.path.isfile(f"./resources/images/teams/{self.nice_name()}.png")
+        self.has_photo = os.path.isfile(
+            f"./resources/images/teams/{self.nice_name()}.png"
+        )
 
     def get_game_team(self, game):
         return GameTeam(self, game)
+
+    @property
+    def percentage(self):
+        return self.games_won / (self.games_played or 1)
+
+    @property
+    def cards(self):
+        return self.red_cards + self.green_cards + self.yellow_cards
+
+    @property
+    def point_difference(self):
+        return self.points_for - self.points_against
 
     def has_played(self, other):
         return other in self.teams_played
@@ -40,7 +54,11 @@ class Team:
     def teams_played(self) -> list:
         if not self.tournament:
             return []
-        my_games = [i for i in self.tournament.games_to_list() if self in [j.team for j in i.teams] and i.best_player]
+        my_games = [
+            i
+            for i in self.tournament.games_to_list()
+            if self in [j.team for j in i.teams] and i.best_player
+        ]
         return [next(j.team for j in i.teams if j.team != self) for i in my_games]
 
     def reset(self):
@@ -66,7 +84,9 @@ class Team:
                 game_teams.append(i.teams[team_names.index(self.name)])
 
         points_for = self.points_for + sum([i.score for i in game_teams])
-        points_against = self.points_against + sum([i.opponent.score for i in game_teams])
+        points_against = self.points_against + sum(
+            [i.opponent.score for i in game_teams]
+        )
         dif = points_for - points_against
         green_cards = self.green_cards + sum([i.green_cards for i in game_teams])
         yellow_cards = self.yellow_cards + sum([i.yellow_cards for i in game_teams])
@@ -79,7 +99,9 @@ class Team:
             "Games Played": games_played,
             "Games Won": self.games_won,
             "Games Lost": self.games_played - self.games_won,
-            "Percentage": f"{100 * self.games_won / (self.games_played): .1f}%" if self.games_played > 0 else "-",
+            "Percentage": f"{100 * self.percentage: .1f}%"
+            if self.games_played > 0
+            else "-",
             "Green Cards": green_cards,
             "Yellow Cards": yellow_cards,
             "Red Cards": red_cards,
@@ -132,7 +154,9 @@ class GameTeam:
         self.opponent: GameTeam | None = None
         self.team: Team = team
         self.name: str = self.team.name
-        self.players: list[GamePlayer] = [i.game_player(game, 1 - c) for c, i in enumerate(team.players)]
+        self.players: list[GamePlayer] = [
+            i.game_player(game, 1 - c) for c, i in enumerate(team.players)
+        ]
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
@@ -168,7 +192,9 @@ class GameTeam:
         self.yellow_cards = 0
         self.red_cards = 0
         self.faults = 0
-        self.players = [i.game_player(self.game, 1 - c) for c, i in enumerate(self.team.players)]
+        self.players = [
+            i.game_player(self.game, 1 - c) for c, i in enumerate(self.team.players)
+        ]
         if self.swapped:
             self.players.reverse()
         # [i.reset() for i in self.players]
@@ -192,17 +218,21 @@ class GameTeam:
     def score_point(self, first_player: bool | None = None, ace: bool = False):
         if ace:
             self.info(
-                f"Ace Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}")
+                f"Ace Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}"
+            )
             if first_player is None:
                 self.server().score_point(True)
             else:
                 self.players[not first_player].score_point(True)
         elif first_player is not None:
             self.info(
-                f"Point Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}")
+                f"Point Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}"
+            )
             self.players[not first_player].score_point(False)
         else:
-            self.info(f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string()}")
+            self.info(
+                f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string()}"
+            )
         self.score += 1
         self.game.next_point(first_player is None and not ace)
         self.opponent.lost_point()
@@ -227,9 +257,13 @@ class GameTeam:
         return [i for i in self.players if not i.captain][0]
 
     def fault(self):
-        self.info(f"Fault by {self.players[not self.first_player_serves].nice_name()} from team {self.nice_name()}")
+        self.info(
+            f"Fault by {self.players[not self.first_player_serves].nice_name()} from team {self.nice_name()}"
+        )
         self.server().fault()
-        self.game.add_to_game_string("f" + ("l" if self.first_player_serves else "r"), self)
+        self.game.add_to_game_string(
+            "f" + ("l" if self.first_player_serves else "r"), self
+        )
         self.faults += 1
         if self.faulted:
             self.server().double_fault()
@@ -238,25 +272,33 @@ class GameTeam:
             self.faulted = True
 
     def green_card(self, first_player: bool):
-        self.info(f"Green Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}")
+        self.info(
+            f"Green Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
+        )
         self.green_carded = True
         self.green_cards += 1
         self.players[not first_player].green_card()
         self.game.add_to_game_string("g" + ("l" if first_player else "r"), self)
 
     def yellow_card(self, first_player: bool, time: int = 3):
-        self.info(f"Yellow Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}")
+        self.info(
+            f"Yellow Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
+        )
         self.yellow_cards += 1
         self.players[not first_player].yellow_card(time)
         if time == 3:
             self.game.add_to_game_string("y" + ("l" if first_player else "r"), self)
         else:
-            self.game.add_to_game_string(f"{time % 10}{'l' if first_player else 'r'}", self)
+            self.game.add_to_game_string(
+                f"{time % 10}{'l' if first_player else 'r'}", self
+            )
         while all([i.is_carded() for i in self.players]) and not self.game.game_ended():
             self.opponent.score_point()
 
     def red_card(self, first_player: bool):
-        self.info(f"Red Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}")
+        self.info(
+            f"Red Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
+        )
         self.red_cards += 1
         self.players[not first_player].red_card()
         self.game.add_to_game_string(f"v{'l' if first_player else 'r'}", self)
@@ -275,9 +317,14 @@ class GameTeam:
         self.game.event()
 
     def card_time(self):
-        if 0 > min(self.players, key=lambda a: a.card_time_remaining).card_time_remaining:
+        if (
+            0
+            > min(self.players, key=lambda a: a.card_time_remaining).card_time_remaining
+        ):
             return -1
-        return max(self.players, key=lambda a: a.card_time_remaining).card_time_remaining
+        return max(
+            self.players, key=lambda a: a.card_time_remaining
+        ).card_time_remaining
 
     def card_duration(self):
         return max(self.players, key=lambda a: a.card_time_remaining).card_duration
@@ -294,7 +341,7 @@ class GameTeam:
             self.team.yellow_cards += self.yellow_cards
             self.team.red_cards += self.red_cards
             self.team.faults += self.faults
-            self.team.timeouts += (1 - self.timeouts)
+            self.team.timeouts += 1 - self.timeouts
             self.game.primary_official.green_cards += self.green_cards
             self.game.primary_official.yellow_cards += self.yellow_cards
             self.game.primary_official.red_cards += self.red_cards
@@ -302,7 +349,11 @@ class GameTeam:
 
         # either elo is not set, or it is positive, and we lost or negative, and we won
         # meaning that the result of the game was changed
-        if not self.elo_delta or (self.elo_delta > 0 and not won) or (self.elo_delta < 0 and won):
+        if (
+            not self.elo_delta
+            or (self.elo_delta > 0 and not won)
+            or (self.elo_delta < 0 and won)
+        ):
             self.elo_delta = calc_elo(self.team, self.opponent.team, won)
             self.opponent.elo_delta = calc_elo(self.opponent.team, self.team, not won)
         self.team.elo += self.elo_delta
@@ -318,7 +369,7 @@ class GameTeam:
         self.team.yellow_cards -= self.yellow_cards
         self.team.red_cards -= self.red_cards
         self.team.faults -= self.faults
-        self.team.timeouts -= (1 - self.timeouts)
+        self.team.timeouts -= 1 - self.timeouts
         self.game.primary_official.green_cards -= self.green_cards
         self.game.primary_official.yellow_cards -= self.yellow_cards
         self.game.primary_official.red_cards -= self.red_cards
@@ -332,7 +383,7 @@ class GameTeam:
             "Green Cards": self.green_cards,
             "Yellow Cards": self.yellow_cards,
             "Red Cards": self.red_cards,
-            "Timeouts Remaining": self.timeouts
+            "Timeouts Remaining": self.timeouts,
         }
         if include_players:
             d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]

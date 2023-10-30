@@ -10,7 +10,7 @@ class OneRound(FixtureMaker):
     def __init__(self, tournament):
         self.dummy_game = Game(BYE, BYE, tournament)
         self.dummy_game.best_player = None
-        self.dummy_game.update_count = -1
+        self.dummy_game.update_count = 999
         self.list = [self.dummy_game]
         self.next_list = [self.dummy_game]
         super().__init__(tournament)

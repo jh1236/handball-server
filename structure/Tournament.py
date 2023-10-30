@@ -19,7 +19,7 @@ class Tournament:
         else:
             self.filename = False
         self.in_finals: bool = False
-        self.teams = []
+        self.teams: list[Team] = []
         self.fixtures: list[list[Game]] = []
         self.finals: list[list[Game]] = []
         self.fixtures_class = None
@@ -41,16 +41,26 @@ class Tournament:
         return self.name.lower().replace(" ", "_").replace("the_", "")
 
     def games_to_list(self) -> list[Game]:
-        return [game for r in self.fixtures for game in r] + [game for r in self.finals for game in r]
+        return [game for r in self.fixtures for game in r] + [
+            game for r in self.finals for game in r
+        ]
 
     def ladder(self):
-        return sorted(self.teams, key=lambda a: (
-            -(a.games_won / (a.games_played or 1)),
-            a.points_for - a.points_against,
-        ))
+        return sorted(
+            self.teams,
+            key=lambda a: (
+                -a.percentage,
+                -a.point_difference,
+                -a.points_for,
+                a.cards,
+                a.faults,
+                a.timeouts,
+            ),
+        )
 
     def add_team(self, team):
-        if team == BYE: return
+        if team == BYE:
+            return
         self.teams.append(team)
         team.tournament = self
         for i in team.players:
@@ -58,11 +68,17 @@ class Tournament:
         self.teams.sort(key=lambda a: a.nice_name())
 
     def no_games_to_play(self):
-        return any([not i.bye for i in self.fixtures[-1]]) and all([i.best_player for i in self.fixtures[-1]])
+        return any([not i.bye for i in self.fixtures[-1]]) and all(
+            [i.best_player for i in self.fixtures[-1]]
+        )
 
     def update_games(self, generator_value=None):
         if not self.in_finals:
-            while (not self.fixtures or self.no_games_to_play() or generator_value is not None) and not self.in_finals:
+            while (
+                not self.fixtures
+                or self.no_games_to_play()
+                or generator_value is not None
+            ) and not self.in_finals:
                 try:
                     n = self.fixtures_gen.send(generator_value)
                     if n is not None:
@@ -76,7 +92,10 @@ class Tournament:
                         self.finals.append(n)
                 generator_value = None
         else:
-            if all([i.best_player for i in self.finals[-1]]) or generator_value is not None:
+            if (
+                all([i.best_player for i in self.finals[-1]])
+                or generator_value is not None
+            ):
                 try:
                     logger.info("Next round of finals")
                     n = next(self.finals_gen)
@@ -86,20 +105,20 @@ class Tournament:
                 except StopIteration:
                     logger.info("Last Game has been added")
                 generator_value = None
+        for i, g in enumerate(self.games_to_list()):
+            g.id = i
         self.appoint_umpires()
         self.assign_rounds()
-        self.assign_ids()
         self.assign_courts()
 
     def get_game(self, game_id: int) -> Game:
         self.update_games()
         if game_id >= len(self.games_to_list()):
             raise ValueError(f"Game index {game_id} out of bounds.")
-        return self.games_to_list()[game_id]
+        if game_id < 0:
+            return self.games_to_list()[game_id]
+        return next(i for i in self.games_to_list() if i.id == game_id)
 
-    def assign_ids(self):
-        for i, g in enumerate(self.games_to_list()):
-            g.id = i
 
     def appoint_umpires(self):
         for r in self.fixtures:
@@ -109,11 +128,21 @@ class Tournament:
                 times_run = 0
                 while times_run < 2 and c1:
                     if c1.primary_official == NoOfficial:
-                        teams = [i.team for i in c1.teams] + ([i.team for i in c2.teams] if c2 else [])
-                        for p in sorted(self.officials,
-                                        key=lambda it: (it.games_officiated, 1 - 2 * times_run * it.games_court_one)):
-                            if any([i in teams for i in p.team]): continue
-                            if c2 and c2.primary_official == p: continue
+                        teams = [i.team for i in c1.teams] + (
+                            [i.team for i in c2.teams] if c2 else []
+                        )
+                        officials = sorted(
+                            self.officials,
+                            key=lambda it: (
+                                it.games_officiated,
+                                1 - 2 * times_run * it.games_court_one,
+                            ),
+                        )
+                        for p in officials:
+                            if any([i in teams for i in p.team]):
+                                continue
+                            if c2 and c2.primary_official == p:
+                                continue
                             c1.set_primary_official(p)
                             break
                     c1, c2 = c2, c1
@@ -122,10 +151,17 @@ class Tournament:
             teams = [gt.team for g in r for gt in g.teams]
             for g in r:
                 if g.primary_official == NoOfficial:
-                    for p in sorted(self.officials,
-                                    key=lambda it: (it.games_officiated, 1 - 2 * times_run * it.games_court_one)):
-                        if any([i in teams for i in p.team]): continue
-                        if not p.finals: continue
+                    for p in sorted(
+                        self.officials,
+                        key=lambda it: (
+                            it.games_officiated,
+                            1 - 2 * times_run * it.games_court_one,
+                        ),
+                    ):
+                        if any([i in teams for i in p.team]):
+                            continue
+                        if not p.finals:
+                            continue
                         g.set_primary_official(p)
                         break
 
@@ -142,8 +178,9 @@ class Tournament:
             if r[0].court != -1:
                 continue
             # court_one_games = sorted(r, key=lambda a: sum([i.team.court_one for i in a.teams]))
-            court_one_games = sorted(r, key=lambda a: -sum(
-                [i.team.games_won for i in a.teams]))  # use for preferential treatment of wins
+            court_one_games = sorted(
+                r, key=lambda a: -sum([i.team.games_won for i in a.teams])
+            )  # use for preferential treatment of wins
             court_one_games = [i for i in court_one_games if not i.bye]
             halfway = False
             for i, g in enumerate(court_one_games):
@@ -176,8 +213,10 @@ class Tournament:
             return
         logger.info("Saving...")
         d: dict[str, Any] = {
-            "games": [[j.as_map() for j in i if not j.super_bye] for i in self.fixtures],
-            "finals": [[j.as_map() for j in i] for i in self.finals]
+            "games": [
+                [j.as_map() for j in i if not j.super_bye] for i in self.fixtures
+            ],
+            "finals": [[j.as_map() for j in i] for i in self.finals],
         }
         if self.ref:
             d["details"] = {"ref": self.ref}
@@ -188,7 +227,7 @@ class Tournament:
                 "name": self.name,
                 "teams": [i.name for i in self.teams],
                 "officials": [i.name for i in self.officials],
-                "twoCourts": self.two_courts
+                "twoCourts": self.two_courts,
             }
         with open(location, "w+") as fp:
             json.dump(d, fp, indent=4, sort_keys=True)
@@ -222,7 +261,6 @@ class Tournament:
                 self.update_games()
                 g = Game.from_map(m, self, True)
                 self.finals[i][j] = g
-        self.assign_ids()
         self.assign_rounds()
         self.assign_courts()
         self.appoint_umpires()
@@ -236,20 +274,27 @@ class Tournament:
             self.details = json.load(fp)["details"]
 
         if "ref" in self.details:
-            self.ref = self.details['ref']
+            self.ref = self.details["ref"]
             with open(f"./config/templates/{self.ref}.json", "r+") as fp:
                 self.details = json.load(fp)
         with open("./config/teams.json", "r+") as fp:
             teams = json.load(fp)
 
             if self.details["teams"] == "all":
-                self.teams = [Team.find_or_create(self, k, [Player(j).set_tournament(self) for c, j in enumerate(v)])
-                              for k, v in
-                              teams.items()]
+                self.teams = [
+                    Team.find_or_create(
+                        self,
+                        k,
+                        [Player(j).set_tournament(self) for c, j in enumerate(v)],
+                    )
+                    for k, v in teams.items()
+                ]
             else:
                 self.teams = []
                 for i in self.details["teams"]:
-                    players = [Player(j).set_tournament(self) for c, j in enumerate(teams[i])]
+                    players = [
+                        Player(j).set_tournament(self) for c, j in enumerate(teams[i])
+                    ]
                     self.teams.append(Team.find_or_create(self, i, players))
         self.teams.sort(key=lambda a: a.nice_name())
         self.two_courts = self.details["twoCourts"]
@@ -259,7 +304,9 @@ class Tournament:
             i.tournament = self
             for j in i.players:
                 j.tournament = self
-        self.fixtures_class = get_type_from_name(self.details["fixtures_generator"])(self)
+        self.fixtures_class = get_type_from_name(self.details["fixtures_generator"])(
+            self
+        )
         self.finals_class = get_type_from_name(self.details["finals_generator"])(self)
         self.name = self.details["name"]
 
