@@ -54,29 +54,35 @@ class Tournament:
             i.tournament = self
         self.teams.sort(key=lambda a: a.nice_name())
 
-    def update_games(self):
+    def no_games_to_play(self):
+        return any([not i.bye for i in self.fixtures[-1]]) and all([i.best_player for i in self.fixtures[-1]])
+
+    def update_games(self, generator_value=None):
         if not self.in_finals:
-            if not self.fixtures or all([i.best_player for i in self.fixtures[-1]]):
+            while not self.fixtures or self.no_games_to_play() or generator_value is not None:
                 try:
-                    n = next(self.fixtures_gen)
+                    n = self.fixtures_gen.send(generator_value)
                     if n is not None:
                         self.fixtures.append(n)
-                except StopIteration as e:  # this has to be broad because of lachies code >:(
+                except StopIteration as e:
                     logger.info(e.args)
                     logger.info("Entering Finals!")
                     self.in_finals = True
-                    n = next(self.finals_gen)
+                    n = self.finals_gen.send(generator_value)
                     if n is not None:
                         self.finals.append(n)
-        elif all([i.best_player for i in self.finals[-1]]):
-            try:
-                logger.info("Next round of finals")
-                n = next(self.finals_gen)
-                if n is not None:
-                    self.finals.append(n)
-                logger.info(self.finals[-1])
-            except StopIteration:
-                logger.info("Last Game has been added")
+                generator_value = None
+        else:
+            while all([i.best_player for i in self.finals[-1]]) or generator_value is not None:
+                try:
+                    logger.info("Next round of finals")
+                    n = self.finals_gen.send(generator_value)
+                    if n is not None:
+                        self.finals.append(n)
+                    logger.info(self.finals[-1])
+                except StopIteration:
+                    logger.info("Last Game has been added")
+                generator_value = None
         self.appoint_umpires()
         self.assign_rounds()
         self.assign_ids()
@@ -204,13 +210,14 @@ class Tournament:
         self.update_games()
         for i, r in enumerate(data.get("games", [])):
             for j, m in enumerate(r):
-                g = Game.from_map(m, self)
                 self.update_games()
+                g = Game.from_map(m, self)
                 self.fixtures[i][j] = g
+            self.update_games(True)
         for i, r in enumerate(data.get("finals", [])):
             for j, m in enumerate(r):
-                g = Game.from_map(m, self, True)
                 self.update_games()
+                g = Game.from_map(m, self, True)
                 self.finals[i][j] = g
         self.assign_ids()
         self.assign_rounds()

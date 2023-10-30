@@ -13,7 +13,6 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 comps = load_all_tournaments()
 
-
 with open("./config/password.txt", "r") as fp:
     admin_password = fp.read()
 
@@ -228,6 +227,15 @@ def start():
     return "", 204
 
 
+@app.post("/api/games/update/round")
+def new_round():
+    tournament = comps[request.json["tournament"]]
+    tournament.update_games(True)
+    tournament.update_games()
+    tournament.save()
+    return "", 200
+
+
 @app.post("/api/games/update/create")
 def create():
     tournament = comps[request.json["tournament"]]
@@ -271,7 +279,7 @@ def create():
     g.court = 0
     if official:
         g.set_primary_official(official)
-    tournament.fixtures[-1][0] = g
+    tournament.fixtures[-1][-1] = g
     tournament.update_games()
     tournament.save()
     return "", 204
@@ -343,7 +351,7 @@ def card():
     if time < 3:
         time += 10
     if color == "green":
-        comps[tournament].get_game(game_id,).teams[
+        comps[tournament].get_game(game_id, ).teams[
             not first_team
         ].green_card(first_player)
     elif color == "yellow":

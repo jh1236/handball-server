@@ -75,12 +75,12 @@ class Game:
         return game
 
     def __init__(
-        self,
-        team_one,
-        team_two,
-        tournament,
-        final: bool = False,
-        attempt_rebalance: bool = True,
+            self,
+            team_one,
+            team_two,
+            tournament,
+            final: bool = False,
+            attempt_rebalance: bool = True,
     ):
         self.update_count: int = 0
         self.tournament = tournament
@@ -98,9 +98,9 @@ class Game:
         self.is_final = final
         self.bye = False
         if (
-            attempt_rebalance
-            and not final
-            and self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio()
+                attempt_rebalance
+                and not final
+                and self.teams[0].team.first_ratio() > self.teams[1].team.first_ratio()
         ):
             self.teams.reverse()
         if team_one not in tournament.teams:
@@ -109,13 +109,11 @@ class Game:
             self.tournament.add_team(team_two)
         if BYE in [i.team for i in self.teams]:
             self.bye = True
-            self.teams = (
-                [i for i in self.teams if i.team != BYE]
-                + [BYE.get_game_team(self), BYE.get_game_team(self)]
-            )[0:2]
-            if self.teams[1] != BYE:
-                self.started = False
-                self.best_player = self.teams[1].players[0]
+            self.teams = ([i for i in self.teams if i.team != BYE] + [BYE.get_game_team(self),
+                                                                      BYE.get_game_team(self)])[0:2]
+            self.started = False
+            self.best_player = self.teams[1].players[0]
+            if self.teams[1].team != BYE:
                 self.teams[0].score = 11
             else:
                 self.super_bye = True
@@ -253,8 +251,8 @@ class Game:
         if self.bye:
             return True
         return (
-            max([i.score for i in self.teams]) >= 11
-            and abs(self.teams[0].score - self.teams[1].score) >= 2
+                max([i.score for i in self.teams]) >= 11
+                and abs(self.teams[0].score - self.teams[1].score) >= 2
         )
 
     def match_points(self):
@@ -329,9 +327,9 @@ class Game:
                     "red": self.teams[0].captain().card_time_remaining < 0,
                     "serving": self.teams[0].captain().serving(),
                     "fault": self.teams[0].captain().serving()
-                    and self.teams[0].faulted,
+                             and self.teams[0].faulted,
                     "cardPercent": self.teams[0].captain().card_time_remaining
-                    / (self.teams[0].captain().card_duration or 1),
+                                   / (self.teams[0].captain().card_duration or 1),
                 },
                 "notCaptain": {
                     "name": self.teams[0].not_captain().name,
@@ -341,9 +339,9 @@ class Game:
                     "red": self.teams[0].not_captain().card_time_remaining < 0,
                     "serving": self.teams[0].not_captain().serving(),
                     "fault": self.teams[0].not_captain().serving()
-                    and self.teams[0].faulted,
+                             and self.teams[0].faulted,
                     "cardPercent": self.teams[0].not_captain().card_time_remaining
-                    / (self.teams[0].not_captain().card_duration or 1),
+                                   / (self.teams[0].not_captain().card_duration or 1),
                 },
             },
             "rightTeam": {
@@ -361,9 +359,9 @@ class Game:
                     "red": self.teams[1].captain().card_time_remaining < 0,
                     "serving": self.teams[1].captain().serving(),
                     "fault": self.teams[1].captain().serving()
-                    and self.teams[1].faulted,
+                             and self.teams[1].faulted,
                     "cardPercent": self.teams[1].captain().card_time_remaining
-                    / (self.teams[1].captain().card_duration or 1),
+                                   / (self.teams[1].captain().card_duration or 1),
                 },
                 "notCaptain": {
                     "name": self.teams[1].not_captain().name,
@@ -373,9 +371,9 @@ class Game:
                     "red": self.teams[1].not_captain().card_time_remaining < 0,
                     "serving": self.teams[1].not_captain().serving(),
                     "fault": self.teams[1].not_captain().serving()
-                    and self.teams[1].faulted,
+                             and self.teams[1].faulted,
                     "cardPercent": self.teams[1].not_captain().card_time_remaining
-                    / (self.teams[1].not_captain().card_duration or 1),
+                                   / (self.teams[1].not_captain().card_duration or 1),
                 },
             },
             "rounds": self.rounds,

@@ -1,5 +1,3 @@
-import logging
-
 from test import *
 
 competition = comps["second_suss_championship"]

@@ -79,7 +79,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             i for i in comps[tournament].games_to_list() if i.in_progress()
         ]
         current_round = (
-            [game for r in comps[tournament].finals for game in r]
+            [game for r in comps[tournament].finals for game in r if not game.super_bye]
             if comps[tournament].in_finals
             else comps[tournament].fixtures[-1]
         )
