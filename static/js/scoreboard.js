@@ -24,3 +24,11 @@ function main() {
         });
     }, 2000)
 }
+
+function swap() {
+    if (document.location.href.includes("swap")) {
+        document.location.href = window.location.href.replace("swap=true", "").replaceAll("?", "")
+    } else {
+        document.location.href = window.location.href + "?swap=true"
+    }
+}

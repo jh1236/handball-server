@@ -32,32 +32,15 @@ a.hide {
 }
 
 .table tr td:first-child {
-    width: 120px;
+    width: 400px;
 }
 
 .table tr td:nth-child(2) {
-    width: 30px;
-    text-align: left;
+    width: 200px;
 }
 
 .table tr td:nth-child(3) {
-    width: 120px;
-}
-
-.table tr td:nth-child(4) {
-    width: 120px;
-}
-
-.table tr td:nth-child(5) {
-    width: 80px;
-}
-
-.table tr td:nth-child(6) {
-    width: 80px;
-}
-
-.table tr td:nth-child(7) {
-    width: 120px;
+    width: 400px;
 }
 
 img.logo {
@@ -135,13 +118,17 @@ img.title_logo {
 }
 
 img.team_logo {
-    width: 200px;
-    height: 200px;
+    width: 250px;
+    height: 250px;
     left: 50%;
     top: 5%
 }
 
 h1.big {
-    font-size: 2000%;
+    font-size: 2500%;
     margin: 0;
+}
+
+.rectangle {
+    height: 20px;
 }

@@ -5,7 +5,7 @@ class Player:
     def __init__(self, name: str):
         self._team = None
         self.tournament = None
-        self.name:str = name
+        self.name: str = name
         self.faults: int = 0
         self.double_faults: int = 0
         self.points_scored: int = 0
@@ -40,7 +40,7 @@ class Player:
             return "#FCCE6E"
         elif self.green_cards > 0:
             return "#84AA63"
-        return "??"
+        return "#FFFFFF"
 
     @property
     def team(self):
@@ -192,6 +192,15 @@ class GamePlayer:
         self.green_carded: bool = False
         self.best: bool = False
 
+    def biggest_card_hex(self):
+        if self.red_cards > 0:
+            return "#EC4A4A"
+        elif self.yellow_cards > 0:
+            return "#FCCE6E"
+        elif self.green_cards > 0:
+            return "#84AA63"
+        return "#FFFFFF"
+
     def score_point(self, ace: bool):
         if ace:
             self.aces_scored += 1
@@ -308,7 +317,4 @@ class GamePlayer:
         return self.name
 
     def serving(self):
-        return (
-            bool(self.game.server())
-            and self.game.server().nice_name() == self.nice_name()
-        )
+        return self.game.server() and self.game.server().nice_name() == self.nice_name()

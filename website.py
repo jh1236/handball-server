@@ -227,8 +227,12 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 400,
             )
+
         game = comps[tournament].get_game(int(game_id))
+        visual_swap = request.args.get("swap", "false") == "true"
         teams = game.teams
+        if visual_swap:
+            teams = list(reversed(teams))
         players = game.players()
         round_number = game.round_number + 1
         if not game.started:
