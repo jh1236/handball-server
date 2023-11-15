@@ -21,5 +21,6 @@
     "The Officials",
     "Riders Of Berk"
   ],
-  "twoCourts": true
+  "twoCourts": true,
+  "scorer": false
 }

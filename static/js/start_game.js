@@ -42,18 +42,18 @@ let setOfficial = (i, s) => {
     document.getElementById("umpire").textContent = "Official: " + s
 }
 
-let lookup = ["One", "Two"]
+let lookup = ["Player One", "Player Two", "Substitute"]
 
 let teamListOne = ["", ""]
 let teamListTwo = ["", ""]
 let setTeamListOne = (d, s, i) => {
     teamListOne[i] = d
-    document.getElementById("teamOne" + i).textContent = `Player ${lookup[i]}: ${s}`
+    document.getElementById("teamOne" + i).textContent = `${lookup[i]}: ${s}`
 }
 
 let setTeamListTwo = (d, s, i) => {
     teamListTwo[i] = d
-    document.getElementById("teamTwo" + i).textContent = `Player ${lookup[i]}: ${s}`
+    document.getElementById("teamTwo" + i).textContent = `${lookup[i]}: ${s}`
 }
 let left = false
 let right = false

@@ -4,5 +4,6 @@
   "name": "The SUSS Practice Games",
   "officials": "all",
   "teams": "all",
-  "twoCourts": false
+  "twoCourts": false,
+  "scorer": false
 }

@@ -1,6 +1,10 @@
 import math
 from typing import TypeVar, Any
 
+from urllib.request import urlopen, Request
+from bs4 import BeautifulSoup
+import re
+
 T = TypeVar("T")
 
 
@@ -47,3 +51,14 @@ def fixture_sorter(fixtures: list[list[Any]]) -> list[list[Any]]:
             court = not court
         output.append(new_round)
     return output
+
+
+
+def google_image(word):
+    url = "https://www.google.com/search?tbm=isch&q=" + word.replace(" ", "_")
+    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+    req = Request(url, headers=headers)
+    page = urlopen(req)
+    bs = BeautifulSoup(page, 'html.parser')
+    images = bs.find_all('img', {'src':re.compile('.*gstatic.com.*')})
+    return images[0]['src']

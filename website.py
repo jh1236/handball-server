@@ -1,4 +1,5 @@
 import random
+import time
 
 from flask import render_template, send_file, request, Response
 
@@ -165,10 +166,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
 
     @app.get("/<tournament>/teams/")
     def stats_directory_site(tournament):
-        teams = [
-            (i.name, i.nice_name())
-            for i in sorted(comps[tournament].teams, key=lambda a: a.nice_name())
-        ]
+        teams = sorted(comps[tournament].teams, key=lambda a: a.nice_name())
         return (
             render_template(
                 "tournament_specific/stats.html",
@@ -208,12 +206,11 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             render_template(
                 "tournament_specific/each_team_stats.html",
                 stats=[(k, v) for k, v in team.get_stats().items()],
-                teamName=team.name,
-                players=players,
-                teamNameClean=team.nice_name(),
+                team=team,
                 recent_games=recent_games,
                 upcoming_games=upcoming_games,
                 tournament=f"{tournament}/",
+                players=players
             ),
             200,
         )
@@ -257,6 +254,8 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 roundNumber=round_number,
                 update_count=game.update_count,
                 tournament=f"{tournament}/",
+                timeout_time=max([i.time_out_time + 30 for i in game.teams]) * 1000,
+                serve_time=(game.serve_clock + 10) * 1000,
             ),
             200,
         )
@@ -358,16 +357,26 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             (
                 i.name,
                 i.nice_name(),
-                [(v, priority[k]) for k, v in i.get_stats().items()],
+                i.image(),
+                [(v, priority[k]) for k, v in i.get_stats().items()]
             )
             for i in comps[tournament].ladder()
+            if i.games_played > 0 or len(comps[tournament].teams) < 15
         ]
+        teams_two = []
+        for i in teams:
+            if len(i[0]) > 30:
+                teams_two.append((i[0][:27] + "...", *i[1:]))
+            else:
+                teams_two.append(i)
+        teams = teams_two
         headers = [
             (i, priority[i])
             for i in (
                 ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
             )
         ]
+        print([i for i in teams if len(i) == 3])
         return (
             render_template(
                 "tournament_specific/ladder.html",
@@ -404,6 +413,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in comps[tournament].players()
+            if i.played
         ]
         headers = ["Name"] + [
             i for i in comps[tournament].teams[0].players[0].get_stats()
@@ -442,6 +452,11 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 )
             else:
                 upcoming_games.append((repr(i), i.id, i.tournament.nice_name()))
+        while len(recent_games) + len(upcoming_games) > 20:
+            if len(recent_games) > 10:
+                recent_games.pop(0)
+            else:
+                upcoming_games.pop(0)
         return (
             render_template(
                 "tournament_specific/player_stats.html",
@@ -515,8 +530,8 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             teams = list(reversed(teams))
         key = request.args.get("key", None)
         players = [i for i in game.players()]
-        team_one_players = [((1 - i), v) for i, v in enumerate(teams[0].players)]
-        team_two_players = [((1 - i), v) for i, v in enumerate(teams[1].players)]
+        team_one_players = [((1 - i), v) for i, v in enumerate(teams[0].players[:2])]
+        team_two_players = [((1 - i), v) for i, v in enumerate(teams[1].players[:2])]
         if key is None:
             return (
                 render_template(
@@ -546,8 +561,9 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 200,
             )
         elif not game.game_ended():
-            for i in teams:
-                i.end_timeout()
+            # for i in teams:
+            #     i.end_timeout()
+            timeout_team = max(game.teams, key=lambda a: a.time_out_time)
             return (
                 render_template(
                     "tournament_specific/game_editor/edit_game.html",
@@ -557,6 +573,9 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                     swap=visual_str,
                     teams=teams,
                     game=game,
+                    timeout_time=30000
+                    + max(i.time_out_time for i in game.teams) * 1000,
+                    timeout_first=1 - game.teams.index(timeout_team),
                     tournament=f"{tournament}/",
                 ),
                 200,
@@ -699,8 +718,9 @@ def universal_tournament(app, comps: dict[str, Tournament]):
     @app.get("/teams/")
     def universal_stats_directory_site():
         teams = [
-            (i.name, i.nice_name())
+            i
             for i in sorted(get_all_teams(comps), key=lambda a: a.nice_name())
+            if i.games_played > 0
         ]
         return (
             render_template(
@@ -743,9 +763,8 @@ def universal_tournament(app, comps: dict[str, Tournament]):
             render_template(
                 "tournament_specific/each_team_stats.html",
                 stats=[(k, v) for k, v in team.get_stats().items()],
-                teamName=team.name,
                 players=players,
-                teamNameClean=team.nice_name(),
+                team=team,
                 recent_games=recent_games,
                 upcoming_games=upcoming_games,
                 tournament="",
@@ -775,13 +794,22 @@ def universal_tournament(app, comps: dict[str, Tournament]):
             (
                 i.name,
                 i.nice_name(),
+                i.image(),
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in sorted(
                 get_all_teams(comps),
                 key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])),
             )
+            if i.games_played > 0
         ]
+        teams_two = []
+        for i in teams:
+            if len(i[0]) > 30:
+                teams_two.append((i[0][:27] + "...", i[1], i[2]))
+            else:
+                teams_two.append(i)
+        teams = teams_two
         headers = [
             (i, priority[i])
             for i in (["Team Names"] + [i for i in get_all_teams(comps)[0].get_stats()])
@@ -856,6 +884,11 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 )
             else:
                 upcoming_games.append((repr(i), i.id, i.tournament.nice_name()))
+        while len(recent_games) + len(upcoming_games) > 20:
+            if len(recent_games) > 10:
+                recent_games.pop(0)
+            else:
+                upcoming_games.pop(0)
         return (
             render_template(
                 "tournament_specific/player_stats.html",

@@ -3,6 +3,9 @@ let tournament = ""
 
 let updateCount = 0
 
+let startTime = 0
+
+let startTimeServe = 0
 let setup = (newId, change_id) => {
     id = newId
     updateCount = change_id
@@ -22,7 +25,7 @@ function main() {
         )
     });
     if (updateCount >= 0) {
-        setTimeout(main, 2000)
+        setTimeout(main, 1000)
     }
 }
 
@@ -31,5 +34,40 @@ function swap() {
         document.location.href = window.location.href.replace("swap=true", "").replaceAll("?", "")
     } else {
         document.location.href = window.location.href + "?swap=true"
+    }
+}
+
+function timeout(timeIn = 0) {
+    if (timeIn > 0) {
+        startTime = timeIn
+    }
+    let clock = (startTime - Date.now()) / 1000
+    document.getElementById("timeout").textContent = clock.toFixed(1)
+    if (clock > 0) {
+        setTimeout(timeout, 10)
+        document.getElementById("timeout").style = ""
+    } else {
+        document.getElementById("timeout").textContent = "0.0"
+        document.getElementById("timeout").style.color = "#FF2222"
+    }
+}
+
+function serveClock(timeIn = 0) {
+    if (timeIn > 0) {
+        startTimeServe = timeIn
+    }
+    let clock = (startTimeServe - Date.now()) / 1000
+    if (clock > 0) {
+        document.getElementById("serveClock").style.color = "#FFFFFF"
+        document.getElementById("serveClock").textContent = clock.toFixed(1)
+    } else {
+        document.getElementById("serveClock").textContent = "0.0"
+        document.getElementById("serveClock").style.color = "#FF0000"
+    }
+    if (clock > -3) {
+        setTimeout(serveClock, 10)
+    } else {
+        document.getElementById("serveClock").textContent = "0.0"
+        document.getElementById("serveClock").style.color = "#000000"
     }
 }

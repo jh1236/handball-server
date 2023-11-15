@@ -13,14 +13,15 @@
   "teams": [
     "Breaking Bad Bois",
     "Bedwars Besties",
-    "Barbenheimer",
+    "Operation Overkill",
     "Lovers",
     "The Baes",
-    "The Boys",
-    "Hanchester United",
-    "RATS",
-    "Sharai and Co",
-    "Liggy"
+    "BCC Bois",
+    "Still inside IGA...",
+    "Rolls for Initiative",
+    "Ziggy",
+    "Vangeli and Tim"
   ],
-  "twoCourts": true
+  "twoCourts": true,
+  "scorer": true
 }

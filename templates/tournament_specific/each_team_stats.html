@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Statistics for {{teamName}}</title>
+    <title>Statistics for {{team.name}}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
@@ -11,9 +11,9 @@
 <script>load("{{tournament}}")</script>
 
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <a href="/{{tournament}}teams/{{teamNameClean}}">
-        <img src="/api/teams/image?name={{teamNameClean}}" class="team_logo"></a>
-    <h1><a href="/{{tournament}}teams/{{teamNameClean}}" class="hide">Statistics for {{teamName}}</a></h1>
+    <a href="/{{tournament}}teams/{{team.nice_name()}}">
+        <img src="{{team.image()}}" class="team_logo"></a>
+    <h1><a href="/{{tournament}}teams/{{team.nice_name()}}" class="hide">Statistics for {{team.name}}</a></h1>
     <table class="table">
         <tbody>
         {% for stat in stats %}

@@ -1,11 +1,15 @@
 import os
+import threading
 import time
 from typing import Any
 
 from structure.Player import Player, GamePlayer
 from utils.logging_handler import logger
-from utils.util import calc_elo
+from utils.util import calc_elo, google_image
 
+images = {
+
+}
 
 class Team:
     def __init__(self, name: str, players: list[Player]):
@@ -28,6 +32,14 @@ class Team:
         self.has_photo = os.path.isfile(
             f"./resources/images/teams/{self.nice_name()}.png"
         )
+        self.image_path: str = (
+            f"/api/teams/image?name={self.nice_name()}" if self.has_photo else None
+        )
+        if not self.image_path:
+            if self.name in images:
+                self.image_path = images[self.name]
+            else:
+                threading.Thread(target=self.helper).start()
 
     def get_game_team(self, game):
         return GameTeam(self, game)
@@ -39,6 +51,15 @@ class Team:
     @property
     def cards(self):
         return self.red_cards + self.green_cards + self.yellow_cards
+
+    def helper(self):
+        print("started")
+        self.image_path = google_image(self.name)
+        images[self.name] = self.image_path
+        print(f"done: '{self.image_path}'")
+
+    def image(self):
+        return self.image_path or f"/api/teams/image?name=blank"
 
     @property
     def point_difference(self):
@@ -157,6 +178,8 @@ class GameTeam:
         self.players: list[GamePlayer] = [
             i.game_player(game, 1 - c) for c, i in enumerate(team.players)
         ]
+        self.has_sub = len(self.players) > 2
+        self.start_players = self.players.copy()
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
@@ -178,6 +201,9 @@ class GameTeam:
             return
         logger.info(f"(Game {self.game.id}) {text}")
 
+    def image(self):
+        return self.team.image()
+
     def __repr__(self):
         return repr(self.team)
 
@@ -193,10 +219,12 @@ class GameTeam:
         self.red_cards = 0
         self.faults = 0
         self.players = [
-            i.game_player(self.game, 1 - c) for c, i in enumerate(self.team.players)
+            i.game_player(self.game, 1 - c > 0) for c, i in enumerate(self.team.players)
         ]
+        self.has_sub = len(self.players) > 2
         if self.swapped:
-            self.players.reverse()
+            self.players[0], self.players[1] = self.players[1], self.players[0]
+        self.start_players = self.players.copy()
         # [i.reset() for i in self.players]
 
     def start(self, serve_first: bool, swap_players: bool):
@@ -205,15 +233,23 @@ class GameTeam:
         self.opponent: GameTeam = [i for i in self.game.teams if i.name != self.name][0]
         self.serving = serve_first
         self.first_player_serves = serve_first
-        if swap_players:
-            self.players.reverse()
+        if self.swapped:
+            self.players[0], self.players[1] = self.players[1], self.players[0]
 
     def next_point(self):
         self.faulted = False
-        [i.next_point() for i in self.players]
+        [i.next_point() for i in self.players[:2]]
 
     def lost_point(self):
         self.serving = False
+
+    def sub_player(self, first_player: bool):
+        self.players[not first_player], self.players[2] = (
+            self.players[2],
+            self.players[not first_player],
+        )
+        self.game.add_to_game_string("x" + ("l" if first_player else "r"), self)
+        self.has_sub = False
 
     def score_point(self, first_player: bool | None = None, ace: bool = False):
         if ace:
@@ -254,7 +290,7 @@ class GameTeam:
         return [i for i in self.players if i.captain][0]
 
     def not_captain(self) -> GamePlayer:
-        return [i for i in self.players if not i.captain][0]
+        return [i for i in self.players if not i.captain[:2]][0]
 
     def fault(self):
         self.info(
@@ -265,6 +301,7 @@ class GameTeam:
             "f" + ("l" if self.first_player_serves else "r"), self
         )
         self.faults += 1
+        self.game.update_count += 1
         if self.faulted:
             self.server().double_fault()
             self.opponent.score_point()
@@ -272,6 +309,7 @@ class GameTeam:
             self.faulted = True
 
     def green_card(self, first_player: bool):
+        self.game.update_count += 1
         self.info(
             f"Green Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
         )
@@ -281,6 +319,7 @@ class GameTeam:
         self.game.add_to_game_string("g" + ("l" if first_player else "r"), self)
 
     def yellow_card(self, first_player: bool, time: int = 3):
+        self.game.update_count += 1
         self.info(
             f"Yellow Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
         )
@@ -292,17 +331,24 @@ class GameTeam:
             self.game.add_to_game_string(
                 f"{time % 10}{'l' if first_player else 'r'}", self
             )
-        while all([i.is_carded() for i in self.players]) and not self.game.game_ended():
+        while (
+            all([i.is_carded() for i in self.players[:2]])
+            and not self.game.game_ended()
+        ):
             self.opponent.score_point()
 
     def red_card(self, first_player: bool):
+        self.game.update_count += 1
         self.info(
             f"Red Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
         )
         self.red_cards += 1
         self.players[not first_player].red_card()
         self.game.add_to_game_string(f"v{'l' if first_player else 'r'}", self)
-        while all([i.is_carded() for i in self.players]) and not self.game.game_ended():
+        while (
+            all([i.is_carded() for i in self.players[:2]])
+            and not self.game.game_ended()
+        ):
             self.opponent.score_point()
 
     def timeout(self):

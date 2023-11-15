@@ -9,7 +9,6 @@ body {
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-family);
-
     padding: 50px;
     margin: auto;
     text-align: center;
@@ -51,9 +50,11 @@ a.hide {
 .table tr td:nth-child(5) {
     width: 80px;
 }
+
 .table tr td:nth-child(6) {
     width: 80px;
 }
+
 .table tr td:nth-child(7) {
     width: 120px;
 }
@@ -82,6 +83,18 @@ img.logo2 {
     padding: 15px 32px;
     width: 220px;
     min-height: 70px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.smallBtn {
+    background-color: #659cce;
+    border: none;
+    color: white;
+    width: 220px;
+    min-height: 30px;
     text-align: center;
     text-decoration: none;
     display: inline-block;

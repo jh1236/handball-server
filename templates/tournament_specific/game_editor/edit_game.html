@@ -45,7 +45,7 @@
 <p><b>Match Official:</b> <i>{{ game.primary_official }}</i></p>
 <p onclick="swap()"><i>Swap sides</i></p>
 {% if game.match_points() > 0 %}
-<p style="font-size: 30px"><b>{{ game.match_points() }} Match Points</b></p>
+    <p style="font-size: 30px"><b>{{ game.match_points() }} Match Points</b></p>
 {% endif %}
 
 <br>
@@ -62,14 +62,15 @@
             <td><i>{{ game.server().name }}</i></td>
         {% endif %}
     </tr>
+
     <tr>
         <th><img
-                src="/api/teams/image?name={{ teams[0].nice_name() }}"
+                src="{{ teams[0].image() }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></th>
         <th style="color:#e0ffe0">spacer..</th>
         <th><img
-                src="/api/teams/image?name={{ teams[1].nice_name() }}"
+                src="{{ teams[1].image() }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></th>
     </tr>
@@ -93,7 +94,35 @@
                 <div class="rectangle" style="background-color: #EC4A4A"></div>
             {% endif %}
         </td>
-
+    </tr>
+    <tr>
+        <td>
+            {% if teams[0].has_sub and game.rounds <= 9 %}
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">Substitute {{ teams[0].name }}</button>
+                    <div class="dropdown-content">
+                        {% for i, p in teamOnePlayers %}
+                            <p onclick="sub(true, {{ i }})">
+                                {{ p.name }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}</td>
+        <td></td>
+        <td>
+            {% if teams[1].has_sub and game.round_number <= 9 %}
+                <div class="dropdown" style="background-color: #2a5d88;">
+                    <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">Substitute {{ teams[1].name }}</button>
+                    <div class="dropdown-content">
+                        {% for i, p in teamTwoPlayers %}
+                            <p onclick="sub(false, {{ i }})">
+                                {{ p.name }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}</td>
     </tr>
     <tr>
         <td><br></td>
@@ -110,9 +139,6 @@
                             {% if p.is_carded() %} </i></s> {% endif %}
                         </p>
                     {% endfor %}
-                    {% if teams[0].serving %}
-                        <p onclick="ace(true)">Ace</p>
-                    {% endif %}
                 </div>
             </div>
         </td>
@@ -128,9 +154,6 @@
                             {% if p.is_carded() %} </i></s> {% endif %}
                         </p>
                     {% endfor %}
-                    {% if teams[1].serving %}
-                        <p onclick="ace(false)">Ace</p>
-                    {% endif %}
                 </div>
             </div>
         </td>
@@ -138,25 +161,24 @@
     <tr>
         <td><br></td>
     </tr>
+
     <tr>
         <td>
-            <button onclick="fault(true)" class="button">Fault {{ teams[0].name }}</button>
+            <button onclick="timeout(true)" class="button" id="timeoutOne">
+                {% if teams[0].timeouts <= 0 %} <s> {% endif %}
+                Timeout {{ teams[0].name }}
+                {% if teams[0].timeouts <= 0 %} </s> {% endif %}
+            </button>
         </td>
         <td></td>
         <td>
-            <button onclick="fault(false)" class="button">Fault {{ teams[1].name }}</button>
-        </td>
-    </tr>
-    <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td>
-            <button onclick="timeout(true)" class="button">Timeout {{ teams[0].name }}</button>
-        </td>
-        <td></td>
-        <td>
-            <button onclick="timeout(false)" class="button">Timeout {{ teams[1].name }}</button>
+
+            <button onclick="timeout(false)" class="button" id="timeoutTwo">
+                {% if teams[1].timeouts <= 0 %} <s> {% endif %}
+                Timeout {{ teams[1].name }}
+                {% if teams[1].timeouts <= 0 %} </s> {% endif %}
+            </button>
+
         </td>
     </tr>
     <tr>
@@ -274,6 +296,13 @@
     </tr>
 </table>
 <br>
+<button class="button" onclick="fault()">Fault</button>
+<button class="button" id="serveBtn" onclick="startServeClock()">Start Serve Timer</button>
+<button class="button" id="serveBtn" onclick="ace()">Ace</button>
+<br><br>
 <button class="button" onclick="undo()" style="background-color: #2a5d88;">Undo</button>
+{% if game.in_timeout() %}
+    <script>timeoutOverlay({{ timeout_time }}, {{ timeout_first }})</script>
+{% endif %}
 </body>
 </html>

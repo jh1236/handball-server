@@ -48,9 +48,6 @@
         </td>
     </tr>
     <tr>
-        <td><br></td>
-    </tr>
-    <tr>
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne1">Player Two</button>
@@ -68,6 +65,32 @@
                 <div class="dropdown-content">
                     {% for p in players %}
                     <p onclick="setTeamListTwo('{{p.nice_name()}}', '{{p}}', 1)">{{p}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" class="button dropbtn" id="teamOne2">Add Substitute</button>
+                <div class="dropdown-content">
+                    {% for p in players %}
+                    <p onclick="setTeamListOne('{{p.nice_name()}}', '{{p}}', 2)">{{p}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </td>
+        <td></td>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo2">Add Substitute</button>
+                <div class="dropdown-content">
+                    {% for p in players %}
+                    <p onclick="setTeamListTwo('{{p.nice_name()}}', '{{p}}', 2)">{{p}}</p>
                     {% endfor %}
                 </div>
             </div>

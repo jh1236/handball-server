@@ -122,7 +122,7 @@ class Player:
                 / (d["Games Played"] or 1),
                 2,
             ),
-            "Percentage Aces": f'{round(d["Aces scored"] / (served or 1), 2) * 100: .1f}%',
+            "Serve Ace Rate": f'{round(d["Aces scored"] / (served or 1), 2) * 100: .1f}%',
             "Percentage of Points scored": f"{round(d['Points scored'] / (d['Rounds on Court'] or 1), 2) * 100: .1f}%",
         }
         return d
@@ -255,7 +255,7 @@ class GamePlayer:
         self.green_carded = False
 
     def end(self, won, final=False):
-        if final:
+        if final or self.time_carded + self.time_on_court == 0:
             return
         self.player.points_scored += self.points_scored
         self.player.points_served += self.points_served
@@ -272,6 +272,8 @@ class GamePlayer:
         self.player.wins += won
 
     def undo_end(self, won):
+        if self.time_carded + self.time_on_court == 0:
+            return
         self.player.points_scored -= self.points_scored
         self.player.points_served -= self.points_served
         self.player.aces_scored -= self.aces_scored

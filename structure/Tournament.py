@@ -107,9 +107,9 @@ class Tournament:
                 generator_value = None
         for i, g in enumerate(self.games_to_list()):
             g.id = i
+        self.assign_courts()
         self.appoint_umpires()
         self.assign_rounds()
-        self.assign_courts()
 
     def get_game(self, game_id: int) -> Game:
         self.update_games()

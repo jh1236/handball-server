@@ -1,4 +1,5 @@
 import os
+import time
 
 import flask
 from flask import request, send_file, jsonify
@@ -200,14 +201,26 @@ def score():
     comps[tournament].save()
     return "", 204
 
+@app.post("/api/games/update/substitute")
+def substitute():
+    tournament = request.json["tournament"]
+    logger.info(f"Request for score: {request.json}")
+    game_id = request.json["id"]
+    first_team = request.json["firstTeam"]
+    first_player = request.json["firstPlayer"]
+    comps[tournament].get_game(game_id).teams[not first_team].sub_player(first_player)
+    comps[tournament].save()
+    return "", 204
+
 
 @app.post("/api/games/update/ace")
 def ace():
     tournament = request.json["tournament"]
     logger.info(f"Request for ace: {request.json}")
     game_id = request.json["id"]
-    first_team = request.json["firstTeam"]
-    comps[tournament].get_game(game_id).teams[not first_team].score_point(None, True)
+    game = comps[tournament].get_game(game_id)
+    first_team = request.json.get("firstTeam", game.teams[0].serving)
+    game.teams[not first_team].score_point(None, True)
     comps[tournament].save()
     return "", 204
 
@@ -310,9 +323,22 @@ def timeout():
 def end_timeout():
     tournament = request.json["tournament"]
     logger.info(f"Request for endTimeout: {request.json}")
-    first_team = request.json["firstTeam"]
     game_id = request.json["id"]
-    comps[tournament].get_game(game_id).teams[not first_team].end_timeout()
+    [i.end_timeout() for i in comps[tournament].get_game(game_id).teams]
+    comps[tournament].save()
+    return "", 204
+
+
+@app.post("/api/games/update/serve_clock")
+def serve_timer():
+    tournament = request.json["tournament"]
+    logger.info(f"Request for timeout: {request.json}")
+    game_id = request.json["id"]
+    if request.json["start"]:
+        comps[tournament].get_game(game_id)._serve_clock = time.time()
+    else:
+        comps[tournament].get_game(game_id)._serve_clock = -1
+    comps[tournament].get_game(game_id).update_count += 1
     comps[tournament].save()
     return "", 204
 
@@ -321,8 +347,10 @@ def end_timeout():
 def fault():
     tournament = request.json["tournament"]
     logger.info(f"Request for fault: {request.json}")
-    first_team = request.json["firstTeam"]
+    first_team = request.json.get("firstTeam", None)
     game_id = request.json["id"]
+    if first_team is None:
+        first_team = comps[tournament].get_game(game_id).teams[0].serving
     comps[tournament].get_game(game_id).teams[not first_team].fault()
     comps[tournament].save()
     return "", 204
@@ -351,7 +379,7 @@ def card():
     if time < 3:
         time += 10
     if color == "green":
-        comps[tournament].get_game(game_id, ).teams[
+        comps[tournament].get_game(game_id,).teams[
             not first_team
         ].green_card(first_player)
     elif color == "yellow":
