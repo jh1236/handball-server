@@ -1,12 +1,17 @@
 from typing import Any
 
+elo_map = {}
+
 
 class Player:
     def __init__(self, name: str):
         self._team = None
         self.tournament = None
         self.name: str = name
+        if self.nice_name() not in elo_map:
+            elo_map[self.nice_name()] = 1000
         self.faults: int = 0
+        self.won_while_serving = 0
         self.double_faults: int = 0
         self.points_scored: int = 0
         self.aces_scored: int = 0
@@ -21,6 +26,13 @@ class Player:
         self.points_served: int = 0
         self.played: int = 0
         self.wins: int = 0
+
+    @property
+    def elo(self):
+        return elo_map[self.nice_name()]
+
+    def change_elo(self, delta: int):
+        elo_map[self.nice_name()] += delta
 
     @property
     def biggest_card(self):
@@ -74,9 +86,12 @@ class Player:
         game_teams: list[GamePlayer] = []
         if self.tournament:
             for i in self.tournament.games_to_list():
-                player_names = [j.name for j in i.players()]
-                if i.in_progress() and self.name in player_names:
-                    game_teams.append(i.players()[player_names.index(self.name)])
+                player_names = [j.name for j in i.teams[0].players] + [
+                    j.name for j in i.teams[1].players
+                ]
+                players = i.teams[0].players + i.teams[1].players
+                if i.in_progress() and self.name in player_names and i.ranked:
+                    game_teams.append(players[player_names.index(self.name)])
 
         points_scored = self.points_scored + sum([i.points_scored for i in game_teams])
         aces_scored = self.aces_scored + sum([i.aces_scored for i in game_teams])
@@ -90,6 +105,7 @@ class Player:
         played = self.played + len(game_teams)
         return {
             "B&F Votes": self.votes,
+            "Elo": round(self.elo, 2),
             "Points scored": points_scored,
             "Aces scored": aces_scored,
             "Faults": faults,
@@ -107,16 +123,23 @@ class Player:
         game_teams: list[GamePlayer] = []
         if self.tournament:
             for i in self.tournament.games_to_list():
-                player_names = [j.name for j in i.players()]
-                if i.in_progress() and self.name in player_names:
-                    game_teams.append(i.players()[player_names.index(self.name)])
+                player_names = [j.name for j in i.teams[0].players] + [
+                    j.name for j in i.teams[1].players
+                ]
+                players = i.teams[0].players + i.teams[1].players
+                if i.in_progress() and self.name in player_names and i.ranked:
+                    game_teams.append(players[player_names.index(self.name)])
 
         served = self.points_served + sum([i.points_served for i in game_teams])
+        won_while_serving = self.won_while_serving + sum(
+            [i.won_while_serving for i in game_teams]
+        )
         d = self.get_stats()
         d = d | {
             "Points served": served,
             "Points Per Game": round(d["Points scored"] / (d["Games Played"] or 1), 2),
             "Aces Per Game": round(d["Aces scored"] / (d["Games Played"] or 1), 2),
+            "Faults Per Game": round(d["Faults"] / (d["Games Played"] or 1), 2),
             "Cards Per Game": round(
                 (d["Green Cards"] + d["Yellow Cards"] + d["Red Cards"])
                 / (d["Games Played"] or 1),
@@ -124,6 +147,7 @@ class Player:
             ),
             "Serve Ace Rate": f'{round(d["Aces scored"] / (served or 1), 2) * 100: .1f}%',
             "Percentage of Points scored": f"{round(d['Points scored'] / (d['Rounds on Court'] or 1), 2) * 100: .1f}%",
+            "Serving Conversion Rate": f"{round(won_while_serving / (served or 1), 2) * 100: .1f}%",
         }
         return d
 
@@ -141,6 +165,9 @@ class Player:
         self.played += d.get("Games Played", 0)
         self.wins += d.get("Games Won", 0)
         self.points_served += d.get("Points served", 0)
+        self.won_while_serving += d.get("Points served", 0) * (
+            float(d.get("Serving Conversion Rate", "0%")[:-1]) / 100.0
+        )
 
     def nice_name(self):
         return self.name.lower().replace(" ", "_")
@@ -163,6 +190,7 @@ class Player:
         self.time_carded = 0
         self.rounds_played = 0
         self.rounds_carded = 0
+        self.won_while_serving = 0
 
     def set_tournament(self, tournament):
         self.tournament = tournament
@@ -171,6 +199,8 @@ class Player:
 
 class GamePlayer:
     def __init__(self, player: Player, game, captain):
+        self._tidy_name = None
+        self.won_while_serving = 0
         self.points_served: int = 0
         self.game = game
         self.double_faults: int = 0
@@ -214,6 +244,19 @@ class GamePlayer:
     def nice_name(self):
         return self.player.nice_name()
 
+    def first_name(self):
+        if " " not in self.name:
+            return self.name
+        first, second = self.name.split(" ", 1)
+        others = self.game.players()
+        for i in others:
+            if i.name == self.name or " " not in i.name:
+                continue
+            other_first = i.name.split(" ", 1)[0]
+            if other_first == first:
+                return self.name
+        return first
+
     def green_card(self):
         self.green_carded = True
         self.green_cards += 1
@@ -241,6 +284,7 @@ class GamePlayer:
 
     def reset(self):
         self.card_time_remaining = 0
+        self.won_while_serving = 0
         self.points_served = 0
         self.card_duration = 0
         self.points_scored = 0
@@ -255,10 +299,11 @@ class GamePlayer:
         self.green_carded = False
 
     def end(self, won, final=False):
-        if final or self.time_carded + self.time_on_court == 0:
+        if final or self.time_carded + self.time_on_court == 0 or not self.game.ranked:
             return
         self.player.points_scored += self.points_scored
         self.player.points_served += self.points_served
+        self.player.won_while_serving += self.won_while_serving
         self.player.aces_scored += self.aces_scored
         self.player.time_on_court += self.time_on_court
         self.player.time_carded += self.time_carded
@@ -272,7 +317,7 @@ class GamePlayer:
         self.player.wins += won
 
     def undo_end(self, won):
-        if self.time_carded + self.time_on_court == 0:
+        if self.time_carded + self.time_on_court == 0 or not self.game.ranked:
             return
         self.player.points_scored -= self.points_scored
         self.player.points_served -= self.points_served
@@ -284,16 +329,32 @@ class GamePlayer:
         self.player.red_cards -= self.red_cards
         self.player.faults -= self.faults
         self.player.double_faults -= self.double_faults
+        self.player.won_while_serving -= self.won_while_serving
         self.player.votes -= self.best
         self.player.played -= 1
         self.player.wins -= won
 
     def tidy_name(self):
-        if not " " in self.name:
+        if self._tidy_name is not None:
+            return self._tidy_name
+        if " " not in self.name:
+            self._tidy_name = self.name
             return self.name
         first, second = self.name.split(" ", 1)
-        second = " " + second[0] + "."
-        return first + second
+        others = self.game.tournament.players()
+        for i in others:
+            if i.name == self.name:
+                continue
+            if " " not in i.name:
+                continue
+            other_first, other_second = i.name.split(" ", 1)
+            if other_first[0] == first[0] and second == other_second:
+                first = first[:2] + ". "
+                self._tidy_name = first + second
+                return self._tidy_name
+        first = first[0] + ". "
+        self._tidy_name = first + second
+        return self._tidy_name
 
     def get_stats(self):
         return {
@@ -307,9 +368,6 @@ class GamePlayer:
             "Yellow Cards": self.yellow_cards,
             "Red Cards": self.red_cards,
         }
-
-    def serve(self):
-        self.points_served += 1
 
     def fault(self):
         self.faults += 1

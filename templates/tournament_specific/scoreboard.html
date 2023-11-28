@@ -40,6 +40,11 @@
                 <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %}
                 <i>{{ official }}</i>
                 {% if not game.bye %}</a> {% endif %}</p>
+            {% if game.scorer.nice_name() != 'none_one' %}
+                <p><b>Scorer:</b>
+                    <a class="hide" href="/{{ tournament }}officials/{{ game.scorer.nice_name() }}"> <i>{{ game.scorer }}</i>
+                    </a></p>
+            {% endif %}
             <h1 id="serveClock" style="font-size: 50px; color:#000000">0.0</h1>
             <script>serveClock({{ serve_time }})</script>
         </th>

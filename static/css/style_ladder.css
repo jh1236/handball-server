@@ -60,6 +60,9 @@
 .table tr td:nth-child(14) {
     width: 100px;
 }
+.table tr td:nth-child(15) {
+    width: 100px;
+}
 
 @media screen and (max-width: 1556px) and (min-width: 1096px) {
     .priority-5 {

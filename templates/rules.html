@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Documents</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script>load("")</script>
+<h1><a href="/documents/" class="hide">Documents</a></h1>
+<table class="table">
+    <tr>
+        <td style="width:100px;"><a href="/rules/simple"
+                                    class="hide"><img
+                src="/api/image?name=SUSS" class="team_logo"
+                style="width: 75px; height: 75px;"
+        ></a></td>
+
+
+        <td style="width:200px;"><a href="/rules/simple" class="hide"><h3>Rules Cheat Sheet</h3></a></td>
+    </tr>
+    <tr>
+        <td style="width:100px;"><a href="/rules/current"
+                                    class="hide"><img
+                src="/api/image?name=SUSS" class="team_logo"
+                style="width: 75px; height: 75px;"
+        ></a></td>
+
+
+        <td style="width:200px;"><a href="/rules/current" class="hide"><h3>Current Rules</h3></a></td>
+    </tr>
+    <tr>
+        <td style="width:100px;"><a href="/code_of_conduct/"
+                                    class="hide"><img
+                src="/api/image?name=SUSS" class="team_logo"
+                style="width: 75px; height: 75px;"
+        ></a></td>
+
+
+        <td style="width:200px;"><a href="/code_of_conduct/" class="hide"><h3>Code Of Conduct</h3></a></td>
+    </tr>
+    <tr>
+        <td style="width:100px;"><a href="/rules/proposed"
+                                    class="hide"><img
+                src="/api/image?name=SUSS" class="team_logo"
+                style="width: 75px; height: 75px;"
+        ></a></td>
+        <td style="width:200px;"><a href="/rules/proposed" class="hide"><h3>Proposed Rule Changes</h3></a></td>
+    </tr>
+    <tr>
+        <td style="width:100px;"><a href="https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing"
+                                    class="hide"><img
+                src="/api/image?name=umpire" class="team_logo"
+                style="width: 75px; height: 75px;"
+        ></a></td>
+        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing" class="hide"><h3>Umpire Qualification Program</h3></a></td>
+    </tr>
+</table>
+</body>
+</html>

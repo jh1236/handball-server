@@ -27,6 +27,8 @@ class OneRound(FixtureMaker):
                 self.list.append(self.dummy_game)
                 add_round = yield None
 
+
+class OneRoundEditable(OneRound):
     @classmethod
     def manual_allowed(cls):
         return True

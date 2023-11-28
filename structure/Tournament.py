@@ -1,13 +1,12 @@
 import json
 import os
-from inspect import getframeinfo, stack
 from itertools import zip_longest
 from typing import Generator, Any
 
 from FixtureMakers.FixtureMaker import get_type_from_name
 from structure.Game import Game
 from structure.OfficiatingBody import Official, get_officials, NoOfficial
-from structure.Player import Player
+from structure.Player import Player, elo_map
 from structure.Team import Team, BYE
 from utils.logging_handler import logger
 
@@ -52,6 +51,7 @@ class Tournament:
                 -a.percentage,
                 -a.point_difference,
                 -a.points_for,
+                -a.games_won,
                 a.cards,
                 a.faults,
                 a.timeouts,
@@ -84,7 +84,6 @@ class Tournament:
                     if n is not None:
                         self.fixtures.append(n)
                 except StopIteration as e:
-                    logger.info(e.args)
                     logger.info("Entering Finals!")
                     self.in_finals = True
                     n = next(self.finals_gen)
@@ -104,7 +103,6 @@ class Tournament:
                     logger.info(self.finals[-1])
                 except StopIteration:
                     logger.info("Last Game has been added")
-                generator_value = None
         for i, g in enumerate(self.games_to_list()):
             g.id = i
         self.assign_courts()
@@ -119,51 +117,75 @@ class Tournament:
             return self.games_to_list()[game_id]
         return next(i for i in self.games_to_list() if i.id == game_id)
 
-
     def appoint_umpires(self):
+
         for r in self.fixtures:
             court_one_games = [i for i in r if i.court == 0]
             court_two_games = [i for i in r if i.court == 1]
-            for c1, c2 in zip_longest(court_one_games, court_two_games):
-                times_run = 0
-                while times_run < 2 and c1:
-                    if c1.primary_official == NoOfficial:
-                        teams = [i.team for i in c1.teams] + (
-                            [i.team for i in c2.teams] if c2 else []
-                        )
-                        officials = sorted(
-                            self.officials,
-                            key=lambda it: (
-                                it.games_officiated,
-                                1 - 2 * times_run * it.games_court_one,
-                            ),
-                        )
-                        for p in officials:
-                            if any([i in teams for i in p.team]):
-                                continue
-                            if c2 and c2.primary_official == p:
-                                continue
-                            c1.set_primary_official(p)
-                            break
-                    c1, c2 = c2, c1
-                    times_run += 1
-        for r in self.finals:
-            teams = [gt.team for g in r for gt in g.teams]
-            for g in r:
-                if g.primary_official == NoOfficial:
-                    for p in sorted(
+            for games in zip_longest(court_one_games, court_two_games):
+                teams = [gt.team for g in games if g for gt in g.teams]
+                for g in games:
+                    court_one = sorted(
                         self.officials,
-                        key=lambda it: (
-                            it.games_officiated,
-                            1 - 2 * times_run * it.games_court_one,
-                        ),
-                    ):
-                        if any([i in teams for i in p.team]):
+                        key=lambda it: (it.games_officiated, it.games_court_one),
+                    )
+                    court_two = sorted(
+                        self.officials,
+                        key=lambda it: (it.games_officiated, -it.games_court_one),
+                    )
+                    if not g:
+                        continue
+                    if g.primary_official != NoOfficial:
+                        continue
+                    for o in court_one if g.court == 0 else court_two:
+                        if o in [k.primary_official for k in games if k]:
                             continue
-                        if not p.finals:
+                        if any([i in teams for i in o.team]):
                             continue
-                        g.set_primary_official(p)
+                        g.set_primary_official(o)
                         break
+            if not self.details.get("scorer", False):
+                continue
+            for games in zip_longest(court_one_games, court_two_games):
+                teams = [gt.team for g in games if g for gt in g.teams]
+                for g in games:
+                    if not g:
+                        continue
+                    if g.scorer != NoOfficial:
+                        continue
+                    scorer = sorted(
+                        self.officials,
+                        key=lambda it: (it.games_scored, it.games_officiated),
+                    )
+                    for o in scorer:
+                        if o in [k.primary_official for k in games if k]:
+                            continue
+                        if o in [k.scorer for k in games if k]:
+                            continue
+                        if any([i in teams for i in o.team]):
+                            continue
+                        g.set_scorer(o)
+                        break
+                    if g.scorer == NoOfficial:
+                        g.set_scorer(g.primary_official)
+        for r in self.finals:
+            court_one_games = [i for i in r if i.court == 0]
+            teams = [gt.team for g in r for gt in g.teams]
+            for g in court_one_games:
+                officials = sorted(
+                    [i for i in self.officials if i.finals],
+                    key=lambda it: it.games_officiated,
+                )
+                for o in officials:
+                    if any([i in teams for i in o.team]) or o == g.primary_official:
+                        continue
+                    elif g.primary_official == NoOfficial:
+                        g.set_primary_official(o)
+                    else:
+                        g.set_scorer(o)
+                        break
+                if g.scorer == NoOfficial:
+                    g.set_scorer(g.primary_official)
 
     def assign_rounds(self):
         for i, r in enumerate(self.fixtures):
@@ -179,7 +201,10 @@ class Tournament:
                 continue
             # court_one_games = sorted(r, key=lambda a: sum([i.team.court_one for i in a.teams]))
             court_one_games = sorted(
-                r, key=lambda a: -sum([i.team.games_won for i in a.teams])
+                r,
+                key=lambda a: -sum(
+                    [i.team.games_won / (i.team.games_played or 1) for i in a.teams]
+                ),
             )  # use for preferential treatment of wins
             court_one_games = [i for i in court_one_games if not i.bye]
             halfway = False
@@ -242,6 +267,7 @@ class Tournament:
         if not self.filename:
             return
         [i.reset() for i in self.teams]
+        [i.reset() for i in self.officials]
         self.fixtures_gen: Generator[list[Game]] = self.fixtures_class.get_generator()
         self.finals_gen: Generator[list[Game]] = self.finals_class.get_generator()
         self.fixtures = []
@@ -252,7 +278,6 @@ class Tournament:
         self.update_games()
         for i, r in enumerate(data.get("games", [])):
             for j, m in enumerate(r):
-                self.update_games()
                 g = Game.from_map(m, self)
                 self.fixtures[i][j] = g
             self.update_games(True)
@@ -313,12 +338,14 @@ class Tournament:
 
 def load_all_tournaments() -> dict[str, Tournament]:
     ret = {}
-    for filename in os.listdir("./config/tournaments"):
-        f = os.path.join("./config/tournaments", filename)
+    with open("./config/tournaments.txt") as fp:
+        files = fp.readlines()
+    for i, filename in enumerate(files):
+        filename = filename.replace('\n', '') + ".json"
+        f = os.path.join("./config/tournaments",filename)
         if os.path.isfile(f):
-            print(filename)
             t = Tournament(filename)
+            t.details["sort"] = i
             ret[t.nice_name()] = t
             logger.info("------------------------------")
-
     return ret

@@ -20,6 +20,11 @@
     <p><b>Match Official:</b>{% if not game.bye %}
         <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %} <i>{{ official }}</i>
         {% if not game.bye %}</a> {% endif %}</p>
+    {% if game.scorer.nice_name() != 'none_one' %}
+        <p><b>Match Scorer:</b>
+            <a class="hide" href="/{{ tournament }}officials/{{ game.scorer.nice_name() }}"> <i>{{ game.scorer }}</i>
+            </a></p>
+    {% endif %}
     <p>{% if not game.bye %}<a href="/{{ tournament }}games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
         {% if not game.bye %}</a>{% endif %} <i>{{ status }}</i></p>
 

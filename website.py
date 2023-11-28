@@ -19,11 +19,43 @@ def init_api(app, comps: dict[str, Tournament]):
 
     @app.get("/")
     def root():
-        return render_template("all_tournaments.html", comps=comps.values()), 200
+        return (
+            render_template(
+                "all_tournaments.html",
+                comps=sorted(comps.values(), key=lambda it: it.details["sort"]),
+            ),
+            200,
+        )
 
-    @app.get("/rules/")
+    @app.get("/documents/")
+    def docs():
+        return (
+            render_template("rules.html"),
+            200,
+        )
+
+    @app.get("/rules/current")
     def rules():
-        return send_file("./resources/rules.pdf"), 200
+        return send_file("resources/documents/pdf/rules.pdf"), 200
+
+    @app.get("/rules/simple")
+    def simple_rules():
+        return send_file("resources/documents/pdf/rules_simple.pdf"), 200
+
+    @app.get("/rules/proposed")
+    def new_rules():
+        return send_file("resources/documents/pdf/proposed_rules.pdf"), 200
+
+    @app.get("/code_of_conduct/")
+    def code_of_conduct():
+        rand = random.Random()
+        if rand.randrange(0, 10):
+            return send_file("resources/documents/pdf/code_of_conduct_2.pdf"), 200
+        return send_file("resources/documents/pdf/code_of_conduct.pdf"), 200
+
+    @app.get("/favicon.ico/")
+    def icon():
+        return send_file("static/favicon.ico")
 
     @app.get("/admin/")
     def log():
@@ -45,17 +77,6 @@ def init_api(app, comps: dict[str, Tournament]):
                 403,
             )
         return render_template("admin.html"), 200
-
-    @app.get("/code_of_conduct/")
-    def code_of_conduct():
-        rand = random.Random()
-        if rand.randrange(0, 10):
-            return send_file("./resources/code_of_conduct_2.pdf"), 200
-        return send_file("./resources/code_of_conduct.pdf"), 200
-
-    @app.get("/favicon.ico/")
-    def icon():
-        return send_file("static/favicon.ico")
 
     tournament_specific(app, comps)
     universal_tournament(app, comps)
@@ -166,7 +187,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
 
     @app.get("/<tournament>/teams/")
     def stats_directory_site(tournament):
-        teams = sorted(comps[tournament].teams, key=lambda a: a.nice_name())
+        teams = [i for i in sorted(comps[tournament].teams, key=lambda a: a.nice_name()) if i.games_played > 0 or len(comps[tournament].teams) < 15]
         return (
             render_template(
                 "tournament_specific/stats.html",
@@ -198,6 +219,11 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 )
             else:
                 upcoming_games.append((repr(i), i.id, i.tournament.nice_name()))
+        while len(recent_games) + len(upcoming_games) > 20:
+            if len(recent_games) > 10:
+                recent_games.pop(0)
+            else:
+                upcoming_games.pop(0)
         players = [
             (i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()])
             for i in team.players
@@ -210,7 +236,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 recent_games=recent_games,
                 upcoming_games=upcoming_games,
                 tournament=f"{tournament}/",
-                players=players
+                players=players,
             ),
             200,
         )
@@ -278,7 +304,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         players = game.players()
         round_number = game.round_number + 1
         prev_matches = []
-        for i in get_all_games(comps):
+        for i in get_all_games():
             if not all(
                 [
                     k.nice_name() in [j.team.nice_name() for j in i.teams]
@@ -293,7 +319,10 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 ]
             ):
                 continue
-            if i == game:
+            if (
+                i.tournament.nice_name() == game.tournament.nice_name()
+                and i.id == game.id
+            ):
                 continue
             prev_matches.append(
                 (
@@ -351,14 +380,14 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             "Points For": 5,
             "Points Against": 5,
             "Point Difference": 2,
-            "ELO": 3,
+            "Elo": 3,
         }
         teams = [
             (
                 i.name,
                 i.nice_name(),
                 i.image(),
-                [(v, priority[k]) for k, v in i.get_stats().items()]
+                [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in comps[tournament].ladder()
             if i.games_played > 0 or len(comps[tournament].teams) < 15
@@ -392,6 +421,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         priority = {
             "Name": 1,
             "B&F Votes": 1,
+            "Elo": 2,
             "Points scored": 2,
             "Aces scored": 2,
             "Faults": 5,
@@ -413,7 +443,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in comps[tournament].players()
-            if i.played
+            if (i.played or len(comps[tournament].fixtures) < 2 )and not i.nice_name().startswith("null")
         ]
         headers = ["Name"] + [
             i for i in comps[tournament].teams[0].players[0].get_stats()
@@ -485,15 +515,22 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         ][0]
         recent_games = []
         for i in comps[tournament].games_to_list():
-            if official.nice_name() != i.primary_official.nice_name():
-                continue
-            recent_games.append(
-                (
-                    f"Round {i.round_number + 1}: {repr(i)} ({i.score_string()})",
-                    i.id,
-                    i.tournament.nice_name(),
+            if official.nice_name() == i.primary_official.nice_name():
+                recent_games.append(
+                    (
+                        f"{'Umpire ' if comps[tournament].details['scorer'] else ''}Round {i.round_number + 1}: {repr(i)} ({i.score_string()})",
+                        i.id,
+                        i.tournament.nice_name(),
+                    )
                 )
-            )
+            elif official.nice_name() == i.scorer.nice_name():
+                recent_games.append(
+                    (
+                        f"Scorer Round {i.round_number + 1}: {repr(i)} ({i.score_string()})",
+                        i.id,
+                        i.tournament.nice_name(),
+                    )
+                )
         return (
             render_template(
                 "tournament_specific/official.html",
@@ -540,7 +577,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 403,
             )
-        elif key not in [game.primary_official.key, admin_password]:
+        elif key not in [game.primary_official.key, game.scorer.key, admin_password]:
             return (
                 render_template(
                     "tournament_specific/game_editor/no_access.html",
@@ -714,12 +751,19 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             )
 
 
+def sign(elo_delta):
+    if elo_delta >= 0:
+        return "+"
+    else:
+        return  "-"
+
+
 def universal_tournament(app, comps: dict[str, Tournament]):
     @app.get("/teams/")
     def universal_stats_directory_site():
         teams = [
             i
-            for i in sorted(get_all_teams(comps), key=lambda a: a.nice_name())
+            for i in sorted(get_all_teams(), key=lambda a: a.nice_name())
             if i.games_played > 0
         ]
         return (
@@ -731,7 +775,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
 
     @app.get("/teams/<team_name>/")
     def universal_stats_site(team_name):
-        team = [i for i in get_all_teams(comps) if team_name == i.nice_name()][0]
+        team = [i for i in get_all_teams() if team_name == i.nice_name()][0]
         recent_games = []
         upcoming_games = []
         for c in comps.values():
@@ -754,7 +798,11 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                             i.tournament.nice_name(),
                         )
                     )
-
+        while len(recent_games) + len(upcoming_games) > 20:
+            if len(recent_games) > 10:
+                recent_games.pop(0)
+            else:
+                upcoming_games.pop(0)
         players = [
             (i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()])
             for i in team.players
@@ -788,7 +836,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
             "Points For": 5,
             "Points Against": 5,
             "Point Difference": 2,
-            "ELO": 3,
+            "Elo": 3,
         }
         teams = [
             (
@@ -798,7 +846,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in sorted(
-                get_all_teams(comps),
+                get_all_teams(),
                 key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])),
             )
             if i.games_played > 0
@@ -806,13 +854,13 @@ def universal_tournament(app, comps: dict[str, Tournament]):
         teams_two = []
         for i in teams:
             if len(i[0]) > 30:
-                teams_two.append((i[0][:27] + "...", i[1], i[2]))
+                teams_two.append((i[0][:27] + "...", *i[1:]))
             else:
                 teams_two.append(i)
         teams = teams_two
         headers = [
             (i, priority[i])
-            for i in (["Team Names"] + [i for i in get_all_teams(comps)[0].get_stats()])
+            for i in (["Team Names"] + [i for i in get_all_teams()[0].get_stats()])
         ]
         return (
             render_template(
@@ -829,6 +877,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
         priority = {
             "Name": 1,
             "B&F Votes": 1,
+            "Elo": 2,
             "Points scored": 2,
             "Aces scored": 2,
             "Faults": 5,
@@ -841,7 +890,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
             "Games Played": 3,
             "Games Won": 2,
         }
-        all_players = get_all_players(comps)
+        all_players = get_all_players()
         players = [
             (
                 i.name,
@@ -850,8 +899,9 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in all_players
+            if not i.nice_name().startswith("null")
         ]
-        headers = ["Name"] + [i for i in get_all_teams(comps)[0].players[0].get_stats()]
+        headers = ["Name"] + [i for i in get_all_teams()[0].players[0].get_stats()]
         return (
             render_template(
                 "tournament_specific/players.html",
@@ -864,7 +914,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
 
     @app.get("/players/<player_name>/")
     def universal_player_stats(player_name):
-        if player_name not in [i.nice_name() for i in get_all_players(comps)]:
+        if player_name not in [i.nice_name() for i in get_all_players()]:
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -872,18 +922,33 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 ),
                 400,
             )
-        player = [i for i in get_all_players(comps) if player_name == i.nice_name()][0]
+        player = [i for i in get_all_players() if player_name == i.nice_name()][0]
         recent_games = []
         upcoming_games = []
-        for i in get_all_games(comps):
-            if player_name not in [j.nice_name() for j in i.players()] or i.bye:
-                continue
-            if i.started:
-                recent_games.append(
-                    (repr(i) + f" ({i.score_string()})", i.id, i.tournament.nice_name())
-                )
-            else:
-                upcoming_games.append((repr(i), i.id, i.tournament.nice_name()))
+        for c in comps.values():
+            for i in c.games_to_list():
+                if player_name not in [j.nice_name() for j in i.players()] or i.bye:
+                    continue
+                gp = next(t for t in i.teams if player_name in [j.nice_name() for j in t.players])
+                s = " <+0>"
+                if gp.elo_delta:
+                    s = f" <{sign(gp.elo_delta)}{round(abs(gp.elo_delta))}>"
+                if i.started:
+                    recent_games.append(
+                        (
+                            repr(i) + f" ({i.score_string()}) [{c.name}]{s}",
+                            i.id,
+                            i.tournament.nice_name(),
+                        )
+                    )
+                else:
+                    upcoming_games.append(
+                        (
+                            repr(i) + f" [{c.name}]",
+                            i.id,
+                            i.tournament.nice_name(),
+                        )
+                    )
         while len(recent_games) + len(upcoming_games) > 20:
             if len(recent_games) > 10:
                 recent_games.pop(0)
@@ -904,20 +969,25 @@ def universal_tournament(app, comps: dict[str, Tournament]):
 
     @app.get("/officials/<nice_name>/")
     def universal_official_site(nice_name):
-        official = [i for i in get_all_officials(comps) if i.nice_name() == nice_name][
-            0
-        ]
+        official = [i for i in get_all_officials() if i.nice_name() == nice_name][0]
         recent_games = []
-        for i in get_all_games(comps):
-            if official.nice_name() != i.primary_official.nice_name():
-                continue
-            recent_games.append(
-                (
-                    f"Round {i.round_number + 1}: {repr(i)} ({i.score_string()})",
-                    i.id,
-                    i.tournament.nice_name(),
+        for i in get_all_games():
+            if official.nice_name() == i.primary_official.nice_name():
+                recent_games.append(
+                    (
+                        f"Umpire Round {i.round_number + 1}: {repr(i)} ({i.score_string()}) [{i.tournament.name}]",
+                        i.id,
+                        i.tournament.nice_name(),
+                    )
                 )
-            )
+            elif official.nice_name() == i.scorer.nice_name():
+                recent_games.append(
+                    (
+                        f"Scorer Round {i.round_number + 1}: {repr(i)} ({i.score_string()}) [{i.tournament.name}]",
+                        i.id,
+                        i.tournament.nice_name(),
+                    )
+                )
         return (
             render_template(
                 "tournament_specific/official.html",
@@ -932,7 +1002,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
 
     @app.get("/officials/")
     def universal_official_directory_site():
-        official = [(i, i.nice_name()) for i in get_all_officials(comps)]
+        official = [(i, i.nice_name()) for i in get_all_officials()]
         return (
             render_template(
                 "tournament_specific/all_officials.html",

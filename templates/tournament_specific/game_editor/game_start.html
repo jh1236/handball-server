@@ -18,6 +18,9 @@
 <h1>{{ teams[0].name }} vs {{ teams[1].name }} </h1>
 <h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
 <p><b>Match Official: </b><i>{{ game.primary_official }}</i></p>
+{% if game.scorer.nice_name() != 'none_one' %}
+    <p><b>Match Scorer:</b> <i>{{ game.scorer }}</i></p>
+{% endif %}
 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
 <p onclick="swap()"><i>Swap sides</i></p>
 <br>

@@ -72,6 +72,6 @@ if __name__ == "__main__":
         print(f"{i + 1}: {t.name} [{t.first_ratio()}] [{t.court_one}]")
     print("-" * 20)
     for t in competition.officials:
-        print(f": {t.name} [{t.games_court_one / t.games_umpired}]")
+        print(f": {t.name} [{t.games_court_one / t.games_umpired}] <{t.games_scored}>")
     print("-" * 20)
     app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)

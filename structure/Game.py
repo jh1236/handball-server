@@ -1,8 +1,8 @@
 import time
 import typing
 
-from structure.OfficiatingBody import NoOfficial
-from structure.Player import GamePlayer, Player
+from structure.OfficiatingBody import NoOfficial, Official
+from structure.Player import GamePlayer, Player, elo_map
 from structure.Team import BYE, Team
 from utils.logging_handler import logger
 from utils.util import chunks_sized
@@ -62,7 +62,10 @@ class Game:
             game.set_primary_official(
                 [i for i in tournament.officials if i.name == game_map["official"]][0]
             )
-
+        if game_map.get("scorer", "None one") != "None one":
+            game.set_primary_official(
+                [i for i in tournament.officials if i.name == game_map["scorer"]][0]
+            )
         game.court = game_map["court"]
         game.id = game_map["id"]
         if not game_map["started"]:
@@ -121,8 +124,12 @@ class Game:
                 self.teams[0].score = 11
             else:
                 self.super_bye = True
+        self.ranked: bool = not final and not any(
+            i.nice_name().startswith("null") for i in self.players()
+        )
         self.first_team_serves: bool = False
-        self.primary_official = NoOfficial
+        self.primary_official: Official = NoOfficial
+        self.scorer: Official = NoOfficial
         self.round_number: int = 0
 
     @property
@@ -146,6 +153,12 @@ class Game:
         o.games_officiated += 1
         self.primary_official = o
 
+    def set_scorer(self, o):
+        if self.bye:
+            raise LookupError(f"Game {self.id} is a bye!")
+        o.games_scored += 1
+        self.scorer = o
+
     def add_to_game_string(self, string: str, team):
         if team == self.teams[0]:
             self.game_string += string.upper()
@@ -156,11 +169,9 @@ class Game:
         if self.bye or self.super_bye:
             raise LookupError(f"Game {self.id} is a bye!")
 
-    def next_point(self, penalty_point: bool):
+    def next_point(self):
         self.bye_check()
         self.event()
-        if not penalty_point:
-            self.server().serve()
         self.rounds += 1
         [i.next_point() for i in self.teams]
 
@@ -319,7 +330,10 @@ class Game:
             "started": self.started,
             "id": self.id,
             "firstTeamServed": self.first_team_serves,
-            "official": self.primary_official.name if self.primary_official else "None",
+            "official": self.primary_official.name
+            if self.primary_official
+            else "None one",
+            "scorer": self.scorer.name if self.scorer else "None one",
         }
         if self.best_player:  # game has been submitted and finalised
             dct["bestPlayer"] = self.best_player.name

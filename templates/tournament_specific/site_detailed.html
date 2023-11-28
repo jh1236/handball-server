@@ -19,7 +19,9 @@
         <th></th>
         <th><b>Second Team</b></th>
         <th><b>Umpire</b></th>
+        {% if t.details['scorer'] %}<th><b>Scorer</b></th> {% endif %}
         {% if t.two_courts %}<th><b>Court</b></th> {% endif %}
+
         <th><b>Result</b></th>
     </tr>
     </thead>
@@ -38,6 +40,7 @@
         <td><a href="/{{tournament}}games/{{game.id}}" class="hide"> vs </a></td>
         <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.teams[1] }}</a></td>
         <td><a href="/{{tournament}}officials/{{game.primary_official.nice_name()}}" class="hide"><i>{{ game.primary_official }}</i></a></td>
+        {% if t.details['scorer'] %}<td><i><a href="/{{tournament}}officials/{{game.scorer.nice_name()}}" class="hide">{{ game.scorer }}</a></i></td> {% endif %}
         {% if t.two_courts %}<td><a href="/{{tournament}}fixtures/detailed?court={{game.court}}" class="hide">{{ game.court_display() }}</a></td> {% endif %}
         <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.score_string() }}</a></td>
     </tr>
@@ -61,6 +64,7 @@
         <td><a href="/{{tournament}}games/{{game.id}}" class="hide"> vs</a></td>
         <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.teams[1] }}</a></td>
         <td><a href="/{{tournament}}officials/{{game.primary_official.nice_name()}}" class="hide"><i>{{ game.primary_official }}</i></a></td>
+        {% if t.details['scorer'] %}<td><i><a href="/{{tournament}}officials/{{game.scorer.nice_name()}}" class="hide">{{ game.scorer }}</a></i></td> {% endif %}
         {% if t.two_courts %}<td><a href="/{{tournament}}fixtures/detailed?court={{game.court}}" class="hide">{{ game.court_display() }}</a></td> {% endif %}
         <td><a href="/{{tournament}}games/{{game.id}}" class="hide">{{ game.score_string() }}</a></td>
     </tr>

@@ -7,13 +7,11 @@ from structure.Player import Player, GamePlayer
 from utils.logging_handler import logger
 from utils.util import calc_elo, google_image
 
-images = {
+images = {}
 
-}
 
 class Team:
     def __init__(self, name: str, players: list[Player]):
-        self.elo = 1000
         self.name = name
         self.players: list[Player] = players
         self.points_against: int = 0
@@ -53,10 +51,8 @@ class Team:
         return self.red_cards + self.green_cards + self.yellow_cards
 
     def helper(self):
-        print("started")
         self.image_path = google_image(self.name)
         images[self.name] = self.image_path
-        print(f"done: '{self.image_path}'")
 
     def image(self):
         return self.image_path or f"/api/teams/image?name=blank"
@@ -91,11 +87,14 @@ class Team:
         self.games_won: int = 0
         self.games_played: int = 0
         self.green_cards: int = 0
-        self.elo = 1000
         self.yellow_cards: int = 0
         self.red_cards: int = 0
         self.faults: int = 0
         self.timeouts: int = 0
+
+    @property
+    def elo(self):
+        return round(sum([i.elo for i in self.players]) / len(self.players), 2)
 
     def get_stats(self, include_players=False):
         game_teams: list[GameTeam] = []
@@ -116,7 +115,7 @@ class Team:
         faults = self.faults + sum([i.faults for i in game_teams])
         games_played = self.games_played + len(game_teams)
         d = {
-            # "ELO": round(self.elo),
+            "Elo": round(self.elo, 2),
             "Games Played": games_played,
             "Games Won": self.games_won,
             "Games Lost": self.games_played - self.games_won,
@@ -165,7 +164,7 @@ class Team:
         return t
 
 
-BYE = Team("BYE", [Player("Goodbye"), Player("Goodbye")])
+BYE = Team("BYE", [Player("Good bye"), Player("Good bye")])
 
 
 class GameTeam:
@@ -236,11 +235,18 @@ class GameTeam:
         if self.swapped:
             self.players[0], self.players[1] = self.players[1], self.players[0]
 
+    def change_elo(self, delta):
+        for i in self.players:
+            if i.time_on_court:
+                i.player.change_elo(delta)
+
     def next_point(self):
         self.faulted = False
         [i.next_point() for i in self.players[:2]]
 
     def lost_point(self):
+        if self.serving:
+            self.server().points_served += 1
         self.serving = False
 
     def sub_player(self, first_player: bool):
@@ -250,6 +256,8 @@ class GameTeam:
         )
         self.game.add_to_game_string("x" + ("l" if first_player else "r"), self)
         self.has_sub = False
+        if any(i.nice_name().startswith("null") for i in self.players[:2]):
+            self.game.ranked = False
 
     def score_point(self, first_player: bool | None = None, ace: bool = False):
         if ace:
@@ -270,7 +278,10 @@ class GameTeam:
                 f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string()}"
             )
         self.score += 1
-        self.game.next_point(first_player is None and not ace)
+        if self.serving and (first_player is not None or ace):
+            self.server().points_served += 1
+            self.server().won_while_serving += 1
+        self.game.next_point()
         self.opponent.lost_point()
         if not self.serving:
             self.first_player_serves = not self.first_player_serves
@@ -378,7 +389,7 @@ class GameTeam:
     def end(self, final=False):
         won = self.game.winner() == self.team
         [i.end(won, final) for i in self.players]
-        if not final:
+        if self.game.ranked:
             self.team.points_for += self.score
             self.team.points_against += self.opponent.score
             self.team.games_played += 1
@@ -393,21 +404,21 @@ class GameTeam:
             self.game.primary_official.red_cards += self.red_cards
             self.game.primary_official.faults += self.faults
 
-        # either elo is not set, or it is positive, and we lost or negative, and we won
-        # meaning that the result of the game was changed
-        if (
-            not self.elo_delta
-            or (self.elo_delta > 0 and not won)
-            or (self.elo_delta < 0 and won)
-        ):
-            self.elo_delta = calc_elo(self.team, self.opponent.team, won)
-            self.opponent.elo_delta = calc_elo(self.opponent.team, self.team, not won)
-        self.team.elo += self.elo_delta
+            # either elo is not set, or it is positive, and we lost or negative, and we won
+            # meaning that the result of the game was changed
+            if not self.game.tournament.details.get("ranked", True): return
+            if (
+                not self.elo_delta
+                or (self.elo_delta > 0 and not won)
+                or (self.elo_delta < 0 and won)
+            ):
+                self.elo_delta = calc_elo(self.team, self.opponent.team, won)
+                self.opponent.elo_delta = calc_elo(self.opponent.team, self.team, not won)
+            self.change_elo(self.elo_delta)
 
     def undo_end(self):
         [i.undo_end(self.game.winner() == self.team) for i in self.players]
         self.team.points_for -= self.score
-        self.team.elo -= self.elo_delta
         self.team.points_against -= self.opponent.score
         self.team.games_played -= 1
         self.team.games_won -= self.game.winner() == self.team

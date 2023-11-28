@@ -8,32 +8,48 @@
     "%o just got rolled. Try a little harder.",
     "A simply un-defendable hit by %p.",
     "A massive hit by %p! Dora has some running to do...",
-    "That ball went miles away! Good luck finding it %o..."
+    "That ball went miles away! Good luck finding it %o...",
+    "%p just slayed that point.",
+    "That was a close one, but %t comes out on top.",
+    "Absolutely smoked by %p! There's no returning that!",
+    "%r needs to check their prescription.",
+    "%r needs to go to specsavers!",
+    "Beautiful leave by %p.",
+    "An absolutely nasty shot by %p! %r didn't stand a chance."
   ],
   "ace": [
     "%p hit an ace.",
     "An un-returnable serve from %p.",
     "I bet %p has been working on that serve for a while...",
     "%p just zinged one past %r.",
-    "And another ace for %p! They're on fire today!"
+    "And another ace for %p! They're on fire today!",
+    "Great areas by %p, 100% earnt that point.",
+    "%r is in disbelief after that serve.",
+    "%p slots a lovely serve straight past %r's left hand",
+    "That's a fantastic serve! Ace for %p.",
+    "%o is clearly behind on their training, %r should not be missing serves like that..."
   ],
   "green": [
     "%p was green carded.",
     "%p thought green meant go?",
     "%p, YOU cANT SAy tHAT!",
-    "First warning for %p..."
+    "First warning for %p...",
+    "%p needs to be careful, another outburst like that and they'll have bench time"
   ],
   "yellow": [
     "%p was yellow carded.",
     "%p needed a break...",
-    "%p was yellow carded.  Good luck %q..."
+    "%p was yellow carded.  Good luck %q...",
+    "%p has been sent to the sin bin!",
+    "Yeouch! That looked dangerous, and %u agrees. Yellow for %p."
   ],
   "red": [
     "%p was red carded.",
     "It's fine. %p didn't wanna play anyway.",
     "%p trusts %q so much, they got carded out!",
     "%p was red carded.  Disgraceful Play.",
-    "Yikes! Someone should warn %p that %u is not gonna like that..."
+    "Yikes! Someone should warn %p that %u is not gonna like that...",
+    "Frankly disrespectful behaviour by %p. I hope that this is followed up after the match"
   ],
   "timeout": [
     "%t called a timeout.",
@@ -49,5 +65,11 @@
     "Just reminding you %p, the ball needs to land *in* the court.",
     "FAULT!!",
     "Keep that arm above your waist %p"
+  ],
+  "sub": [
+    "%p needed a rest.",
+    "Enter the X-factor player: %q",
+    "Tactical retreat for %p.",
+    "Let's hope that %q did their warm ups"
   ]
 }

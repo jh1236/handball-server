@@ -133,6 +133,6 @@ if __name__ == "__main__":
         print(f"{i + 1}: {t.name} [{t.first_ratio()}] [{t.court_one}]")
     print("-" * 20)
     for t in competition.officials:
-        print(f": {t.name} [{t.games_umpired}] [{t.games_court_one / t.games_umpired}]")
+        print(f": {t.name} [{t.games_umpired}] [{t.games_court_one / t.games_umpired}] <{t.games_scored}>")
     print("-" * 20)
 

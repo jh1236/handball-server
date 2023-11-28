@@ -48,7 +48,5 @@ let load = (s) => {
     addToNavBar("Ladder", `/${s}ladder`)
     addToNavBar("Players", `/${s}players`)
     addToNavBar("Officials", `/${s}officials`)
-    addToNavBar("U.Q.P.", "https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing")
-    addToNavBar("Rules", "/rules")
-    addToNavBar("Conduct", "/code_of_conduct")
+    addToNavBar("Documents", "/documents")
 }

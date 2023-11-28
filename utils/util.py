@@ -4,6 +4,7 @@ from typing import TypeVar, Any
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 import re
+import re
 
 T = TypeVar("T")
 
@@ -30,7 +31,7 @@ def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
 
 
 def calc_elo(team_one, team_two, first_won):
-    K = 60
+    K = 100
     pa = probability(team_two.elo, team_one.elo)
     ra = team_one.elo + K * (first_won - pa)
 
@@ -55,7 +56,7 @@ def fixture_sorter(fixtures: list[list[Any]]) -> list[list[Any]]:
 
 
 def google_image(word):
-    url = "https://www.google.com/search?tbm=isch&q=" + word.replace(" ", "_")
+    url = "https://www.google.com/search?tbm=isch&q=" + re.sub("[^a-zA-Z0-9]","",word.replace(" ", "_"))
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
     req = Request(url, headers=headers)
     page = urlopen(req)

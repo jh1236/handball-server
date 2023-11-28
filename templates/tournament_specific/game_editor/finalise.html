@@ -19,6 +19,9 @@
 <h1 class="big">{{teams[0].score}} - {{teams[1].score}}</h1>
 <p><b>Round:</b> <i>{{game.rounds}}</i></p>
 <p><b>Match Official:</b><i>{{game.primary_official}}</i>
+    {% if game.scorer.nice_name() != 'none_one' %}
+        <p><b>Match Scorer:</b> <i>{{ game.scorer }}</i></p>
+    {% endif %}
 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
 </p>
 <br>
