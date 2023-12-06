@@ -12,12 +12,12 @@
 
 <script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
 <h1><a href="/{{tournament}}players/" class="hide">Players</a></h1>
-<table class="table" id="sort">
+<table class="table" id="sort0">
     <thead>
     <tr>
         <th style="color:#e0ffe0">This is an image</th>
         {% for i, h, p in headers %}
-        <th onclick="sortTable({{i}})" class="priority-{{p}}" ><b>{{h}}</b></th>
+        <th onclick="sortTable(0, {{i}})" class="priority-{{p}}" ><b>{{h}}</b></th>
         {% endfor %}
     </tr>
     </thead>

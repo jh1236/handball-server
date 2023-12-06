@@ -1,4 +1,5 @@
 import os
+import re
 import threading
 import time
 from typing import Any
@@ -149,7 +150,15 @@ class Team:
             p.add_stats(i)
 
     def nice_name(self):
-        return self.name.lower().replace(" ", "_").replace("the_", "")
+        s = self.name.lower().replace(" ", "_").replace(",", "").replace("the_", "")
+        return re.sub("[^a-zA-Z0-9_]", "", s)
+
+    @property
+    def short_name(self):
+        if len(self.name) > 30:
+            return self.name[:27] + "..."
+        else:
+            return self.name
 
     def first_ratio(self):
         return self.listed_first / (self.games_played or 1)
@@ -181,6 +190,7 @@ class GameTeam:
         self.start_players = self.players.copy()
         self.green_cards: int = 0
         self.yellow_cards: int = 0
+        self.elo_at_start = self.team.elo
         self.red_cards: int = 0
         self.timeouts: int = 1
         self.green_carded: bool = False
@@ -207,13 +217,15 @@ class GameTeam:
         return repr(self.team)
 
     def reset(self):
+        if self.elo_delta:
+            self.change_elo(-self.elo_delta, -self.game.id)
+            self.elo_delta = None
         self.green_carded = False
         self.score = 0
         self.serving = False
         self.faulted = False
         self.timeouts = 1
         self.green_cards = 0
-        self.elo_delta = None
         self.yellow_cards = 0
         self.red_cards = 0
         self.faults = 0
@@ -232,13 +244,14 @@ class GameTeam:
         self.opponent: GameTeam = [i for i in self.game.teams if i.name != self.name][0]
         self.serving = serve_first
         self.first_player_serves = serve_first
+        self.elo_at_start = self.team.elo
         if self.swapped:
             self.players[0], self.players[1] = self.players[1], self.players[0]
 
-    def change_elo(self, delta):
+    def change_elo(self, delta, a):
         for i in self.players:
             if i.time_on_court:
-                i.player.change_elo(delta)
+                i.player.change_elo(delta, a)
 
     def next_point(self):
         self.faulted = False
@@ -387,6 +400,8 @@ class GameTeam:
         return max(self.players, key=lambda a: a.card_time_remaining).card_duration
 
     def end(self, final=False):
+        if self.elo_delta:
+            Exception("game ended twice!")
         won = self.game.winner() == self.team
         [i.end(won, final) for i in self.players]
         if self.game.ranked:
@@ -406,18 +421,19 @@ class GameTeam:
 
             # either elo is not set, or it is positive, and we lost or negative, and we won
             # meaning that the result of the game was changed
-            if not self.game.tournament.details.get("ranked", True): return
-            if (
-                not self.elo_delta
-                or (self.elo_delta > 0 and not won)
-                or (self.elo_delta < 0 and won)
-            ):
-                self.elo_delta = calc_elo(self.team, self.opponent.team, won)
-                self.opponent.elo_delta = calc_elo(self.opponent.team, self.team, not won)
-            self.change_elo(self.elo_delta)
+            if not self.game.tournament.details.get("ranked", True):
+                return
+            if not self.elo_delta:
+                self.elo_delta = calc_elo(
+                    self.elo_at_start, self.opponent.elo_at_start, won
+                )
+                self.change_elo(self.elo_delta, self.game.id)
 
     def undo_end(self):
         [i.undo_end(self.game.winner() == self.team) for i in self.players]
+        if self.elo_delta:
+            self.change_elo(-self.elo_delta, -self.game.id)
+        self.elo_delta = None
         self.team.points_for -= self.score
         self.team.points_against -= self.opponent.score
         self.team.games_played -= 1
@@ -434,6 +450,10 @@ class GameTeam:
 
     def nice_name(self):
         return self.team.nice_name()
+
+    @property
+    def short_name(self):
+        return self.team.short_name
 
     def get_stats(self, include_players=False):
         d = {

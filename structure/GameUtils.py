@@ -33,7 +33,7 @@ def game_string_to_commentary(game: Game) -> list[str]:
         return ["Hang Tight, the game will start soon!"]
     else:
         out.append(
-            f"Game Begin: {game.teams[not game.first_team_serves]} will be serving."
+            f"Game Begin! {game.teams[not game.first_team_serves]} will be serving."
         )
     teams = [i.start_players for i in game.teams]
     for j in chunks_sized(game.game_string, 2):
@@ -77,4 +77,6 @@ def game_string_to_commentary(game: Game) -> list[str]:
         )
         string = string.replace("%u", repr(game.primary_official))
         out.append(string)
+    if game.best_player:
+        out.append(f"Game Over! The winner was {game.winner().name}, and best on court was {game.best_player.first_name()}.")
     return out

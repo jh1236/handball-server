@@ -1,3 +1,4 @@
+import inspect
 from typing import Any
 
 elo_map = {}
@@ -9,7 +10,7 @@ class Player:
         self.tournament = None
         self.name: str = name
         if self.nice_name() not in elo_map:
-            elo_map[self.nice_name()] = 1000
+            elo_map[self.nice_name()] = 1500
         self.faults: int = 0
         self.won_while_serving = 0
         self.double_faults: int = 0
@@ -31,7 +32,7 @@ class Player:
     def elo(self):
         return elo_map[self.nice_name()]
 
-    def change_elo(self, delta: int):
+    def change_elo(self, delta: int, a):
         elo_map[self.nice_name()] += delta
 
     @property
@@ -144,7 +145,7 @@ class Player:
                 (d["Green Cards"] + d["Yellow Cards"] + d["Red Cards"])
                 / (d["Games Played"] or 1),
                 2,
-            ),
+                ),
             "Serve Ace Rate": f'{round(d["Aces scored"] / (served or 1), 2) * 100: .1f}%',
             "Percentage of Points scored": f"{round(d['Points scored'] / (d['Rounds on Court'] or 1), 2) * 100: .1f}%",
             "Serving Conversion Rate": f"{round(won_while_serving / (served or 1), 2) * 100: .1f}%",
@@ -166,11 +167,11 @@ class Player:
         self.wins += d.get("Games Won", 0)
         self.points_served += d.get("Points served", 0)
         self.won_while_serving += d.get("Points served", 0) * (
-            float(d.get("Serving Conversion Rate", "0%")[:-1]) / 100.0
+                float(d.get("Serving Conversion Rate", "0%")[:-1]) / 100.0
         )
 
     def nice_name(self):
-        return self.name.lower().replace(" ", "_")
+        return self.name.lower().replace(" ", "_").replace("'","")
 
     def game_player(self, game, captain):
         return GamePlayer(self, game, captain)

@@ -37,6 +37,13 @@ function swap() {
     }
 }
 
+function jump() {
+    new_id = +(document.getElementById("jump").value)
+    console.log(new_id)
+    document.location.href = `/${tournament}games/${new_id}/display`
+}
+
+
 function timeout(timeIn = 0) {
     if (timeIn > 0) {
         startTime = timeIn

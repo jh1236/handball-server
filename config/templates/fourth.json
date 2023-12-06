@@ -1,6 +1,6 @@
 {
   "fixtures_generator": "Pooled",
-  "finals_generator": "BasicFinals",
+  "finals_generator": "PooledFinals",
   "name": "The Fourth SUSS Championship",
   "officials": [
     "Jared Healy",
@@ -8,21 +8,20 @@
     "Aimee Soudure",
     "Alex Soudure",
     "Zaiah Deards",
-    "James Sharpham",
     "Eddie Smith"
   ],
   "teams": [
     "Bedwars Besties",
-    "Breaking Bad Bois",
+    "Saelmoa",
     "Ball Fondlers",
     "GORGON WOOBT",
     "Handchester United",
     "Height Difference",
-    "Operation Overkill",
-    "Riggy",
+    "Operation Underkill",
+    "Team Weezer",
     "Team Rocket",
     "The Baes",
-    "Rolls for Initiative"
+    "*REDACTED*"
   ],
   "twoCourts": true,
   "scorer": true

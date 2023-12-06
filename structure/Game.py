@@ -2,7 +2,7 @@ import time
 import typing
 
 from structure.OfficiatingBody import NoOfficial, Official
-from structure.Player import GamePlayer, Player, elo_map
+from structure.Player import GamePlayer, Player
 from structure.Team import BYE, Team
 from utils.logging_handler import logger
 from utils.util import chunks_sized
@@ -156,8 +156,11 @@ class Game:
     def set_scorer(self, o):
         if self.bye:
             raise LookupError(f"Game {self.id} is a bye!")
-        o.games_scored += 1
+        if self.scorer == o:
+            return
         self.scorer = o
+        if self.primary_official != o:
+            o.games_scored += 1
 
     def add_to_game_string(self, string: str, team):
         if team == self.teams[0]:
@@ -234,7 +237,7 @@ class Game:
         )
 
     def end(self, best_player: str):
-        if best_player is None:
+        if best_player is None or self.best_player is not None:
             return
         self.bye_check()
         if self.game_ended():
@@ -248,12 +251,14 @@ class Game:
                     for i in self.teams:
                         i.team.court_one += 1
                     self.primary_official.games_court_one += 1
-            self.best_player = []
+            self.best_player = None
             for i in self.players():
                 if i.name == best_player:
                     self.best_player = i
                     i.best_player()
                     break
+            if self.best_player == None:
+                raise Exception(f"Best Player '{best_player}' not found")
             self.update_count = -1
             [i.end(self.is_final) for i in self.teams]
             self.primary_official.games_umpired += 1
@@ -456,6 +461,12 @@ class Game:
         if self.bye or not self.started:
             return "-"
         return f"{self.teams[0].score} - {self.teams[1].score}"
+
+    @property
+    def full_name(self):
+        if self.started:
+            return repr(self) + f" ({self.score_string()}) [{self.tournament.name}]"
+        return repr(self) + f" [{self.tournament.name}]"
 
     def info(self, message):
         if self.id < 0:

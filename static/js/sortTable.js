@@ -1,10 +1,9 @@
-function sortTable(n) {
+function sortTable(id, n) {
     let table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById("sort");
+    table = document.getElementById("sort" + id);
     switching = true;
     // Set the sorting direction to ascending:
     rows = table.rows;
-
     if (n >= 0) {
         x = rows[1].getElementsByTagName("TD")[n].innerHTML;
     } else {

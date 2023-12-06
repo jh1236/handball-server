@@ -30,12 +30,12 @@ def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
         yield l[i::n]
 
 
-def calc_elo(team_one, team_two, first_won):
-    K = 100
-    pa = probability(team_two.elo, team_one.elo)
-    ra = team_one.elo + K * (first_won - pa)
+def calc_elo(elo, elo_other, first_won):
+    K = 30
+    pa = probability(elo_other, elo)
+    ra = K * (first_won - pa)
 
-    return ra - team_one.elo
+    return ra
 
 
 def fixture_sorter(fixtures: list[list[Any]]) -> list[list[Any]]:
@@ -56,6 +56,7 @@ def fixture_sorter(fixtures: list[list[Any]]) -> list[list[Any]]:
 
 
 def google_image(word):
+    # raise Exception("asd")
     url = "https://www.google.com/search?tbm=isch&q=" + re.sub("[^a-zA-Z0-9]","",word.replace(" ", "_"))
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
     req = Request(url, headers=headers)

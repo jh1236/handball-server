@@ -1,5 +1,1044 @@
 {
     "details": {
         "ref": "fourth"
-    }
+    },
+    "finals": [
+        [
+            {
+                "bestPlayer": "Eddie Smith",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SRFLslalfralFLttslttYLfrslttglFLalTTARARsrarflglarslFRflsr",
+                "id": 36,
+                "official": "Aimee Soudure",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Handchester United",
+                    "players": [
+                        "Eddie Smith",
+                        "Liam Cox"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Zebiah Peaker",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "grGRalgrSRFRSRsrglsrslYLfrslGLSRSRTTalarslalYRslFLGLsl",
+                "id": 37,
+                "official": "Aimee Soudure",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "*REDACTED*",
+                    "players": [
+                        "Zebiah Peaker",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "slyrARslfrsrYLfrslalFLttalfrFLalfrsrgrttfrSRfrFRslalsr",
+                "id": 38,
+                "official": "Aimee Soudure",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                }
+            }
+        ]
+    ],
+    "games": [
+        [
+            {
+                "bestPlayer": "Eva Hajigabriel",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "flflFLalsrgrslslfrslSRarslararflglARFLsrsr",
+                "id": 0,
+                "official": "Aimee Soudure",
+                "scorer": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "The Baes",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Dora Wan"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Team Weezer",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Reece Taylor",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "FLfrsrARFRFRslARyralgrSRylsrarsrglFRFRarylalFRfrYLfrTTsr",
+                "id": 1,
+                "official": "Eddie Smith",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "Saelmoa",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Eddie Smith",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "alalARSRflFRFRslslfrSRYRfrfrTTslflyryryrSRalslslSRsrSRYLSRal",
+                "id": 2,
+                "official": "Jared Healy",
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Handchester United",
+                    "players": [
+                        "Eddie Smith",
+                        "Liam Cox"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "Operation Underkill",
+                    "players": [
+                        "Eddie Eddieson",
+                        "Michael Russ"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 3,
+                "official": "None one",
+                "scorer": "None one",
+                "started": false,
+                "teamOne": {
+                    "name": "Ball Fondlers",
+                    "players": [
+                        "Charlie Wyatt",
+                        "Elizabeth Gover"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "FRarsralSRFLSRslgralfrslalGLslSRFRTTfrsrFRSRslsl",
+                "id": 4,
+                "official": "Alex Soudure",
+                "scorer": "Eddie Smith",
+                "started": true,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Team Rocket",
+                    "players": [
+                        "James Frayne",
+                        "Heidi Leow"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Vangeli Hajigabriel",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "frSRgrGRsralflslSRARFRararfrFRsralslfrfrSRyrSRslflFLglGLsrflflARFRFR",
+                "id": 5,
+                "official": "Zaiah Deards",
+                "scorer": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "*REDACTED*",
+                    "players": [
+                        "Zebiah Peaker",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Brigitte Gredziuk",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "slYRFRyryrslttslalslyryrsrflyrGLslyrslsrYLflslFRFR",
+                "id": 6,
+                "official": "Alex Soudure",
+                "scorer": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Saelmoa",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 0
+                },
+                "teamTwo": {
+                    "name": "The Baes",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Dora Wan"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Iggy Kreutz",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slslflttsralslGRGRflslalARgrSRalarGRFRSRfrylslTTal",
+                "id": 7,
+                "official": "Lachlan Banks",
+                "scorer": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Team Weezer",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Reece Taylor",
+                        "Zaiah Deards"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Operation Underkill",
+                    "players": [
+                        "Eddie Eddieson",
+                        "Michael Russ"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "alflslslYLylslalyrslyrYRfralsrfralARARsrflSRal",
+                "id": 8,
+                "official": "Aimee Soudure",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Handchester United",
+                    "players": [
+                        "Eddie Smith",
+                        "Liam Cox"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Elizabeth Gover",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "GRfrttyrYRYRalgralsralARarSRGLalARFRslalFRfrsrarFRgryrfrFR",
+                "id": 9,
+                "official": "Lachlan Banks",
+                "scorer": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Ball Fondlers",
+                    "players": [
+                        "Charlie Wyatt",
+                        "Elizabeth Gover"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Team Rocket",
+                    "players": [
+                        "James Frayne",
+                        "Heidi Leow"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 10,
+                "official": "None one",
+                "scorer": "None one",
+                "started": false,
+                "teamOne": {
+                    "name": "*REDACTED*",
+                    "players": [
+                        "Zebiah Peaker",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "ylfrgrgrsrFLgrFLFLflFLFLslaralsrflslaralal",
+                "id": 11,
+                "official": "Eddie Smith",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 0
+                },
+                "teamTwo": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Michael Russ",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "FRttalalslylslGLARgraralslslARfrslslARal",
+                "id": 12,
+                "official": "Aimee Soudure",
+                "scorer": "Eddie Smith",
+                "started": true,
+                "teamOne": {
+                    "name": "Operation Underkill",
+                    "players": [
+                        "Eddie Eddieson",
+                        "Michael Russ"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "The Baes",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Dora Wan"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Sophie Lane",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "FLFLalFLFLFLTTFLFLyralSRalFRslalSRslalYRflsl",
+                "id": 13,
+                "official": "Zaiah Deards",
+                "scorer": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Saelmoa",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Handchester United",
+                    "players": [
+                        "Eddie Smith",
+                        "Liam Cox"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Reece Taylor",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "ararSRglarargrFLYLSRslFRalARARalFLFLalFLslglARARGRar",
+                "id": 14,
+                "official": "Alex Soudure",
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Team Weezer",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Reece Taylor",
+                        "Zaiah Deards"
+                    ],
+                    "score": 6
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Ethan Dal Molin",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "YRarGRSRyralFLarslsrfrararGLSRarflYLflglalsryrsl",
+                "id": 15,
+                "official": "Jared Healy",
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "*REDACTED*",
+                    "players": [
+                        "Zebiah Peaker",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Ball Fondlers",
+                    "players": [
+                        "Charlie Wyatt",
+                        "Elizabeth Gover"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Heidi Leow",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "FLSRsrarttylARslSRFLfrfrsrARslfrslFRfrsrfrFRSRFLfralflglflflGLflYRglflylslYL",
+                "id": 16,
+                "official": "Zaiah Deards",
+                "scorer": "Eddie Smith",
+                "started": true,
+                "teamOne": {
+                    "name": "Team Rocket",
+                    "players": [
+                        "James Frayne",
+                        "Heidi Leow"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 17,
+                "official": "None one",
+                "scorer": "None one",
+                "started": false,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Dora Wan",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "FRglylslslylGRsrslGLalslflYLflalYRslTTFLarFLGLyral",
+                "id": 18,
+                "official": "Jared Healy",
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "The Baes",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Dora Wan"
+                    ],
+                    "score": 1
+                },
+                "teamTwo": {
+                    "name": "Handchester United",
+                    "players": [
+                        "Eddie Smith",
+                        "Liam Cox"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Eddie Eddieson",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRslaralalalYRslFLflYLSRslFRslTTyrsl",
+                "id": 19,
+                "official": "Eddie Smith",
+                "scorer": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Operation Underkill",
+                    "players": [
+                        "Eddie Eddieson",
+                        "Michael Russ"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Sophie Lane",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "fryrfrTTfrFLSRfralYRsrTTslSRarfrGLfrarGRttslsraryrSRslslFRttFR",
+                "id": 20,
+                "official": "Lachlan Banks",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Saelmoa",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "Team Weezer",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Reece Taylor",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Vangeli Hajigabriel",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "FLfrYRsralalARflalfralalYLGRSRTTarARalfrslslsr",
+                "id": 21,
+                "official": "Eddie Smith",
+                "scorer": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Ball Fondlers",
+                    "players": [
+                        "Charlie Wyatt",
+                        "Elizabeth Gover"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Ethan Dal Molin",
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "alalalarflFRylglARFLSRTTalglFLfralSRfrfrslSRYRsrGLSRYRalsrSRGRFLSRal",
+                "id": 22,
+                "official": "Aimee Soudure",
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "*REDACTED*",
+                    "players": [
+                        "Zebiah Peaker",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 23,
+                "official": "None one",
+                "scorer": "None one",
+                "started": false,
+                "teamOne": {
+                    "name": "Team Rocket",
+                    "players": [
+                        "James Frayne",
+                        "Heidi Leow"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Eva Hajigabriel",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "slsrflslFRFRGLarsralFRflarFRalarsl",
+                "id": 24,
+                "official": "Alex Soudure",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "The Baes",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Dora Wan"
+                    ],
+                    "score": 0
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Eddie Smith",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "GLalglGRyrFLflslflflflFRglalfrFRFRslslYRYRYLalTTFRfrfrGLsl",
+                "id": 25,
+                "official": "Jared Healy",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Handchester United",
+                    "players": [
+                        "Eddie Smith",
+                        "Liam Cox"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Team Weezer",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Reece Taylor",
+                        "Zaiah Deards"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Eddie Eddieson",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "TTARfrFLslflylARARalalfrslSRARslglslSRglflalttalfrYLsrSRTTFLalflGLFLflal",
+                "id": 26,
+                "official": "Zaiah Deards",
+                "scorer": "Eddie Smith",
+                "started": true,
+                "teamOne": {
+                    "name": "Operation Underkill",
+                    "players": [
+                        "Eddie Eddieson",
+                        "Michael Russ"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "Saelmoa",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Charlie Wyatt",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "GRararalFRflflylTTARSRglARgralfrGRYRGLalslalalslARslARYLsr",
+                "id": 27,
+                "official": "Alex Soudure",
+                "scorer": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Ball Fondlers",
+                    "players": [
+                        "Charlie Wyatt",
+                        "Elizabeth Gover"
+                    ],
+                    "score": 6
+                },
+                "teamTwo": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 28,
+                "official": "None one",
+                "scorer": "None one",
+                "started": false,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "James Frayne",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "YLslFLTTGLslarslflflGRalGLalarTTFRsrgryrslarsl",
+                "id": 29,
+                "official": "Lachlan Banks",
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Team Rocket",
+                    "players": [
+                        "James Frayne",
+                        "Heidi Leow"
+                    ],
+                    "score": 1
+                },
+                "teamTwo": {
+                    "name": "*REDACTED*",
+                    "players": [
+                        "Zebiah Peaker",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Eddie Smith",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "ARalslalfrFLfrsralslylTTSRflflgrARaralARslFRgrflslsl",
+                "id": 30,
+                "official": "Aimee Soudure",
+                "scorer": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Handchester United",
+                    "players": [
+                        "Eddie Smith",
+                        "Liam Cox"
+                    ],
+                    "score": 6
+                },
+                "teamTwo": {
+                    "name": "Ball Fondlers",
+                    "players": [
+                        "Charlie Wyatt",
+                        "Elizabeth Gover"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "aralFLSRalTTfralalslttalttalalARfrSRfrFLalflYRflFRARFRsl",
+                "id": 31,
+                "official": "Zaiah Deards",
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Reece Taylor",
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "slTTflaralylflFRsraralalflslylarslARar",
+                "id": 32,
+                "official": "Lachlan Banks",
+                "scorer": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Team Weezer",
+                    "players": [
+                        "Iggy Kreutz",
+                        "Reece Taylor",
+                        "Zaiah Deards"
+                    ],
+                    "score": 1
+                },
+                "teamTwo": {
+                    "name": "*REDACTED*",
+                    "players": [
+                        "Zebiah Peaker",
+                        "Ethan Dal Molin"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "James Frayne",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "srARyrslslylfrslylARalYLfrSRgrYLFLfrsrslARSRarsralal",
+                "id": 33,
+                "official": "Jared Healy",
+                "scorer": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Team Rocket",
+                    "players": [
+                        "James Frayne",
+                        "Heidi Leow"
+                    ],
+                    "score": 6
+                },
+                "teamTwo": {
+                    "name": "Operation Underkill",
+                    "players": [
+                        "Eddie Eddieson",
+                        "Michael Russ"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Sharai Rose",
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "grslFLttflarslslFLyrSRalalARglfrSRGLSRslARalTTFRfrglGRalglslFRFR",
+                "id": 34,
+                "official": "Eddie Smith",
+                "scorer": "Eddie Smith",
+                "started": true,
+                "teamOne": {
+                    "name": "GORGON WOOBT",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Sharai Rose"
+                    ],
+                    "score": 5
+                },
+                "teamTwo": {
+                    "name": "The Baes",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Dora Wan"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 35,
+                "official": "None one",
+                "scorer": "None one",
+                "started": false,
+                "teamOne": {
+                    "name": "Saelmoa",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            }
+        ]
+    ]
 }

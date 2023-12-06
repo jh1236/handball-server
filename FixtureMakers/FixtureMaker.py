@@ -31,7 +31,7 @@ def get_type_from_name(name: str) -> Type[FixtureMaker]:
     from FixtureMakers.RoundRobin import RoundRobin
     from FixtureMakers.OneRound import OneRound, OneRoundEditable
     from FixtureMakers.Pooled import Pooled
-
+    from FixtureMakers.PooledFinals import PooledFinals
 
     return {
         BasicFinals.get_name(): BasicFinals,
@@ -40,6 +40,7 @@ def get_type_from_name(name: str) -> Type[FixtureMaker]:
         RoundRobin.get_name(): RoundRobin,
         OneRound.get_name(): OneRound,
         OneRoundEditable.get_name(): OneRoundEditable,
-        "None": Empty,
+        Empty.get_name(): Empty,
         Pooled.get_name(): Pooled,
+        PooledFinals.get_name(): PooledFinals,
     }[name]

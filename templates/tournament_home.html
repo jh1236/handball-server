@@ -82,16 +82,21 @@
         <h2><a class="hide" href="/{{ tournament }}ladder/">Ladder</a></h2>
 
         <table class="table">
-            <tr>
-                <th style="width:30px">Rank</th>
-                <th>Team</th>
-                <th>Games Won</th>
-                <th>Games Played</th>
-            </tr>
-            {% for i, team in ladder %}
+
+            {% for i, l in ladder %}
+                <tr>
+                    <th colspan="4"><a class="hide" href="/{{ tournament }}ladder/">{{ i }}</a></th>
+                </tr>
+                <tr>
+                    <th style="width:30px">Rank</th>
+                    <th>Team</th>
+                    <th>Games Won</th>
+                    <th>Games Played</th>
+                </tr>
+                {% for j, team in l %}
                 <tr>
                     <td style="width:30px"><a class="hide"
-                                              href="/{{ tournament }}teams/{{ team.nice_name() }}"><i>{{ i }}</i></a>
+                                              href="/{{ tournament }}teams/{{ team.nice_name() }}"><i>{{ j }}</i></a>
                     </td>
                     <td style="width:200px; text-align: center"><a class="hide"
                                                                    href="/{{ tournament }}teams/{{ team.nice_name() }}">{{ team.name }}</a>
@@ -103,6 +108,7 @@
                                                href="/{{ tournament }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Played"] }}</a>
                     </td>
                 </tr>
+                {% endfor %}
             {% endfor %}
         </table>
         <h2><a class="hide" href="/{{ tournament }}players/">Players</a></h2>

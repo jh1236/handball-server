@@ -17,7 +17,7 @@ def get_all_games() -> list[Game]:
     ]
 
 
-def get_all_teams() -> list[Team]:
+def get_all_teams(tournament=null_tournament) -> list[Team]:
     from api import comps
 
     teams: dict[str, Team] = {}
@@ -26,9 +26,9 @@ def get_all_teams() -> list[Team]:
             if t.name not in teams:
                 teams[t.name] = Team(
                     t.name,
-                    [Player(j.name).set_tournament(null_tournament) for j in t.players],
+                    [Player(j.name).set_tournament(tournament) for j in t.players],
                 )
-                teams[t.name].tournament = null_tournament
+                teams[t.name].tournament = tournament
             teams[t.name].add_stats(t.get_stats(True))
     return list(teams.values())
 

@@ -13,6 +13,8 @@ from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
 from utils.util import fixture_sorter
 
+numbers = ["One", "Two", "Three", "Four", "Five", "Six"]
+
 
 def init_api(app, comps: dict[str, Tournament]):
     from api import admin_password
@@ -91,6 +93,13 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         )
         ladder = comps[tournament].ladder()
+        if isinstance(ladder[0], list):
+            ladder = [
+                (f"Pool {numbers[i]}", list(enumerate(l if len(l) < 10 else l[:10], start=1)))
+                for i, l in enumerate(ladder)
+            ]
+        else:
+            ladder = [("", list(enumerate(ladder if len(ladder) < 10 else ladder[:10], start=1)))]
         ongoing_games = [
             i for i in comps[tournament].games_to_list() if i.in_progress()
         ]
@@ -114,9 +123,9 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         players.sort(key=lambda a: -a.votes)
         if len(players) > 10:
             players = players[0:10]
-        if len(ladder) > 10:
-            ladder = ladder[0:10]
+
         notes = comps[tournament].notes or ["Notices will appear here when posted"]
+        print(ladder)
         return (
             render_template(
                 "tournament_home.html",
@@ -127,7 +136,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 notes=notes,
                 in_progress=in_progress,
                 tournament=f"{tournament}/",
-                ladder=list(enumerate(ladder, start=1)),
+                ladder=ladder,
             ),
             200,
         )
@@ -187,7 +196,11 @@ def tournament_specific(app, comps: dict[str, Tournament]):
 
     @app.get("/<tournament>/teams/")
     def stats_directory_site(tournament):
-        teams = [i for i in sorted(comps[tournament].teams, key=lambda a: a.nice_name()) if i.games_played > 0 or len(comps[tournament].teams) < 15]
+        teams = [
+            i
+            for i in sorted(comps[tournament].teams, key=lambda a: a.nice_name())
+            if i.games_played > 0 or len(comps[tournament].teams) < 15
+        ]
         return (
             render_template(
                 "tournament_specific/stats.html",
@@ -326,7 +339,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 continue
             prev_matches.append(
                 (
-                    f"{repr(i)} ({i.score_string()}) [{i.tournament.name}]",
+                    i.full_name,
                     i.id,
                     i.tournament,
                 )
@@ -382,30 +395,36 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             "Point Difference": 2,
             "Elo": 3,
         }
+        ladder = comps[tournament].ladder()
+        if isinstance(ladder[0], list):
+            ladder = [
+                (f"Pool {numbers[i]}", list(enumerate(l, start=1)))
+                for i, l in enumerate(ladder)
+            ]
+        else:
+            ladder = [("", list(enumerate(ladder, start=1)))]
+        ladder = [(i if len(i) <= 10 else i[:10]) for i in ladder]
+        print(ladder)
         teams = [
             (
-                i.name,
-                i.nice_name(),
-                i.image(),
-                [(v, priority[k]) for k, v in i.get_stats().items()],
-            )
-            for i in comps[tournament].ladder()
-            if i.games_played > 0 or len(comps[tournament].teams) < 15
+                [
+                    (
+                        j.short_name,
+                        j.nice_name(),
+                        j.image(),
+                        [(v, priority[k]) for k, v in j.get_stats().items()],
+                    )
+                    for _, j in l[1]
+                    if j.games_played > 0 or len(comps[tournament].teams) < 15
+                ], l[0], k
+            ) for k, l in enumerate(ladder)
         ]
-        teams_two = []
-        for i in teams:
-            if len(i[0]) > 30:
-                teams_two.append((i[0][:27] + "...", *i[1:]))
-            else:
-                teams_two.append(i)
-        teams = teams_two
         headers = [
             (i, priority[i])
             for i in (
                 ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
             )
         ]
-        print([i for i in teams if len(i) == 3])
         return (
             render_template(
                 "tournament_specific/ladder.html",
@@ -443,7 +462,8 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in comps[tournament].players()
-            if (i.played or len(comps[tournament].fixtures) < 2 )and not i.nice_name().startswith("null")
+            if (i.played or len(comps[tournament].fixtures) < 2)
+            and not i.nice_name().startswith("null")
         ]
         headers = ["Name"] + [
             i for i in comps[tournament].teams[0].players[0].get_stats()
@@ -476,9 +496,19 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         for i in comps[tournament].games_to_list():
             if player_name not in [j.nice_name() for j in i.players()] or i.bye:
                 continue
+            gp = next(
+                t for t in i.teams if player_name in [j.nice_name() for j in t.players]
+            )
+            s = " <+0>"
+            if gp.elo_delta:
+                s = f" <{sign(gp.elo_delta)}{round(abs(gp.elo_delta))}>"
             if i.started:
                 recent_games.append(
-                    (repr(i) + f" ({i.score_string()})", i.id, i.tournament.nice_name())
+                    (
+                        i.full_name + s,
+                        i.id,
+                        i.tournament.nice_name(),
+                    )
                 )
             else:
                 upcoming_games.append((repr(i), i.id, i.tournament.nice_name()))
@@ -518,7 +548,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             if official.nice_name() == i.primary_official.nice_name():
                 recent_games.append(
                     (
-                        f"{'Umpire ' if comps[tournament].details['scorer'] else ''}Round {i.round_number + 1}: {repr(i)} ({i.score_string()})",
+                        f"{'Umpire ' if comps[tournament].details.get('scorer', False) else ''}Round {i.round_number + 1}: {repr(i)} ({i.score_string()})",
                         i.id,
                         i.tournament.nice_name(),
                     )
@@ -755,7 +785,7 @@ def sign(elo_delta):
     if elo_delta >= 0:
         return "+"
     else:
-        return  "-"
+        return "-"
 
 
 def universal_tournament(app, comps: dict[str, Tournament]):
@@ -785,7 +815,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 if i.started:
                     recent_games.append(
                         (
-                            repr(i) + f" ({i.score_string()}) [{c.name}]",
+                            i.full_name,
                             i.id,
                             i.tournament.nice_name(),
                         )
@@ -793,7 +823,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 else:
                     upcoming_games.append(
                         (
-                            repr(i) + f" [{c.name}]",
+                            i.full_name,
                             i.id,
                             i.tournament.nice_name(),
                         )
@@ -838,26 +868,28 @@ def universal_tournament(app, comps: dict[str, Tournament]):
             "Point Difference": 2,
             "Elo": 3,
         }
+        ladder = [("", list(enumerate(sorted(
+            get_all_teams(),
+            key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])),
+        ), start=1)))]
+        ladder = [(i if len(i) <= 10 else i[:10]) for i in ladder]
+        print(ladder)
         teams = [
             (
-                i.name,
-                i.nice_name(),
-                i.image(),
-                [(v, priority[k]) for k, v in i.get_stats().items()],
+                [
+                    (
+                        j.short_name,
+                        j.nice_name(),
+                        j.image(),
+                        [(v, priority[k]) for k, v in j.get_stats().items()],
+                    )
+                    for _, j in l[1]
+                    if j.games_played > 0
+                ], l[0], k
             )
-            for i in sorted(
-                get_all_teams(),
-                key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])),
-            )
-            if i.games_played > 0
+            for k, l in enumerate(ladder)
         ]
         teams_two = []
-        for i in teams:
-            if len(i[0]) > 30:
-                teams_two.append((i[0][:27] + "...", *i[1:]))
-            else:
-                teams_two.append(i)
-        teams = teams_two
         headers = [
             (i, priority[i])
             for i in (["Team Names"] + [i for i in get_all_teams()[0].get_stats()])
@@ -929,14 +961,18 @@ def universal_tournament(app, comps: dict[str, Tournament]):
             for i in c.games_to_list():
                 if player_name not in [j.nice_name() for j in i.players()] or i.bye:
                     continue
-                gp = next(t for t in i.teams if player_name in [j.nice_name() for j in t.players])
+                gp = next(
+                    t
+                    for t in i.teams
+                    if player_name in [j.nice_name() for j in t.players]
+                )
                 s = " <+0>"
                 if gp.elo_delta:
                     s = f" <{sign(gp.elo_delta)}{round(abs(gp.elo_delta))}>"
                 if i.started:
                     recent_games.append(
                         (
-                            repr(i) + f" ({i.score_string()}) [{c.name}]{s}",
+                            i.full_name + s,
                             i.id,
                             i.tournament.nice_name(),
                         )
@@ -944,7 +980,7 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 else:
                     upcoming_games.append(
                         (
-                            repr(i) + f" [{c.name}]",
+                            i.full_name,
                             i.id,
                             i.tournament.nice_name(),
                         )

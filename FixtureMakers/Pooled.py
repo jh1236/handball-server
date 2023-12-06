@@ -6,7 +6,7 @@ from structure.Team import BYE
 
 class Pooled(FixtureMaker):
     def get_generator(self):
-        pools = list(n_chunks(self.tournament.teams, 2))
+        pools = list(n_chunks(sorted(self.tournament.teams, key=lambda it: it.nice_name()), 2))
         for pool in pools:
             if len(pool) % 2 != 0:
                 pool += [BYE]

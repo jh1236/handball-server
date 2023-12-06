@@ -43,7 +43,7 @@ class Official:
         return self._tidy_name
 
     def nice_name(self):
-        return self.name.lower().replace(" ", "_")
+        return self.name.lower().replace(" ", "_").replace("'","")
 
 
     def get_stats(self):

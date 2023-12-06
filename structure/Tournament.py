@@ -4,12 +4,16 @@ from itertools import zip_longest
 from typing import Generator, Any
 
 from FixtureMakers.FixtureMaker import get_type_from_name
+from FixtureMakers.Pooled import Pooled
 from structure.Game import Game
 from structure.OfficiatingBody import Official, get_officials, NoOfficial
 from structure.Player import Player, elo_map
 from structure.Team import Team, BYE
 from utils.logging_handler import logger
+from utils.util import n_chunks
+from itertools import permutations
 
+officials_permuted = []
 
 class Tournament:
     def __init__(self, file: str):
@@ -37,7 +41,7 @@ class Tournament:
         self.load()
 
     def nice_name(self):
-        return self.name.lower().replace(" ", "_").replace("the_", "")
+        return self.name.lower().replace(" ", "_").replace("the_", "").replace("'", "")
 
     def games_to_list(self) -> list[Game]:
         return [game for r in self.fixtures for game in r] + [
@@ -45,18 +49,36 @@ class Tournament:
         ]
 
     def ladder(self):
-        return sorted(
-            self.teams,
-            key=lambda a: (
-                -a.percentage,
-                -a.point_difference,
-                -a.points_for,
-                -a.games_won,
-                a.cards,
-                a.faults,
-                a.timeouts,
-            ),
-        )
+        if isinstance(self.fixtures_class, Pooled):
+            pools = list(n_chunks(sorted(self.teams, key=lambda it: it.nice_name()), 2))
+            return [
+                sorted(
+                    i,
+                    key=lambda a: (
+                        -a.percentage,
+                        -a.point_difference,
+                        -a.points_for,
+                        -a.games_won,
+                        a.cards,
+                        a.faults,
+                        a.timeouts,
+                    ),
+                )
+                for i in pools
+            ]
+        else:
+            return sorted(
+                self.teams,
+                key=lambda a: (
+                    -a.percentage,
+                    -a.point_difference,
+                    -a.points_for,
+                    -a.games_won,
+                    a.cards,
+                    a.faults,
+                    a.timeouts,
+                ),
+            )
 
     def add_team(self, team):
         if team == BYE:
@@ -117,8 +139,7 @@ class Tournament:
             return self.games_to_list()[game_id]
         return next(i for i in self.games_to_list() if i.id == game_id)
 
-    def appoint_umpires(self):
-
+    def appoint_umpires(self, best_attempt = None, most_mistakes = 999):
         for r in self.fixtures:
             court_one_games = [i for i in r if i.court == 0]
             court_two_games = [i for i in r if i.court == 1]
@@ -250,8 +271,12 @@ class Tournament:
                 "fixtures_generator": self.fixtures_class.get_name(),
                 "finals_generator": self.finals_class.get_name(),
                 "name": self.name,
-                "teams": [i.name for i in self.teams],
-                "officials": [i.name for i in self.officials],
+                "teams": "all"
+                if self.details["teams"] == "all"
+                else [i.name for i in self.teams],
+                "officials": "all"
+                if self.details["officials"] == "all"
+                else [i.name for i in self.teams],
                 "twoCourts": self.two_courts,
             }
         with open(location, "w+") as fp:
@@ -277,10 +302,10 @@ class Tournament:
             data = json.load(fp)
         self.update_games()
         for i, r in enumerate(data.get("games", [])):
+            self.update_games(True)
             for j, m in enumerate(r):
                 g = Game.from_map(m, self)
                 self.fixtures[i][j] = g
-            self.update_games(True)
         for i, r in enumerate(data.get("finals", [])):
             for j, m in enumerate(r):
                 self.update_games()
@@ -338,11 +363,13 @@ class Tournament:
 
 def load_all_tournaments() -> dict[str, Tournament]:
     ret = {}
+    for i in elo_map:
+        elo_map[i] = 1500
     with open("./config/tournaments.txt") as fp:
         files = fp.readlines()
     for i, filename in enumerate(files):
-        filename = filename.replace('\n', '') + ".json"
-        f = os.path.join("./config/tournaments",filename)
+        filename = filename.replace("\n", "") + ".json"
+        f = os.path.join("./config/tournaments", filename)
         if os.path.isfile(f):
             t = Tournament(filename)
             t.details["sort"] = i
