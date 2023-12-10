@@ -24,7 +24,7 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne">Team One</button>
                 <div class="dropdown-content">
                     {% for team in teams %}
-                    <p onclick="setTeamOne('{{team.nice_name()}}', '{{team.name}}')">{{team.name}}</p>
+                    <p onclick="setTeamOne('{{team.nice_name()}}', '{{team.short_name}}')">{{team.short_name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -35,7 +35,7 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo">Team Two</button>
                 <div class="dropdown-content">
                     {% for team in teams %}
-                    <p onclick="setTeamTwo('{{team.nice_name()}}', '{{team.name}}')">{{team.name}}</p>
+                    <p onclick="setTeamTwo('{{team.nice_name()}}', '{{team.short_name}}')">{{team.short_name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -43,6 +43,10 @@
     </tr>
 </table>
 <br>
+{% if officials.__len__() == 1 %}
+    <button disabled class="button" id="umpire">Official</button>
+    <script>setOfficial('{{officials[0].nice_name()}}', '{{officials[0].tidy_name()}}')</script>
+{% else %}
 <div class="dropdown">
     <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
     <div class="dropdown-content">
@@ -51,6 +55,7 @@
         {% endfor %}
     </div>
 </div>
+{% endif %}
 <br>
 <br>
 <button onclick="createTeams()" class="button">Start</button>

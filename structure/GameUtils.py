@@ -28,6 +28,7 @@ def game_string_to_commentary(game: Game) -> list[str]:
         "t": taunts["timeout"],
         "f": taunts["fault"],
         "x": taunts["sub"],
+        'e': ["Forfeit by %t."]
     }
     if not game.started:
         return ["Hang Tight, the game will start soon!"]

@@ -98,14 +98,19 @@
     </tr>
 </table>
 <br>
-<div class="dropdown">
-    <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
-    <div class="dropdown-content">
-        {% for i in officials %}
-        <p onclick="setOfficial('{{i.nice_name()}}', '{{i.tidy_name()}}')">{{i.tidy_name()}}</p>
-        {% endfor %}
+{% if officials.__len__() == 1 %}
+    <button disabled class="button" id="umpire">Official</button>
+    <script>setOfficial('{{officials[0].nice_name()}}', '{{officials[0].tidy_name()}}')</script>
+{% else %}
+    <div class="dropdown">
+        <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
+        <div class="dropdown-content">
+            {% for i in officials %}
+                <p onclick="setOfficial('{{i.nice_name()}}', '{{i.tidy_name()}}')">{{i.tidy_name()}}</p>
+            {% endfor %}
+        </div>
     </div>
-</div>
+{% endif %}
 <br>
 <br>
 <button onclick="createPlayers()" class="button">Start</button>

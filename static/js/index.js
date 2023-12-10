@@ -49,4 +49,10 @@ let load = (s) => {
     addToNavBar("Players", `/${s}players`)
     addToNavBar("Officials", `/${s}officials`)
     addToNavBar("Documents", "/documents")
+    var toInsert = document.createElement("div");
+    toInsert.innerHTML = "©2023 Squarers' United Sporting Syndicate. All rights reserved.";
+    toInsert.style.position = "absolute";
+    toInsert.style.bottom = "0px";
+    toInsert.style.width = "100%";
+    toInsert.style.textAlign="center";
 }

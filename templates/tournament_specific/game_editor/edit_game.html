@@ -7,7 +7,7 @@
 </head>
 <body>
 <div id="navBar"></div>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{#<script src="{{ url_for('static', filename='js/index.js') }}"></script>#}
 <script>load("{{tournament}}")</script>
 
 <script src="{{ url_for('static', filename='js/scorer.js') }}"></script>
@@ -37,275 +37,331 @@
         <button class="button" onclick="sendCustomCard()">Submit</button>
     </div>
 </div>
+<div style="width: 100%">
+    <h1>{{ teams[0].name }} vs {{ teams[1].name }}</h1>
+    <h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
 
-<h1>{{ teams[0].name }} vs {{ teams[1].name }}</h1>
-<h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
-<p><b>Round:</b> <i>{{ game.rounds }}</i></p>
-<p><b>Match Id:</b> <i>{{ game.id }}</i></p>
-<p><b>Match Official:</b> <i>{{ game.primary_official }}</i></p>
-{% if game.scorer.nice_name() != 'none_one' %}
-    <p><b>Match Scorer:</b> <i>{{ game.scorer }}</i></p>
-{% endif %}
-<p onclick="swap()"><i>Swap sides</i></p>
-{% if game.match_points() > 0 %}
-    <p style="font-size: 30px"><b>{{ game.match_points() }} Match Points</b></p>
-{% endif %}
+    {% if game.match_points() > 0 %}
+        <p style="font-size: 30px"><b>{{ game.match_points() }} Match Points</b></p>
+    {% endif %}
 
-<br>
-<table class="table">
+    <br>
+    <table class="table">
 
-    <tr>
-        {% if teams[1].serving %}
+        <tr>
+            {% if teams[1].serving %}
+                <td></td>
+                <td></td>
+            {% endif %}
+            {% if game.team_serving().faulted %}
+                <td style="color: #ff0000"><i>{{ game.server().name }}</i></td>
+            {% else %}
+                <td><i>{{ game.server().name }}</i></td>
+            {% endif %}
+        </tr>
+
+        <tr>
+            <th><img
+                    src="{{ teams[0].image() }}"
+                    class="team_logo"
+                    style="display: inline;left:70%;vertical-align:middle;"></th>
+            <td style="width: 150px;"><p><b>Round:</b> <i>{{ game.rounds }}</i></p>
+                <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
+                <p><b>Official:</b> <i>{{ game.primary_official }}</i></p>
+                {% if game.scorer.nice_name() != 'no_one' %}
+                    <p><b>Scorer:</b> <i>{{ game.scorer }}</i></p>
+                {% endif %}
+                <p onclick="swap()"><i>Swap Sides</i></p>
+            </td>
+            <th><img
+                    src="{{ teams[1].image() }}"
+                    class="team_logo"
+                    style="display: inline;left:70%;vertical-align:middle;"></th>
+        </tr>
+        <tr>
+            <td>
+                {% if teams[0].card_time() > 0 %}
+                    <div class="rectangle"
+                         style="background-color: #FCCE6E;width:{{ 100*(teams[0].card_time()) / teams[0].card_duration() }}%"></div>
+                {% endif %}
+                {% if teams[0].card_time() < 0 %}
+                    <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
+                {% endif %}
+            </td>
             <td></td>
+            <td>
+                {% if teams[1].card_time() > 0 %}
+                    <div class="rectangle"
+                         style="background-color: #FCCE6E;width:{{ 100*(teams[1].card_time()) / teams[1].card_duration() }}%"></div>
+                {% endif %}
+                {% if teams[1].card_time() < 0 %}
+                    <div class="rectangle" style="background-color: #EC4A4A"></div>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {% if teams[0].has_sub and game.rounds <= 9 %}
+                    <div class="dropdown">
+                        <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
+                            Substitute {{ teams[0].short_name }}</button>
+                        <div class="dropdown-content">
+                            {% for i, p in teamOnePlayers %}
+                                <p onclick="sub(true, {{ i }})">
+                                    {{ p.name }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}</td>
             <td></td>
-        {% endif %}
-        {% if game.team_serving().faulted %}
-            <td style="color: #ff0000"><i>{{ game.server().name }}</i></td>
-        {% else %}
-            <td><i>{{ game.server().name }}</i></td>
-        {% endif %}
-    </tr>
-
-    <tr>
-        <th><img
-                src="{{ teams[0].image() }}"
-                class="team_logo"
-                style="display: inline;left:70%;vertical-align:middle;"></th>
-        <th style="color:#e0ffe0">spacer..</th>
-        <th><img
-                src="{{ teams[1].image() }}"
-                class="team_logo"
-                style="display: inline;left:70%;vertical-align:middle;"></th>
-    </tr>
-    <tr>
-        <td>
-            {% if teams[0].card_time() > 0 %}
-                <div class="rectangle"
-                     style="background-color: #FCCE6E;width:{{ 100*(teams[0].card_time()) / teams[0].card_duration() }}%"></div>
-            {% endif %}
-            {% if teams[0].card_time() < 0 %}
-                <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
-            {% endif %}
-        </td>
-        <td></td>
-        <td>
-            {% if teams[1].card_time() > 0 %}
-                <div class="rectangle"
-                     style="background-color: #FCCE6E;width:{{ 100*(teams[1].card_time()) / teams[1].card_duration() }}%"></div>
-            {% endif %}
-            {% if teams[1].card_time() < 0 %}
-                <div class="rectangle" style="background-color: #EC4A4A"></div>
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td>
-            {% if teams[0].has_sub and game.rounds <= 9 %}
+            <td>
+                {% if teams[1].has_sub and game.round_number <= 9 %}
+                    <div class="dropdown" style="background-color: #2a5d88;">
+                        <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
+                            Substitute {{ teams[1].short_name }}</button>
+                        <div class="dropdown-content">
+                            {% for i, p in teamTwoPlayers %}
+                                <p onclick="sub(false, {{ i }})">
+                                    {{ p.name }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}</td>
+        </tr>
+        <tr>
+            <td><br></td>
+        </tr>
+        <tr>
+            <td>
                 <div class="dropdown">
-                    <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">Substitute {{ teams[0].name }}</button>
+                    <button onclick="myFunction(this)" class="button dropbtn">Score {{ teams[0].short_name }}</button>
                     <div class="dropdown-content">
                         {% for i, p in teamOnePlayers %}
-                            <p onclick="sub(true, {{ i }})">
+                            <p onclick="score(true, {{ i }})">
+                                {% if p.is_carded() %} <s><i> {% endif %}
                                 {{ p.name }}
+                                {% if p.is_carded() %} </i></s> {% endif %}
                             </p>
                         {% endfor %}
                     </div>
                 </div>
-            {% endif %}</td>
-        <td></td>
-        <td>
-            {% if teams[1].has_sub and game.round_number <= 9 %}
-                <div class="dropdown" style="background-color: #2a5d88;">
-                    <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">Substitute {{ teams[1].name }}</button>
+            </td>
+            <td><br></td>
+            <td>
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" class="button dropbtn">Score {{ teams[1].short_name }}</button>
                     <div class="dropdown-content">
                         {% for i, p in teamTwoPlayers %}
-                            <p onclick="sub(false, {{ i }})">
+                            <p onclick="score(false, {{ i }})">
+                                {% if p.is_carded() %} <s><i> {% endif %}
                                 {{ p.name }}
+                                {% if p.is_carded() %} </i></s> {% endif %}
                             </p>
                         {% endfor %}
                     </div>
                 </div>
-            {% endif %}</td>
-    </tr>
-    <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td>
-            <div class="dropdown">
-                <button onclick="myFunction(this)" class="button dropbtn">Score {{ teams[0].name }}</button>
-                <div class="dropdown-content">
-                    {% for i, p in teamOnePlayers %}
-                        <p onclick="score(true, {{ i }})">
-                            {% if p.is_carded() %} <s><i> {% endif %}
-                            {{ p.name }}
-                            {% if p.is_carded() %} </i></s> {% endif %}
-                        </p>
-                    {% endfor %}
-                </div>
-            </div>
-        </td>
-        <td><br></td>
-        <td>
-            <div class="dropdown">
-                <button onclick="myFunction(this)" class="button dropbtn">Score {{ teams[1].name }}</button>
-                <div class="dropdown-content">
-                    {% for i, p in teamTwoPlayers %}
-                        <p onclick="score(false, {{ i }})">
-                            {% if p.is_carded() %} <s><i> {% endif %}
-                            {{ p.name }}
-                            {% if p.is_carded() %} </i></s> {% endif %}
-                        </p>
-                    {% endfor %}
-                </div>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td><br></td>
-    </tr>
+            </td>
+        </tr>
+        <tr>
+            <td><br></td>
+        </tr>
+        <tr>
+            <td><br></td>
+        </tr>
+        <tr>
+            <td><br></td>
+        </tr>
+        <tr>
+            <td>
+                <button onclick="timeout(true)" class="button" id="timeoutOne">
+                    {% if teams[0].timeouts <= 0 %} <s> {% endif %}
+                    Timeout {{ teams[0].short_name }}
+                    {% if teams[0].timeouts <= 0 %} </s> {% endif %}
+                </button>
+            </td>
+            <td></td>
+            <td>
 
-    <tr>
-        <td>
-            <button onclick="timeout(true)" class="button" id="timeoutOne">
-                {% if teams[0].timeouts <= 0 %} <s> {% endif %}
-                Timeout {{ teams[0].name }}
-                {% if teams[0].timeouts <= 0 %} </s> {% endif %}
-            </button>
-        </td>
-        <td></td>
-        <td>
+                <button onclick="timeout(false)" class="button" id="timeoutTwo">
+                    {% if teams[1].timeouts <= 0 %} <s> {% endif %}
+                    Timeout {{ teams[1].short_name }}
+                    {% if teams[1].timeouts <= 0 %} </s> {% endif %}
+                </button>
 
-            <button onclick="timeout(false)" class="button" id="timeoutTwo">
-                {% if teams[1].timeouts <= 0 %} <s> {% endif %}
-                Timeout {{ teams[1].name }}
-                {% if teams[1].timeouts <= 0 %} </s> {% endif %}
-            </button>
+            </td>
+        </tr>
+        <tr>
+            <td><br></td>
+        </tr>
+        <tr>
+            <td>
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" class="green_button dropbtn">Green
+                        Card {{ teams[0].short_name }}</button>
+                    <div class="dropdown-content">
+                        {% for i, p in teamOnePlayers %}
+                            <p onclick="card(true, {{ i }}, 'green')">
+                                {% if p.is_carded() %} <s><i> {% endif %}
+                                {{ p.name }}
+                                {% if p.is_carded() %} </i></s> {% endif %}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </td>
+            <td></td>
+            <td>
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" class="green_button dropbtn">Green
+                        Card {{ teams[1].short_name }}</button>
+                    <div class="dropdown-content">
+                        {% for i, p in teamTwoPlayers %}
+                            <p onclick="card(false, {{ i }}, 'green')">
+                                {% if p.is_carded() %} <s><i> {% endif %}
+                                {{ p.name }}
+                                {% if p.is_carded() %} </i></s> {% endif %}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><br></td>
+        </tr>
+        <tr>
+            <td>
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" class="yellow_button dropbtn">Yellow
+                        Card {{ teams[0].short_name }}</button>
+                    <div class="dropdown-content">
+                        {% for i, p in teamOnePlayers %}
+                            <p onclick="card(true, {{ i }}, 'yellow')">
+                                {% if p.is_carded() %} <s><i> {% endif %}
+                                {{ p.name }}
+                                {% if p.is_carded() %} </i></s> {% endif %}
+                            </p>
+                        {% endfor %}
+                        <p onclick="openCustomCard(true, {% for i in teamOnePlayers %}'{{ i[1] }}',{% endfor %})">
+                            Custom
+                        </p>
+                    </div>
+                </div>
+            </td>
+            <td></td>
+            <td>
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" class="yellow_button dropbtn">Yellow
+                        Card {{ teams[1].short_name }}</button>
+                    <div class="dropdown-content">
+                        {% for i, p in teamTwoPlayers %}
+                            <p onclick="card(false, {{ i }}, 'yellow')">
+                                {% if p.is_carded() %} <s><i> {% endif %}
+                                {{ p.name }}
+                                {% if p.is_carded() %} </i></s> {% endif %}
+                            </p>
 
-        </td>
-    </tr>
-    <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td>
-            <div class="dropdown">
-                <button onclick="myFunction(this)" class="green_button dropbtn">Green
-                    Card {{ teams[0].name }}</button>
-                <div class="dropdown-content">
-                    {% for i, p in teamOnePlayers %}
-                        <p onclick="card(true, {{ i }}, 'green')">
-                            {% if p.is_carded() %} <s><i> {% endif %}
-                            {{ p.name }}
-                            {% if p.is_carded() %} </i></s> {% endif %}
+                        {% endfor %}
+                        <p onclick="openCustomCard(false, {% for i in teamTwoPlayers %}'{{ i[1] }}',{% endfor %})">
+                            Custom
                         </p>
-                    {% endfor %}
+                    </div>
                 </div>
-            </div>
-        </td>
-        <td></td>
-        <td>
-            <div class="dropdown">
-                <button onclick="myFunction(this)" class="green_button dropbtn">Green
-                    Card {{ teams[1].name }}</button>
-                <div class="dropdown-content">
-                    {% for i, p in teamTwoPlayers %}
-                        <p onclick="card(false, {{ i }}, 'green')">
-                            {% if p.is_carded() %} <s><i> {% endif %}
-                            {{ p.name }}
-                            {% if p.is_carded() %} </i></s> {% endif %}
-                        </p>
-                    {% endfor %}
-                </div>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td>
-            <div class="dropdown">
-                <button onclick="myFunction(this)" class="yellow_button dropbtn">Yellow
-                    Card {{ teams[0].name }}</button>
-                <div class="dropdown-content">
-                    {% for i, p in teamOnePlayers %}
-                        <p onclick="card(true, {{ i }}, 'yellow')">
-                            {% if p.is_carded() %} <s><i> {% endif %}
-                            {{ p.name }}
-                            {% if p.is_carded() %} </i></s> {% endif %}
-                        </p>
-                    {% endfor %}
-                    <p onclick="openCustomCard(true, {% for i in teamOnePlayers %}'{{ i[1] }}',{% endfor %})">
-                        Custom
-                    </p>
-                </div>
-            </div>
-        </td>
-        <td></td>
-        <td>
-            <div class="dropdown">
-                <button onclick="myFunction(this)" class="yellow_button dropbtn">Yellow
-                    Card {{ teams[1].name }}</button>
-                <div class="dropdown-content">
-                    {% for i, p in teamTwoPlayers %}
-                        <p onclick="card(false, {{ i }}, 'yellow')">
-                            {% if p.is_carded() %} <s><i> {% endif %}
-                            {{ p.name }}
-                            {% if p.is_carded() %} </i></s> {% endif %}
-                        </p>
+            </td>
+        </tr>
 
-                    {% endfor %}
-                    <p onclick="openCustomCard(false, {% for i in teamTwoPlayers %}'{{ i[1] }}',{% endfor %})">
-                        Custom
-                    </p>
+        <tr>
+            <td><br></td>
+        </tr>
+        <tr>
+            <td>
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" class="red_button dropbtn">Red
+                        Card {{ teams[0].short_name }}</button>
+                    <div class="dropdown-content">
+                        {% for i, p in teamOnePlayers %}
+                            <p onclick="card(true, {{ i }}, 'red')">
+                                {% if p.is_carded() %} <s><i> {% endif %}
+                                {{ p.name }}
+                                {% if p.is_carded() %} </i></s> {% endif %}
+                            </p>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td>
-            <div class="dropdown">
-                <button onclick="myFunction(this)" class="red_button dropbtn">Red Card {{ teams[0].name }}</button>
-                <div class="dropdown-content">
-                    {% for i, p in teamOnePlayers %}
-                        <p onclick="card(true, {{ i }}, 'red')">
-                            {% if p.is_carded() %} <s><i> {% endif %}
-                            {{ p.name }}
-                            {% if p.is_carded() %} </i></s> {% endif %}
-                        </p>
-                    {% endfor %}
+            </td>
+            <td></td>
+            <td>
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" class="red_button dropbtn">Red
+                        Card {{ teams[1].short_name }}</button>
+                    <div class="dropdown-content">
+                        {% for i, p in teamTwoPlayers %}
+                            <p onclick="card(false, {{ i }}, 'red')">
+                                {% if p.is_carded() %} <s><i> {% endif %}
+                                {{ p.name }}
+                                {% if p.is_carded() %} </i></s> {% endif %}
+                            </p>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-        </td>
-        <td></td>
-        <td>
-            <div class="dropdown">
-                <button onclick="myFunction(this)" class="red_button dropbtn">Red Card {{ teams[1].name }}</button>
-                <div class="dropdown-content">
-                    {% for i, p in teamTwoPlayers %}
-                        <p onclick="card(false, {{ i }}, 'red')">
-                            {% if p.is_carded() %} <s><i> {% endif %}
-                            {{ p.name }}
-                            {% if p.is_carded() %} </i></s> {% endif %}
-                        </p>
-                    {% endfor %}
-                </div>
-            </div>
-        </td>
-    </tr>
-</table>
-<br>
-<button class="button" onclick="fault()">Fault</button>
-<button class="button" id="serveBtn" onclick="startServeClock()">Start Serve Timer</button>
-<button class="button" id="serveBtn" onclick="ace()">Ace</button>
-<br><br>
-<button class="button" onclick="undo()" style="background-color: #2a5d88;">Undo</button>
-{% if game.in_timeout() %}
-    <script>timeoutOverlay({{ timeout_time }}, {{ timeout_first }})</script>
-{% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <br>
+    <br>
+    <button class="button" onclick="fault()">
+        {% if game.team_serving().faulted %}
+            <b style="font-size:18px">
+        {% endif %}
+        Fault
+        {% if game.team_serving().faulted %}
+            </b>
+        {% endif %}
+    </button>
+    <button class="button" id="serveBtn" onclick="startServeClock()">Start Serve Timer</button>
+    <button class="button" id="serveBtn" onclick="ace()">Ace</button>
+    <br><br>
+    <div class="dropdown">
+        <button onclick="myFunction(this)" class="red_button dropbtn" style="color:#9C1A1C"><b>Forfeit</b></button>
+        <div class="dropdown-content">
+            {% for i, p in enum_teams %}
+                <p onclick="forfeit({{ 1 - i }})">{{ p.short_name }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    <br><br>
+    <button class="button" onclick="undo()" style="background-color: #2a5d88;">Undo</button>
+    {% if game.in_timeout() %}
+        <script>timeoutOverlay({{ timeout_time }}, {{ timeout_first }})</script>
+    {% endif %}
+</div>
+<div style="position:absolute; top: 10%;left: 0; width: 20%">
+    <h3>Cards for {{ teams[0].short_name }}</h3>
+    {% if not teams[0].cards() %}
+        <i>None Received</i>
+    {% endif %}
+    {% for i in teams[0].cards() %}
+        <i>{{ i.player.first_name() }} has received a <a style="color: {{ i.hex }}">{{ i.color }}</a> card
+            for</i> <b>{{ i.reason }}</b>
+        <br>
+        <br>
+    {% endfor %}
+</div>
+<div style="position:absolute; top: 10%;left: 80%; width: 20%">
+    <h3>Cards for {{ teams[1].short_name }}</h3>
+    {% if not teams[1].cards() %}
+        <i>None Received</i>
+    {% endif %}
+    {% for i in teams[1].cards() %}
+        <i>{{ i.player.first_name() }} has received a <a style="color: {{ i.hex }}">{{ i.color }}</a> card
+            for</i> <b>{{ i.reason }}</b>
+        <br>
+        <br>
+    {% endfor %}
+</div>
+
 </body>
 </html>

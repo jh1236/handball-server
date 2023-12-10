@@ -19,18 +19,19 @@
             "The Tradies",
             "Whipped"
         ],
-        "ranked": false,
         "twoCourts": false
     },
     "finals": [
         [
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slSLsrSRslSLsrSRslSLsrSRslSLsrSRSLSRSR",
                 "id": 40,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -51,11 +52,13 @@
             },
             {
                 "bestPlayer": "Nick Burvil",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLslsrSRSRsrslSLSLsrslSLSRslSLslslSLARsrarSLARSR",
                 "id": 41,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Whipped",
@@ -78,11 +81,13 @@
         [
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLslslSRSRsrarSRSLsrarSLSRSRSRSLAR",
                 "id": 42,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -107,11 +112,13 @@
         [
             {
                 "bestPlayer": "Eva Hajigabriel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slslsrsrsrsrararararar",
                 "id": 0,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Barbenheimer",
@@ -132,11 +139,13 @@
             },
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slsrslSLSRSRsrslsrSRSLsrsrsrsrsr",
                 "id": 1,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IKEA Workers",
@@ -157,11 +166,13 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRSRSRSRslslSRSRsrslSLARARAR",
                 "id": 2,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Satnavs",
@@ -182,11 +193,13 @@
             },
             {
                 "bestPlayer": "James Sharpham",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLsrSRSLsrslSRSLslSRSRSLSRslsrslslSLslararar",
                 "id": 3,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Sleeby",
@@ -206,12 +219,14 @@
                 }
             },
             {
-                "bestPlayer": "None",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 4,
-                "official": "None one",
+                "official": "No one",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Whipped",
@@ -224,7 +239,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "None"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -233,11 +249,15 @@
         [
             {
                 "bestPlayer": "Sean Robinson",
+                "cards": [
+                    "Not Provided"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRARARSLARslSRARARslglSRAR",
                 "id": 5,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Seanitha",
@@ -258,11 +278,13 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRslsrSRslfrsrSLSLSRsrSLSLttslSRSRSR",
                 "id": 6,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IKEA Workers",
@@ -283,11 +305,13 @@
             },
             {
                 "bestPlayer": "Michael Russ",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRSRslarSLSRARSRslsrSLFLSRSLFLSR",
                 "id": 7,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Whipped",
@@ -307,12 +331,14 @@
                 }
             },
             {
-                "bestPlayer": "None",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 8,
-                "official": "None one",
+                "official": "No one",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -325,18 +351,21 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "None"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Nick Burvil",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slslararsrararSLsrsrsrSLsr",
                 "id": 9,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IDK",
@@ -359,11 +388,13 @@
         [
             {
                 "bestPlayer": "Ethan Dal Molin",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRSLslslsrSLSRARARSLARSLslSLSL",
                 "id": 10,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Barbenheimer",
@@ -383,12 +414,14 @@
                 }
             },
             {
-                "bestPlayer": "None",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 11,
-                "official": "None one",
+                "official": "No one",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Tradies",
@@ -401,18 +434,21 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "None"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slSLsrararararSLSRslSLsrarsrSLsl",
                 "id": 12,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IDK",
@@ -433,11 +469,13 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSLSLsrSRARARslSLsrSRslSLSRAR",
                 "id": 13,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -458,11 +496,13 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slSLsrSRslSLslslSLSLsrararSLSLslSLSRSRslsrSLslar",
                 "id": 14,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Satnavs",
@@ -484,12 +524,14 @@
         ],
         [
             {
-                "bestPlayer": "None",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 15,
-                "official": "None one",
+                "official": "No one",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Sleeby",
@@ -502,18 +544,21 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "None"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Zebiah Peaker",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRSLslSRSLsrSRFLSLsrSLSRslSLSRSR",
                 "id": 16,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Tradies",
@@ -534,11 +579,13 @@
             },
             {
                 "bestPlayer": "Sean Robinson",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRslSLSRsrSLSRsrSLSRFRslSLSRslSL",
                 "id": 17,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Seanitha",
@@ -559,11 +606,13 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARARARslSLARARsrararSLSRSLSRSL",
                 "id": 18,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Whipped",
@@ -584,11 +633,13 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRARSLslsrsrSLSLslSRSLslSRARTTslSLslslslSL",
                 "id": 19,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -611,11 +662,13 @@
         [
             {
                 "bestPlayer": "Ruby Farrel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slsrslsrslsrSLsrslSRSRsrarar",
                 "id": 20,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Sleeby",
@@ -635,12 +688,14 @@
                 }
             },
             {
-                "bestPlayer": "None",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 21,
-                "official": "None one",
+                "official": "No one",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Barbenheimer",
@@ -653,18 +708,21 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "None"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Sean Robinson",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slsrslsrsrslslSRslSRSRSLsrslar",
                 "id": 22,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IKEA Workers",
@@ -685,11 +743,15 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [
+                    "Not Provided"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLslararararsrslsrSLSRsrSRGLsrsl",
                 "id": 23,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Tradies",
@@ -710,11 +772,13 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRARslsrSLslsrSLsrSRARsrslsrSLSRSRsrslSRslSRSR",
                 "id": 24,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -737,11 +801,15 @@
         [
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [
+                    "Not Provided"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLsrarFLSRSLslarSLFLslsrarslSRslsrGLsr",
                 "id": 25,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Barbenheimer",
@@ -762,11 +830,13 @@
             },
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "arararsrarslarSLSRsrarsrSLSRSLsr",
                 "id": 26,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IDK",
@@ -786,12 +856,14 @@
                 }
             },
             {
-                "bestPlayer": "None",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 27,
-                "official": "None one",
+                "official": "No one",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Satnavs",
@@ -804,18 +876,23 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "None"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Sean Robinson",
+                "cards": [
+                    "Not Provided"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRSLSRSLSRslsrSLslSRsrsrSLttglSLAR",
                 "id": 28,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Seanitha",
@@ -836,11 +913,15 @@
             },
             {
                 "bestPlayer": "Michael Russ",
+                "cards": [
+                    "Not Provided"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLsrslslarsrflsrsrslTTslflargrsl",
                 "id": 29,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Sleeby",
@@ -863,11 +944,13 @@
         [
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "srarsrsrarslsrarsrarsr",
                 "id": 30,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Barbenheimer",
@@ -888,11 +971,13 @@
             },
             {
                 "bestPlayer": "Zebiah Peaker",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSLSRslsrSLSRSRSLARsrSLslslSLsrarSL",
                 "id": 31,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Tradies",
@@ -912,12 +997,14 @@
                 }
             },
             {
-                "bestPlayer": "None",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 32,
-                "official": "None one",
+                "official": "No one",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IKEA Workers",
@@ -930,18 +1017,21 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "None"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARARARSRARSRSLSRSRSLAR",
                 "id": 33,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Satnavs",
@@ -962,11 +1052,13 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRslsrSLSRslsrSLSRsrsrarSRSLSLSRSR",
                 "id": 34,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Whipped",
@@ -989,11 +1081,13 @@
         [
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARARSRSRARARSRARARSLAR",
                 "id": 35,
                 "official": "Jared Healy",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Satnavs",
@@ -1014,11 +1108,13 @@
             },
             {
                 "bestPlayer": "Michael Russ",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSLSRsrsrarararsrsrslsrsrflar",
                 "id": 36,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IDK",
@@ -1039,11 +1135,16 @@
             },
             {
                 "bestPlayer": "James Sharpham",
+                "cards": [
+                    "Not Provided",
+                    "Not Provided"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARslSLslSLARARsrarSRslTTGRYRslarfrarSRslSLFRARARSL",
                 "id": 37,
                 "official": "Aimee Soudure",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "IKEA Workers",
@@ -1064,11 +1165,13 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRSRSRSLSRSRSLSRSRSR",
                 "id": 38,
                 "official": "Lachlan Banks",
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -1088,13 +1191,15 @@
                 }
             },
             {
-                "bestPlayer": "None",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 39,
-                "official": "None one",
-                "started": false,
+                "official": "No one",
+                "scorer": "No one",
+                "started": true,
                 "teamOne": {
                     "name": "Seanitha",
                     "players": [
@@ -1106,7 +1211,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "None"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }

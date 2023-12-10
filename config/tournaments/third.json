@@ -6,11 +6,18 @@
         [
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [
+                    "Disrespect"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLslSRslslSRSRslarSLFRSLSRSRARslSLTTFLglslslslarSLSRslSLslslSLslSRslSLslsl",
                 "id": 40,
+                "notes": "",
                 "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -31,11 +38,16 @@
             },
             {
                 "bestPlayer": "Naveen Nimilan",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSLSRsrsrsrSLARFRARFRsrSLARSLSLttSR",
                 "id": 41,
+                "notes": "",
                 "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "AC Lads",
@@ -58,11 +70,16 @@
         [
             {
                 "bestPlayer": "Declan Holloway",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLslslsrSLsrSLSLsrsrslSLSLFRsrarSLSLsrSLSLsl",
                 "id": 42,
+                "notes": "",
                 "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Tourism New Zealand",
@@ -87,11 +104,18 @@
         [
             {
                 "bestPlayer": "Liam Cooper",
+                "cards": [
+                    "Non-Captain Talking to umpire"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
-                "game": "SLSLSLsrGLGRSLSRSRSLsrSLFLARslarSLslsrslSL",
+                "game": "SLSLSLsrGRSLSRSRSLsrSLFLARslarSLslsrslSL",
                 "id": 0,
+                "notes": "",
                 "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Blaaergh",
@@ -112,11 +136,19 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [
+                    "Swearing",
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARglSRylARARARSRSRTTARSLSRslSL",
                 "id": 1,
+                "notes": "",
                 "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bunbury Boys",
@@ -137,11 +169,19 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Swearing",
+                    "Spoke To Umpire Outside BRA"
+                ],
                 "court": 1,
                 "firstTeamServed": true,
                 "game": "slslsrGRGRsrsrararsrarsrsl",
                 "id": 2,
+                "notes": "",
                 "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Iggy Squad",
@@ -163,11 +203,16 @@
             },
             {
                 "bestPlayer": "Sean Robinson",
+                "cards": [],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "arSLslslSLsrarslsrsrslslsl",
                 "id": 3,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Riders Of Berk",
@@ -187,12 +232,17 @@
                 }
             },
             {
-                "bestPlayer": "Goodbye",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 4,
-                "official": "None one",
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Tourism New Zealand",
@@ -205,8 +255,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "Goodbye",
-                        "Goodbye"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -215,11 +265,18 @@
         [
             {
                 "bestPlayer": "Tomasz Sakowski",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "SLslSLSLSLsrSLARslSLsrSLslylSLARSL",
                 "id": 5,
+                "notes": "",
                 "official": "James Sharpham",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "GORGON WOOBT",
@@ -241,11 +298,16 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "srarslSRSRsrsrsrSRsrsrSLslslsl",
                 "id": 6,
+                "notes": "",
                 "official": "Zaiah Deards",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Breaking Bad Bois",
@@ -265,12 +327,17 @@
                 }
             },
             {
-                "bestPlayer": "Goodbye",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 7,
-                "official": "None one",
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Tourism New Zealand",
@@ -283,19 +350,24 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "Goodbye",
-                        "Goodbye"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Declan Holloway",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "slarSLARSLSRSRttSRSRSLsrSLARslSR",
                 "id": 8,
+                "notes": "",
                 "official": "Zaiah Deards",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "AC Lads",
@@ -316,11 +388,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SRsrarSLsrSLSLSRFLSRARsrsrTTSRSLSRSR",
                 "id": 9,
+                "notes": "",
                 "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -343,11 +420,18 @@
         [
             {
                 "bestPlayer": "Brigitte Gredziuk",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 1,
                 "firstTeamServed": true,
                 "game": "slSLsrsrsrarslararsl5Lsrsr",
                 "id": 10,
+                "notes": "",
                 "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Iggy Squad",
@@ -369,11 +453,16 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "slslSRSRSLSRslSRSRSRSRslSRSLslSR",
                 "id": 11,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Tourism New Zealand",
@@ -393,12 +482,17 @@
                 }
             },
             {
-                "bestPlayer": "Goodbye",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 12,
-                "official": "None one",
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Blaaergh",
@@ -411,19 +505,24 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "Goodbye",
-                        "Goodbye"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Eddie Smith",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "srflSRSRFLslslslsrslTTslslslsrsl",
                 "id": 13,
+                "notes": "",
                 "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Riders Of Berk",
@@ -444,11 +543,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLslSLsrfrslSLslflslarSLsrttfrSLslarflSLFRSRslSRSLsl",
                 "id": 14,
+                "notes": "",
                 "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "AC Lads",
@@ -471,11 +575,16 @@
         [
             {
                 "bestPlayer": "Liam Cooper",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLslSRSRSRslarSLARSRFLSLslslSLsrSLsrSL",
                 "id": 15,
+                "notes": "",
                 "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bunbury Boys",
@@ -496,11 +605,16 @@
             },
             {
                 "bestPlayer": "Brigitte Gredziuk",
+                "cards": [],
                 "court": 1,
                 "firstTeamServed": true,
                 "game": "SLsrSRARSLSLARSLSRSRslslSRslSL",
                 "id": 16,
+                "notes": "",
                 "official": "Zaiah Deards",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Breaking Bad Bois",
@@ -521,11 +635,18 @@
             },
             {
                 "bestPlayer": "Iggy Kreutz",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 1,
                 "firstTeamServed": true,
                 "game": "ARFLVLsrarSRsrsrslsrslsrsrsrSRsr",
                 "id": 17,
+                "notes": "",
                 "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": true,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Iggy Squad",
@@ -547,11 +668,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLSRARslfrslfrarsrSRSLSRSRSLSLslSRTTAR",
                 "id": 18,
+                "notes": "",
                 "official": "James Sharpham",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -571,12 +697,17 @@
                 }
             },
             {
-                "bestPlayer": "Goodbye",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 19,
-                "official": "None one",
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "AC Lads",
@@ -589,8 +720,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "Goodbye",
-                        "Goodbye"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -599,11 +730,18 @@
         [
             {
                 "bestPlayer": "Tomasz Sakowski",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "srSLSLslsrslSLSLGLsrSLARslsrsrarSLsrSLSLsr",
                 "id": 20,
+                "notes": "",
                 "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "GORGON WOOBT",
@@ -624,11 +762,16 @@
             },
             {
                 "bestPlayer": "Eddie Smith",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "arSRSRsrslararSRsrflsrSRslararSLsr",
                 "id": 21,
+                "notes": "",
                 "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Breaking Bad Bois",
@@ -649,11 +792,18 @@
             },
             {
                 "bestPlayer": "Declan Holloway",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "xlSLsrSLARSLARGLARSLsrarSLARslslslSLAR",
                 "id": 22,
+                "notes": "",
                 "official": "James Sharpham",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "AC Lads",
@@ -674,12 +824,17 @@
                 }
             },
             {
-                "bestPlayer": "Goodbye",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 23,
-                "official": "None one",
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -692,19 +847,24 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "Goodbye",
-                        "Goodbye"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Naveen Nimilan",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SRFLFLSRsrslslSLARARslSRslsrarsrFRSLARFLSRFLARSR",
                 "id": 24,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Riders Of Berk",
@@ -727,11 +887,16 @@
         [
             {
                 "bestPlayer": "Eva Hajigabriel",
+                "cards": [],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "xrSRSLslSRSRSLSLARARSRSLSL",
                 "id": 25,
+                "notes": "",
                 "official": "Zaiah Deards",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Blaaergh",
@@ -753,11 +918,16 @@
             },
             {
                 "bestPlayer": "Brigitte Gredziuk",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLSRslsrarsrslSRARSRSRFRSRSRSRSLAR",
                 "id": 26,
+                "notes": "",
                 "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -778,11 +948,16 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRSLSRsrarSLsrarararSLsrsrSLSLsrSLARSL",
                 "id": 27,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Tourism New Zealand",
@@ -803,11 +978,16 @@
             },
             {
                 "bestPlayer": "Declan Holloway",
+                "cards": [],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "slarslarflSRslarSRsrslflslsrsl",
                 "id": 28,
+                "notes": "",
                 "official": "James Sharpham",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "GORGON WOOBT",
@@ -827,12 +1007,17 @@
                 }
             },
             {
-                "bestPlayer": "Goodbye",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 29,
-                "official": "None one",
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Riders Of Berk",
@@ -845,8 +1030,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "Goodbye",
-                        "Goodbye"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -854,12 +1039,17 @@
         ],
         [
             {
-                "bestPlayer": "Goodbye",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 30,
-                "official": "None one",
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Iggy Squad",
@@ -873,19 +1063,24 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "Goodbye",
-                        "Goodbye"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Tomasz Sakowski",
+                "cards": [],
                 "court": 1,
                 "firstTeamServed": true,
                 "game": "SLsrSLSLsrsrsrsrsrSLSRsrSLsrSLsrflsrsl",
                 "id": 31,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "GORGON WOOBT",
@@ -906,11 +1101,18 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "SLARsrsrsrsrsrfrSLFRSRsrarglSRsrSRARsrsrSRsr",
                 "id": 32,
+                "notes": "",
                 "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Breaking Bad Bois",
@@ -931,11 +1133,18 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Arguing With Umpire"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "arslslSLslfrslararfrSLSRslSLttslSRSLARGRsrsr",
                 "id": 33,
+                "notes": "",
                 "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Blaaergh",
@@ -956,11 +1165,19 @@
             },
             {
                 "bestPlayer": "Declan Holloway",
+                "cards": [
+                    "Swearing",
+                    "Time wasting"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "flarSLFLARslSRsrSLslSRSRylSLSLsrslGRsrsrSRARttslararsr",
                 "id": 34,
+                "notes": "",
                 "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bunbury Boys",
@@ -983,11 +1200,16 @@
         [
             {
                 "bestPlayer": "Liam Cooper",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARSRsrsrSLsrSLslflSLsrSRARsrSRslsrSLSLslslsrTTsl",
                 "id": 35,
+                "notes": "",
                 "official": "Zaiah Deards",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Blaaergh",
@@ -1008,11 +1230,16 @@
             },
             {
                 "bestPlayer": "Declan Holloway",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRsrSLslfrSRslSLSLFRslSRSLSRttslSLslfrSRSR",
                 "id": 36,
+                "notes": "",
                 "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "AC Lads",
@@ -1032,13 +1259,18 @@
                 }
             },
             {
-                "bestPlayer": "Goodbye",
+                "bestPlayer": "Good bye",
+                "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
                 "game": "",
                 "id": 37,
-                "official": "None one",
-                "started": false,
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
                 "teamOne": {
                     "name": "Bunbury Boys",
                     "players": [
@@ -1050,19 +1282,24 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "Goodbye",
-                        "Goodbye"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
             },
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 1,
                 "firstTeamServed": false,
                 "game": "SLSLslSRARARARARFRFRSRFLSRslslttarSLSR",
                 "id": 38,
+                "notes": "",
                 "official": "James Sharpham",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Officials",
@@ -1083,11 +1320,18 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 1,
                 "firstTeamServed": true,
                 "game": "xrSLSLARslarSLARSLsrglSLslSLSLSRsrSL",
                 "id": 39,
+                "notes": "",
                 "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Tourism New Zealand",

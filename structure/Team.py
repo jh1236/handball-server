@@ -168,6 +168,8 @@ class Team:
         for i in tournament.teams:
             if sorted([j.name for j in players]) == sorted([j.name for j in i.players]):
                 return i
+        if not name.strip():
+            raise NameError("Team name is not valid!")
         t = cls(name, players)
         t.tournament = tournament
         return t
@@ -248,6 +250,17 @@ class GameTeam:
         if self.swapped:
             self.players[0], self.players[1] = self.players[1], self.players[0]
 
+    def cards(self):
+        return sorted(
+            [item for sublist in self.players for item in sublist.player.cards],
+            key=lambda it: -it.sort_key,
+        )
+
+    def forfeit(self):
+        self.game.add_to_game_string("ee", self)
+        while not self.game.game_ended():
+            self.opponent.score_point()
+
     def change_elo(self, delta, a):
         for i in self.players:
             if i.time_on_court:
@@ -268,6 +281,7 @@ class GameTeam:
             self.players[not first_player],
         )
         self.game.add_to_game_string("x" + ("l" if first_player else "r"), self)
+        self.game.event()
         self.has_sub = False
         if any(i.nice_name().startswith("null") for i in self.players[:2]):
             self.game.ranked = False

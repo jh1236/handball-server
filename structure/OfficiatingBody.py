@@ -8,12 +8,13 @@ class Official:
         self.name: str = name
         self._tidy_name: str = None
         self.team: list[Team] = team
-        self.games_officiated: int = 0
-        self.games_scored: int = 0
+        self.internal_games_umpired: int = 0
+        self.internal_games_scored: int = 0
         self.games_court_one = 0
         self.key: str = key
         self.primary: bool = primary
-        self.games_umpired = 0
+        self.games_umpired: int = 0
+        self.games_scored: int = 0
         self.faults: int = 0
         self.green_cards: int = 0
         self.yellow_cards: int = 0
@@ -52,7 +53,7 @@ class Official:
             "Yellow Cards Given": self.yellow_cards,
             "Red Cards Given": self.red_cards,
             "Cards Given": self.red_cards + self.yellow_cards + self.green_cards,
-            "Cards Per Game": round((self.red_cards + self.yellow_cards + self.green_cards) / (self.games_umpired or -1), 2),
+            "Cards Per Game": round((self.red_cards + self.yellow_cards + self.green_cards) / (self.games_umpired or 1), 2),
             "Faults Called": self.faults,
             "Faults Per Game": round(self.faults / (self.games_umpired or 1), 2),
             "Games Umpired": self.games_umpired,
@@ -70,18 +71,19 @@ class Official:
         self.rounds_umpired += d["Rounds Umpired"]
 
     def reset(self):
-        self.games_officiated: int = 0
-        self.games_scored: int = 0
+        self.internal_games_umpired = 0
+        self.internal_games_scored = 0
         self.games_court_one = 0
         self.games_umpired = 0
-        self.faults: int = 0
-        self.green_cards: int = 0
-        self.yellow_cards: int = 0
-        self.red_cards: int = 0
-        self.rounds_umpired: int = 0
+        self.games_scored = 0
+        self.faults = 0
+        self.green_cards = 0
+        self.yellow_cards = 0
+        self.red_cards = 0
+        self.rounds_umpired = 0
 
 
-NoOfficial = Official("None one", "", [])
+NoOfficial = Official("No one", "", [])
 
 
 def get_officials(tournament) -> list[Official]:

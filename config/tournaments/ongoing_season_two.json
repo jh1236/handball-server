@@ -12,12 +12,16 @@
         [
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRsrslflflslsrarSLSLslflarslSRsrfrslar",
                 "id": 0,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Joyful Damnation ",
@@ -38,12 +42,18 @@
             },
             {
                 "bestPlayer": "Eva Hajigabriel",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "arSLSRslSLSRSRslarslsrGLsrslSRFLARARARsrslsr",
                 "id": 1,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -65,12 +75,16 @@
             },
             {
                 "bestPlayer": "Tomasz Sakowski",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRsrSRARSRSRsrsrarSRsrsrSRFRSRsrarSRFLSL",
                 "id": 2,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Vigorous Hand Movements",
@@ -92,12 +106,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "slsrSLSLSLSLSLSRSLsrSLsrSLARsrSL",
                 "id": 3,
+                "notes": "",
                 "official": "James Sharpham",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -119,12 +137,16 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "flsrsrSRslSRslSLTTSRSRSRsrSRSRFRsrSRslsrSRsrsrsrSRsrSRSRsrsrsr",
                 "id": 4,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -145,12 +167,16 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRsrarsrarSRsrsrsrSRsrsrSRARSRARSRsrsr",
                 "id": 5,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "wE are the benChwarMers",
@@ -171,12 +197,19 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [
+                    "Swearing",
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLslarTTsrSLSRttTTARARFRslSRARslSRslslslGLfrslYLslSRSRSLsrSLslfrSRSLAR",
                 "id": 6,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Tot4l DraMa: World 70ur_!",
@@ -197,12 +230,16 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLslslSLslfrSRslslSLslslslarslsl",
                 "id": 7,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Straight Ones",
@@ -223,12 +260,20 @@
             },
             {
                 "bestPlayer": "Tomasz Sakowski",
+                "cards": [
+                    "Swearing",
+                    "Swearing",
+                    "Time wasting"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLsrsrSLgrGRARARARSRARARSLslSRgrSLFLslslarSL",
                 "id": 8,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bench Warmers",
@@ -249,12 +294,18 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slarslSRsrsrslarslsrslSRSLGLsl",
                 "id": 9,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Save the whales with four lower case letters, you pick where.",
@@ -275,12 +326,16 @@
             },
             {
                 "bestPlayer": "James Sharpham",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRslSLFRFRslfrSLsrSLsrarararslTTarsr",
                 "id": 10,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Lizzie LDShadowLady",
@@ -301,12 +356,18 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Not Provided"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "vrslSLSLslslslsrslSRARslslSRSLSRARslslsl",
                 "id": 11,
+                "notes": "",
                 "official": "James Sharpham",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Loghch",
@@ -329,12 +390,16 @@
         [
             {
                 "bestPlayer": "James Sharpham",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRslSLsrslSLSRslSLslslslfrfrSRSLSRSRslsrSL",
                 "id": 12,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "james",
@@ -355,12 +420,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "srslsrsrsrsrSRARsrarararar",
                 "id": 13,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "james",
@@ -381,12 +450,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SRARARARSLsrSRSLARFRSRARAR",
                 "id": 14,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -407,12 +480,16 @@
             },
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLslararSRSRsrSLslSRARSRSRslslSLARsrSR",
                 "id": 15,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Wildcats",
@@ -433,12 +510,16 @@
             },
             {
                 "bestPlayer": "James Sharpham",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slsrflSRsrfrsrSLslarTTSRsrSRsrsrsrar",
                 "id": 16,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Chase Ridley",
@@ -459,12 +540,18 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [
+                    "Equipment Abuse"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLSRSRSLsrsrSLslsrSLARslSLslslSRslarSLsrGRsl",
                 "id": 17,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "james",
@@ -487,12 +574,18 @@
         [
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "ararSLSRARSRARARsrSRSRslGRarSLSRSR",
                 "id": 18,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Nick and Jared Palestine",
@@ -513,12 +606,16 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARslSLSRsrSRSRSRSLSRARARttSL",
                 "id": 19,
+                "notes": "",
                 "official": "Alex Soudure",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -539,12 +636,19 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [
+                    "Excessive Celebration",
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "arflsrsrsrflarslflarsrarGRglslttTTar",
                 "id": 20,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bropocalypse ",
@@ -565,12 +669,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "srsrarsrSLsrfrsrSLARFLsrslarslttsl",
                 "id": 21,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -591,12 +699,18 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [
+                    "Arguing with umpire"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "flSLSLSLslSRSLSLTTgrFRsrSLSRsrSRslSRSL",
                 "id": 22,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "LAX",
@@ -617,12 +731,16 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRSRARsrSRsrSRARsrarsrSRsrfrarsrslarTTSRsl",
                 "id": 23,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "LAX",
@@ -643,12 +761,16 @@
             },
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARsrsrslarSLFRsrfrsrslslSLARARsrSLFRsrar",
                 "id": 24,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -669,12 +791,16 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLARslfrSLFRFRSLSRslfrSRsrSLARARSRAR",
                 "id": 25,
+                "notes": "",
                 "official": "Alex Soudure",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -695,12 +821,16 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slflSRARFRsrsrslSRARslslSRsrarslfrsrfrsl",
                 "id": 26,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -723,12 +853,18 @@
         [
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [
+                    "Allowed Non-captain to communicate"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRsrSLsrsrsrsrarsrSRsrSLARsrGRSRSRSLSLsrar",
                 "id": 27,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -749,12 +885,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLSRFLSLARFLARARARFLSLSRARSL",
                 "id": 28,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "We are bad at hanball <3",
@@ -775,12 +915,20 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [
+                    "Swearing",
+                    "Protesting Umpire",
+                    "Accusation of cheating"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "glslTTslSRslSRslslarslflGLVLttslsrSRslsl",
                 "id": 29,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -801,12 +949,16 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "srSRFRSLsrSLFLsrSLSLSLSLARSLSLSL",
                 "id": 30,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Cringeiana Grande",
@@ -827,12 +979,16 @@
             },
             {
                 "bestPlayer": "Michael Russ",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slSRSLsrslSLSRARSRTTSLSLSRslsrSLSL",
                 "id": 31,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Operation Overkill",
@@ -854,12 +1010,16 @@
             },
             {
                 "bestPlayer": "Michael Russ",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slarflararSRARSRSRsrSLslsrSRsrfrSLARARslflarar",
                 "id": 32,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -881,12 +1041,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "srslarslSLSRSRSRSRSRARSRslSRSRSR",
                 "id": 33,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -907,12 +1071,16 @@
             },
             {
                 "bestPlayer": "Michael Russ",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SRslslSRsrsrsrsrSLsrarSRslSRTTSRsrfrsl",
                 "id": 34,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -934,12 +1102,19 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [
+                    "Swearing",
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARFLSRFLSRARGLFLsrSLFRFRarGRSRFLSRARSLFLARslslSR",
                 "id": 35,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Operation Overkill",
@@ -963,12 +1138,19 @@
         [
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [
+                    "Not Provided",
+                    "Equipment Abuse"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "VRSLSLslSLsrSLslslSLSLslsrSLSLSLsrsrSLslsrarGLar",
                 "id": 36,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Alex",
@@ -989,12 +1171,16 @@
             },
             {
                 "bestPlayer": "Eva Hajigabriel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLARsrSRslslflSRSLsrslSLslsrsrslSRSRSLslSRsrSLTTsrSRSLsrSLslslsr",
                 "id": 37,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -1015,12 +1201,18 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "glslflsrSLARsrTTSLSLsrSRARsrSRFRsrSRSRFLSRTTSR",
                 "id": 38,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Vigorous Hand Movements",
@@ -1041,12 +1233,18 @@
             },
             {
                 "bestPlayer": "Zaiah Deards",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "GRflsrSRSLARSLSLsrSRSRSRSLsrsrSRFLSR",
                 "id": 39,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Jay-Z",
@@ -1067,12 +1265,16 @@
             },
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLSRslSRTTSRsrSLARSRSRSLSLSR",
                 "id": 40,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "LAX",
@@ -1095,12 +1297,16 @@
         [
             {
                 "bestPlayer": "Zaiah Deards",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "arSRslSRslarslSRslslsrSRslSLttslsl",
                 "id": 41,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -1121,12 +1327,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "slSLSRFLSRSRSRSLttslSLslSRTTslSRslSLSR",
                 "id": 42,
+                "notes": "",
                 "official": "Brigitte Gredziuk",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -1147,12 +1357,16 @@
             },
             {
                 "bestPlayer": "Lachlan Banks",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "srsrSRSLSRARSRslSRSLSLsrSLARsrSL",
                 "id": 43,
+                "notes": "",
                 "official": "Alex Soudure",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -1175,12 +1389,19 @@
         [
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [
+                    "Swearing",
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "flflSLARsrsrGRYRsrslarSLsrSLSLARslSLsrSLSRslsrsrsr",
                 "id": 44,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "ZL",
@@ -1198,17 +1419,19 @@
                     ],
                     "score": 12
                 }
-            }
-        ],
-        [
+            },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "slsrsrSLslsrSRslslsrSRsrsrttfrSRsr",
                 "id": 45,
+                "notes": "",
                 "official": "Aimee Soudure",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "T. Swift Song Inspo",
@@ -1229,12 +1452,16 @@
             },
             {
                 "bestPlayer": "Charlie Wyatt",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SRARARslsrSLslSLARARSLSLSLTTttAR",
                 "id": 46,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Jared's big toe ",
@@ -1255,12 +1482,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slsrsrslararSLsrSRsrttsrsrSLsr",
                 "id": 47,
+                "notes": "",
                 "official": "James Sharpham",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -1281,12 +1512,16 @@
             },
             {
                 "bestPlayer": "James Sharpham",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLsrslSRARSLSLSRSLSLARSLTTsrslslSL",
                 "id": 48,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Jared's big toe ",
@@ -1307,12 +1542,18 @@
             },
             {
                 "bestPlayer": "James Sharpham",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLsrslsrarSLARsrSRSRARSLFLSRttSRSRSRslGRSL",
                 "id": 49,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "T. Swift Song Inspo",
@@ -1333,12 +1574,16 @@
             },
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSLslSRARSLslSLslSRslarslslslTTSRslflslsl",
                 "id": 50,
+                "notes": "",
                 "official": "Aimee Soudure",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
@@ -1361,12 +1606,18 @@
         [
             {
                 "bestPlayer": "Eva Hajigabriel",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slslsrttttflSLARsrslSRSRslarSRARSRGRslslslSRsl",
                 "id": 51,
+                "notes": "",
                 "official": "Aimee Soudure",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "The Baes",
@@ -1387,12 +1638,16 @@
             },
             {
                 "bestPlayer": "Alex Soudure",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARSLTTARSLSRARARFLARARsrSRSR",
                 "id": 52,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Alex Soudure (oh Zaiah is here too ig)",
@@ -1413,12 +1668,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLSRsrSLSRSRsrsrsrsrsrsrsrsrsrttTTSLSLsr",
                 "id": 53,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Alex Soudure (oh Zaiah is here too ig)",
@@ -1439,12 +1698,16 @@
             },
             {
                 "bestPlayer": "Dora Wan",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLARsrSRsrSRARslsrsrsrsrflSLARsrsrSRARARSRAR",
                 "id": 54,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Harry's Mates",
@@ -1465,12 +1728,16 @@
             },
             {
                 "bestPlayer": "Eva Hajigabriel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slSRsrsrarsrsrsrSRsrSRsrsrar",
                 "id": 55,
+                "notes": "",
                 "official": "Lachlan Banks",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Bitches from Thornlie",
@@ -1491,12 +1758,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slSLslslslsrSRSLslSLARslslslttsrsl",
                 "id": 56,
+                "notes": "",
                 "official": "Alex Soudure",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Lizzie LDShadowLady",
@@ -1517,12 +1788,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SRsrsrSRFRARSRsrSRSRFLSRttSRSRSRFLsrarSR",
                 "id": 57,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Jay-Z",
@@ -1543,12 +1818,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARARsrSLsrsrarSRSRSLsrsrslSLsrfrsrsrsr",
                 "id": 58,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "LAX",
@@ -1569,12 +1848,16 @@
             },
             {
                 "bestPlayer": "Jared Healy",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "srSRsrsrSRsrsrsrSRSLsrSLslsrsrsr",
                 "id": 59,
+                "notes": "",
                 "official": "Zaiah Deards",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Harry's Mates",
@@ -1597,12 +1880,20 @@
         [
             {
                 "bestPlayer": "Null2",
+                "cards": [
+                    "Not Provided",
+                    "Not Provided",
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "VRvrSLSLFLSLSLSLFLARglSLttSLARFLSLslSL",
                 "id": 60,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Jared\u21912 (Olivia swear jar)",
@@ -1623,12 +1914,19 @@
             },
             {
                 "bestPlayer": "Null",
+                "cards": [
+                    "Not Provided",
+                    "Not Provided"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLVRvrslslflslslslflslslslslslsl",
                 "id": 61,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Lach",
@@ -1649,12 +1947,16 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SRsrSRSRSRslarsrsrflslsrSLsrSRsrflSRsrSRFRsr",
                 "id": 62,
+                "notes": "",
                 "official": "Jared Healy",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Cringeiana Grande",
@@ -1675,12 +1977,18 @@
             },
             {
                 "bestPlayer": "Tristan Nel",
+                "cards": [
+                    "Swearing"
+                ],
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slGRsrSLsrarSLsrsrsrSLsrSRARSRsrsrSLsl",
                 "id": 63,
+                "notes": "",
                 "official": "Eddie Smith",
-                "scorer": "None one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
                 "started": true,
                 "teamOne": {
                     "name": "Tourism New Zealand",
@@ -1697,6 +2005,271 @@
                         "Jared Healy"
                     ],
                     "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Jared Healy",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "slSLslfrarSRSRSLSLSRsrSLSRARslSRsrSR",
+                "id": 64,
+                "notes": "",
+                "official": "Jared Healy",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "james",
+                    "players": [
+                        "James Sharpham",
+                        "Alex Soudure"
+                    ],
+                    "score": 6
+                }
+            },
+            {
+                "bestPlayer": "Lachlan Banks",
+                "cards": [
+                    "Swearing",
+                    "Swearing"
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARslGRflslslSLsrarYRsrSLttSLFLslslSLARFRsrSLslTTar",
+                "id": 65,
+                "notes": "",
+                "official": "Aimee Soudure",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Alex Soudure (oh Zaiah is here too ig)",
+                    "players": [
+                        "Alex Soudure",
+                        "Zaiah Deards"
+                    ],
+                    "score": 7
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Alex Soudure",
+                "cards": [
+                    "teammate spoke to umpire "
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "srSRsrSRslsrsrararararsrttYLsr",
+                "id": 66,
+                "notes": "",
+                "official": "Aimee Soudure",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Jay-Z",
+                    "players": [
+                        "Zaiah Deards",
+                        "Jared Healy"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "LAX",
+                    "players": [
+                        "Lachlan Banks",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Yes",
+                    "Yes"
+                ],
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "VRvrSLSLslSLSLSLSLARFRSLee",
+                "id": 67,
+                "notes": "",
+                "official": "Lachlan Banks",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Jared\u21912 (Olivia swear jar)",
+                    "players": [
+                        "Jared Healy",
+                        "Null"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Alex",
+                    "players": [
+                        "Alex Soudure",
+                        "Null"
+                    ],
+                    "score": 1
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Not Provided",
+                    "Not Provided"
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "VRvrSLslslslTTSLSLSLslslslslslslfrslar",
+                "id": 68,
+                "notes": " ",
+                "official": "Eddie Smith",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Lach",
+                    "players": [
+                        "Lachlan Banks",
+                        "Null2"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Jared\u21912 (Olivia swear jar)",
+                    "players": [
+                        "Jared Healy",
+                        "Null"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Eddie Smith",
+                "cards": [
+                    "Not Provided",
+                    "Not Provided",
+                    "Disrespect towards umpire"
+                ],
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "vrVRSLslSLslSLARFLSLslSLSLSLslslGLslflarslslSLslsl",
+                "id": 69,
+                "notes": " ",
+                "official": "Zaiah Deards",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Eddie spaghetti ",
+                    "players": [
+                        "Eddie Smith",
+                        "Null"
+                    ],
+                    "score": 9
+                },
+                "teamTwo": {
+                    "name": "Jared\u21912 (Olivia swear jar)",
+                    "players": [
+                        "Jared Healy",
+                        "Null"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Not Provided",
+                    "Not Provided"
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "VRvrARslSLslSLSLSLSLSLSLSLSLee",
+                "id": 70,
+                "notes": " ",
+                "official": "Eddie Smith",
+                "protested": null,
+                "resolved": true,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Jared\u21912 (Olivia swear jar)",
+                    "players": [
+                        "Jared Healy",
+                        "Null"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Lach",
+                    "players": [
+                        "Lachlan Banks",
+                        "Null2"
+                    ],
+                    "score": 2
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Brigitte Gredziuk",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ee",
+                "id": 71,
+                "notes": " This is a note!!!",
+                "official": "Jared Healy",
+                "protested": 1,
+                "resolved": true,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Saelmoa",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "Sophie Lane",
+                        "James Sharpham"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Ball Fondlers",
+                    "players": [
+                        "Charlie Wyatt",
+                        "Elizabeth Gover"
+                    ],
+                    "score": 0
                 }
             }
         ]

@@ -201,6 +201,7 @@ def score():
     comps[tournament].save()
     return "", 204
 
+
 @app.post("/api/games/update/substitute")
 def substitute():
     tournament = request.json["tournament"]
@@ -303,7 +304,33 @@ def end():
     tournament = request.json["tournament"]
     logger.info(f"Request for end: {request.json}")
     game_id = request.json["id"]
-    comps[tournament].get_game(game_id).end(request.json["bestPlayer"])
+    comps[tournament].get_game(game_id).end(
+        request.json["bestPlayer"],
+        request.json.get("cards", None),
+        request.json.get("notes", None),
+    )
+    comps[tournament].save()
+    return "", 204
+
+
+@app.post("/api/games/update/protest")
+def protest():
+    tournament = request.json["tournament"]
+    logger.info(f"Request for end: {request.json}")
+    game_id = request.json["id"]
+    comps[tournament].get_game(game_id).protest(
+        request.json["teamOne"], request.json["teamTwo"]
+    )
+    comps[tournament].save()
+    return "", 204
+
+
+@app.post("/api/games/update/resolve")
+def resolve():
+    tournament = request.json["tournament"]
+    logger.info(f"Request for end: {request.json}")
+    game_id = request.json["id"]
+    comps[tournament].get_game(game_id).resolve()
     comps[tournament].save()
     return "", 204
 
@@ -315,6 +342,17 @@ def timeout():
     first_team = request.json["firstTeam"]
     game_id = request.json["id"]
     comps[tournament].get_game(game_id).teams[not first_team].timeout()
+    comps[tournament].save()
+    return "", 204
+
+
+@app.post("/api/games/update/forfeit")
+def forfeit():
+    tournament = request.json["tournament"]
+    logger.info(f"Request for forfeit: {request.json}")
+    first_team = request.json["firstTeam"]
+    game_id = request.json["id"]
+    comps[tournament].get_game(game_id).teams[not first_team].forfeit()
     comps[tournament].save()
     return "", 204
 
@@ -362,7 +400,6 @@ def undo():
     logger.info(f"Request for undo: {request.json}")
     game_id = request.json["id"]
     comps[tournament].get_game(game_id).undo()
-    comps[tournament].get_game(game_id).print_gamestate()
     comps[tournament].save()
     return "", 204
 

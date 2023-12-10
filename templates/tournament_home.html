@@ -73,8 +73,8 @@
             {% endfor %}
         </div>
         {% if tourney.fixtures_class.manual_allowed() and not in_progress %}
-            <button class="button" onclick="document.location.href = '/{{ tournament }}/games/create'">New Game</button>
-            <button class="button" onclick="newRound('{{ tournament }}')">New Round
+            <button class="button" onclick="document.location.href = '/{{ tournament }}/create'">New Game</button>
+            <button class="button" onclick="document.location.href = '/{{ tournament }}/round'">New Round
             </button>
         {% endif %}
     </div>
@@ -141,6 +141,10 @@
             {% endfor %}
         </table>
     </div>
+    <br>
+    <br>
 </div>
+<br>
+<br>
 </body>
 </html>

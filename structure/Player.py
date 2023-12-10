@@ -1,5 +1,6 @@
-import inspect
 from typing import Any
+
+from structure.Card import Card
 
 elo_map = {}
 
@@ -27,6 +28,7 @@ class Player:
         self.points_served: int = 0
         self.played: int = 0
         self.wins: int = 0
+        self.cards: list[Card] = []
 
     @property
     def elo(self):
@@ -34,26 +36,6 @@ class Player:
 
     def change_elo(self, delta: int, a):
         elo_map[self.nice_name()] += delta
-
-    @property
-    def biggest_card(self):
-        if self.red_cards > 0:
-            return "red"
-        elif self.yellow_cards > 0:
-            return "yellow"
-        elif self.green_cards > 0:
-            return "green"
-        return None
-
-    @property
-    def biggest_card_hex(self):
-        if self.red_cards > 0:
-            return "#EC4A4A"
-        elif self.yellow_cards > 0:
-            return "#FCCE6E"
-        elif self.green_cards > 0:
-            return "#84AA63"
-        return "#FFFFFF"
 
     @property
     def team(self):
@@ -200,6 +182,7 @@ class Player:
 
 class GamePlayer:
     def __init__(self, player: Player, game, captain):
+        self.cards: list[Card] = []
         self._tidy_name = None
         self.won_while_serving = 0
         self.points_served: int = 0
@@ -261,16 +244,25 @@ class GamePlayer:
     def green_card(self):
         self.green_carded = True
         self.green_cards += 1
+        card = Card(self, 0)
+        self.cards.append(card)
+        self.game.cards.append(card)
 
     def yellow_card(self, time):
         self.yellow_cards += 1
         if self.card_time_remaining >= 0:
             self.card_time_remaining += time
             self.card_duration += time
+        card = Card(self, time)
+        self.cards.append(card)
+        self.game.cards.append(card)
 
     def red_card(self):
         self.red_cards += 1
         self.card_time_remaining = -1
+        card = Card(self, -1)
+        self.cards.append(card)
+        self.game.cards.append(card)
 
     def is_carded(self):
         return self.card_time_remaining != 0
@@ -316,6 +308,7 @@ class GamePlayer:
         self.player.votes += self.best
         self.player.played += 1
         self.player.wins += won
+        self.player.cards += self.cards
 
     def undo_end(self, won):
         if self.time_carded + self.time_on_court == 0 or not self.game.ranked:
@@ -334,6 +327,8 @@ class GamePlayer:
         self.player.votes -= self.best
         self.player.played -= 1
         self.player.wins -= won
+        for i in self.cards:
+            self.player.cards.remove(i)
 
     def tidy_name(self):
         if self._tidy_name is not None:

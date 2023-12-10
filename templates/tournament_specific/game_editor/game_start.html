@@ -28,12 +28,12 @@
 <table class="table">
     <tr>
         <th><img
-                src="{{ teams[0].image()}}"
+                src="{{ teams[0].image() }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></th>
         <th style="color:#e0ffe0">spacer..</th>
         <th><img
-                src="{{ teams[1].image()}}"
+                src="{{ teams[1].image() }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></th>
     </tr>
@@ -74,25 +74,23 @@
     </tr>
     <tr></tr>
     <tr>
-        <td>
-            {% for i in teams[0].players %}
-                {% if i.player.biggest_card %}
-                    <i>{{ i.tidy_name() }} has received a <a style="color: {{ i.player.biggest_card_hex }}">{{ i.player.biggest_card }}</a> card</i>
-                    <br>
-                    <br>
-                {% endif %}
+        <td style="vertical-align: top">
+            {% for i in teams[0].cards() %}
+                <i>{{ i.player.first_name() }} has received a <a style="color: {{ i.hex }}">{{ i.color }}</a> card
+                    for</i> <b>{{ i.reason }}</b>
+                <br>
+                <br>
             {% endfor %}
         </td>
-        <td>
+        <td style="vertical-align: top">
             <button onclick="start()" class="button">Start</button>
         </td>
-        <td>
-            {% for i in teams[1].players %}
-                {% if i.player.biggest_card %}
-                    <i>{{ i.tidy_name() }} has received a <a style="color: {{ i.player.biggest_card_hex }}">{{ i.player.biggest_card }}</a> card</i>
-                    <br>
-                    <br>
-                {% endif %}
+        <td style="vertical-align: top">
+            {% for i in teams[1].cards() %}
+                <i>{{ i.player.first_name() }} has received a <a style="color: {{ i.hex }}">{{ i.color }}</a> card
+                    for</i> <b>{{ i.reason }}</b>
+                <br>
+                <br>
             {% endfor %}
         </td>
     </tr>
@@ -101,5 +99,8 @@
 
 <br>
 <br>
+{% if game.tournament.fixtures_class.manual_allowed() %}
+    <button class="button" onclick="del()" style="background-color: #2a5d88;">Delete</button>
+{% endif %}
 </body>
 </html>

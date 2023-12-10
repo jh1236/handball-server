@@ -9,6 +9,7 @@ from utils.util import chunks_sized
 
 if typing.TYPE_CHECKING:
     from structure.Team import GameTeam
+    from structure.Card import Card
 
 
 class Game:
@@ -56,13 +57,13 @@ class Game:
 
         team_one_swap = team_one.players[0].name != game_map["teamOne"]["players"][0]
         team_two_swap = team_two.players[0].name != game_map["teamTwo"]["players"][0]
-        if game_map["official"] == "None one":
+        if game_map["official"] == "No one":
             game.set_primary_official(NoOfficial)
         else:
             game.set_primary_official(
                 [i for i in tournament.officials if i.name == game_map["official"]][0]
             )
-        if game_map.get("scorer", "None one") != "None one":
+        if game_map.get("scorer", "No one") != "No one":
             game.set_primary_official(
                 [i for i in tournament.officials if i.name == game_map["scorer"]][0]
             )
@@ -73,7 +74,13 @@ class Game:
         game.start(swapped, team_one_swap, team_two_swap)
         game.load_from_string(game_map["game"])
         if game_map.get("bestPlayer", False):
-            game.end(game_map["bestPlayer"])
+            game.end(
+                game_map["bestPlayer"],
+                game_map.get("cards", None),
+                game_map.get("notes", None),
+            )
+            game.protested = game_map.get("protested", 0)
+            game.resolved = game_map.get("resolved", False)
 
         return game
 
@@ -85,16 +92,19 @@ class Game:
         final: bool = False,
         attempt_rebalance: bool = True,
     ):
+        self.resolved = False
         self._serve_clock: int = -1
         self.update_count: int = 0
         self.tournament = tournament
         self.id: int = -1
         self.court: int = -1
+        self.protested = None
         self.game_string: str = ""
         self.rounds: int = 0
         self.started: bool = False
         self.super_bye = False
         self.best_player: GamePlayer | None = None
+        self.notes: str = ""
         self.teams: list[GameTeam] = [
             team_one.get_game_team(self),
             team_two.get_game_team(self),
@@ -131,6 +141,7 @@ class Game:
         self.primary_official: Official = NoOfficial
         self.scorer: Official = NoOfficial
         self.round_number: int = 0
+        self.cards: list[Card] = []
 
     @property
     def serve_clock(self):
@@ -147,10 +158,27 @@ class Game:
             return f"Court {self.court + 1}"
         return "-"
 
+    @property
+    def requires_action_string(self):
+        if self.resolved:
+            return "Resolved"
+        elif self.protested:
+            return "Requires Action"
+        elif any(i.red_cards for i in self.teams):
+            return "Requires Action"
+        elif self.notes.strip():
+                return "Requires Action"
+        else:
+            return ""
+
+    @property
+    def requires_action(self):
+        return (self.protested or any(i.red_cards for i in self.teams) or self.notes.strip()) and not self.resolved
+
     def set_primary_official(self, o):
         if self.bye:
             raise LookupError(f"Game {self.id} is a bye!")
-        o.games_officiated += 1
+        o.internal_games_umpired += 1
         self.primary_official = o
 
     def set_scorer(self, o):
@@ -160,7 +188,7 @@ class Game:
             return
         self.scorer = o
         if self.primary_official != o:
-            o.games_scored += 1
+            o.internal_games_scored += 1
 
     def add_to_game_string(self, string: str, team):
         if team == self.teams[0]:
@@ -236,7 +264,12 @@ class Game:
             f"Started, {self.server().nice_name()} serving from team {self.team_serving().nice_name()}"
         )
 
-    def end(self, best_player: str):
+    def end(
+        self,
+        best_player: str,
+        card_reasons: list[str] | None = None,
+        notes: str | None = None,
+    ):
         if best_player is None or self.best_player is not None:
             return
         self.bye_check()
@@ -244,6 +277,7 @@ class Game:
             if self.best_player:
                 [i.undo_end() for i in self.teams]
                 self.primary_official.games_umpired -= 1
+                self.scorer.games_scored -= 1
                 self.primary_official.rounds_umpired -= self.rounds
             if not self.is_final:
                 self.teams[0].team.listed_first += 1
@@ -251,6 +285,13 @@ class Game:
                     for i in self.teams:
                         i.team.court_one += 1
                     self.primary_official.games_court_one += 1
+
+            if card_reasons:
+                for i, val in enumerate(card_reasons):
+                    if val:
+                        self.cards[i].reason = val
+            if notes:
+                self.notes = notes
             self.best_player = None
             for i in self.players():
                 if i.name == best_player:
@@ -262,6 +303,7 @@ class Game:
             self.update_count = -1
             [i.end(self.is_final) for i in self.teams]
             self.primary_official.games_umpired += 1
+            self.scorer.games_scored += 1
             self.primary_official.rounds_umpired += self.rounds
             self.info(
                 f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}"
@@ -294,14 +336,23 @@ class Game:
 
     def undo(self):
         self.bye_check()
-        if self.game_string == "":
+        if not self.started:
+            if not self.tournament.fixtures_class.manual_allowed():
+                raise Exception("Tournament can not be edited!")
+            self.tournament.fixtures[-1].remove(self)
+            self.tournament.update_games()
+        elif self.game_string == "":
             self.info(f"Undoing Game start")
             self.started = False
+        elif self.protested != None:
+            self.protested = None
         elif self.best_player:
             [i.undo_end() for i in self.teams]
+            self.cards.clear()
             self.best_player = None
             self.primary_official.games_umpired -= 1
             self.primary_official.rounds_umpired -= self.rounds
+            self.scorer.games_scored -= 1
             self.game_string = self.game_string[:-2]
             self.start(
                 self.first_team_serves, self.teams[0].swapped, self.teams[1].swapped
@@ -311,6 +362,7 @@ class Game:
         else:
             self._serve_clock = -1
             [i.end_timeout() for i in self.teams]
+            self.cards.clear()
             self.game_string = self.game_string[:-2]
             self.start(
                 self.first_team_serves, self.teams[0].swapped, self.teams[1].swapped
@@ -337,11 +389,15 @@ class Game:
             "firstTeamServed": self.first_team_serves,
             "official": self.primary_official.name
             if self.primary_official
-            else "None one",
-            "scorer": self.scorer.name if self.scorer else "None one",
+            else "No one",
+            "scorer": self.scorer.name if self.scorer else "No one",
         }
         if self.best_player:  # game has been submitted and finalised
             dct["bestPlayer"] = self.best_player.name
+            dct["cards"] = [i.reason for i in self.cards]
+            dct["notes"] = self.notes
+            dct["protested"] = self.protested
+            dct["resolved"] = self.resolved
         return dct
 
     def display_map(self):
@@ -444,6 +500,8 @@ class Game:
                 team.end_timeout()
             elif c == "x":
                 team.sub_player(first)
+            elif c == "e":
+                team.forfeit()
             elif c.isdigit():
                 if int(c) <= 3:
                     team.yellow_card(first, int(c) + 10)
@@ -455,7 +513,7 @@ class Game:
         return [self.teams[0], self.teams[1], self.score_string(), self.id]
 
     def __repr__(self):
-        return f"{self.teams[0]} vs {self.teams[1]}"
+        return f"{self.teams[0].short_name} vs {self.teams[1].short_name}"
 
     def score_string(self):
         if self.bye or not self.started:
@@ -472,3 +530,9 @@ class Game:
         if self.id < 0:
             return
         logger.info(f"(Game {self.id}) {message}")
+
+    def protest(self, first_team, second_team):
+        self.protested = first_team + 2 * second_team
+
+    def resolve(self):
+        self.resolved = True

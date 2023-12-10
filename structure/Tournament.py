@@ -15,6 +15,7 @@ from itertools import permutations
 
 officials_permuted = []
 
+
 class Tournament:
     def __init__(self, file: str):
         if file != "-":
@@ -139,7 +140,7 @@ class Tournament:
             return self.games_to_list()[game_id]
         return next(i for i in self.games_to_list() if i.id == game_id)
 
-    def appoint_umpires(self, best_attempt = None, most_mistakes = 999):
+    def appoint_umpires(self):
         for r in self.fixtures:
             court_one_games = [i for i in r if i.court == 0]
             court_two_games = [i for i in r if i.court == 1]
@@ -148,11 +149,11 @@ class Tournament:
                 for g in games:
                     court_one = sorted(
                         self.officials,
-                        key=lambda it: (it.games_officiated, it.games_court_one),
+                        key=lambda it: (it.internal_games_umpired, it.games_court_one),
                     )
                     court_two = sorted(
                         self.officials,
-                        key=lambda it: (it.games_officiated, -it.games_court_one),
+                        key=lambda it: (it.internal_games_umpired, -it.games_court_one),
                     )
                     if not g:
                         continue
@@ -176,7 +177,7 @@ class Tournament:
                         continue
                     scorer = sorted(
                         self.officials,
-                        key=lambda it: (it.games_scored, it.games_officiated),
+                        key=lambda it: (it.internal_games_scored, it.internal_games_scored),
                     )
                     for o in scorer:
                         if o in [k.primary_official for k in games if k]:
@@ -191,22 +192,57 @@ class Tournament:
                         g.set_scorer(g.primary_official)
         for r in self.finals:
             court_one_games = [i for i in r if i.court == 0]
-            teams = [gt.team for g in r for gt in g.teams]
-            for g in court_one_games:
-                officials = sorted(
-                    [i for i in self.officials if i.finals],
-                    key=lambda it: it.games_officiated,
-                )
-                for o in officials:
-                    if any([i in teams for i in o.team]) or o == g.primary_official:
+            court_two_games = [i for i in r if i.court == 1]
+            for games in zip_longest(court_one_games, court_two_games):
+                teams = [gt.team for g in games if g for gt in g.teams]
+                for g in games:
+                    finals = [
+                        i
+                        for i in sorted(
+                            self.officials,
+                            key=lambda it: it.internal_games_umpired,
+                        )
+                        if i.finals
+                    ]
+                    other = sorted(
+                        self.officials,
+                        key=lambda it: it.internal_games_umpired,
+                    )
+                    if not g:
                         continue
-                    elif g.primary_official == NoOfficial:
+                    if g.primary_official != NoOfficial:
+                        continue
+                    for o in (finals if g.court == 0 else other):
+                        if o in [k.primary_official for k in games if k]:
+                            continue
+                        if any([i in teams for i in o.team]):
+                            continue
                         g.set_primary_official(o)
-                    else:
+                        break
+            if not self.details.get("scorer", False):
+                continue
+            for games in zip_longest(court_one_games, court_two_games):
+                teams = [gt.team for g in games if g for gt in g.teams]
+                for g in games:
+                    if not g:
+                        continue
+                    if g.scorer != NoOfficial:
+                        continue
+                    scorer = sorted(
+                        self.officials,
+                        key=lambda it: (it.internal_games_scored, it.internal_games_umpired),
+                    )
+                    for o in scorer:
+                        if o in [k.primary_official for k in games if k]:
+                            continue
+                        if o in [k.scorer for k in games if k]:
+                            continue
+                        if any([i in teams for i in o.team]):
+                            continue
                         g.set_scorer(o)
                         break
-                if g.scorer == NoOfficial:
-                    g.set_scorer(g.primary_official)
+                    if g.scorer == NoOfficial:
+                        g.set_scorer(g.primary_official)
 
     def assign_rounds(self):
         for i, r in enumerate(self.fixtures):
@@ -218,7 +254,7 @@ class Tournament:
 
     def assign_courts(self):
         for r in self.fixtures:
-            if r[0].court != -1:
+            if not r or r[0].court != -1:
                 continue
             # court_one_games = sorted(r, key=lambda a: sum([i.team.court_one for i in a.teams]))
             court_one_games = sorted(
@@ -237,7 +273,8 @@ class Tournament:
                 halfway = i + 1 >= (len(court_one_games) / 2) and self.two_courts
         for r in self.finals:
             for g in r:
-                g.court = 0
+                if g.court == -1:
+                    g.court = 0
 
     def players(self):
         players = {}
@@ -276,7 +313,7 @@ class Tournament:
                 else [i.name for i in self.teams],
                 "officials": "all"
                 if self.details["officials"] == "all"
-                else [i.name for i in self.teams],
+                else [i.name for i in self.officials],
                 "twoCourts": self.two_courts,
             }
         with open(location, "w+") as fp:
@@ -288,6 +325,7 @@ class Tournament:
         self.save()
         self.load()
 
+    # TODO: Rewrite this god forsaken code this is actually horrible
     def load(self):
         if not self.filename:
             return
@@ -300,9 +338,11 @@ class Tournament:
         self.in_finals = False
         with open(f"{self.filename}", "r+") as fp:
             data = json.load(fp)
-        self.update_games()
+        cursed = None  # HACK: OH GOD OH WHY THIS IS BEGGING TO BE REWRITTEN
+        # FUTURE: nvm senpai Lachie agreed that its the best code he's ever seen
         for i, r in enumerate(data.get("games", [])):
-            self.update_games(True)
+            self.update_games(cursed)
+            cursed = True
             for j, m in enumerate(r):
                 g = Game.from_map(m, self)
                 self.fixtures[i][j] = g
@@ -375,4 +415,5 @@ def load_all_tournaments() -> dict[str, Tournament]:
             t.details["sort"] = i
             ret[t.nice_name()] = t
             logger.info("------------------------------")
+
     return ret

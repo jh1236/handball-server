@@ -179,7 +179,7 @@ function startServeClock() {
         stopServeClock()
         return
     }
-    serveClock(Date.now() + 10000)
+    serveClock(Date.now() + 8000)
     fetch("/api/games/update/serve_clock", {
         method: "POST", body: JSON.stringify({
             id: id,
@@ -189,6 +189,18 @@ function startServeClock() {
             "Content-type": "application/json; charset=UTF-8"
         }
     });
+}
+
+function forfeit(firstTeam) {
+    fetch("/api/games/update/forfeit", {
+        method: "POST", body: JSON.stringify({
+            id: id,
+            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
+            tournament: tournament.replace("/", ""),
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then( () => document.location.reload());
 }
 
 function stopServeClock() {

@@ -1,7 +1,6 @@
 import random
-import time
 
-from flask import render_template, send_file, request, Response
+from flask import render_template, send_file, request, redirect
 
 from structure.AllTournament import (
     get_all_teams,
@@ -82,6 +81,7 @@ def init_api(app, comps: dict[str, Tournament]):
 
     tournament_specific(app, comps)
     universal_tournament(app, comps)
+    add_admin_pages(app, comps)
 
 
 def tournament_specific(app, comps: dict[str, Tournament]):
@@ -95,11 +95,21 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         ladder = comps[tournament].ladder()
         if isinstance(ladder[0], list):
             ladder = [
-                (f"Pool {numbers[i]}", list(enumerate(l if len(l) < 10 else l[:10], start=1)))
+                (
+                    f"Pool {numbers[i]}",
+                    list(enumerate(l if len(l) < 10 else l[:10], start=1)),
+                )
                 for i, l in enumerate(ladder)
             ]
         else:
-            ladder = [("", list(enumerate(ladder if len(ladder) < 10 else ladder[:10], start=1)))]
+            ladder = [
+                (
+                    "",
+                    list(
+                        enumerate(ladder if len(ladder) < 10 else ladder[:10], start=1)
+                    ),
+                )
+            ]
         ongoing_games = [
             i for i in comps[tournament].games_to_list() if i.in_progress()
         ]
@@ -125,7 +135,6 @@ def tournament_specific(app, comps: dict[str, Tournament]):
             players = players[0:10]
 
         notes = comps[tournament].notes or ["Notices will appear here when posted"]
-        print(ladder)
         return (
             render_template(
                 "tournament_home.html",
@@ -168,14 +177,64 @@ def tournament_specific(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/fixtures/detailed")
     def detailed_fixtures(tournament):
         court = request.args.get("court", None, type=int)
+        round = request.args.get("round", None, type=int)
+        umpire = request.args.get("umpire", None, type=str)
+        team = request.args.get("team", None, type=str)
+        player = request.args.get("player", None, type=str)
         fixtures = comps[tournament].fixtures
         finals = comps[tournament].finals
+        fixtures = fixture_sorter(fixtures)
         if court is not None:
             fixtures = [[j for j in i if j.court == court] for i in fixtures]
             finals = [[j for j in i if j.court == court] for i in finals]
+        if round is not None:
+            fixtures = [[j for j in i if j.round_number == round] for i in fixtures]
+            finals = [
+                [
+                    j
+                    for j in i
+                    if j.round_number + len(comps[tournament].fixtures) == round
+                ]
+                for i in finals
+            ]
+        if umpire is not None:
+            fixtures = [
+                [
+                    j
+                    for j in i
+                    if umpire in [j.primary_official.nice_name(), j.scorer.nice_name()]
+                ]
+                for i in fixtures
+            ]
+            finals = [
+                [
+                    j
+                    for j in i
+                    if umpire in [j.primary_official.nice_name(), j.scorer.nice_name()]
+                ]
+                for i in finals
+            ]
+        if team is not None:
+            fixtures = [
+                [j for j in i if team in [k.nice_name() for k in j.teams]]
+                for i in fixtures
+            ]
+            finals = [
+                [j for j in i if team in [k.nice_name() for k in j.teams]]
+                for i in finals
+            ]
+        if player is not None:
+            fixtures = [
+                [j for j in i if player in [k.nice_name() for k in j.players()]]
+                for i in fixtures
+            ]
+            finals = [
+                [j for j in i if player in [k.nice_name() for k in j.players()]]
+                for i in finals
+            ]
         fixtures = [
             (n, [i for i in j if not i.bye or i.best_player])
-            for n, j in enumerate(fixture_sorter(fixtures))
+            for n, j in enumerate(fixtures)
         ]
         finals = [
             (n, [i for i in j if not i.bye or i.best_player])
@@ -190,6 +249,11 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 finals=finals,
                 tournament=f"{tournament}/",
                 t=comps[tournament],
+                reset=court is not None
+                or round is not None
+                or umpire is not None
+                or team is not None
+                or player is not None,
             ),
             200,
         )
@@ -294,7 +358,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 update_count=game.update_count,
                 tournament=f"{tournament}/",
                 timeout_time=max([i.time_out_time + 30 for i in game.teams]) * 1000,
-                serve_time=(game.serve_clock + 10) * 1000,
+                serve_time=(game.serve_clock + 8) * 1000,
             ),
             200,
         )
@@ -404,7 +468,6 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         else:
             ladder = [("", list(enumerate(ladder, start=1)))]
         ladder = [(i if len(i) <= 10 else i[:10]) for i in ladder]
-        print(ladder)
         teams = [
             (
                 [
@@ -416,8 +479,11 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                     )
                     for _, j in l[1]
                     if j.games_played > 0 or len(comps[tournament].teams) < 15
-                ], l[0], k
-            ) for k, l in enumerate(ladder)
+                ],
+                l[0],
+                k,
+            )
+            for k, l in enumerate(ladder)
         ]
         headers = [
             (i, priority[i])
@@ -639,10 +705,29 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                     teamTwoPlayers=team_two_players,
                     swap=visual_str,
                     teams=teams,
+                    enum_teams=enumerate(teams),
                     game=game,
                     timeout_time=30000
                     + max(i.time_out_time for i in game.teams) * 1000,
                     timeout_first=1 - game.teams.index(timeout_team),
+                    tournament=f"{tournament}/",
+                ),
+                200,
+            )
+        elif game.protested is None:
+            team_dicts = [i.get_stats() for i in teams]
+            return (
+                render_template(
+                    "tournament_specific/game_editor/team_signatures.html",
+                    players=[i.tidy_name() for i in players],
+                    swap=visual_str,
+                    teams=teams,
+                    game=game,
+                    player_stats=[
+                        (i, *[j.get_stats()[i] for j in players])
+                        for i in players[0].get_stats()
+                    ],
+                    stats=[(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]],
                     tournament=f"{tournament}/",
                 ),
                 200,
@@ -655,6 +740,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                     swap=visual_str,
                     teams=teams,
                     game=game,
+                    cards=enumerate(game.cards, start=1),
                     tournament=f"{tournament}/",
                 ),
                 200,
@@ -668,7 +754,7 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 400,
             )
 
-    @app.get("/<tournament>/games/create")
+    @app.get("/<tournament>/create")
     def create_game(tournament):
         if not comps[tournament].fixtures_class.manual_allowed():
             return (
@@ -724,7 +810,50 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 200,
             )
 
-    @app.get("/<tournament>/games/createPlayers")
+    @app.get("/<tournament>/round")
+    def new_round_site(tournament):
+        if not comps[tournament].fixtures_class.manual_allowed():
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="This competition cannot be edited manually!",
+                ),
+                400,
+            )
+        elif any(
+            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+        ):
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="There is already a game in progress!",
+                ),
+                400,
+            )
+        key = request.args.get("key", None)
+        if key is None:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/no_access.html",
+                    error="This page requires a password to access:",
+                ),
+                403,
+            )
+        elif key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
+        else:
+            comps[tournament].update_games(True)
+            comps[tournament].update_games()
+            comps[tournament].save()
+            return redirect(f"/{comps[tournament].nice_name()}/", code=302)
+
+    @app.get("/<tournament>/createPlayers")
     def create_game_players(tournament):
         if not comps[tournament].fixtures_class.manual_allowed():
             return (
@@ -868,10 +997,23 @@ def universal_tournament(app, comps: dict[str, Tournament]):
             "Point Difference": 2,
             "Elo": 3,
         }
-        ladder = [("", list(enumerate(sorted(
-            get_all_teams(),
-            key=lambda a: (-a.games_won, -(a.get_stats()["Point Difference"])),
-        ), start=1)))]
+        ladder = [
+            (
+                "",
+                list(
+                    enumerate(
+                        sorted(
+                            get_all_teams(),
+                            key=lambda a: (
+                                -a.games_won,
+                                -(a.get_stats()["Point Difference"]),
+                            ),
+                        ),
+                        start=1,
+                    )
+                ),
+            )
+        ]
         ladder = [(i if len(i) <= 10 else i[:10]) for i in ladder]
         print(ladder)
         teams = [
@@ -885,7 +1027,9 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                     )
                     for _, j in l[1]
                     if j.games_played > 0
-                ], l[0], k
+                ],
+                l[0],
+                k,
             )
             for k, l in enumerate(ladder)
         ]
@@ -1044,6 +1188,191 @@ def universal_tournament(app, comps: dict[str, Tournament]):
                 "tournament_specific/all_officials.html",
                 officials=official,
                 tournament="",
+            ),
+            200,
+        )
+
+
+def add_admin_pages(app, comps: dict[str, Tournament]):
+    from api import admin_password
+
+    @app.get("/<tournament>/fixtures/admin")
+    def admin_fixtures(tournament):
+        key = request.args.get("key", None)
+        if key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
+        court = request.args.get("court", None, type=int)
+        round = request.args.get("round", None, type=int)
+        umpire = request.args.get("umpire", None, type=str)
+        team = request.args.get("team", None, type=str)
+        player = request.args.get("player", None, type=str)
+        fixtures = comps[tournament].fixtures
+        finals = comps[tournament].finals
+        fixtures = fixture_sorter(fixtures)
+        if court is not None:
+            fixtures = [[j for j in i if j.court == court] for i in fixtures]
+            finals = [[j for j in i if j.court == court] for i in finals]
+        if round is not None:
+            fixtures = [[j for j in i if j.round_number == round] for i in fixtures]
+            finals = [
+                [
+                    j
+                    for j in i
+                    if j.round_number + len(comps[tournament].fixtures) == round
+                ]
+                for i in finals
+            ]
+        if umpire is not None:
+            fixtures = [
+                [
+                    j
+                    for j in i
+                    if umpire in [j.primary_official.nice_name(), j.scorer.nice_name()]
+                ]
+                for i in fixtures
+            ]
+            finals = [
+                [
+                    j
+                    for j in i
+                    if umpire in [j.primary_official.nice_name(), j.scorer.nice_name()]
+                ]
+                for i in finals
+            ]
+        if team is not None:
+            fixtures = [
+                [j for j in i if team in [k.nice_name() for k in j.teams]]
+                for i in fixtures
+            ]
+            finals = [
+                [j for j in i if team in [k.nice_name() for k in j.teams]]
+                for i in finals
+            ]
+        if player is not None:
+            fixtures = [
+                [j for j in i if player in [k.nice_name() for k in j.players()]]
+                for i in fixtures
+            ]
+            finals = [
+                [j for j in i if player in [k.nice_name() for k in j.players()]]
+                for i in finals
+            ]
+        fixtures = [
+            (n, [i for i in j if not i.bye or i.best_player])
+            for n, j in enumerate(fixtures)
+        ]
+        finals = [
+            (n, [i for i in j if not i.bye or i.best_player])
+            for n, j in enumerate(finals)
+        ]
+        fixtures = [i for i in fixtures if i[1]]
+        finals = [i for i in finals if i[1]]
+        return (
+            render_template(
+                "tournament_specific/admin/site.html",
+                fixtures=fixtures,
+                finals=finals,
+                tournament=f"{tournament}/",
+                key=key,
+                t=comps[tournament],
+                reset=court is not None
+                or round is not None
+                or umpire is not None
+                or team is not None
+                or player is not None,
+            ),
+            200,
+        )
+
+    @app.get("/<tournament>/games/<game_id>/admin")
+    def admin_game_site(tournament, game_id):
+        if int(game_id) >= len(comps[tournament].games_to_list()):
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="Game Does not exist",
+                ),
+                400,
+            )
+        key = request.args.get("key", None)
+        if key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
+        game = comps[tournament].get_game(int(game_id))
+        teams = game.teams
+        team_dicts = [i.get_stats() for i in teams]
+        stats = [(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]]
+        best = game.best_player.tidy_name() if game.best_player else "TBD"
+        players = game.players()
+        round_number = game.round_number + 1
+        prev_matches = []
+        for i in get_all_games():
+            if not all(
+                [
+                    k.nice_name() in [j.team.nice_name() for j in i.teams]
+                    for k in game.teams
+                ]
+            ):
+                continue
+            if not all(
+                [
+                    j.team.nice_name() in [k.nice_name() for k in game.teams]
+                    for j in i.teams
+                ]
+            ):
+                continue
+            if (
+                i.tournament.nice_name() == game.tournament.nice_name()
+                and i.id == game.id
+            ):
+                continue
+            prev_matches.append(
+                (
+                    i.full_name,
+                    i.id,
+                    i.tournament,
+                )
+            )
+        prev_matches = prev_matches or [("No other matches", -1, game.tournament)]
+        if not game.started:
+            status = "Waiting for toss"
+        elif game.in_timeout():
+            status = "In Timeout"
+        elif not game.game_ended():
+            status = "Game in Progress"
+        elif not game.best_player:
+            status = "Finished"
+        else:
+            status = "Official"
+        player_stats = [
+            (i, *[j.get_stats()[i] for j in players]) for i in players[0].get_stats()
+        ]
+        return (
+            render_template(
+                "tournament_specific/admin/game_page.html",
+                game=game,
+                status=status,
+                players=[i.tidy_name() for i in players],
+                teams=teams,
+                stats=stats,
+                player_stats=player_stats,
+                official=game.primary_official,
+                commentary=game_string_to_commentary(game),
+                best=best,
+                roundNumber=round_number,
+                prev_matches=prev_matches,
+                tournament=f"{tournament}/",
             ),
             200,
         )
