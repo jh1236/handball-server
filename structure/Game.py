@@ -2,7 +2,7 @@ import time
 import typing
 
 from structure.OfficiatingBody import NoOfficial, Official
-from structure.Player import GamePlayer, Player
+from structure.Player import GamePlayer, Player, forfeit_player
 from structure.Team import BYE, Team
 from utils.logging_handler import logger
 from utils.util import chunks_sized
@@ -75,7 +75,7 @@ class Game:
         game.load_from_string(game_map["game"])
         if game_map.get("bestPlayer", False):
             game.end(
-                game_map["bestPlayer"],
+                None if game_map["bestPlayer"] == "Forfeit" else game_map["bestPlayer"],
                 game_map.get("cards", None),
                 game_map.get("notes", None),
             )
@@ -134,8 +134,10 @@ class Game:
                 self.teams[0].score = 11
             else:
                 self.super_bye = True
-        self.ranked: bool = not final and not any(
-            i.nice_name().startswith("null") for i in self.players()
+        self.ranked: bool = (
+            not final
+            and not any(i.nice_name().startswith("null") for i in self.players())
+            and self.tournament.details.get("ranked", True)
         )
         self.first_team_serves: bool = False
         self.primary_official: Official = NoOfficial
@@ -163,17 +165,29 @@ class Game:
         if self.resolved:
             return "Resolved"
         elif self.protested:
-            return "Requires Action"
+            return "Protested"
         elif any(i.red_cards for i in self.teams):
-            return "Requires Action"
+            return "Red card awarded"
         elif self.notes.strip():
-                return "Requires Action"
+            return "Notes to review"
+        elif self.forfeit():
+            return "Forfeited"
+        elif self.best_player:
+            return "Official"
+        elif self.protested is not None:
+            return "Finished"
+        elif self.in_timeout():
+            return "In timeout"
+        elif self.started:
+            return "Game in progress"
         else:
-            return ""
+            return "Waiting for toss"
 
     @property
     def requires_action(self):
-        return (self.protested or any(i.red_cards for i in self.teams) or self.notes.strip()) and not self.resolved
+        return (
+            self.protested or any(i.red_cards for i in self.teams) or self.notes.strip()
+        ) and not self.resolved
 
     def set_primary_official(self, o):
         if self.bye:
@@ -220,6 +234,11 @@ class Game:
         if server.is_carded():
             server = serving_team.players[serving_team.first_player_serves]
         return server
+
+    def server_side(self):
+        if self.bye or not self.started:
+            return None
+        return ["Left", "Right"][not self.team_serving().first_player_serves]
 
     def players(self) -> list[GamePlayer]:
         if self.bye:
@@ -270,7 +289,7 @@ class Game:
         card_reasons: list[str] | None = None,
         notes: str | None = None,
     ):
-        if best_player is None or self.best_player is not None:
+        if self.best_player is not None:
             return
         self.bye_check()
         if self.game_ended():
@@ -293,11 +312,14 @@ class Game:
             if notes:
                 self.notes = notes
             self.best_player = None
-            for i in self.players():
-                if i.name == best_player:
-                    self.best_player = i
-                    i.best_player()
-                    break
+            if self.forfeit() and best_player is None:
+                self.best_player = forfeit_player(self)
+            else:
+                for i in self.players():
+                    if i.name == best_player:
+                        self.best_player = i
+                        i.best_player()
+                        break
             if self.best_player == None:
                 raise Exception(f"Best Player '{best_player}' not found")
             self.update_count = -1
@@ -536,3 +558,6 @@ class Game:
 
     def resolve(self):
         self.resolved = True
+
+    def forfeit(self):
+        return self.game_string[-2:].lower() == "ee"

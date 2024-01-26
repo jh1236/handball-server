@@ -54,9 +54,17 @@
                 <td></td>
             {% endif %}
             {% if game.team_serving().faulted %}
-                <td style="color: #ff0000"><i>{{ game.server().name }}</i></td>
+                {% if game.team_serving().carded %}
+                    <td style="color: #ff0000"><i>{{ game.server().name }} ({{ game.server_side()[0] }})</i></td>
+                {% else %}
+                    <td style="color: #ff0000"><i>{{ game.server().name }}</i></td>
+                {% endif %}
             {% else %}
-                <td><i>{{ game.server().name }}</i></td>
+                {% if game.team_serving().carded %}
+                    <td><i>{{ game.server().name }} ({{ game.server_side()[0] }})</i></td>
+                {% else %}
+                    <td><i>{{ game.server().name }}</i></td>
+                {% endif %}
             {% endif %}
         </tr>
 

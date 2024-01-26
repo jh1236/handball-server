@@ -9,6 +9,7 @@ from structure.Team import Team
 from structure.Tournament import load_all_tournaments
 from utils.logging_handler import logger
 from website import init_api
+import json
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -401,6 +402,33 @@ def undo():
     game_id = request.json["id"]
     comps[tournament].get_game(game_id).undo()
     comps[tournament].save()
+    return "", 204
+
+
+@app.post("/api/signup")
+def signup():
+    with open("./config/signups/teams.json") as fp:
+        teams = json.load(fp)
+    teams[request.json["teamName"]] = {
+        "players": [
+            request.json["playerOne"],
+            request.json["playerTwo"],
+        ],
+        "colors" : [
+            request.json["colorOne"],
+            request.json["colorTwo"],
+        ]
+    }
+    if "substitute" in request.json and request.json["substitute"]:
+        teams[request.json["teamName"]].append(request.json["substitute"])
+    with open("./config/signups/teams.json", "w+") as fp:
+        json.dump(teams, fp, indent=4, sort_keys=True)
+    with open("./config/signups/umpires.json") as fp:
+        umpires = json.load(fp)
+    umpires += request.json["umpires"]
+    print(request.json["umpires"])
+    with open("./config/signups/umpires.json", "w+") as fp:
+        json.dump(umpires, fp)
     return "", 204
 
 

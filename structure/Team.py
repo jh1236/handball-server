@@ -9,6 +9,7 @@ from utils.logging_handler import logger
 from utils.util import calc_elo, google_image
 
 images = {}
+team_names = {}
 
 
 class Team:
@@ -25,6 +26,8 @@ class Team:
         self.red_cards: int = 0
         self.faults: int = 0
         self.timeouts: int = 0
+        self.primary_color: str = "None/Unknown"
+        self.secondary_color: str = "None/Unknown"
 
         self.listed_first: int = 0
         self.court_one: int = 0
@@ -34,6 +37,7 @@ class Team:
         self.image_path: str = (
             f"/api/teams/image?name={self.nice_name()}" if self.has_photo else None
         )
+        team_names[tuple(sorted(i.nice_name() for i in players))] = self.name
         if not self.image_path:
             if self.name in images:
                 self.image_path = images[self.name]
@@ -61,6 +65,14 @@ class Team:
     @property
     def point_difference(self):
         return self.points_for - self.points_against
+
+    @property
+    def captain(self):
+        return self.players[0]
+
+    @property
+    def non_captain(self):
+        return self.players[1]
 
     def has_played(self, other):
         return other in self.teams_played
@@ -95,7 +107,8 @@ class Team:
 
     @property
     def elo(self):
-        return round(sum([i.elo for i in self.players]) / len(self.players), 2)
+        true_players = [i.elo for i in self.players if "null" not in i.nice_name()]
+        return round(sum(true_players) / (len(true_players) or 1), 2)
 
     def get_stats(self, include_players=False):
         game_teams: list[GameTeam] = []
@@ -165,9 +178,13 @@ class Team:
 
     @classmethod
     def find_or_create(cls, tournament, name, players):
-        for i in tournament.teams:
-            if sorted([j.name for j in players]) == sorted([j.name for j in i.players]):
-                return i
+        if tournament:
+            for i in tournament.teams:
+                if sorted([j.name for j in players]) == sorted([j.name for j in i.players]):
+                    return i
+        key = tuple(sorted(i.nice_name() for i in players))
+        if key in team_names:
+            name = team_names[key]
         if not name.strip():
             raise NameError("Team name is not valid!")
         t = cls(name, players)
@@ -218,9 +235,13 @@ class GameTeam:
     def __repr__(self):
         return repr(self.team)
 
+    @property
+    def carded(self):
+        return any(i.is_carded() for i in self.players)
+
     def reset(self):
         if self.elo_delta:
-            self.change_elo(-self.elo_delta, -self.game.id)
+            self.change_elo(-self.elo_delta, self.game)
             self.elo_delta = None
         self.green_carded = False
         self.score = 0
@@ -264,7 +285,7 @@ class GameTeam:
     def change_elo(self, delta, a):
         for i in self.players:
             if i.time_on_court:
-                i.player.change_elo(delta, a)
+                i.change_elo(delta, a)
 
     def next_point(self):
         self.faulted = False
@@ -414,39 +435,41 @@ class GameTeam:
         return max(self.players, key=lambda a: a.card_time_remaining).card_duration
 
     def end(self, final=False):
+        if final:
+            return
         if self.elo_delta:
             Exception("game ended twice!")
         won = self.game.winner() == self.team
         [i.end(won, final) for i in self.players]
-        if self.game.ranked:
-            self.team.points_for += self.score
-            self.team.points_against += self.opponent.score
-            self.team.games_played += 1
-            self.team.games_won += won
-            self.team.green_cards += self.green_cards
-            self.team.yellow_cards += self.yellow_cards
-            self.team.red_cards += self.red_cards
-            self.team.faults += self.faults
-            self.team.timeouts += 1 - self.timeouts
-            self.game.primary_official.green_cards += self.green_cards
-            self.game.primary_official.yellow_cards += self.yellow_cards
-            self.game.primary_official.red_cards += self.red_cards
-            self.game.primary_official.faults += self.faults
+
+        self.team.points_for += self.score
+        self.team.points_against += self.opponent.score
+        self.team.games_played += 1
+        self.team.games_won += won
+        self.team.green_cards += self.green_cards
+        self.team.yellow_cards += self.yellow_cards
+        self.team.red_cards += self.red_cards
+        self.team.faults += self.faults
+        self.team.timeouts += 1 - self.timeouts
+        self.game.primary_official.green_cards += self.green_cards
+        self.game.primary_official.yellow_cards += self.yellow_cards
+        self.game.primary_official.red_cards += self.red_cards
+        self.game.primary_official.faults += self.faults
 
             # either elo is not set, or it is positive, and we lost or negative, and we won
             # meaning that the result of the game was changed
-            if not self.game.tournament.details.get("ranked", True):
+        if not self.game.ranked:
                 return
-            if not self.elo_delta:
-                self.elo_delta = calc_elo(
-                    self.elo_at_start, self.opponent.elo_at_start, won
-                )
-                self.change_elo(self.elo_delta, self.game.id)
+        if not self.elo_delta:
+            self.elo_delta = calc_elo(
+                self.elo_at_start, self.opponent.elo_at_start, won
+            )
+            self.change_elo(self.elo_delta, self.game)
 
     def undo_end(self):
         [i.undo_end(self.game.winner() == self.team) for i in self.players]
         if self.elo_delta:
-            self.change_elo(-self.elo_delta, -self.game.id)
+            self.change_elo(-self.elo_delta, self.game)
         self.elo_delta = None
         self.team.points_for -= self.score
         self.team.points_against -= self.opponent.score

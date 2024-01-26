@@ -1,6 +1,7 @@
 from typing import Any
 
 from structure.Card import Card
+from utils.util import initial_elo
 
 elo_map = {}
 
@@ -11,7 +12,7 @@ class Player:
         self.tournament = None
         self.name: str = name
         if self.nice_name() not in elo_map:
-            elo_map[self.nice_name()] = 1500
+            elo_map[self.nice_name()] = initial_elo
         self.faults: int = 0
         self.won_while_serving = 0
         self.double_faults: int = 0
@@ -34,7 +35,7 @@ class Player:
     def elo(self):
         return elo_map[self.nice_name()]
 
-    def change_elo(self, delta: int, a):
+    def change_elo(self, delta: int, game):
         elo_map[self.nice_name()] += delta
 
     @property
@@ -127,7 +128,7 @@ class Player:
                 (d["Green Cards"] + d["Yellow Cards"] + d["Red Cards"])
                 / (d["Games Played"] or 1),
                 2,
-                ),
+            ),
             "Serve Ace Rate": f'{round(d["Aces scored"] / (served or 1), 2) * 100: .1f}%',
             "Percentage of Points scored": f"{round(d['Points scored'] / (d['Rounds on Court'] or 1), 2) * 100: .1f}%",
             "Serving Conversion Rate": f"{round(won_while_serving / (served or 1), 2) * 100: .1f}%",
@@ -149,11 +150,11 @@ class Player:
         self.wins += d.get("Games Won", 0)
         self.points_served += d.get("Points served", 0)
         self.won_while_serving += d.get("Points served", 0) * (
-                float(d.get("Serving Conversion Rate", "0%")[:-1]) / 100.0
+            float(d.get("Serving Conversion Rate", "0%")[:-1]) / 100.0
         )
 
     def nice_name(self):
-        return self.name.lower().replace(" ", "_").replace("'","")
+        return self.name.lower().replace(" ", "_").replace("'", "")
 
     def game_player(self, game, captain):
         return GamePlayer(self, game, captain)
@@ -182,13 +183,15 @@ class Player:
 
 class GamePlayer:
     def __init__(self, player: Player, game, captain):
+        self.player: Player = player
+        self.elo_delta = None
+        self.elo_at_start: float = self.player.elo
         self.cards: list[Card] = []
         self._tidy_name = None
         self.won_while_serving = 0
         self.points_served: int = 0
         self.game = game
         self.double_faults: int = 0
-        self.player: Player = player
         self.name: str = self.player.name
         self.faults: int = 0
         self.points_scored: int = 0
@@ -252,7 +255,7 @@ class GamePlayer:
         self.yellow_cards += 1
         if self.card_time_remaining >= 0:
             self.card_time_remaining += time
-            self.card_duration += time
+            self.card_duration = self.card_time_remaining
         card = Card(self, time)
         self.cards.append(card)
         self.game.cards.append(card)
@@ -292,7 +295,7 @@ class GamePlayer:
         self.green_carded = False
 
     def end(self, won, final=False):
-        if final or self.time_carded + self.time_on_court == 0 or not self.game.ranked:
+        if final or self.time_carded + self.time_on_court == 0:
             return
         self.player.points_scored += self.points_scored
         self.player.points_served += self.points_served
@@ -376,3 +379,69 @@ class GamePlayer:
 
     def serving(self):
         return self.game.server() and self.game.server().nice_name() == self.nice_name()
+
+    def change_elo(self, delta, game):
+        """
+        delta: float    - the raw elo delta calculated by the elo function (https://www.desmos.com/calculator/3grcevz6t7)
+        game: Game      - The game that this change is caused by
+        """
+        game_player: GamePlayer = next(
+            i for i in game.players() if i.nice_name() == self.nice_name()
+        )
+        team = next(i for i in game.teams if game_player in i.players)
+        if delta > 0:
+            player = game_player
+        else:
+            player = next(i for i in team.players if i.nice_name() != self.nice_name())
+        m = (sum(i.points_scored for i in team.players) / len(team.players)) or 1
+        ratio = player.points_scored / (m or 1)
+        self.elo_delta = delta * (1 + 2 * ratio) / 3
+        self.player.change_elo(self.elo_delta, game)
+
+    # def change_elo(self, delta, game):
+    #     """
+    #     delta: float    - the raw elo delta calculated by the elo function (https://www.desmos.com/calculator/3grcevz6t7)
+    #     game: Game      - The game that this change is caused by
+    #     """
+    #     game_player: GamePlayer = next(
+    #         i for i in game.players() if i.nice_name() == self.nice_name()
+    #     )
+    #     team = next(i for i in game.teams if game_player in i.players)
+    #     other = next(i for i in team.players if i.nice_name() != self.nice_name())
+    #     if delta <= 0:
+    #         game_player, other = other, game_player
+    #     s = 0
+    #     for i in range(len(team.players)):
+    #         s += team.players[i].points_scored * team.players[1 - i].elo_at_start
+    #     m = (s / len(team.players)) or 1
+    #     ratio = (other.elo_at_start * game_player.points_scored) / (m or 1)
+    #     self.elo_delta = delta * (1 + 2 * ratio) / 3
+    #     self.player.change_elo(self.elo_delta, game)
+
+    def new_change_elo(self, delta, game):
+        """
+        delta: float    - the raw elo delta calculated by the elo function (https://www.desmos.com/calculator/3grcevz6t7)
+        game: Game      - The game that this change is caused by
+        """
+        game_player: GamePlayer = next(
+            i for i in game.players() if i.nice_name() == self.nice_name()
+        )
+        team = next(i for i in game.teams if game_player in i.players)
+        other = next(i for i in team.players if i.nice_name() != self.nice_name())
+        if delta <= 0:
+            game_player, other = other, game_player
+        s = 0
+        m_elo = min(i.elo_at_start for i in team.players) - 10
+        for i in range(len(team.players)):
+            s += (team.players[1 - i].elo_at_start - m_elo)
+        m = (s / len(team.players)) or 1
+        ratio = (other.elo_at_start - m_elo) / (m or 1)
+        self.elo_delta = delta * ratio
+        self.player.change_elo(self.elo_delta, game)
+
+
+ff = Player("Forfeit")
+
+
+def forfeit_player(game):
+    return ff.game_player(game, False)

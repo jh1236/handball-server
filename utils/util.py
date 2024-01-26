@@ -8,6 +8,9 @@ import re
 
 T = TypeVar("T")
 
+K = 30.0
+initial_elo = 1500
+D = 1200.0
 
 def chunks_sized(lst: list[T], n: int) -> list[list[T]]:
     """Yield successive n-sized chunks from lst."""
@@ -17,8 +20,6 @@ def chunks_sized(lst: list[T], n: int) -> list[list[T]]:
     return lizt
 
 
-def probability(rating1, rating2):
-    return 1.0 * 1.0 / (1 + 1.0 * math.pow(10, 1.0 * (rating1 - rating2) / 400))
 
 
 def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
@@ -30,8 +31,10 @@ def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
         yield l[i::n]
 
 
+def probability(other, me):
+    return  1.0 / (1.0 + math.pow(10, K * (other - me) / D))
+
 def calc_elo(elo, elo_other, first_won):
-    K = 30
     pa = probability(elo_other, elo)
     ra = K * (first_won - pa)
 
@@ -64,3 +67,7 @@ def google_image(word):
     bs = BeautifulSoup(page, 'html.parser')
     images = bs.find_all('img', {'src':re.compile('.*gstatic.com.*')})
     return images[0]['src']
+
+
+if __name__ == "__main__":
+    print(calc_elo(1000, 1000, False))

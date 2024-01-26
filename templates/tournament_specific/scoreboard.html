@@ -92,8 +92,11 @@
     </tr>
     {% for i in range(2) %}
         <tr>
-            <td style="color: {{ teams[0].players[i].biggest_card_hex() }}; font-size: 45px">
+            <td style="color: {{ teams[0].players[i].biggest_card_hex() }}; font-size: 40px">
                 <a class="hide" href="/{{ tournament }}players/{{ teams[0].players[i].nice_name() }}">
+                    {% if teams[0].players[i].is_carded() %}
+                        <s>
+                    {% endif %}
                     {% if not teams[0].players[i].serving() %}
                         <i>
                     {% else %}
@@ -102,14 +105,11 @@
                         {% endif %}
                         <b> >
                     {% endif %}
-                    {% if teams[0].players[i].is_carded() %}
-                        <s>
-                    {% endif %}
                     {{ teams[0].players[i] }}
-                    {% if teams[0].players[i].is_carded() %}
-                        </s>
-                    {% endif %}
                     {% if teams[0].players[i].serving() %}
+                        {% if game.team_serving().carded %}
+                            ({{ game.server_side()[0] }})
+                        {% endif %}
                         </b>
                         {% if teams[0].faulted %}
                             </u>
@@ -117,11 +117,17 @@
                     {% else %}
                         </i>
                     {% endif %}
+                    {% if teams[0].players[i].is_carded() %}
+                        </s>
+                    {% endif %}
                 </a>
             </td>
             <td></td>
-            <td style="color: {{ teams[1].players[i].biggest_card_hex() }}; font-size: 45px">
+            <td style="color: {{ teams[1].players[i].biggest_card_hex() }}; font-size: 40px">
                 <a class="hide" href="/{{ tournament }}players/{{ teams[1].players[i].nice_name() }}">
+                    {% if teams[1].players[i].is_carded() %}
+                        <s>
+                    {% endif %}
                     {% if not teams[1].players[i].serving() %}
                         <i>
                     {% else %}
@@ -130,20 +136,20 @@
                         {% endif %}
                         <b> >
                     {% endif %}
-                    {% if teams[1].players[i].is_carded() %}
-                        <s>
-                    {% endif %}
                     {{ teams[1].players[i] }}
-                    {% if teams[1].players[i].is_carded() %}
-                        </s>
-                    {% endif %}
                     {% if teams[1].players[i].serving() %}
+                        {% if game.team_serving().carded %}
+                            ({{ game.server_side()[0] }})
+                        {% endif %}
                         </b>
                         {% if teams[1].faulted %}
                             </u>
                         {% endif %}
                     {% else %}
                         </i>
+                    {% endif %}
+                    {% if teams[1].players[i].is_carded() %}
+                        </s>
                     {% endif %}
                 </a>
             </td>

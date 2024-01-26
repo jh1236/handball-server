@@ -1,7 +1,7 @@
 {
     "details": {
         "finals_generator": "Empty",
-        "fixtures_generator": "OneRoundEditable",
+        "fixtures_generator": "OneRound",
         "name": "SUSS Practice Season Two",
         "officials": "all",
         "teams": "all",

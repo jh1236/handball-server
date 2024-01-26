@@ -79,7 +79,7 @@
                     <td><a href="/{{ tournament }}fixtures/detailed?umpire={{ game.primary_official.nice_name() }}"
                            class="hide"><i>{{ game.primary_official }}</i></a></td>
                     {% if t.details['scorer'] %}
-                        <td><i><a href="/{{ tournament }}fixtures/detailed?umpire={{ game.scorer.nice_name() }}"
+                        <td><i><a href="/{{ tournament }}officials/{{ game.scorer.nice_name() }}"
                                   class="hide">{{ game.scorer }}</a></i></td> {% endif %}
                     {% if t.two_courts %}
                         <td><a href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"

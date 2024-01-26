@@ -10,7 +10,7 @@ from structure.OfficiatingBody import Official, get_officials, NoOfficial
 from structure.Player import Player, elo_map
 from structure.Team import Team, BYE
 from utils.logging_handler import logger
-from utils.util import n_chunks
+from utils.util import n_chunks, initial_elo
 from itertools import permutations
 
 officials_permuted = []
@@ -177,7 +177,10 @@ class Tournament:
                         continue
                     scorer = sorted(
                         self.officials,
-                        key=lambda it: (it.internal_games_scored, it.internal_games_scored),
+                        key=lambda it: (
+                            it.internal_games_scored,
+                            it.internal_games_scored,
+                        ),
                     )
                     for o in scorer:
                         if o in [k.primary_official for k in games if k]:
@@ -212,7 +215,7 @@ class Tournament:
                         continue
                     if g.primary_official != NoOfficial:
                         continue
-                    for o in (finals if g.court == 0 else other):
+                    for o in other if g.court == 1 else finals:
                         if o in [k.primary_official for k in games if k]:
                             continue
                         if any([i in teams for i in o.team]):
@@ -230,7 +233,10 @@ class Tournament:
                         continue
                     scorer = sorted(
                         self.officials,
-                        key=lambda it: (it.internal_games_scored, it.internal_games_umpired),
+                        key=lambda it: (
+                            it.internal_games_scored,
+                            it.internal_games_umpired,
+                        ),
                     )
                     for o in scorer:
                         if o in [k.primary_official for k in games if k]:
@@ -315,6 +321,7 @@ class Tournament:
                 if self.details["officials"] == "all"
                 else [i.name for i in self.officials],
                 "twoCourts": self.two_courts,
+                "ranked": self.details.get("ranked", True),
             }
         with open(location, "w+") as fp:
             json.dump(d, fp, indent=4, sort_keys=True)
@@ -367,25 +374,38 @@ class Tournament:
             self.ref = self.details["ref"]
             with open(f"./config/templates/{self.ref}.json", "r+") as fp:
                 self.details = json.load(fp)
-        with open("./config/teams.json", "r+") as fp:
+        with open("./config/signups/teams.json", "r+") as fp:
             teams = json.load(fp)
+            with open("./config/teams.json", "r+") as fp2:
+                teams = teams| json.load(fp2)
+
 
             if self.details["teams"] == "all":
-                self.teams = [
-                    Team.find_or_create(
-                        self,
-                        k,
-                        [Player(j).set_tournament(self) for c, j in enumerate(v)],
-                    )
-                    for k, v in teams.items()
-                ]
+                self.teams = []
+                for k, v in teams.items():
+                    if isinstance(v,  list):
+                        team = Team.find_or_create(self, k, [Player(j) for j in v])
+                    else:
+                        team = Team.find_or_create(self, k, [Player(j).set_tournament(self) for j in v["players"]])
+                        team.primary_color = v["colors"][0]
+                        team.secondary_color = v["colors"][1]
+                    self.teams.append(team)
             else:
                 self.teams = []
                 for i in self.details["teams"]:
-                    players = [
-                        Player(j).set_tournament(self) for c, j in enumerate(teams[i])
-                    ]
-                    self.teams.append(Team.find_or_create(self, i, players))
+                    if isinstance(teams[i],  list):
+                        players = [
+                            Player(j).set_tournament(self) for c, j in enumerate(teams[i])
+                        ]
+                        team = Team.find_or_create(self, i, players)
+                    else:
+                        players = [
+                            Player(j).set_tournament(self) for c, j in enumerate(teams[i]["players"])
+                        ]
+                        team = Team.find_or_create(self, i, players)
+                        team.primary_color = teams[i]["colors"][0]
+                        team.secondary_color = teams[i]["colors"][1]
+                    self.teams.append(team)
         self.teams.sort(key=lambda a: a.nice_name())
         self.two_courts = self.details["twoCourts"]
         self.officials: list[Official] = get_officials(self)
@@ -404,7 +424,7 @@ class Tournament:
 def load_all_tournaments() -> dict[str, Tournament]:
     ret = {}
     for i in elo_map:
-        elo_map[i] = 1500
+        elo_map[i] = initial_elo
     with open("./config/tournaments.txt") as fp:
         files = fp.readlines()
     for i, filename in enumerate(files):
