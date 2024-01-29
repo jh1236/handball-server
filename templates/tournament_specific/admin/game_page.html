@@ -17,9 +17,9 @@
     <h1 class="big"><a class="hide" href="/{{ tournament }}games/{{ game.id }}/display">{{ game.score_string() }}</a>
     </h1>
     <p><b>Round:</b> <a class="hide"
-                        href="/{{ tournament }}fixtures/detailed?round={{ roundNumber - 1 + game.is_final * game.tournament.fixtures.__len__() }}"><i>{{ roundNumber }}</i></a></p>
+                        href="/{{ tournament }}fixtures/admin?key={{ key }}&round={{ roundNumber - 1 + game.is_final * game.tournament.fixtures.__len__() }}"><i>{{ roundNumber }}</i></a></p>
     <p><b>Court:</b> <a class="hide"
-                        href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court_display() }}</i></a>
+                        href="/{{ tournament }}fixtures/admin?key={{ key }}&?court={{ game.court }}"><i>{{ game.court_display() }}</i></a>
     </p>
     <p><b>Match Official:</b>{% if not game.bye %}
         <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %} <i>{{ official }}</i>
@@ -40,14 +40,14 @@
     <br>
     <table class="table">
         <tr>
-            <th><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+            <th><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}/admin?key={{ key }}"
                    class="hide"><img
                     src="{{ teams[0].image() }}"
                     class="team_logo"
                     style="display: inline;left:70%;vertical-align:middle;"></a></th>
             <th style="color:#e0ffe0">Another spacer..</th>
             <th>
-                {% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+                {% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}/admin?key={{ key }}"
                                         class="hide">{% endif %}<img
                     src="{{ teams[1].image() }}"
                     class="team_logo"
@@ -60,9 +60,9 @@
     <table class="table">
         <tr>
             <td></td>
-            <th colspan="2"><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+            <th colspan="2"><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}/admin?key={{ key }}"
                                   class="hide">{{ teams[0].name }}</a></b></th>
-            <th colspan="2"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+            <th colspan="2"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}/admin?key={{ key }}"
                                                        class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
                 </a>{% endif %}</b></th>
             <th style="color:#e0ffe0">Spacerrrrrrr</th>

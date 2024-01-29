@@ -43,6 +43,8 @@ let load = (s) => {
     addToNavBar("Home", `/`)
     if (s) {
         addToNavBar("Fixtures", `/${s}fixtures`)
+    } else {
+        addToNavBar("Sign-Up", `/signup`)
     }
     addToNavBar("Teams", `/${s}teams`)
     addToNavBar("Ladder", `/${s}ladder`)

@@ -377,35 +377,41 @@ class Tournament:
         with open("./config/signups/teams.json", "r+") as fp:
             teams = json.load(fp)
             with open("./config/teams.json", "r+") as fp2:
-                teams = teams| json.load(fp2)
+                teams = teams | json.load(fp2)
 
 
-            if self.details["teams"] == "all":
-                self.teams = []
-                for k, v in teams.items():
-                    if isinstance(v,  list):
-                        team = Team.find_or_create(self, k, [Player(j) for j in v])
-                    else:
-                        team = Team.find_or_create(self, k, [Player(j).set_tournament(self) for j in v["players"]])
-                        team.primary_color = v["colors"][0]
-                        team.secondary_color = v["colors"][1]
-                    self.teams.append(team)
-            else:
-                self.teams = []
-                for i in self.details["teams"]:
-                    if isinstance(teams[i],  list):
-                        players = [
-                            Player(j).set_tournament(self) for c, j in enumerate(teams[i])
-                        ]
-                        team = Team.find_or_create(self, i, players)
-                    else:
-                        players = [
-                            Player(j).set_tournament(self) for c, j in enumerate(teams[i]["players"])
-                        ]
-                        team = Team.find_or_create(self, i, players)
-                        team.primary_color = teams[i]["colors"][0]
-                        team.secondary_color = teams[i]["colors"][1]
-                    self.teams.append(team)
+        key = self.details["teams"]
+
+        if self.details["teams"] == "signup":
+            with open("./config/signups/teams.json", "r+") as fp:
+                key = json.load(fp).keys()
+
+        if self.details["teams"] == "all":
+            self.teams = []
+            for k, v in teams.items():
+                if isinstance(v,  list):
+                    team = Team.find_or_create(self, k, [Player(j) for j in v])
+                else:
+                    team = Team.find_or_create(self, k, [Player(j).set_tournament(self) for j in v["players"]])
+                    team.primary_color = v["colors"][0]
+                    team.secondary_color = v["colors"][1]
+                self.teams.append(team)
+        else:
+            self.teams = []
+            for i in key:
+                if isinstance(teams[i],  list):
+                    players = [
+                        Player(j).set_tournament(self) for c, j in enumerate(teams[i])
+                    ]
+                    team = Team.find_or_create(self, i, players)
+                else:
+                    players = [
+                        Player(j).set_tournament(self) for c, j in enumerate(teams[i]["players"])
+                    ]
+                    team = Team.find_or_create(self, i, players)
+                    team.primary_color = teams[i]["colors"][0]
+                    team.secondary_color = teams[i]["colors"][1]
+                self.teams.append(team)
         self.teams.sort(key=lambda a: a.nice_name())
         self.two_courts = self.details["twoCourts"]
         self.officials: list[Official] = get_officials(self)

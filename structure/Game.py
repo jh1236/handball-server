@@ -164,10 +164,15 @@ class Game:
     def requires_action_string(self):
         if self.resolved:
             return "Resolved"
-        elif self.protested:
+        return self.noteable_string(False)
+
+    def noteable_string(self, include_yellows):
+        if self.protested:
             return "Protested"
         elif any(i.red_cards for i in self.teams):
             return "Red card awarded"
+        elif any(i.yellow_cards for i in self.teams) and include_yellows:
+            return "Yellow card awarded"
         elif self.notes.strip():
             return "Notes to review"
         elif self.forfeit():
@@ -188,6 +193,12 @@ class Game:
         return (
             self.protested or any(i.red_cards for i in self.teams) or self.notes.strip()
         ) and not self.resolved
+
+    @property
+    def is_noteable(self):
+        return (
+            self.protested or any(i.red_cards + i.yellow_cards for i in self.teams) or self.notes.strip()
+        )
 
     def set_primary_official(self, o):
         if self.bye:

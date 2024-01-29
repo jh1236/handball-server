@@ -26,7 +26,7 @@ def init_api(app, comps: dict[str, Tournament]):
         return (
             render_template(
                 "all_tournaments.html",
-                comps=sorted(comps.values(), key=lambda it: it.details["sort"]),
+                comps=comps.values(),
             ),
             200,
         )
@@ -1401,7 +1401,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             t.primary_color = v["colors"][0]
             t.secondary_color = v["colors"][1]
             teams.append(t)
-        with open("./config/signups/umpires.json") as fp:
+        with open("config/signups/officials.json") as fp:
             umpires = json.load(fp)
         return render_template("sign_up/admin.html", tournament = "Fifth S.U.S.S. Championship", teams = teams, umpires=umpires)
 
@@ -1481,12 +1481,147 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 players=[i.tidy_name() for i in players],
                 teams=teams,
                 stats=stats,
+                key=key,
                 player_stats=player_stats,
                 official=game.primary_official,
                 commentary=game_string_to_commentary(game),
                 best=best,
                 roundNumber=round_number,
                 prev_matches=prev_matches,
+                tournament=f"{tournament}/",
+            ),
+            200,
+        )
+
+    @app.get("/<tournament>/teams/<team_name>/admin")
+    def admin_team_site(tournament, team_name):
+        key = request.args.get("key", None)
+        if key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
+        team = [i for i in comps[tournament].teams if team_name == i.nice_name()][0]
+        recent_games = []
+        key_matches = []
+        for i in comps[tournament].games_to_list():
+            if team not in [j.team for j in i.teams] or i.bye:
+                continue
+            if i.started:
+                gt = next(j for j in i.teams if j.nice_name() == team_name)
+                s = " <+0>"
+                if gt.elo_delta:
+                    s = f" <{sign(gt.elo_delta)}{round(abs(gt.elo_delta), 2)}>"
+                recent_games.append(
+                    (
+                        repr(i) + f" ({i.score_string()}){s}",
+                        i.id,
+                        i.tournament.nice_name(),
+                    )
+                )
+                if i.is_noteable:
+                    key_matches.append((i.noteable_string(True), repr(i) + f" ({i.score_string()}){s}", i.id, i.tournament.nice_name()))
+
+        players = [
+            (i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()])
+            for i in team.players
+        ]
+        return (
+            render_template(
+                "tournament_specific/admin/each_team_stats.html",
+                stats=[(k, v) for k, v in team.get_stats().items()],
+                team=team,
+                recent_games=recent_games,
+                key_games=key_matches,
+                tournament=f"{tournament}/",
+                players=players,
+                key=key
+            ),
+            200,
+        )
+
+    @app.get("/<tournament>/teams/admin")
+    def admin_stats_directory_site(tournament):
+        key = request.args.get("key", None)
+        if key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
+        teams = [
+            i
+            for i in sorted(comps[tournament].teams, key=lambda a: a.nice_name())
+            if i.games_played > 0 or len(comps[tournament].teams) < 15
+        ]
+        return (
+            render_template(
+                "tournament_specific/admin/stats.html",
+                teams=teams,
+                tournament=f"{tournament}/",
+                key=key
+            ),
+            200,
+        )
+
+    @app.get("/<tournament>/players/<player_name>/admin")
+    def admin_player_stats(tournament, player_name):
+        key = request.args.get("key", None)
+        if key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
+        if player_name not in [i.nice_name() for i in comps[tournament].players()]:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="This is not a real player",
+                ),
+                400,
+            )
+        player = [
+            i for i in comps[tournament].players() if player_name == i.nice_name()
+        ][0]
+        recent_games = []
+        noteable_games = []
+        for i in comps[tournament].games_to_list():
+            if player_name not in [j.nice_name() for j in i.players()] or i.bye:
+                continue
+            gt = next(
+                t for t in i.teams if player_name in [j.nice_name() for j in t.players]
+            )
+            gp = next(p for p in gt.players if player_name == p.nice_name())
+            s = " <+0>"
+            if gt.elo_delta:
+                s = f" <{sign(gp.elo_delta)}{round(abs(gp.elo_delta), 2)}>"
+            if i.started:
+                recent_games.append(
+                    (
+                        i.full_name + s,
+                        i.id,
+                        i.tournament.nice_name(),
+                    )
+                )
+                if gp.yellow_cards or gp.red_cards or i or i.teams[i.protested].nice_name() == gt.nice_name():
+                    noteable_games.append((i.noteable_string(True), repr(i) + f" ({i.score_string()}){s}", i.id, i.tournament.nice_name()))
+
+        return (
+            render_template(
+                "tournament_specific/admin/player_stats.html",
+                stats=[(k, v) for k, v in player.get_stats_detailed().items()],
+                name=player.name,
+                player=player,
+                recent_games=recent_games,
+                noteable_games=noteable_games,
                 tournament=f"{tournament}/",
             ),
             200,

@@ -88,12 +88,15 @@ NoOfficial = Official("No one", "", [])
 
 def get_officials(tournament) -> list[Official]:
     officials: list[Official] = []
+    names = tournament.details["officials"]
+    if names == "signup":
+        with open("./config/signups/officials.json", "r+") as fp:
+            names = json.load(fp)
     with open("./config/officials.json", "r") as fp:
-
         for n, v in json.load(fp).items():
             team = [j for j in tournament.teams if n in [k.name for k in j.players]]
             o: Official = Official(n, v["key"], team, primary=v["primary"], finals=v["finals"])
-            if tournament.details["officials"] == "all" or n in tournament.details["officials"]:
+            if tournament.details["officials"] == "all" or n in names:
                 officials.append(o)
                 o.tournament = tournament
     return sorted(officials, key=lambda it: it.nice_name())

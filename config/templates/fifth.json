@@ -1,0 +1,9 @@
+{
+  "fixtures_generator": "Swiss",
+  "finals_generator": "BasicFinals",
+  "name": "The Fifth SUSS Championship",
+  "officials": "signup",
+  "teams": "signup",
+  "twoCourts": true,
+  "scorer": true
+}

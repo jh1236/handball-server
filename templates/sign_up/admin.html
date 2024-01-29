@@ -31,7 +31,7 @@
     </tr>
     {% for i in teams %}
         <tr>
-            <td>{{ i.name }}</td>
+            <th>{{ i.name }}</th>
             <td>{{ i.captain }}</td>
             <td>{{ i.non_captain }}</td>
             <td>{{ "None" if i.players.__len__() <= 2 else i.players[2] }}</td>
