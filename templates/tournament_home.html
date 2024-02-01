@@ -67,15 +67,11 @@
             </table>
         </div>
         <div style="min-height: 200px">
-            <h2>Notices</h2>
-            {% for i in notes %}
-                <p><i>{{ i }}</i></p>
-            {% endfor %}
+            <a href="/{{ tournament }}admin" class="hide"><h2>Notices</h2></a>
+            <p><i>{{ notes }}</i></p>
         </div>
         {% if tourney.fixtures_class.manual_allowed() and not in_progress %}
             <button class="button" onclick="document.location.href = '/{{ tournament }}/create'">New Game</button>
-            <button class="button" onclick="document.location.href = '/{{ tournament }}/round'">New Round
-            </button>
         {% endif %}
     </div>
     <div style="float:left;width: 25%; height: 100%">

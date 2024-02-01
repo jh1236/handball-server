@@ -3,12 +3,12 @@
 <head>
     <title>Create Game</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_editor.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}")</script>
 
 <script src="{{ url_for('static', filename='js/start_game.js') }}"></script>
 <script>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ tourney.name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script>load("{{tournament}}", "{{ key }}")</script>
+
+<a href="/{{ tournament }}/admin?key={{ key }}">
+    <img src="/api/tournaments/image?name={{ tourney.nice_name() }}" class="title_logo"></a>
+<h1><a href="/{{ tournament }}/admin?key={{ key }}" class="hide">{{ tourney.name }}</a></h1>
+
+<div>
+    <div style="bottom: 100%;width: 60%;float:left">
+        <div style="min-height: 200px">
+            <h2>Games Requiring Action</h2>
+
+            {% if not require_action %}
+                <br>
+                <br>
+                <i>All games are currently resolved.</i>
+            {% else %}
+                {% for i in require_action %}
+
+                    <p><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}"
+                          class="hide"><b>[{{ i.requires_action_string }}]: </b>{{ i }}</a></p>
+
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div style="min-height: 200px">
+            <h2><a class="hide" href="/{{ tournament }}fixtures/admin?key={{ key }}">Current Round</a></h2>
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th>Team One</th>
+                    <td></td>
+                    <th>Team Two</th>
+                    <th>Score</th>
+                </tr>
+                {% for i in current_round %}
+                    <tr>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}"
+                               class="hide">{{ i.teams[0] }}</a></td>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}" class="hide">vs</a></td>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}"
+                               class="hide">{{ i.teams[1] }}</a></td>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}"
+                               class="hide">{{ i.score_string() }}</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="min-height: 200px">
+            <h2>Notices</h2>
+            <textarea style="width: 400px; height: 150px" id="notes"> {{ notes }} </textarea>
+            <br>
+            <button onclick="sendNotes('{{ tournament }}')">Submit</button>
+            <br>
+            <br>
+        </div>
+        {% if tourney.fixtures_class.manual_allowed() and not in_progress %}
+            <button class="button" onclick="document.location.href = '/{{ tournament }}/create'">New Game</button>
+            <button class="button" onclick="document.location.href = '/{{ tournament }}/round'">New Round
+            </button>
+        {% endif %}
+    </div>
+    <div style="float:left;width: 25%; height: 100%">
+        <h2><a class="hide" href="/{{ tournament }}players/admin?key={{ key }}">Umpiring Notes</a></h2>
+        <div style="height: 200px"></div>
+
+        <h2><a class="hide" href="/{{ tournament }}players/admin?key={{ key }}">Noteable Players</a></h2>
+
+        <table class="table">
+            <tr>
+                <th style="width:400px">Name</th>
+                <th style="width:140px; text-align: center">Green Cards</th>
+                <th style="width:140px">Yellow Cards</th>
+                <th style="width:140px">Red Cards</th>
+                <th style="width:140px">Rounds On bench</th>
+            </tr>
+            {% for p in players %}
+                <tr>
+                    <td style="width:300px"><a class="hide"
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.name }}</a>
+                    </td>
+                    <td style="width:140px; text-align: center"><a class="hide"
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.green_cards }}</a>
+                    </td>
+                    <td style="width:140px; text-align: center"><a class="hide"
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.yellow_cards }}</a>
+                    </td>
+                    <td style="width:140px"><a class="hide"
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.red_cards }}</a>
+                    </td>
+                    <td style="width:140px"><a class="hide"
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.time_carded }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <br>
+    <br>
+</div>
+<br>
+<br>
+</body>
+</html>

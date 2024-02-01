@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Officials</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/clips.js') }}"></script>
+<script>
+    load("")
+    setup({{ id }},"{{ key }}")
+</script>
+
+<h1><a href="/video/{{ id }}?key={{ key }}" class="hide">Video Rating System</a>
+    {% if bookmarked %}
+        (★)
+    {% else %}
+        <a onclick="document.getElementById('reason').hidden = false">(☆)</a>
+    {%  endif %}
+</h1>
+{% if not bookmarked %}
+<div id="reason" hidden>
+    <input type="text" id="reasonText"><button onclick="bookmark()">Submit</button>
+    <br>
+    <br>
+</div>
+{% endif %}
+<video src="/video/{{ id }}/raw" autoplay controls width="60%" poster="/api/image?name=SUSS_VIDEO"></video>
+<br>
+<br>
+<div class="dropdown">
+    <button onclick="myFunction(this)" id="team" class="smallBtn dropbtn" style="background-color: #2a5d88;">
+        Team Outcome
+    </button>
+    <div class="dropdown-content">
+        <p onclick="setTeamOutcome(1)" id="team1">Replay</p>
+        <p onclick="setTeamOutcome(2)" id="team2">Point for team</p>
+        <p onclick="setTeamOutcome(3)" id="team3">Point against team</p>
+        <p onclick="setTeamOutcome(4)" id="team4">Fault</p>
+    </div>
+</div>
+<br>
+<br>
+<div class="dropdown">
+    <button onclick="myFunction(this)" id="personal" class="smallBtn dropbtn" style="background-color: #2a5d88;">
+        Personal Outcome
+    </button>
+    <div class="dropdown-content">
+        <p onclick="setPersonalOutcome(1)" id="personal1">No Card</p>
+        <p onclick="setPersonalOutcome(2)" id="personal2">Green Card</p>
+        <p onclick="setPersonalOutcome(3)" id="personal3">Yellow Card</p>
+        <p onclick="setPersonalOutcome(4)" id="personal4">Extended Yellow Card (4-6 rounds)</p>
+        <p onclick="setPersonalOutcome(5)" id="personal5">Extended Yellow Card (7+ rounds)</p>
+        <p onclick="setPersonalOutcome(6)" id="personal6">Red Card</p>
+    </div>
+</div>
+<br>
+<br>
+<label>
+    Certain?
+    <input type="checkbox" id="certain">
+</label>
+<br>
+<br>
+
+<label>
+    Garbage
+    <input type="range" min="1" max="3" id="quality">
+    Perfect
+</label>
+<br>
+<br>
+<label>
+    Starring:
+    <input type="text" id="starring">
+</label>
+<h3>Tags (comma seperated)</h3>
+
+<textarea style="width: 600px;height: 100px" id="tags"></textarea>
+
+<br>
+<br>
+<button class="button" style = "color:#550000" onclick="garbage()">Garbage</button>
+<button class="button" onclick="submit()">Submit</button>
+
+</body>
+</html>

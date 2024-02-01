@@ -2,7 +2,7 @@ import logging
 import threading
 from random import Random
 
-from api import comps, app
+from start import comps, app
 from utils.logging_handler import logger
 
 competition = comps["fourth_suss_championship"]

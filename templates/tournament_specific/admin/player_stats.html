@@ -3,17 +3,18 @@
 <head>
     <title>Statistics for {{player.name}}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}")</script>
+<script>load("{{tournament}}", "{{ key }}")</script>
 
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <a href="/{{tournament}}teams/{{player.team.nice_name()}}">
+    <a href="/{{tournament}}teams/{{player.team.nice_name()}}/admin?key={{ key }}">
         <img src="/api/teams/image?name={{player.team.nice_name()}}" class="team_logo"></a>
-    <h1><a href="/{{tournament}}players/{{player.nice_name()}}" class="hide">Statistics for {{player.name}}</a></h1>
+    <h1><a href="/{{tournament}}players/{{player.nice_name()}}/admin?key={{ key }}" class="hide">Statistics for {{player.name}}</a></h1>
     <table class="table">
         <tbody>
         {% for stat in stats %}
@@ -28,9 +29,9 @@
 </div>
 <div style="top:70px;left:66% ; position: absolute;width: 33%">
     <div style="min-height: 400px">
-    <h2><a class = "hide" href="/{{tournament}}fixtures/admin?key={{ key }}&player={{ player.nice_name() }}">Recent Matches</a></h2>
-    {% for line in recent_games %}
-        <p style="color: black;"><a class = "hide" href="/{{line[2]}}/games/{{line[1]}}/admin?key={{ key }}">{{line[0]}}</a></p>
+    <h2><a class = "hide" href="/{{tournament}}fixtures/admin?key={{ key }}&player={{ player.nice_name() }}">Cards</a></h2>
+    {% for line in cards %}
+        <p style="color: black;"><a class = "hide" href="/{{tournament}}games/{{line[1]}}/admin?key={{ key }}"><b>[{{line[2]}}]:</b> {{ line[3] }} <i>(vs {{line[0] }})</i></a></p>
     {% endfor %}
 </div>
 <div>

@@ -3,6 +3,7 @@
 <head>
     <title>Finalise Game {{ teams[0].name }} vs {{ teams[1].name }}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_editor.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
@@ -31,7 +32,7 @@
         <th colspan="2"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
                                                    class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
             </a>{% endif %}</b></th>
-        <th style="color:#e0ffe0">Spacerrrrrrr</th>
+        <th class="invisible">Spacerrrrrrr</th>
     </tr>
     {% for stat in stats %}
         <tr>

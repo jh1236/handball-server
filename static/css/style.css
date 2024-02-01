@@ -5,6 +5,10 @@
     --color-text: hsl(210, 8%, 25%);
 }
 
+.invisible {
+    color: #e0ffe0;
+}
+
 body {
     background-color: var(--color-bg);
     color: var(--color-text);

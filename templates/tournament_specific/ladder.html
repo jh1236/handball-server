@@ -17,7 +17,7 @@
     <h2>{{ j }}</h2>
     <thead>
     <tr>
-        <th style="color:#e0ffe0">This is an image</th>
+        <th class="invisible">This is an image</th>
         {% for i, h, p in headers %}
         <th onclick="sortTable({{ k }}, {{i}})" class="priority-{{p}}" ><b>{{h}}</b></th>
         {% endfor %}

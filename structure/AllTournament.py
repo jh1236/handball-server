@@ -8,7 +8,7 @@ null_tournament = Tournament("-")
 
 
 def get_all_games() -> list[Game]:
-    from api import comps
+    from start import comps
 
     return [
         game
@@ -18,7 +18,7 @@ def get_all_games() -> list[Game]:
 
 
 def get_all_teams(tournament=null_tournament) -> list[Team]:
-    from api import comps
+    from start import comps
 
     teams: dict[str, Team] = {}
     for i in sorted(comps.values(), key=lambda it: it.details["sort"]):
@@ -34,7 +34,7 @@ def get_all_teams(tournament=null_tournament) -> list[Team]:
 
 
 def get_all_players() -> list[Player]:
-    from api import comps
+    from start import comps
 
     players = {}
     for i in sorted(comps.values(), key=lambda it: it.details["sort"]):
@@ -54,12 +54,13 @@ def get_all_players() -> list[Player]:
 
 
 def get_all_officials() -> list[Official]:
-    from api import comps
+    from start import comps
 
     officials = {}
     for i in sorted(comps.values(), key=lambda it: it.details["sort"]):
         for j in i.officials:
             if j.nice_name() not in officials:
-                officials[j.nice_name()] = Official(j.name, "", [])
+                officials[j.nice_name()] = Official(j.name, j.key, [])
             officials[j.nice_name()].add_stats(j.get_stats())
+            officials[j.nice_name()].team += [i for i in j.team if i.nice_name() not in [k.nice_name() for k in officials[j.nice_name()].team]]
     return list(officials.values())

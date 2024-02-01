@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Officials</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/clips.js') }}"></script>
+<script>
+    load("")
+    setup({{ id }},"{{ key }}")
+</script>
+
+<h1><a href="/video/{{ id }}?key={{ key }}" class="hide">Video Quiz!</a></h1>
+<h3 style="display: inline">Starring:</h3> <i>{{ starring }}</i>
+<br>
+<br>
+<video src="/video/{{ id }}/raw" autoplay controls width="60%" poster="/api/image?name=SUSS_VIDEO"></video>
+<br>
+<br>
+<h3>Your answer of {{ team }} is {{ "correct!" if team_correct else "incorrect." }}</h3>
+<h3>Your answer of {{ personal }} is {{ "correct!" if personal_correct else "incorrect." }}</h3>
+<br>
+<button class="button" onclick="location = '/video/random?key={{ key }}'">Next Video</button>
+</body>
+</html>

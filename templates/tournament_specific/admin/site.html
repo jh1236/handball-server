@@ -3,17 +3,18 @@
 <head>
     <title>Handball Tournament</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}")</script>
+<script>load("{{tournament}}", "{{ key }}")</script>
 
 <div>
-    <h1><a href="/{{ tournament }}fixtures" class="hide">Fixtures</a>
+    <h1><a href="/{{ tournament }}fixtures/admin?key={{ key }}" class="hide">Fixtures</a>
         {% if reset %}
-            <i style="font-size: 16px;font-weight: normal"><a href="/{{ tournament }}fixtures/detailed" class="hide">(reset)</a></i>
+            <i style="font-size: 16px;font-weight: normal"><a href="/{{ tournament }}fixtures/admin?key={{ key }}" class="hide">(reset)</a></i>
         {% endif %}
     </h1>
 </div>
@@ -41,7 +42,7 @@
             <td><br></td>
         </tr>
         <tr>
-            <th colspan="10" style="font-size: 18px"><a href="/{{ tournament }}fixtures/detailed?round={{ i }}"
+            <th colspan="10" style="font-size: 18px"><a href="/{{ tournament }}fixtures/admin?key={{ key }}&round={{ i }}"
                                                        class="hide">Round {{ i + 1 }}</a></th>
         </tr>
         {% for game in round %}
@@ -60,7 +61,7 @@
                     <td><i><a href="/{{ tournament }}officials/{{ game.scorer.nice_name() }}"
                               class="hide">{{ game.scorer }}</a></i></td> {% endif %}
                 {% if t.two_courts %}
-                    <td><a href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"
+                    <td><a href="/{{ tournament }}fixtures/admin?key={{ key }}&court={{ game.court }}"
                            class="hide">{{ game.court_display() }}</a></td> {% endif %}
                 <td><a href="/{{ tournament }}games/{{ game.id }}/admin?key={{ key }}"
                        class="hide">{{ game.score_string() }}</a></td>
@@ -84,7 +85,7 @@
         {% for i, round in finals %}
             <tr>
                 <th colspan="10" style="font-size: 18px"><a
-                        href="/{{ tournament }}fixtures/detailed?round={{ round[0].tournament.fixtures.__len__() +  i }}"
+                        href="/{{ tournament }}fixtures/admin?key={{ key }}&round={{ round[0].tournament.fixtures.__len__() +  i }}"
                         class="hide">Round {{ i + 1 }}</a></th>
             </tr>
             {% for game in round %}
@@ -94,13 +95,13 @@
                     <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide"> vs</a></td>
                     <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.teams[1].short_name }}</a>
                     </td>
-                    <td><a href="/{{ tournament }}fixtures/detailed?umpire={{ game.primary_official.nice_name() }}"
+                    <td><a href="/{{ tournament }}officials/{{ game.primary_official.nice_name() }}"
                            class="hide"><i>{{ game.primary_official }}</i></a></td>
                     {% if t.details['scorer'] %}
                         <td><i><a href="/{{ tournament }}officials/{{ game.scorer.nice_name() }}"
                                   class="hide">{{ game.scorer }}</a></i></td> {% endif %}
                     {% if t.two_courts %}
-                        <td><a href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"
+                        <td><a href="/{{ tournament }}fixtures/admin?key={{ key }}&?court={{ game.court }}"
                                class="hide">{{ game.court_display() }}</a></td> {% endif %}
                     <td><a href="/{{ tournament }}games/{{ game.id }}/admin?key={{ key }}" class="hide">{{ game.score_string() }}</a></td>
                     <td><a href="/{{ tournament }}games/{{ game.id }}/admin?key={{ key }}" class="hide">{{ game.cards.__len__() }}</a></td>

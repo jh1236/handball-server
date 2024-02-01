@@ -397,12 +397,15 @@ class GameTeam:
             self.opponent.score_point()
 
     def red_card(self, first_player: bool):
+        player = self.players[not first_player]
+        if "null" in player.nice_name():
+                return
+        self.red_cards += 1
         self.game.update_count += 1
         self.info(
             f"Red Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
         )
-        self.red_cards += 1
-        self.players[not first_player].red_card()
+        player.red_card()
         self.game.add_to_game_string(f"v{'l' if first_player else 'r'}", self)
         while (
             all([i.is_carded() for i in self.players[:2]])
@@ -422,13 +425,14 @@ class GameTeam:
         self.game.event()
 
     def card_time(self):
+        players = [i for i in self.players if "null" not in i.nice_name()]
         if (
             0
-            > min(self.players, key=lambda a: a.card_time_remaining).card_time_remaining
+            > min(players, key=lambda a: a.card_time_remaining).card_time_remaining
         ):
             return -1
         return max(
-            self.players, key=lambda a: a.card_time_remaining
+            players, key=lambda a: a.card_time_remaining
         ).card_time_remaining
 
     def card_duration(self):

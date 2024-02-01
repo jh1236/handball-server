@@ -30,7 +30,7 @@ class Tournament:
         self.finals_class = None
         self.officials: list[Official] = []
         self.name = ""
-        self.notes = []
+        self.notes = ""
         self.two_courts = False
         if not self.filename:
             return
@@ -306,6 +306,7 @@ class Tournament:
                 [j.as_map() for j in i if not j.super_bye] for i in self.fixtures
             ],
             "finals": [[j.as_map() for j in i] for i in self.finals],
+            "notes": self.notes
         }
         if self.ref:
             d["details"] = {"ref": self.ref}
@@ -368,7 +369,9 @@ class Tournament:
             return
         self.teams = []
         with open(f"{self.filename}", "r+") as fp:
-            self.details = json.load(fp)["details"]
+            dic = json.load(fp)
+            self.details = dic["details"]
+            self.notes = dic.get("notes", "")
 
         if "ref" in self.details:
             self.ref = self.details["ref"]
