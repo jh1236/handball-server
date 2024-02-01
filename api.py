@@ -31,14 +31,14 @@ def tournaments():
     return list(comps.values())
 
 
-@app.get("/api/note")
+@app.post("/api/note")
 def note():
-    tournament = request.args.get("tournament", type=str)
-    note = request.args.get("note", type=str)
+    tournament = request.json["tournament"]
+    note = request.json["note"]
     if note == "del":
-        comps[tournament].notes = []
+        comps[tournament].notes = ""
     else:
-        comps[tournament].notes.append(note)
+        comps[tournament].notes = note
     return "", 204
 
 
@@ -415,13 +415,15 @@ def signup():
                 request.json["playerOne"],
                 request.json["playerTwo"],
             ],
-            "colors" : [
+            "colors": [
                 request.json["colorOne"],
                 request.json["colorTwo"],
-            ]
+            ],
         }
         if "substitute" in request.json and request.json["substitute"]:
-            teams[request.json["teamName"]]["players"].append(request.json["substitute"])
+            teams[request.json["teamName"]]["players"].append(
+                request.json["substitute"]
+            )
         with open("./config/signups/teams.json", "w+") as fp:
             json.dump(teams, fp, indent=4, sort_keys=True)
     with open("config/signups/officials.json") as fp:

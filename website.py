@@ -133,11 +133,12 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         ):  # basically just for home and aways
             current_round = comps[tournament].fixtures[-2]
         players = comps[tournament].players()
+        players = [i for i in players if "null" not in i.nice_name()]
         players.sort(key=lambda a: -a.votes)
         if len(players) > 10:
             players = players[0:10]
 
-        notes = comps[tournament].notes or ["Notices will appear here when posted"]
+        notes = comps[tournament].notes or "Notices will appear here when posted"
         return (
             render_template(
                 "tournament_home.html",
@@ -590,7 +591,6 @@ def tournament_specific(app, comps: dict[str, Tournament]):
                 "tournament_specific/players.html",
                 headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
                 players=sorted(players),
-                tournament=f"{tournament}/",
             ),
             200,
         )
@@ -969,9 +969,13 @@ def tournament_specific(app, comps: dict[str, Tournament]):
         string = "Name," + ",".join(headers)
         for i in players:
             string += "\n"
-            string += ",".join([i.name] + [str(j) for j in i.get_stats_detailed().values()])
+            string += ",".join(
+                [i.name] + [str(j) for j in i.get_stats_detailed().values()]
+            )
         response = Response(string, content_type="text/csv")
-        response.headers["Content-Disposition"] = f"attachment; filename={tournament}.csv"
+        response.headers[
+            "Content-Disposition"
+        ] = f"attachment; filename={tournament}.csv"
         return response
 
 
@@ -1280,10 +1284,13 @@ def universal_tournament(app, comps: dict[str, Tournament]):
         string = "Name," + ",".join(headers)
         for i in players:
             string += "\n"
-            string += ",".join([i.name] + [str(j) for j in i.get_stats_detailed().values()])
+            string += ",".join(
+                [i.name] + [str(j) for j in i.get_stats_detailed().values()]
+            )
         response = Response(string, content_type="text/csv")
         response.headers["Content-Disposition"] = "attachment; filename=all_games.csv"
         return response
+
 
 def add_admin_pages(app, comps: dict[str, Tournament]):
     from api import admin_password
@@ -1294,7 +1301,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         if key != admin_password:
             return (
                 render_template(
-                    "tournament_specific/game_editor/no_access.html",
+                    "tournament_specific/admin/no_access.html",
                     error="The password you entered is not correct",
                 ),
                 403,
@@ -1403,10 +1410,25 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             teams.append(t)
         with open("config/signups/officials.json") as fp:
             umpires = json.load(fp)
-        return render_template("sign_up/admin.html", tournament = "Fifth S.U.S.S. Championship", teams = teams, umpires=umpires)
+        return render_template(
+            "sign_up/admin.html",
+            tournament="Fifth S.U.S.S. Championship",
+            teams=teams,
+            umpires=umpires,
+        )
 
     @app.get("/<tournament>/games/<game_id>/admin")
     def admin_game_site(tournament, game_id):
+
+        key = request.args.get("key", None)
+        if key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/admin/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
         if int(game_id) >= len(comps[tournament].games_to_list()):
             return (
                 render_template(
@@ -1414,15 +1436,6 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                     error="Game Does not exist",
                 ),
                 400,
-            )
-        key = request.args.get("key", None)
-        if key != admin_password:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
             )
         game = comps[tournament].get_game(int(game_id))
         teams = game.teams
@@ -1499,7 +1512,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         if key != admin_password:
             return (
                 render_template(
-                    "tournament_specific/game_editor/no_access.html",
+                    "tournament_specific/admin/no_access.html",
                     error="The password you entered is not correct",
                 ),
                 403,
@@ -1522,8 +1535,15 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                         i.tournament.nice_name(),
                     )
                 )
-                if i.is_noteable:
-                    key_matches.append((i.noteable_string(True), repr(i) + f" ({i.score_string()}){s}", i.id, i.tournament.nice_name()))
+                if i.is_noteable or gt.yellow_cards:
+                    key_matches.append(
+                        (
+                            i.noteable_string(True),
+                            repr(i) + f" ({i.score_string()}){s}",
+                            i.id,
+                            i.tournament.nice_name(),
+                        )
+                    )
 
         players = [
             (i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()])
@@ -1538,7 +1558,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 key_games=key_matches,
                 tournament=f"{tournament}/",
                 players=players,
-                key=key
+                key=key,
             ),
             200,
         )
@@ -1549,7 +1569,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         if key != admin_password:
             return (
                 render_template(
-                    "tournament_specific/game_editor/no_access.html",
+                    "tournament_specific/admin/no_access.html",
                     error="The password you entered is not correct",
                 ),
                 403,
@@ -1564,7 +1584,60 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 "tournament_specific/admin/stats.html",
                 teams=teams,
                 tournament=f"{tournament}/",
-                key=key
+                key=key,
+            ),
+            200,
+        )
+
+    @app.get("/<tournament>/players/admin")
+    def admin_players_site(tournament):
+        key = request.args.get("key", None)
+        if key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/admin/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
+        priority = {
+            "Name": 1,
+            "B&F Votes": 1,
+            "Elo": 2,
+            "Points scored": 2,
+            "Aces scored": 2,
+            "Faults": 5,
+            "Double Faults": 5,
+            "Green Cards": 4,
+            "Yellow Cards": 3,
+            "Red Cards": 3,
+            "Rounds on Court": 5,
+            "Points served": 5,
+            "Rounds Carded": 5,
+            "Games Played": 5,
+            "Games Won": 4,
+        }
+        players = [
+            (
+                i.name,
+                i.team.nice_name(),
+                i.nice_name(),
+                [(v, priority[k]) for k, v in i.get_stats().items()],
+            )
+            for i in comps[tournament].players()
+            if (i.played or len(comps[tournament].fixtures) < 2)
+            and not i.nice_name().startswith("null")
+        ]
+        headers = ["Name"] + [
+            i for i in comps[tournament].teams[0].players[0].get_stats()
+        ]
+        return (
+            render_template(
+                "tournament_specific/admin/players.html",
+                headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
+                players=sorted(players),
+                tournament=f"{tournament}/",
+                key=key,
             ),
             200,
         )
@@ -1575,7 +1648,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         if key != admin_password:
             return (
                 render_template(
-                    "tournament_specific/game_editor/no_access.html",
+                    "tournament_specific/admin/no_access.html",
                     error="The password you entered is not correct",
                 ),
                 403,
@@ -1591,8 +1664,8 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         player = [
             i for i in comps[tournament].players() if player_name == i.nice_name()
         ][0]
-        recent_games = []
         noteable_games = []
+        cards = []
         for i in comps[tournament].games_to_list():
             if player_name not in [j.nice_name() for j in i.players()] or i.bye:
                 continue
@@ -1604,15 +1677,26 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             if gt.elo_delta:
                 s = f" <{sign(gp.elo_delta)}{round(abs(gp.elo_delta), 2)}>"
             if i.started:
-                recent_games.append(
-                    (
-                        i.full_name + s,
-                        i.id,
-                        i.tournament.nice_name(),
+                for j in  i.cards:
+                    if j.player.nice_name() == player_name:
+                        cards.append((tournament, i.id, j.color, j.reason))
+                if (
+                    gp.yellow_cards
+                    or gp.red_cards
+                    or i.notes.strip()
+                    or (
+                        i.protested
+                        and i.teams[i.protested - 1].nice_name() == gt.nice_name()
                     )
-                )
-                if gp.yellow_cards or gp.red_cards or i or i.teams[i.protested].nice_name() == gt.nice_name():
-                    noteable_games.append((i.noteable_string(True), repr(i) + f" ({i.score_string()}){s}", i.id, i.tournament.nice_name()))
+                ):
+                    noteable_games.append(
+                        (
+                            i.noteable_string(True),
+                            repr(i) + f" ({i.score_string()}){s}",
+                            i.id,
+                            i.tournament.nice_name(),
+                        )
+                    )
 
         return (
             render_template(
@@ -1620,9 +1704,69 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 stats=[(k, v) for k, v in player.get_stats_detailed().items()],
                 name=player.name,
                 player=player,
-                recent_games=recent_games,
+                cards=cards,
                 noteable_games=noteable_games,
                 tournament=f"{tournament}/",
+                key=key,
+            ),
+            200,
+        )
+
+    @app.get("/<tournament>/admin")
+    def admin_home_page(tournament):
+        key = request.args.get("key", None)
+        if key != admin_password:
+            return (
+                render_template(
+                    "tournament_specific/admin/no_access.html",
+                    error="The password you entered is not correct",
+                ),
+                403,
+            )
+        in_progress = any(
+            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+        )
+        games_requiring_action = []
+        for i in comps[tournament].games_to_list():
+            if i.requires_action:
+                games_requiring_action.append(i)
+        ongoing_games = [
+            i for i in comps[tournament].games_to_list() if i.in_progress()
+        ]
+        current_round = fixture_sorter(
+            [
+                [
+                    game
+                    for r in comps[tournament].finals
+                    for game in r
+                    if not game.super_bye
+                ]
+                if comps[tournament].in_finals
+                else comps[tournament].fixtures[-1]
+            ]
+        )[0]
+        if (
+            all([i.bye for i in current_round]) and len(comps[tournament].fixtures) > 1
+        ):  # basically just for home and aways
+            current_round = comps[tournament].fixtures[-2]
+        players = comps[tournament].players()
+        players = [i for i in players if "null" not in i.nice_name()]
+        players.sort(key=lambda a: -a.total_cards())
+        if len(players) > 10:
+            players = players[0:10]
+
+        return (
+            render_template(
+                "tournament_specific/admin/tournament_home.html",
+                tourney=comps[tournament],
+                ongoing=ongoing_games,
+                current_round=current_round,
+                players=players,
+                notes=comps[tournament].notes,
+                in_progress=in_progress,
+                tournament=f"{tournament}/",
+                require_action=games_requiring_action,
+                key=key,
             ),
             200,
         )

@@ -169,7 +169,7 @@ class Game:
     def noteable_string(self, include_yellows):
         if self.protested:
             return "Protested"
-        elif any(i.red_cards for i in self.teams):
+        elif any(i.red_cards for i in self.players() if "null" not in i.nice_name()):
             return "Red card awarded"
         elif any(i.yellow_cards for i in self.teams) and include_yellows:
             return "Yellow card awarded"
@@ -191,13 +191,13 @@ class Game:
     @property
     def requires_action(self):
         return (
-            self.protested or any(i.red_cards for i in self.teams) or self.notes.strip()
+            self.protested or any(i.red_cards for i in self.players() if "null" not in i.nice_name()) or self.notes.strip()
         ) and not self.resolved
 
     @property
     def is_noteable(self):
         return (
-            self.protested or any(i.red_cards + i.yellow_cards for i in self.teams) or self.notes.strip()
+            self.protested or any(i.red_cards for i in self.players() if "null" not in i.nice_name()) or self.notes.strip()
         )
 
     def set_primary_official(self, o):

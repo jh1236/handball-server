@@ -20,6 +20,17 @@
             "Sophie Lane"
         ]
     },
+    "Ceebs": {
+        "colors": [
+            "None/Unknown",
+            "None/Unknown"
+        ],
+        "players": [
+            "Tristan",
+            "Caitlin",
+            "Tristan again"
+        ]
+    },
     "Height Difference": {
         "colors": [
             "White",
@@ -38,6 +49,16 @@
         "players": [
             "Zaiah Deards",
             "Sharai Rose"
+        ]
+    },
+    "The Baes": {
+        "colors": [
+            "Pink",
+            "Purple"
+        ],
+        "players": [
+            "Eva Hajigabriel",
+            "Dora Wan"
         ]
     }
 }

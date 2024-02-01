@@ -30,7 +30,7 @@ class Tournament:
         self.finals_class = None
         self.officials: list[Official] = []
         self.name = ""
-        self.notes = []
+        self.notes = ""
         self.two_courts = False
         if not self.filename:
             return

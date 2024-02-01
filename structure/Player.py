@@ -24,8 +24,6 @@ class Player:
         self.red_cards: int = 0
         self.time_on_court: int = 0
         self.time_carded: int = 0
-        self.rounds_played: int = 0
-        self.rounds_carded: int = 0
         self.points_served: int = 0
         self.played: int = 0
         self.wins: int = 0
@@ -172,8 +170,6 @@ class Player:
         self.red_cards = 0
         self.time_on_court = 0
         self.time_carded = 0
-        self.rounds_played = 0
-        self.rounds_carded = 0
         self.won_while_serving = 0
 
     def set_tournament(self, tournament):
