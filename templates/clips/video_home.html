@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script>load("")</script>
+
+<a href="/video?key={{ key }}">
+    <img src="/api/image?name=umpire" class="title_logo"></a>
+<h1><a href="/video?key={{ key }}" class="hide">Videos</a></h1>
+
+<div>
+    <div style="bottom: 100%;width: 60%;float:left">
+        <div style="min-height: 200px">
+            <h2>Key Topics</h2>
+            <p><a class="hide" href="/video/random?key={{ key }}&tags=PossibleJames"><i>Danger (James')</i></a></p>
+            <p><a class="hide" href="/video/random?key={{ key }}&tags=PossibleSkim"><i>Danger (Skims)</i></a></p>
+            <p><a class="hide" href="/video/random?key={{ key }}&tags=Misconduct"><i>Misconduct</i></a></p>
+            <p><a class="hide" href="/video/random?key={{ key }}&tags=Serve"><i>Serve</i></a></p>
+        </div>
+        <div style="min-height: 200px">
+            <h2>Areas To Improve</h2>
+        {% if wrong %}
+            {% for i in wrong %}
+                <p><a class="hide" href="/video/random?key={{ key }}&tags={{ i }}"><i>{{ i }}</i></a></p>
+            {% endfor %}
+        {% else %}
+            <br>
+            <p>You have not completed enough videos</p>
+        {% endif %}
+        </div>
+
+
+    </div>
+    <div style="float:left;width: 25%; height: 100%">
+        <div style="min-height: 200px">
+            <h2>Videos Set By UM</h2>
+            {% if reqd %}
+                {% for i in reqd %}
+                    <p><a class="hide" href="/video/{{ i }}?key={{ key }}&tags=required,new"><i>Video {{ i }}</i></a></p>
+                {% endfor %}
+            {% else %}
+                <br>
+                <p>There are no required videos at this time</p>
+            {% endif %}
+        </div>
+        <div style="min-height: 200px">
+            <h2>Random Videos</h2>
+            <p><a class="hide" href="/video/random?key={{ key }}"><i>Random Video</i></a></p>
+            <p><a class="hide" href="/video/random?key={{ key }}&tags=new"><i>Random Video I've never seen</i></a></p>
+            <p><a class="hide" href="/video/random?key={{ key }}&tags=old"><i>Random Video I've seen before</i></a></p>
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+<br>
+<br>
+</body>
+</html>

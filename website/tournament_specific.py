@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, Response
 
 from structure.AllTournament import (
     get_all_games,
+    get_all_officials,
 )
 from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
@@ -10,8 +11,6 @@ from website.website import numbers, sign
 
 
 def add_tournament_specific(app, comps: dict[str, Tournament]):
-    from start import admin_password
-
     @app.get("/<tournament>/")
     def home_page(tournament):
         in_progress = any(
@@ -647,7 +646,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 403,
             )
-        elif key not in [game.primary_official.key, game.scorer.key, admin_password]:
+        elif key not in [game.primary_official.key, game.scorer.key] + [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/game_editor/no_access.html",
@@ -706,7 +705,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 200,
             )
-        elif not game.best_player or key == admin_password:
+        elif not game.best_player or key in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/game_editor/finalise.html",
@@ -754,7 +753,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
         )
         officials = comps[tournament].officials
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             officials = [i for i in officials if i.key == key]
         if key is None:
             return (
@@ -764,7 +763,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 403,
             )
-        elif key != admin_password and not officials:
+        elif not officials:
             return (
                 render_template(
                     "tournament_specific/game_editor/no_access.html",
@@ -813,7 +812,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 403,
             )
-        elif key != admin_password:
+        elif key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/game_editor/no_access.html",
@@ -853,7 +852,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
         )
         officials = comps[tournament].officials
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             officials = [i for i in officials if i.key == key]
         if key is None:
             return (
@@ -863,7 +862,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 403,
             )
-        elif key != admin_password and not officials:
+        elif not officials:
             return (
                 render_template(
                     "tournament_specific/game_editor/no_access.html",

@@ -60,7 +60,7 @@ def get_all_officials() -> list[Official]:
     for i in sorted(comps.values(), key=lambda it: it.details["sort"]):
         for j in i.officials:
             if j.nice_name() not in officials:
-                officials[j.nice_name()] = Official(j.name, j.key, [])
+                officials[j.nice_name()] = Official(j.name, j.key, [], admin=j.admin)
             officials[j.nice_name()].add_stats(j.get_stats())
             officials[j.nice_name()].team += [i for i in j.team if i.nice_name() not in [k.nice_name() for k in officials[j.nice_name()].team]]
     return list(officials.values())

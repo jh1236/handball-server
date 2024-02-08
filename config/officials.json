@@ -2,45 +2,54 @@
   "Jared Healy": {
     "primary": true,
     "key": "1236",
+    "admin": true,
     "finals": true
   },
   "Lachlan Banks": {
     "primary": true,
-    "key": "1",
+    "admin": true,
+    "key": "2",
     "finals": true
   },
   "Aimee Soudure": {
     "primary": true,
+    "admin": false,
     "key": "balls",
     "finals": true
   },
   "Brigitte Gredziuk": {
     "primary": true,
+    "admin": false,
     "key": "1397",
     "finals": false
   },
   "Zaiah Deards": {
     "primary": true,
+    "admin": false,
     "key": "2645",
     "finals": false
   },
   "James Sharpham": {
     "primary": true,
+    "admin": false,
     "key": "3636",
     "finals": false
   },
   "Alex Soudure": {
     "primary": true,
+    "admin": false,
     "key": "Testiclees",
     "finals": true
   },
   "Eddie Smith": {
     "primary": true,
+    "admin": false,
     "key": "ed",
     "finals": false
   },
   "William Prozerska": {
     "primary": true,
+    "admin": false,
     "key": "mreow",
     "finals": false
   }

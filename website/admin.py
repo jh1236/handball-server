@@ -2,7 +2,7 @@ import json
 
 from flask import request, render_template
 
-from structure.AllTournament import get_all_games
+from structure.AllTournament import get_all_games, get_all_officials
 from structure.GameUtils import game_string_to_commentary
 from structure.Player import Player
 from structure.Team import Team
@@ -12,12 +12,10 @@ from website.website import sign
 
 
 def add_admin_pages(app, comps: dict[str, Tournament]):
-    from start import admin_password
-
     @app.get("/<tournament>/fixtures/admin")
     def admin_fixtures(tournament):
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/admin/no_access.html",
@@ -111,7 +109,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/signup/admin")
     def admin_sign_up():
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/game_editor/no_access.html",
@@ -140,7 +138,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     def admin_game_site(tournament, game_id):
 
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/admin/no_access.html",
@@ -228,7 +226,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/teams/<team_name>/admin")
     def admin_team_site(tournament, team_name):
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/admin/no_access.html",
@@ -285,7 +283,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/teams/admin")
     def admin_stats_directory_site(tournament):
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/admin/no_access.html",
@@ -311,7 +309,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/players/admin")
     def admin_players_site(tournament):
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/admin/no_access.html",
@@ -364,7 +362,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/players/<player_name>/admin")
     def admin_player_stats(tournament, player_name):
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/admin/no_access.html",
@@ -435,7 +433,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/admin")
     def admin_home_page(tournament):
         key = request.args.get("key", None)
-        if key != admin_password:
+        if key not in [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
                     "tournament_specific/admin/no_access.html",

@@ -9,7 +9,7 @@ numbers = ["One", "Two", "Three", "Four", "Five", "Six"]
 
 
 def init_api(app, comps: dict[str, Tournament]):
-    from start import admin_password
+
     add_endpoints(app, comps)
 
     @app.get("/")
@@ -52,26 +52,6 @@ def init_api(app, comps: dict[str, Tournament]):
     def icon():
         return send_file("../static/favicon.ico")
 
-    @app.get("/admin/")
-    def log():
-        key = request.args.get("key", None)
-        if key is None:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="This page requires a password to access:",
-                ),
-                403,
-            )
-        elif key != admin_password:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
-        return render_template("admin.html"), 200
 
     from website.tournament_specific import add_tournament_specific
     from website.admin import add_admin_pages

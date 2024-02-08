@@ -35,16 +35,41 @@ function submit() {
         alert("The form is not complete!")
         return
     }
+    tags = document.getElementById("tags").value.replaceAll(",","|").replaceAll("\n","")
+    if (tags.endsWith("|")) {
+        tags = tags.trimEnd("|")
+    }
     fetch("/api/clip/rate", {
         method: "POST", body: JSON.stringify({
             key: key,
             id: id,
+            required:document.getElementById("required").checked,
             certain: document.getElementById("certain").checked,
             teamOutcome: document.getElementById("team").textContent,
             personalOutcome: document.getElementById("personal").textContent,
             starring: document.getElementById("starring").value.replaceAll(",","|"),
             quality: +document.getElementById("quality").value,
-            tags: document.getElementById("tags").value.replaceAll(",","|").replaceAll("\n",""),
+            tags: tags,
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(() => document.location = "/video/unrated?key=" + key);
+}
+
+function submitConflict() {
+    tags = document.getElementById("tags").value.replaceAll(",","|").replaceAll("\n","")
+    if (tags.endsWith("|")) {
+        tags = tags.trimEnd("|")
+    }
+    fetch("/api/clip/rate", {
+        method: "POST", body: JSON.stringify({
+            key: key,
+            id: id,
+            required:false,
+            certain: false,
+            teamOutcome: document.getElementById("team").textContent.replaceAll("\n",""),
+            personalOutcome: document.getElementById("personal").textContent.replaceAll("\n",""),
+            tags: tags,
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }

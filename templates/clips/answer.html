@@ -24,6 +24,10 @@
 <h3>Your answer of {{ team }} is {{ "correct!" if team_correct else "incorrect." }}</h3>
 <h3>Your answer of {{ personal }} is {{ "correct!" if personal_correct else "incorrect." }}</h3>
 <br>
-<button class="button" onclick="location = '/video/random?key={{ key }}'">Next Video</button>
+{% if tags %}
+    <button class="button" onclick="location = '/video/random?key={{ key }}&tags={{ tags }}'">Next Video</button>
+{%  else %}
+    <button class="button" onclick="location = '/video/random?key={{ key }}'">Next Video</button>
+{% endif %}
 </body>
 </html>

@@ -41,7 +41,7 @@ class Team:
         if not self.image_path:
             if self.name in images:
                 self.image_path = images[self.name]
-            else:
+            elif False:
                 threading.Thread(target=self.helper).start()
 
     def get_game_team(self, game):

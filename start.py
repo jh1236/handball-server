@@ -7,8 +7,6 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 comps = load_all_tournaments()
 
-with open("./config/password.txt", "r") as fp:
-    admin_password = fp.read()
 
 init_api(app, comps)
 
