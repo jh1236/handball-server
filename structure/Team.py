@@ -41,8 +41,9 @@ class Team:
         if not self.image_path:
             if self.name in images:
                 self.image_path = images[self.name]
-            elif False:
-                threading.Thread(target=self.helper).start()
+            else:
+                pass
+                # threading.Thread(target=self.helper).start()
 
     def get_game_team(self, game):
         return GameTeam(self, game)
@@ -84,12 +85,19 @@ class Team:
     def teams_played(self) -> list:
         if not self.tournament:
             return []
-        my_games = [
-            i
-            for i in self.tournament.games_to_list()
-            if self in [j.team for j in i.teams] and i.best_player
-        ]
-        return [next(j.team for j in i.teams if j.team != self) for i in my_games]
+        if "bye" in self.nice_name():
+            games = []
+            for i in self.tournament.games_to_list():
+                if not i.bye: continue
+                games.append(i)
+            return [next(j.team for j in i.teams if j.team != self) for i in games]
+        else:
+            games = []
+            for i in self.tournament.games_to_list():
+                if not self in [j.team for j in i.teams]:
+                    continue
+                games.append(i)
+            return [next(j.team for j in i.teams if j.team != self) for i in games]
 
     def reset(self):
         [i.reset() for i in self.players]
@@ -134,8 +142,7 @@ class Team:
             "Games Won": self.games_won,
             "Games Lost": self.games_played - self.games_won,
             "Percentage": f"{100 * self.percentage: .1f}%"
-            if self.games_played > 0
-            else "-",
+            if self.games_played > 0 else "-",
             "Green Cards": green_cards,
             "Yellow Cards": yellow_cards,
             "Red Cards": red_cards,
@@ -174,6 +181,8 @@ class Team:
             return self.name
 
     def first_ratio(self):
+        if "bye" in self.nice_name():
+            return 999.0
         return self.listed_first / (self.games_played or 1)
 
     @classmethod

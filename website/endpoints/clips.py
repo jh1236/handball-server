@@ -93,11 +93,11 @@ def add_clip_endpoints(app, comps):
                 "time": time.time(),
                 "rater": name,
                 "certain": request.json["certain"],
-                "teamOutcome": request.json["teamOutcome"],
-                "personalOutcome": request.json["personalOutcome"],
-                "starring": starring,
+                "teamOutcome": request.json["teamOutcome"].strip(" \n"),
+                "personalOutcome": request.json["personalOutcome"].strip(" \n"),
+                "starring": starring.strip(" \n"),
                 "quality": quality,
-                "tags": request.json["tags"],
+                "tags": request.json["tags"].strip(" \n"),
             }
         )
         lines = [
@@ -109,9 +109,16 @@ def add_clip_endpoints(app, comps):
         print([i["id"] for i in clip if i["time"]])
         with open("./clips/details.csv", "w") as fp:
             fp.write("\n".join(lines))
+        with open("./clips/required.txt", "r") as fp:
+            reqd = fp.readlines()
+        reqd = list(set(reqd))
         if request.json["required"]:
-            with open("./clips/required.txt", "a+") as fp:
-                fp.write(f"{id}\n")
+            if str(id) not in [i.strip() for i in reqd]:
+                with open("./clips/required.txt", "a+") as fp:
+                    fp.write(f"{id}\n")
+        else:
+            with open("./clips/required.txt", "w") as fp:
+                fp.writelines([i for i in reqd if i.strip() != str(id)])
         return redirect(f"/video/unrated")
 
     @app.post("/api/clip/bookmark")

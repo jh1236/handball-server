@@ -179,6 +179,8 @@ class Player:
 
 class GamePlayer:
     def __init__(self, player: Player, game, captain):
+        self._card_time_remaining = 0
+        self._card_duration = 0
         self.player: Player = player
         self.elo_delta = None
         self.elo_at_start: float = self.player.elo
@@ -198,14 +200,20 @@ class GamePlayer:
         self.green_cards: int = 0
         self.yellow_cards: int = 0
         self.red_cards: int = 0
-        self.card_time_remaining: int = (
-            0  # how many rounds the player is carded for (-1 is infinite)
-        )
-        self.card_duration: int = (
-            0  # total time the player is carded for (used for progress bar in app)
-        )
         self.green_carded: bool = False
         self.best: bool = False
+
+    @property
+    def card_time_remaining(self):
+        if "null" in self.nice_name():
+            return -1
+        return self._card_time_remaining
+
+    @property
+    def card_duration(self):
+        if "null" in self.nice_name():
+            return 1
+        return self._card_duration
 
     def biggest_card_hex(self):
         if self.red_cards > 0:
@@ -250,21 +258,21 @@ class GamePlayer:
     def yellow_card(self, time):
         self.yellow_cards += 1
         if self.card_time_remaining >= 0:
-            self.card_time_remaining += time
-            self.card_duration = self.card_time_remaining
+            self._card_time_remaining += time
+            self._card_duration = self.card_time_remaining
         card = Card(self, time)
         self.cards.append(card)
         self.game.cards.append(card)
 
     def red_card(self):
         self.red_cards += 1
-        self.card_time_remaining = -1
+        self._card_time_remaining = -1
         card = Card(self, -1)
         self.cards.append(card)
         self.game.cards.append(card)
 
     def is_carded(self):
-        return self.card_time_remaining != 0
+        return "null" in self.nice_name() or self.card_time_remaining != 0
 
     def next_point(self):
         if self.is_carded():
@@ -272,13 +280,13 @@ class GamePlayer:
         else:
             self.time_on_court += 1
         if self.card_time_remaining > 0:
-            self.card_time_remaining -= 1
+            self._card_time_remaining -= 1
 
     def reset(self):
-        self.card_time_remaining = 0
+        self._card_time_remaining = 0
         self.won_while_serving = 0
         self.points_served = 0
-        self.card_duration = 0
+        self._card_duration = 0
         self.points_scored = 0
         self.aces_scored = 0
         self.time_on_court = 0
@@ -381,59 +389,9 @@ class GamePlayer:
         delta: float    - the raw elo delta calculated by the elo function (https://www.desmos.com/calculator/3grcevz6t7)
         game: Game      - The game that this change is caused by
         """
-        game_player: GamePlayer = next(
-            i for i in game.players() if i.nice_name() == self.nice_name()
-        )
-        team = next(i for i in game.teams if game_player in i.players)
-        if delta > 0:
-            player = game_player
-        else:
-            player = next(i for i in team.players if i.nice_name() != self.nice_name())
-        m = (sum(i.points_scored for i in team.players) / len(team.players)) or 1
-        ratio = player.points_scored / (m or 1)
-        self.elo_delta = delta * (1 + 2 * ratio) / 3
+        self.elo_delta = delta
         self.player.change_elo(self.elo_delta, game)
 
-    # def change_elo(self, delta, game):
-    #     """
-    #     delta: float    - the raw elo delta calculated by the elo function (https://www.desmos.com/calculator/3grcevz6t7)
-    #     game: Game      - The game that this change is caused by
-    #     """
-    #     game_player: GamePlayer = next(
-    #         i for i in game.players() if i.nice_name() == self.nice_name()
-    #     )
-    #     team = next(i for i in game.teams if game_player in i.players)
-    #     other = next(i for i in team.players if i.nice_name() != self.nice_name())
-    #     if delta <= 0:
-    #         game_player, other = other, game_player
-    #     s = 0
-    #     for i in range(len(team.players)):
-    #         s += team.players[i].points_scored * team.players[1 - i].elo_at_start
-    #     m = (s / len(team.players)) or 1
-    #     ratio = (other.elo_at_start * game_player.points_scored) / (m or 1)
-    #     self.elo_delta = delta * (1 + 2 * ratio) / 3
-    #     self.player.change_elo(self.elo_delta, game)
-
-    def new_change_elo(self, delta, game):
-        """
-        delta: float    - the raw elo delta calculated by the elo function (https://www.desmos.com/calculator/3grcevz6t7)
-        game: Game      - The game that this change is caused by
-        """
-        game_player: GamePlayer = next(
-            i for i in game.players() if i.nice_name() == self.nice_name()
-        )
-        team = next(i for i in game.teams if game_player in i.players)
-        other = next(i for i in team.players if i.nice_name() != self.nice_name())
-        if delta <= 0:
-            game_player, other = other, game_player
-        s = 0
-        m_elo = min(i.elo_at_start for i in team.players) - 10
-        for i in range(len(team.players)):
-            s += (team.players[1 - i].elo_at_start - m_elo)
-        m = (s / len(team.players)) or 1
-        ratio = (other.elo_at_start - m_elo) / (m or 1)
-        self.elo_delta = delta * ratio
-        self.player.change_elo(self.elo_delta, game)
 
 
 ff = Player("Forfeit")

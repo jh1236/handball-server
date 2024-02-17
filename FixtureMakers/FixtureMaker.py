@@ -25,16 +25,16 @@ class Empty(FixtureMaker):
 
 
 def get_type_from_name(name: str) -> Type[FixtureMaker]:
-    from FixtureMakers.BasicFinals import BasicFinals
+    from FixtureMakers.BasicFinals import BasicFinals,BasicFinalsWithBronze
     from FixtureMakers.SecondChanceFinals import SecondChanceFinals
     from FixtureMakers.Swiss import Swiss
     from FixtureMakers.RoundRobin import RoundRobin
     from FixtureMakers.OneRound import OneRound, OneRoundEditable
     from FixtureMakers.Pooled import Pooled
     from FixtureMakers.PooledFinals import PooledFinals
-
     return {
         BasicFinals.get_name(): BasicFinals,
+        BasicFinalsWithBronze.get_name(): BasicFinalsWithBronze,
         SecondChanceFinals.get_name(): SecondChanceFinals,
         Swiss.get_name(): Swiss,
         RoundRobin.get_name(): RoundRobin,
@@ -43,4 +43,5 @@ def get_type_from_name(name: str) -> Type[FixtureMaker]:
         Empty.get_name(): Empty,
         Pooled.get_name(): Pooled,
         PooledFinals.get_name(): PooledFinals,
+        "Swiss6": lambda t: Swiss(t, rounds=6),
     }[name]

@@ -1,16 +1,15 @@
 import math
+import re
 from typing import TypeVar, Any
-
 from urllib.request import urlopen, Request
+
 from bs4 import BeautifulSoup
-import re
-import re
 
 T = TypeVar("T")
 
-K = 30.0
+K = 40.0
 initial_elo = 1500
-D = 1200.0
+D = 3000.0
 
 def chunks_sized(lst: list[T], n: int) -> list[list[T]]:
     """Yield successive n-sized chunks from lst."""

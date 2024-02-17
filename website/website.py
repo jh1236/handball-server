@@ -31,26 +31,26 @@ def init_api(app, comps: dict[str, Tournament]):
 
     @app.get("/rules/current")
     def rules():
-        return send_file("../resources/documents/pdf/rules.pdf"), 200
+        return send_file("./resources/documents/pdf/rules.pdf"), 200
 
     @app.get("/rules/simple")
     def simple_rules():
-        return send_file("../resources/documents/pdf/rules_simple.pdf"), 200
+        return send_file("./resources/documents/pdf/rules_simple.pdf"), 200
 
     @app.get("/rules/proposed")
     def new_rules():
-        return send_file("../resources/documents/pdf/proposed_rules.pdf"), 200
+        return send_file("./resources/documents/pdf/proposed_rules.pdf"), 200
 
     @app.get("/code_of_conduct/")
     def code_of_conduct():
         rand = random.Random()
-        if rand.randrange(0, 10):
-            return send_file("../resources/documents/pdf/code_of_conduct_2.pdf"), 200
-        return send_file("../resources/documents/pdf/code_of_conduct.pdf"), 200
+        if rand.randrange(1, 10):
+            return send_file("./resources/documents/pdf/code_of_conduct_2.pdf"), 200
+        return send_file("./resources/documents/pdf/code_of_conduct.pdf"), 200
 
     @app.get("/favicon.ico/")
     def icon():
-        return send_file("../static/favicon.ico")
+        return send_file("./static/favicon.ico")
 
 
     from website.tournament_specific import add_tournament_specific

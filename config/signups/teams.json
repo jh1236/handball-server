@@ -30,6 +30,16 @@
             "Caitlin Milne"
         ]
     },
+    "Enjoyers of Male Genitalia": {
+        "colors": [
+            "None/Unknown",
+            "None/Unknown"
+        ],
+        "players": [
+            "Digby Ross",
+            "Zebiah Peaker"
+        ]
+    },
     "Height Difference": {
         "colors": [
             "White",
@@ -40,34 +50,34 @@
             "Alex Soudure"
         ]
     },
-    "Heteros": {
-        "colors": [
-            "White",
-            "Black"
-        ],
-        "players": [
-            "Zaiah Deards",
-            "Sharai Rose"
-        ]
-    },
-    "The Baes": {
+    "BCFing Fun": {
         "colors": [
             "Pink",
             "Purple"
         ],
         "players": [
             "Eva Hajigabriel",
-            "Dora Wan"
+            "Tomasz Sakowski"
         ]
     },
-    "seanitha": {
+    "Seanitha": {
         "colors": [
             "Black",
             "Red"
         ],
         "players": [
-            "Sean",
-            "Tab"
+            "Sean Robinson",
+            "Tabitha Blechynden"
+        ]
+    },
+    "BYE": {
+        "colors": [
+            "Black",
+            "Red"
+        ],
+        "players": [
+            "BYE",
+            "BYE"
         ]
     }
 }

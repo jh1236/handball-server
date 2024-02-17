@@ -58,7 +58,7 @@ class Swiss(FixtureMaker):
 
             for i, team in enumerate(unfilled):
                 if not target.has_played(team):
-                    roster.append(x := [target, unfilled.pop(i)])
+                    roster.append([target, unfilled.pop(i)])
                     break
             else:
                 # could not find a unique match,

@@ -32,7 +32,7 @@ def add_universal_tournament(app, comps: dict[str, Tournament]):
         upcoming_games = []
         for c in comps.values():
             for i in c.games_to_list():
-                if team_name not in [j.team.nice_name() for j in i.teams] or i.bye:
+                if team_name not in [j.team.nice_name() for j in i.teams] or i.bye or not i.ranked:
                     continue
                 if i.started:
                     gt = next(j for j in i.teams if j.nice_name() == team_name)
@@ -200,7 +200,7 @@ def add_universal_tournament(app, comps: dict[str, Tournament]):
         upcoming_games = []
         for c in comps.values():
             for i in c.games_to_list():
-                if player_name not in [j.nice_name() for j in i.players()] or i.bye:
+                if player_name not in [j.nice_name() for j in i.players()] or i.bye or not i.ranked:
                     continue
                 gt = next(
                     t

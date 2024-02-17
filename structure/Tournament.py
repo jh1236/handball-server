@@ -54,30 +54,36 @@ class Tournament:
             pools = list(n_chunks(sorted(self.teams, key=lambda it: it.nice_name()), 2))
             return [
                 sorted(
-                    i,
+                    [j for j in i if "bye" not in j.nice_name()],
                     key=lambda a: (
                         -a.percentage,
                         -a.point_difference,
                         -a.points_for,
                         -a.games_won,
                         a.cards,
+                        a.red_cards,
+                        a.yellow_cards,
                         a.faults,
                         a.timeouts,
+                        a.nice_name(),
                     ),
                 )
                 for i in pools
             ]
         else:
             return sorted(
-                self.teams,
+                [j for j in self.teams if "bye" not in j.nice_name()],
                 key=lambda a: (
                     -a.percentage,
                     -a.point_difference,
                     -a.points_for,
                     -a.games_won,
                     a.cards,
+                    a.red_cards,
+                    a.yellow_cards,
                     a.faults,
                     a.timeouts,
+                    a.nice_name(),
                 ),
             )
 
@@ -149,11 +155,19 @@ class Tournament:
                 for g in games:
                     court_one = sorted(
                         self.officials,
-                        key=lambda it: (it.internal_games_umpired, it.games_court_one),
+                        key=lambda it: (
+                            -it.level,
+                            it.internal_games_umpired,
+                            it.games_court_one,
+                        ),
                     )
                     court_two = sorted(
                         self.officials,
-                        key=lambda it: (it.internal_games_umpired, -it.games_court_one),
+                        key=lambda it: (
+                            3 if (it.level == 0) else it.level,
+                            it.internal_games_umpired,
+                            -it.games_court_one,
+                        ),
                     )
                     if not g:
                         continue
@@ -178,8 +192,9 @@ class Tournament:
                     scorer = sorted(
                         self.officials,
                         key=lambda it: (
+                            it.level == 0,
                             it.internal_games_scored,
-                            it.internal_games_scored,
+                            it.internal_games_umpired,
                         ),
                     )
                     for o in scorer:
@@ -205,11 +220,11 @@ class Tournament:
                             self.officials,
                             key=lambda it: it.internal_games_umpired,
                         )
-                        if i.finals
+                        if i.level == 2
                     ]
                     other = sorted(
                         self.officials,
-                        key=lambda it: it.internal_games_umpired,
+                        key=lambda it: (it.level != 0, it.internal_games_umpired),
                     )
                     if not g:
                         continue
@@ -306,7 +321,7 @@ class Tournament:
                 [j.as_map() for j in i if not j.super_bye] for i in self.fixtures
             ],
             "finals": [[j.as_map() for j in i] for i in self.finals],
-            "notes": self.notes
+            "notes": self.notes,
         }
         if self.ref:
             d["details"] = {"ref": self.ref}
@@ -382,7 +397,6 @@ class Tournament:
             with open("./config/teams.json", "r+") as fp2:
                 teams = teams | json.load(fp2)
 
-
         key = self.details["teams"]
 
         if self.details["teams"] == "signup":
@@ -392,24 +406,27 @@ class Tournament:
         if self.details["teams"] == "all":
             self.teams = []
             for k, v in teams.items():
-                if isinstance(v,  list):
+                if isinstance(v, list):
                     team = Team.find_or_create(self, k, [Player(j) for j in v])
                 else:
-                    team = Team.find_or_create(self, k, [Player(j).set_tournament(self) for j in v["players"]])
+                    team = Team.find_or_create(
+                        self, k, [Player(j).set_tournament(self) for j in v["players"]]
+                    )
                     team.primary_color = v["colors"][0]
                     team.secondary_color = v["colors"][1]
                 self.teams.append(team)
         else:
             self.teams = []
             for i in key:
-                if isinstance(teams[i],  list):
+                if isinstance(teams[i], list):
                     players = [
                         Player(j).set_tournament(self) for c, j in enumerate(teams[i])
                     ]
                     team = Team.find_or_create(self, i, players)
                 else:
                     players = [
-                        Player(j).set_tournament(self) for c, j in enumerate(teams[i]["players"])
+                        Player(j).set_tournament(self)
+                        for c, j in enumerate(teams[i]["players"])
                     ]
                     team = Team.find_or_create(self, i, players)
                     team.primary_color = teams[i]["colors"][0]

@@ -2181,7 +2181,7 @@
                 ],
                 "court": 0,
                 "firstTeamServed": false,
-                "game": "vrVRSLslSLslSLARFLSLslSLSLSLslslGLslflarslslSLslsl",
+                "game": "SLslSLslSLARFLSLslSLSLSLslslGLslflarslslSLslsl",
                 "id": 69,
                 "notes": " ",
                 "official": "Zaiah Deards",
@@ -2237,39 +2237,6 @@
                         "Null2"
                     ],
                     "score": 2
-                }
-            }
-        ],
-        [
-            {
-                "bestPlayer": "Brigitte Gredziuk",
-                "cards": [],
-                "court": 0,
-                "firstTeamServed": true,
-                "game": "ee",
-                "id": 71,
-                "notes": " This is a note!!!",
-                "official": "Jared Healy",
-                "protested": 1,
-                "resolved": true,
-                "scorer": "No one",
-                "started": true,
-                "teamOne": {
-                    "name": "Saelmoa",
-                    "players": [
-                        "Brigitte Gredziuk",
-                        "Sophie Lane",
-                        "James Sharpham"
-                    ],
-                    "score": 11
-                },
-                "teamTwo": {
-                    "name": "Ball Fondlers",
-                    "players": [
-                        "Charlie Wyatt",
-                        "Elizabeth Gover"
-                    ],
-                    "score": 0
                 }
             }
         ]

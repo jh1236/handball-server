@@ -3,54 +3,66 @@
     "primary": true,
     "key": "1236",
     "admin": true,
-    "finals": true
+    "level": 2
   },
   "Lachlan Banks": {
     "primary": true,
     "admin": true,
-    "key": "2",
-    "finals": true
+    "key": "0",
+    "level": 2
   },
   "Aimee Soudure": {
     "primary": true,
-    "admin": false,
+    "admin": true,
     "key": "balls",
-    "finals": true
+    "level": 2
   },
   "Brigitte Gredziuk": {
     "primary": true,
     "admin": false,
     "key": "1397",
-    "finals": false
+    "level": 1
   },
   "Zaiah Deards": {
     "primary": true,
     "admin": false,
     "key": "2645",
-    "finals": false
+    "level": 1
   },
   "James Sharpham": {
     "primary": true,
     "admin": false,
     "key": "3636",
-    "finals": false
+    "level": 1
   },
   "Alex Soudure": {
     "primary": true,
     "admin": false,
     "key": "Testiclees",
-    "finals": true
+    "level": 2
   },
   "Eddie Smith": {
     "primary": true,
     "admin": false,
     "key": "ed",
-    "finals": false
+    "level": 2
   },
   "William Prozerska": {
     "primary": true,
     "admin": false,
     "key": "mreow",
-    "finals": false
+    "level": 1
+  },
+  "Elizabeth Gover": {
+    "primary": true,
+    "admin": false,
+    "key": "liz",
+    "level": 0
+  },
+  "Eva Hajigabriel": {
+    "primary": true,
+    "admin": false,
+    "key": "poo",
+    "level": 0
   }
 }

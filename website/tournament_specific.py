@@ -229,7 +229,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
         recent_games = []
         upcoming_games = []
         for i in comps[tournament].games_to_list():
-            if team not in [j.team for j in i.teams] or i.bye:
+            if team not in [j.team for j in i.teams] or i.bye or not i.ranked:
                 continue
             if i.started:
                 gt = next(j for j in i.teams if j.nice_name() == team_name)
@@ -512,6 +512,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
                 "tournament_specific/players.html",
                 headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
                 players=sorted(players),
+                tournament=f"{tournament}/"
             ),
             200,
         )
@@ -532,7 +533,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
         recent_games = []
         upcoming_games = []
         for i in comps[tournament].games_to_list():
-            if player_name not in [j.nice_name() for j in i.players()] or i.bye:
+            if player_name not in [j.nice_name() for j in i.players()] or i.bye or not i.ranked:
                 continue
             gt = next(
                 t for t in i.teams if player_name in [j.nice_name() for j in t.players]
@@ -751,10 +752,14 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
         next_id = (
             comps[tournament].fixtures[-1][-1].id if comps[tournament].fixtures else 0
         )
-        officials = comps[tournament].officials
+        officials = comps[tournament].officials.copy()
         key = request.args.get("key", None)
         if key not in [i.key for i in get_all_officials() if i.admin]:
             officials = [i for i in officials if i.key == key]
+        else:
+            official = [i for i in officials if i.key == key]
+            officials = official + [i for i in officials if i.key != key]
+
         if key is None:
             return (
                 render_template(
@@ -854,6 +859,9 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
         key = request.args.get("key", None)
         if key not in [i.key for i in get_all_officials() if i.admin]:
             officials = [i for i in officials if i.key == key]
+        else:
+            official = [i for i in officials if i.key == key]
+            officials = official + [i for i in officials if i.key != key]
         if key is None:
             return (
                 render_template(

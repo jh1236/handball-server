@@ -5,7 +5,7 @@ from random import Random
 from start import comps, app
 from utils.logging_handler import logger
 
-competition = comps["fourth_suss_championship"]
+competition = comps["fifth_suss_championship"]
 
 logger.debug(competition.teams)
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         return bool(random.randint(0, 1))
 
     once = False
-    winners = False
+    winners = True
     while not once or (
         "Bedwars" not in competition.get_game(-1).winner().name and winners
     ):
@@ -133,6 +133,6 @@ if __name__ == "__main__":
         print(f"{i + 1}: {t.name} [{t.first_ratio()}] [{t.court_one}]")
     print("-" * 20)
     for t in competition.officials:
-        print(f": {t.name} [{t.games_umpired}] [{t.games_court_one / t.games_umpired}] <{t.internal_games_scored}>")
+        print(f": {t.name} [{t.internal_games_umpired}] [{t.games_court_one /(t.internal_games_umpired or 1)}] <{t.internal_games_scored}>")
     print("-" * 20)
 

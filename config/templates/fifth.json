@@ -1,6 +1,6 @@
 {
-  "fixtures_generator": "Swiss",
-  "finals_generator": "BasicFinals",
+  "fixtures_generator": "Swiss6",
+  "finals_generator": "BasicFinalsWithBronze",
   "name": "The Fifth SUSS Championship",
   "officials": "signup",
   "teams": "signup",
