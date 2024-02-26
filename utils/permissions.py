@@ -29,25 +29,15 @@ def _no_permissions():
             )
 
 def admin_only(func):
-    print("admin only1")
     def inner(*args, **kwargs):
-        print("admin only2")
         key = request.args.get("key", None)
-        print("admin only3")
         if key is None:
-            print("admin only4")
             return _requires_password()
-            print("admin only5")
         if key in [i.key for i in get_all_officials()]:
-            print("admin only6")
             if key in [i.key for i in get_all_officials() if i.admin]:
-                print("admin only7")
                 return func(*args, **kwargs)
-                print("admin only8")
             return _no_permissions()  
-            print("admin only9")
         return _incorrect_password()
-        print("admin only10")
     inner.__name__ = func.__name__ # changing name of inner function so flask acts nicely <3
     return inner
 
