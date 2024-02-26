@@ -8,7 +8,7 @@ from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
 from structure.UniversalTournament import UniversalTournament
 from utils.statistics import get_player_stats
-from utils.permissions import admin_only, officials_only
+from utils.permissions import admin_only, fetch_user, officials_only
 from utils.util import fixture_sorter
 from website.website import numbers, sign
 
@@ -681,6 +681,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         )
 
     @app.get("/<tournament>/games/<game_id>/edit/")
+    @officials_only
     def game_editor(tournament, game_id):
         if int(game_id) >= len(comps[tournament].games_to_list()):
             raise Exception("Game Does not exist!!")
@@ -690,21 +691,13 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         teams = game.teams
         if visual_swap:
             teams = list(reversed(teams))
-        key = request.args.get("key", None)
+        key = fetch_user()
         players = [i for i in game.players()]
         team_one_players = [((1 - i), v) for i, v in enumerate(teams[0].players[:2])]
         team_two_players = [((1 - i), v) for i, v in enumerate(teams[1].players[:2])]
-        if key is None:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="This page requires a password to access:",
-                ),
-                403,
-            )
 
         # TODO: Write a permissions decorator for scorers and primary officials
-        elif key not in [game.primary_official.key, game.scorer.key] + [
+        if key not in [game.primary_official.key, game.scorer.key] + [
             i.key for i in get_all_officials() if i.admin
         ]:
             return (
@@ -815,7 +808,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             comps[tournament].fixtures[-1][-1].id if comps[tournament].fixtures else 0
         )
         officials = comps[tournament].officials.copy()
-        key = request.args.get("key", None)
+        key = fetch_user()   
         
         if key not in [i.key for i in get_all_officials() if i.admin]:
             officials = [i for i in officials if i.key == key]
@@ -888,7 +881,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         )
         officials = comps[tournament].officials
 
-        key = request.args.get("key", None)
+        key = fetch_user()
         if key not in [i.key for i in get_all_officials() if i.admin]:
             officials = [i for i in officials if i.key == key]
         else:

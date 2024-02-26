@@ -12,9 +12,9 @@
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>load("{{tournament}}", "{{ key }}")</script>
 
-<a href="/{{ tournament }}/admin?key={{ key }}">
+<a href="/{{ tournament }}/admin">
     <img src="/api/tournaments/image?name={{ tourney.nice_name() }}" class="title_logo"></a>
-<h1><a href="/{{ tournament }}/admin?key={{ key }}" class="hide">{{ tourney.name }}</a></h1>
+<h1><a href="/{{ tournament }}/admin" class="hide">{{ tourney.name }}</a></h1>
 
 <div>
     <div style="bottom: 100%;width: 60%;float:left">
@@ -28,14 +28,14 @@
             {% else %}
                 {% for i in require_action %}
 
-                    <p><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}"
+                    <p><a href="/{{ tournament }}games/{{ i.id }}/admin"
                           class="hide"><b>[{{ i.requires_action_string }}]: </b>{{ i }}</a></p>
 
                 {% endfor %}
             {% endif %}
         </div>
         <div style="min-height: 200px">
-            <h2><a class="hide" href="/{{ tournament }}fixtures/admin?key={{ key }}">Current Round</a></h2>
+            <h2><a class="hide" href="/{{ tournament }}fixtures/admin">Current Round</a></h2>
             <table class="table">
                 <tbody>
                 <tr>
@@ -46,12 +46,12 @@
                 </tr>
                 {% for i in current_round %}
                     <tr>
-                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}"
+                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin"
                                class="hide">{{ i.teams[0] }}</a></td>
-                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}" class="hide">vs</a></td>
-                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}"
+                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin" class="hide">vs</a></td>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin"
                                class="hide">{{ i.teams[1] }}</a></td>
-                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin?key={{ key }}"
+                        <td><a href="/{{ tournament }}games/{{ i.id }}/admin"
                                class="hide">{{ i.score_string() }}</a></td>
                     </tr>
                 {% endfor %}
@@ -73,10 +73,10 @@
         {% endif %}
     </div>
     <div style="float:left;width: 25%; height: 100%">
-        <h2><a class="hide" href="/{{ tournament }}players/admin?key={{ key }}">Umpiring Notes</a></h2>
+        <h2><a class="hide" href="/{{ tournament }}players/admin">Umpiring Notes</a></h2>
         <div style="height: 200px"></div>
 
-        <h2><a class="hide" href="/{{ tournament }}players/admin?key={{ key }}">Noteable Players</a></h2>
+        <h2><a class="hide" href="/{{ tournament }}players/admin">Noteable Players</a></h2>
 
         <table class="table">
             <tr>
@@ -89,19 +89,19 @@
             {% for p in players %}
                 <tr>
                     <td style="width:300px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.name }}</a>
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.name }}</a>
                     </td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.green_cards }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.green_cards }}</a>
                     </td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.yellow_cards }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.yellow_cards }}</a>
                     </td>
                     <td style="width:140px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.red_cards }}</a>
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.red_cards }}</a>
                     </td>
                     <td style="width:140px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin?key={{ key }}">{{ p.time_carded }}</a>
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.time_carded }}</a>
                     </td>
                 </tr>
             {% endfor %}

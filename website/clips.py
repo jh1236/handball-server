@@ -4,7 +4,7 @@ from random import Random
 from flask import render_template, send_from_directory, request, redirect, send_file
 
 from structure.AllTournament import get_all_officials
-from utils.permissions import admin_only, officials_only
+from utils.permissions import admin_only, fetch_user, officials_only
 from website.endpoints.clips import clip
 
 umpire_stats = {}
@@ -76,7 +76,7 @@ def add_video_player(app, comps):
     @app.get("/video/<id>/admin")
     @admin_only
     def rate_video(id):
-        key = request.args.get("key", None)
+        key = fetch_user()
         url_tags = request.args.get("tags", "")
         official = next(i for i in get_all_officials() if i.key == key)
         rated_by_me = [i for i in clip if i["rater"] == official.nice_name()]
@@ -123,7 +123,6 @@ def add_video_player(app, comps):
         return render_template(
             "clips/viewer_admin.html",
             id=id,
-            key=key,
             bookmarked=bookmarked,
             conflict=conflict,
             tags=tags,
@@ -138,7 +137,7 @@ def add_video_player(app, comps):
     @app.get("/video/conflict")
     @admin_only
     def conflict_video():
-        key = request.args.get("key", None)
+        key = fetch_user()
         official = next(i for i in get_all_officials() if i.key == key)
         rated_by_me = [i for i in clip if i["rater"] == official.nice_name()]
         not_by_me = [
@@ -180,18 +179,16 @@ def add_video_player(app, comps):
             return render_template(
                 "clips/viewer_conflict.html",
                 id=conflict[0]["id"],
-                key=key,
                 me=conflict[0],
                 other=conflict[1],
                 tags=tags,
             )
         else:
-            return redirect(f"/video/unrated?key={key}")
+            return redirect(f"/video/unrated")
 
     @app.get("/video/<id>/answer/admin")
     @admin_only
     def every_answer(id):
-        key = request.values["key"]
         details = sorted(
             [i for i in clip if str(i["id"]) == str(id) if i["time"]],
             key=lambda a: a["time"],
@@ -205,7 +202,6 @@ def add_video_player(app, comps):
         return render_template(
             "clips/viewer_all_answers.html",
             answers=ans,
-            key=key,
             id=id,
             true_team=team,
             true_personal=personal,
@@ -214,7 +210,7 @@ def add_video_player(app, comps):
     @app.get("/video/unrated")
     @admin_only
     def next_unrated_video():
-        key = request.args.get("key", None)
+        key = fetch_user()
         official = next(i for i in get_all_officials() if i.key == key)
         rated_by_me = [i for i in clip if i["rater"] == official.nice_name()]
         not_by_me = [
@@ -223,15 +219,15 @@ def add_video_player(app, comps):
         id = request.args.get("id", None, type=int)
         if not not_by_me:
             if id:
-                return redirect(f"/video/{id+1}/admin?key={key}")
-            return redirect(f"/video?key={key}")
+                return redirect(f"/video/{id+1}/admin")
+            return redirect(f"/video")
         id = Random().choice(not_by_me)["id"]
-        return redirect(f"/video/{id}/admin?key={key}")
+        return redirect(f"/video/{id}/admin")
 
     @app.get("/video/next/admin")
     @admin_only
     def random_admin_video():
-        key = request.args.get("key", None)
+        key = fetch_user()
         tags = request.args.get("tags", "")
         official = next(i for i in get_all_officials() if i.key == key)
 
@@ -242,12 +238,12 @@ def add_video_player(app, comps):
         rand = Random()
         videos.sort(key=lambda a: float(a["time"] or -rand.randint(0, 100)))
         if not videos:
-            return redirect(f"/video?key={key}")
+            return redirect(f"/video")
         id = videos[0]["id"]
         if tags:
-            return redirect(f"/video/{id}/admin?key={key}&tags={tags}")
+            return redirect(f"/video/{id}/admin?tags={tags}")
         else:
-            return redirect(f"/video/{id}/admin?key={key}")
+            return redirect(f"/video/{id}/admin")
 
     @app.get("/video/answers.csv")
     @admin_only
@@ -258,7 +254,7 @@ def add_video_player(app, comps):
     @officials_only
     def test_video(id):
         tags = request.args.get("tags", "")
-        key = request.args.get("key", None)
+        key = fetch_user()
         name = next(
             (i.nice_name() for i in get_all_officials() if i.key == key), "admin"
         )
@@ -269,20 +265,22 @@ def add_video_player(app, comps):
             return render_template(
                 "clips/viewer.html",
                 id=id,
-                key=key,
                 starring=starring,
                 stats=stats,
                 tags=tags,
             )
         else:
             return render_template(
-                "clips/viewer.html", id=id, key=key, starring=starring, stats=stats
+                "clips/viewer.html", 
+                id=id, 
+                starring=starring, 
+                stats=stats
             )
 
     @app.post("/video/<id>/answer")
     @officials_only
     def answer_video(id):
-        key  = request.values["key"]
+        key  = fetch_user()
         tags = request.values.get("tags", "")
         details = sorted(
             [i for i in clip if str(i["id"]) == str(id) if i["time"]],
@@ -306,7 +304,6 @@ def add_video_player(app, comps):
         return render_template(
             "clips/answer.html",
             id=id,
-            key=key,
             tags=tags,
             starring=starring,
             team=answer_team,
@@ -318,7 +315,7 @@ def add_video_player(app, comps):
     @app.get("/video/random")
     @officials_only
     def random_video():
-        key = request.args.get("key", None)
+        key = fetch_user()
         tags = request.args.get("tags", "")
         videos = [i for i in clip if i["time"] and int(i["quality"])]
         official = next(i for i in get_all_officials() if i.key == key)
@@ -344,17 +341,17 @@ def add_video_player(app, comps):
             videos = process_videos(videos, tags, official.nice_name())
         videos = [i for i in videos if i["id"] not in conflict]
         if not videos:
-            return redirect(f"/video?key={key}")
+            return redirect(f"/video")
         id = Random().choice(videos)["id"]
         if tags:
-            return redirect(f"/video/{id}?key={key}&tags={tags}")
+            return redirect(f"/video/{id}?tags={tags}")
         else:
-            return redirect(f"/video/{id}?key={key}")
+            return redirect(f"/video/{id}")
 
     @app.get("/video/")
     @officials_only
     def video_homepage():
-        key = request.args.get("key", None)
+        key = fetch_user()
         official = next(i for i in get_all_officials() if i.key == key)
         wrong_videos = [
             j for j in answers if j["name"] == official.nice_name() and not j["correct"]
@@ -378,7 +375,10 @@ def add_video_player(app, comps):
         reqd = [i for i in reqd if i not in seen_videos]
         if len(reqd) > 4:
             reqd = reqd[:4]
-        return render_template("clips/video_home.html", key=key, wrong=wrong, reqd=reqd)
+        return render_template(
+            "clips/video_home.html", 
+            wrong=wrong, 
+            reqd=reqd)
 
 
 def add_to_answers(name, id, team, personal, time):

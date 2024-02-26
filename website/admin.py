@@ -10,7 +10,7 @@ from structure.Tournament import Tournament
 from utils.util import fixture_sorter
 from website.website import sign
 
-from utils.permissions import admin_only
+from utils.permissions import admin_only, fetch_user
 def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/fixtures/admin")
     @admin_only
@@ -81,14 +81,12 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         ]
         fixtures = [i for i in fixtures if i[1]]
         finals = [i for i in finals if i[1]]
-        key = request.args.get("key", None)
         return (
             render_template(
                 "tournament_specific/admin/site.html",
                 fixtures=fixtures,
                 finals=finals,
                 tournament=f"{tournament}/",
-                key=key,
                 t=comps[tournament],
                 reset=court is not None
                 or round is not None
@@ -122,7 +120,6 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/games/<game_id>/admin")
     @admin_only
     def admin_game_site(tournament, game_id):
-        key = request.args.get("key", None)
         if int(game_id) >= len(comps[tournament].games_to_list()):
             return (
                 render_template(
@@ -188,7 +185,6 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 players=[i.tidy_name() for i in players],
                 teams=teams,
                 stats=stats,
-                key=key,
                 player_stats=player_stats,
                 official=game.primary_official,
                 commentary=game_string_to_commentary(game),
@@ -203,7 +199,6 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/teams/<team_name>/admin")
     @admin_only
     def admin_team_site(tournament, team_name):
-        key = request.args.get("key", None)
         team = [i for i in comps[tournament].teams if team_name == i.nice_name()][0]
         recent_games = []
         key_matches = []
@@ -245,8 +240,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 key_games=key_matches,
                 tournament=f"{tournament}/",
                 players=players,
-                key=key,
-            ),
+                ),
             200,
         )
 
@@ -254,7 +248,6 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/teams/admin")
     @admin_only
     def admin_stats_directory_site(tournament):
-        key = request.args.get("key", None)
         teams = [
             i
             for i in sorted(comps[tournament].teams, key=lambda a: a.nice_name())
@@ -265,15 +258,13 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 "tournament_specific/admin/stats.html",
                 teams=teams,
                 tournament=f"{tournament}/",
-                key=key,
-            ),
+                ),
             200,
         )
 
     @app.get("/<tournament>/players/admin")
     @admin_only
     def admin_players_site(tournament):
-        key = request.args.get("key", None)
         priority = {
             "Name": 1,
             "B&F Votes": 1,
@@ -311,15 +302,13 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
                 players=sorted(players),
                 tournament=f"{tournament}/",
-                key=key,
-            ),
+                ),
             200,
         )
 
     @app.get("/<tournament>/players/<player_name>/admin")
     @admin_only
     def admin_player_stats(tournament, player_name):
-        key = request.args.get("key", None)
         if player_name not in [i.nice_name() for i in comps[tournament].players()]:
             return (
                 render_template(
@@ -375,15 +364,13 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 cards=cards,
                 noteable_games=noteable_games,
                 tournament=f"{tournament}/",
-                key=key,
-            ),
+                ),
             200,
         )
 
     @app.get("/<tournament>/admin")
     @admin_only
     def admin_home_page(tournament):
-        key = request.args.get("key", None)
         in_progress = any(
             [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         )
@@ -427,7 +414,6 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 in_progress=in_progress,
                 tournament=f"{tournament}/",
                 require_action=games_requiring_action,
-                key=key,
             ),
             200,
         )
