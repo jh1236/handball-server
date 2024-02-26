@@ -189,16 +189,9 @@ def add_video_player(app, comps):
             return redirect(f"/video/unrated?key={key}")
 
     @app.get("/video/<id>/answer/admin")
+    @admin_only
     def every_answer(id):
         key = request.values["key"]
-        if key not in [i.key for i in get_all_officials()]:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         details = sorted(
             [i for i in clip if str(i["id"]) == str(id) if i["time"]],
             key=lambda a: a["time"],
@@ -236,17 +229,10 @@ def add_video_player(app, comps):
         return redirect(f"/video/{id}/admin?key={key}")
 
     @app.get("/video/next/admin")
+    @admin_only
     def random_admin_video():
         key = request.args.get("key", None)
         tags = request.args.get("tags", "")
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         official = next(i for i in get_all_officials() if i.key == key)
 
         videos = [i for i in clip if i["rater"] == official.nice_name()]
