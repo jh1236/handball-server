@@ -2,7 +2,7 @@ import json
 
 from flask import request, render_template
 
-from structure.AllTournament import get_all_games, get_all_officials
+from structure.AllTournament import get_all_games
 from structure.GameUtils import game_string_to_commentary
 from structure.Player import Player
 from structure.Team import Team
@@ -10,19 +10,11 @@ from structure.Tournament import Tournament
 from utils.util import fixture_sorter
 from website.website import sign
 
-
+from utils.permissions import admin_only
 def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/fixtures/admin")
+    @admin_only
     def admin_fixtures(tournament):
-        key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         court = request.args.get("court", None, type=int)
         round = request.args.get("round", None, type=int)
         umpire = request.args.get("umpire", None, type=str)
@@ -89,6 +81,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         ]
         fixtures = [i for i in fixtures if i[1]]
         finals = [i for i in finals if i[1]]
+        key = request.args.get("key", None)
         return (
             render_template(
                 "tournament_specific/admin/site.html",
@@ -107,16 +100,8 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         )
 
     @app.get("/signup/admin")
+    @admin_only
     def admin_sign_up():
-        key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         teams = []
         with open("./config/signups/teams.json") as fp:
             teams_raw = json.load(fp)
@@ -135,17 +120,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         )
 
     @app.get("/<tournament>/games/<game_id>/admin")
+    @admin_only
     def admin_game_site(tournament, game_id):
-
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         if int(game_id) >= len(comps[tournament].games_to_list()):
             return (
                 render_template(
@@ -224,16 +201,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         )
 
     @app.get("/<tournament>/teams/<team_name>/admin")
+    @admin_only
     def admin_team_site(tournament, team_name):
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         team = [i for i in comps[tournament].teams if team_name == i.nice_name()][0]
         recent_games = []
         key_matches = []
@@ -280,17 +250,11 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             200,
         )
 
+
     @app.get("/<tournament>/teams/admin")
+    @admin_only
     def admin_stats_directory_site(tournament):
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         teams = [
             i
             for i in sorted(comps[tournament].teams, key=lambda a: a.nice_name())
@@ -307,16 +271,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         )
 
     @app.get("/<tournament>/players/admin")
+    @admin_only
     def admin_players_site(tournament):
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         priority = {
             "Name": 1,
             "B&F Votes": 1,
@@ -360,16 +317,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         )
 
     @app.get("/<tournament>/players/<player_name>/admin")
+    @admin_only
     def admin_player_stats(tournament, player_name):
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         if player_name not in [i.nice_name() for i in comps[tournament].players()]:
             return (
                 render_template(
@@ -431,16 +381,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         )
 
     @app.get("/<tournament>/admin")
+    @admin_only
     def admin_home_page(tournament):
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         in_progress = any(
             [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         )

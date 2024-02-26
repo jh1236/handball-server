@@ -6,6 +6,7 @@ from structure.AllTournament import (
 )
 from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
+from utils.permissions import admin_only, officials_only
 from utils.util import fixture_sorter
 from website.website import numbers, sign
 
@@ -646,6 +647,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 403,
             )
+        # TODO: Write a permissions decorator for scorers and primary officials
         elif key not in [game.primary_official.key, game.scorer.key] + [i.key for i in get_all_officials() if i.admin]:
             return (
                 render_template(
@@ -728,6 +730,7 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
             )
 
     @app.get("/<tournament>/create")
+    @officials_only
     def create_game(tournament):
         if not comps[tournament].fixtures_class.manual_allowed():
             return (
@@ -755,35 +758,19 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
         key = request.args.get("key", None)
         if key not in [i.key for i in get_all_officials() if i.admin]:
             officials = [i for i in officials if i.key == key]
-        if key is None:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="This page requires a password to access:",
-                ),
-                403,
-            )
-        elif not officials:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
-        else:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/create_game_teams.html",
-                    tournament=f"{tournament}/",
-                    officials=officials,
-                    teams=teams,
-                    id=next_id,
-                ),
-                200,
+        return (
+            render_template(
+                "tournament_specific/game_editor/create_game_teams.html",
+                tournament=f"{tournament}/",
+                officials=officials,
+                teams=teams,
+                id=next_id,
+            ),
+            200,
             )
 
     @app.get("/<tournament>/round")
+    @admin_only
     def new_round_site(tournament):
         if not comps[tournament].fixtures_class.manual_allowed():
             return (
@@ -803,30 +790,14 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
                 ),
                 400,
             )
-        key = request.args.get("key", None)
-        if key is None:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="This page requires a password to access:",
-                ),
-                403,
-            )
-        elif key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
-        else:
-            comps[tournament].update_games(True)
-            comps[tournament].update_games()
-            comps[tournament].save()
-            return redirect(f"/{comps[tournament].nice_name()}/", code=302)
+
+        comps[tournament].update_games(True)
+        comps[tournament].update_games()
+        comps[tournament].save()
+        return redirect(f"/{comps[tournament].nice_name()}/", code=302)
 
     @app.get("/<tournament>/createPlayers")
+    @admin_only
     def create_game_players(tournament):
         if not comps[tournament].fixtures_class.manual_allowed():
             return (
@@ -851,36 +822,16 @@ def add_tournament_specific(app, comps: dict[str, Tournament]):
             comps[tournament].fixtures[-1][-1].id if comps[tournament].fixtures else 0
         )
         officials = comps[tournament].officials
-        key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            officials = [i for i in officials if i.key == key]
-        if key is None:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="This page requires a password to access:",
-                ),
-                403,
-            )
-        elif not officials:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
-        else:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/create_game_players.html",
-                    tournament=f"{tournament}/",
-                    officials=officials,
-                    players=players,
-                    id=next_id,
-                ),
-                200,
-            )
+        return (
+            render_template(
+                "tournament_specific/game_editor/create_game_players.html",
+                tournament=f"{tournament}/",
+                officials=officials,
+                players=players,
+                id=next_id,
+            ),
+            200,
+        )
 
     @app.get("/<tournament>/raw/")
     def raw_tournament(tournament):

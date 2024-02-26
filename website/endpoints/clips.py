@@ -4,6 +4,7 @@ import time
 from flask import request, redirect
 
 from structure.AllTournament import get_all_officials
+from utils.permissions import admin_only
 
 clip_id = 0
 clip = []
@@ -43,6 +44,7 @@ def add_clip_endpoints(app, comps):
                 clip.append(d)
 
     @app.post("/api/clip/upload")
+    @admin_only
     def upload_file():
         global clip_id
         if request.method == "POST":
@@ -60,11 +62,9 @@ def add_clip_endpoints(app, comps):
         return "<h1>An error Occured Uploading!</h1>", 500
 
     @app.post("/api/clip/rate")
+    @admin_only
     def rate_file():
         key = request.json["key"]
-
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return "<h1>invalid!!!</h1>", 403
         name = next(
             i.nice_name() for i in get_all_officials() if i.key == key
         )

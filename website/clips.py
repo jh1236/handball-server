@@ -4,6 +4,7 @@ from random import Random
 from flask import render_template, send_from_directory, request, redirect, send_file
 
 from structure.AllTournament import get_all_officials
+from utils.permissions import admin_only, officials_only
 from website.endpoints.clips import clip
 
 umpire_stats = {}
@@ -38,6 +39,7 @@ def add_video_player(app, comps):
             add_to_answers(splt[2], int(splt[0]), splt[3], splt[4])
 
     @app.get("/upload/")
+    # @admin_only
     def upload():
         return render_template("clips/upload.html")
 
@@ -46,16 +48,9 @@ def add_video_player(app, comps):
         return send_from_directory("clips/videos", f"clip_{id}.mp4")
 
     @app.get("/video/<id>/admin")
+    @admin_only
     def rate_video(id):
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         official = next(i for i in get_all_officials() if i.key == key)
         rated_by_me = [i for i in clip if i["rater"] == official.nice_name()]
         not_by_me = [
@@ -92,16 +87,9 @@ def add_video_player(app, comps):
         )
 
     @app.get("/video/conflict")
+    @admin_only
     def conflict_video():
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         official = next(i for i in get_all_officials() if i.key == key)
         rated_by_me = [i for i in clip if i["rater"] == official.nice_name()]
         not_by_me = [
@@ -152,16 +140,9 @@ def add_video_player(app, comps):
             return redirect(f"/video/unrated?key={key}")
 
     @app.get("/video/unrated")
+    @admin_only
     def next_unrated_video():
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         official = next(i for i in get_all_officials() if i.key == key)
         rated_by_me = [i for i in clip if i["rater"] == official.nice_name()]
         not_by_me = [
@@ -173,30 +154,15 @@ def add_video_player(app, comps):
         return redirect(f"/video/{id}/admin?key={key}")
 
     @app.get("/video/answers.csv")
+    @admin_only
     def get_answers():
-        key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            return (
-                render_template(
-                    "tournament_specific/admin/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         return send_file("./clips/attempts.csv")
 
     @app.get("/video/<id>")
+    @officials_only
     def test_video(id):
         tags = request.args.get("tags", "")
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials()]:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         name = next(
             (i.nice_name() for i in get_all_officials() if i.key == key), "admin"
         )
@@ -218,17 +184,10 @@ def add_video_player(app, comps):
             )
 
     @app.post("/video/<id>/answer")
+    @officials_only
     def answer_video(id):
         key = request.values["key"]
         tags = request.values["tags"]
-        if key not in [i.key for i in get_all_officials()]:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         details = sorted(
             [i for i in clip if str(i["id"]) == str(id) if i["time"]],
             key=lambda a: a["time"],
@@ -262,17 +221,10 @@ def add_video_player(app, comps):
         )
 
     @app.get("/video/random")
+    @officials_only
     def random_video():
         key = request.args.get("key", None)
         tags = request.args.get("tags", "")
-        if key not in [i.key for i in get_all_officials()]:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         videos = [i for i in clip if i["time"] and int(i["quality"])]
         official = next(i for i in get_all_officials() if i.key == key)
         rated_by_me = [i for i in clip if i["rater"] == official.nice_name()]
@@ -328,16 +280,9 @@ def add_video_player(app, comps):
             return redirect(f"/video/{id}?key={key}")
 
     @app.get("/video/")
+    @officials_only
     def video_homepage():
         key = request.args.get("key", None)
-        if key not in [i.key for i in get_all_officials()]:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
         official = next(i for i in get_all_officials() if i.key == key)
         wrong_videos = [
             j for j in answers if j["name"] == official.nice_name() and not j["correct"]
