@@ -296,7 +296,7 @@ def add_video_player(app, comps):
     @app.post("/video/<id>/answer")
     @officials_only
     def answer_video(id):
-          = request.values["key"]
+        key  = request.values["key"]
         tags = request.values.get("tags", "")
         details = sorted(
             [i for i in clip if str(i["id"]) == str(id) if i["time"]],
