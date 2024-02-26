@@ -5,12 +5,14 @@ from typing import Generator, Any
 
 from FixtureMakers.FixtureMaker import get_type_from_name
 from FixtureMakers.Pooled import Pooled
+from structure.UniversalTournament import UniversalTournament
 from structure.Game import Game
 from structure.OfficiatingBody import Official, get_officials, NoOfficial
 from structure.Player import Player, elo_map
-from structure.Team import Team, BYE
+from structure.Team import Team
 from utils.logging_handler import logger
-from utils.util import n_chunks, initial_elo
+from utils.util import n_chunks
+from utils.statistics import initial_elo
 from itertools import permutations
 
 officials_permuted = []
@@ -18,6 +20,7 @@ officials_permuted = []
 
 class Tournament:
     def __init__(self, file: str):
+        self._bye = None
         if file != "-":
             self.filename = f"./config/tournaments/{file}"
         else:
@@ -44,6 +47,13 @@ class Tournament:
     def nice_name(self):
         return self.name.lower().replace(" ", "_").replace("the_", "").replace("'", "")
 
+    @property
+    def BYE(self):
+        if not self._bye:
+            self._bye = Team("BYE", [Player("Good bye"), Player("Good bye")])
+            self._bye.tournament = self
+        return self._bye
+
     def games_to_list(self) -> list[Game]:
         return [game for r in self.fixtures for game in r] + [
             game for r in self.finals for game in r
@@ -58,13 +68,13 @@ class Tournament:
                     key=lambda a: (
                         -a.percentage,
                         -a.point_difference,
-                        -a.points_for,
-                        -a.games_won,
+                        -a.get_stats()["Points For"],
+                        -a.get_stats()["Games Won"],
                         a.cards,
-                        a.red_cards,
-                        a.yellow_cards,
-                        a.faults,
-                        a.timeouts,
+                        a.get_stats()["Red Cards"],
+                        a.get_stats()["Yellow Cards"],
+                        a.get_stats()["Faults"],
+                        a.get_stats()["Timeouts Called"],
                         a.nice_name(),
                     ),
                 )
@@ -76,19 +86,19 @@ class Tournament:
                 key=lambda a: (
                     -a.percentage,
                     -a.point_difference,
-                    -a.points_for,
-                    -a.games_won,
+                    -a.get_stats()["Points For"],
+                    -a.get_stats()["Games Won"],
                     a.cards,
-                    a.red_cards,
-                    a.yellow_cards,
-                    a.faults,
-                    a.timeouts,
+                    a.get_stats()["Red Cards"],
+                    a.get_stats()["Yellow Cards"],
+                    a.get_stats()["Faults"],
+                    a.get_stats()["Timeouts Called"],
                     a.nice_name(),
                 ),
             )
 
     def add_team(self, team):
-        if team == BYE:
+        if "bye" in team.nice_name():
             return
         self.teams.append(team)
         team.tournament = self
@@ -281,7 +291,7 @@ class Tournament:
             court_one_games = sorted(
                 r,
                 key=lambda a: -sum(
-                    [i.team.games_won / (i.team.games_played or 1) for i in a.teams]
+                    [i.team.percentage for i in a.teams]
                 ),
             )  # use for preferential treatment of wins
             court_one_games = [i for i in court_one_games if not i.bye]
@@ -303,11 +313,7 @@ class Tournament:
         for t in self.teams:
             for p in t.players:
                 if p.name not in names:
-                    p1 = Player(p.name)
-                    p1.tournament = self
-                    players[p.name] = p1
-                    names.append(p.name)
-                players[p.name].add_stats(p.get_stats_detailed())
+                    players[p.name] = p
         return list(players.values())
 
     def save(self, location=None):
@@ -352,7 +358,6 @@ class Tournament:
     def load(self):
         if not self.filename:
             return
-        [i.reset() for i in self.teams]
         [i.reset() for i in self.officials]
         self.fixtures_gen: Generator[list[Game]] = self.fixtures_class.get_generator()
         self.finals_gen: Generator[list[Game]] = self.finals_class.get_generator()

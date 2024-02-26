@@ -2,9 +2,7 @@ from structure.Game import Game
 from structure.OfficiatingBody import Official
 from structure.Player import Player
 from structure.Team import Team
-from structure.Tournament import Tournament
 
-null_tournament = Tournament("-")
 
 
 def get_all_games() -> list[Game]:
@@ -17,7 +15,7 @@ def get_all_games() -> list[Game]:
     ]
 
 
-def get_all_teams(tournament=null_tournament) -> list[Team]:
+def get_all_teams() -> list[Team]:
     from start import comps
 
     teams: dict[str, Team] = {}
@@ -26,10 +24,8 @@ def get_all_teams(tournament=null_tournament) -> list[Team]:
             if t.name not in teams:
                 teams[t.name] = Team(
                     t.name,
-                    [Player(j.name).set_tournament(tournament) for j in t.players],
+                    [Player(j.name) for j in t.players],
                 )
-                teams[t.name].tournament = tournament
-            teams[t.name].add_stats(t.get_stats(True))
     return list(teams.values())
 
 
@@ -44,8 +40,6 @@ def get_all_players() -> list[Player]:
                     players[p.name] = [Player(p.name), []]
                 if t.name not in [i.name for i in players[p.name][1]]:
                     players[p.name][1].insert(0, t)
-                if i.details.get("ranked", True):
-                    players[p.name][0].add_stats(p.get_stats_detailed())
     output = []
     for i in sorted(players.values(), key=lambda it: it[0].nice_name()):
         i[0]._team = ([k for k in i[1] if k.has_photo] + [i[1][0]])[0]

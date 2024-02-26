@@ -122,8 +122,8 @@
                 "teamTwo": {
                     "name": "Bedwars Besties",
                     "players": [
-                        "Jared Healy",
-                        "Lachlan Banks"
+                        "Lachlan Banks",
+                        "Jared Healy"
                     ],
                     "score": 11
                 }
@@ -163,7 +163,7 @@
                 }
             },
             {
-                "bestPlayer": "BYE",
+                "bestPlayer": "Good bye",
                 "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
@@ -174,7 +174,7 @@
                 "protested": null,
                 "resolved": false,
                 "scorer": "No one",
-                "started": false,
+                "started": true,
                 "teamOne": {
                     "name": "Breaking Bad Boys",
                     "players": [
@@ -187,8 +187,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "BYE",
-                        "BYE"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -295,7 +295,7 @@
                 }
             },
             {
-                "bestPlayer": "BYE",
+                "bestPlayer": "Good bye",
                 "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
@@ -306,7 +306,7 @@
                 "protested": null,
                 "resolved": false,
                 "scorer": "No one",
-                "started": false,
+                "started": true,
                 "teamOne": {
                     "name": "Bedwars Besties",
                     "players": [
@@ -318,8 +318,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "BYE",
-                        "BYE"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -341,7 +341,7 @@
                 "notes": " ",
                 "official": "Lachlan Banks",
                 "protested": 1,
-                "resolved": false,
+                "resolved": true,
                 "scorer": "James Sharpham",
                 "started": true,
                 "teamOne": {
@@ -394,7 +394,7 @@
         ],
         [
             {
-                "bestPlayer": "BYE",
+                "bestPlayer": "Good bye",
                 "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
@@ -405,7 +405,7 @@
                 "protested": null,
                 "resolved": false,
                 "scorer": "No one",
-                "started": false,
+                "started": true,
                 "teamOne": {
                     "name": "BCFing Fun",
                     "players": [
@@ -417,8 +417,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "BYE",
-                        "BYE"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -505,7 +505,7 @@
                 "notes": " ",
                 "official": "Jared Healy",
                 "protested": 0,
-                "resolved": false,
+                "resolved": true,
                 "scorer": "Lachlan Banks",
                 "started": true,
                 "teamOne": {
@@ -621,7 +621,7 @@
                 }
             },
             {
-                "bestPlayer": "BYE",
+                "bestPlayer": "Good bye",
                 "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
@@ -632,7 +632,7 @@
                 "protested": null,
                 "resolved": false,
                 "scorer": "No one",
-                "started": false,
+                "started": true,
                 "teamOne": {
                     "name": "Enjoyers of Male Genitalia",
                     "players": [
@@ -644,8 +644,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "BYE",
-                        "BYE"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -698,7 +698,7 @@
                 "notes": " ",
                 "official": "James Sharpham",
                 "protested": 0,
-                "resolved": false,
+                "resolved": true,
                 "scorer": "Alex Soudure",
                 "started": true,
                 "teamOne": {
@@ -752,7 +752,7 @@
                 }
             },
             {
-                "bestPlayer": "BYE",
+                "bestPlayer": "Good bye",
                 "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
@@ -763,7 +763,7 @@
                 "protested": null,
                 "resolved": false,
                 "scorer": "No one",
-                "started": false,
+                "started": true,
                 "teamOne": {
                     "name": "Seanitha",
                     "players": [
@@ -775,8 +775,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "BYE",
-                        "BYE"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -844,7 +844,7 @@
                 }
             },
             {
-                "bestPlayer": "BYE",
+                "bestPlayer": "Good bye",
                 "cards": [],
                 "court": -1,
                 "firstTeamServed": false,
@@ -855,7 +855,7 @@
                 "protested": null,
                 "resolved": false,
                 "scorer": "No one",
-                "started": false,
+                "started": true,
                 "teamOne": {
                     "name": "Ceebs",
                     "players": [
@@ -867,8 +867,8 @@
                 "teamTwo": {
                     "name": "BYE",
                     "players": [
-                        "BYE",
-                        "BYE"
+                        "Good bye",
+                        "Good bye"
                     ],
                     "score": 0
                 }
@@ -888,7 +888,7 @@
                 "notes": " Protest: sexual discrimination against the bodily charm of two \u2018people\u2019(players Sharpy and Digby) who should be treated as equals. The umpire showed clear favouritism towards one player and their appeal, in that the distraction (which was carded as green) was far more impactful against the play of the game than that of the other player\u2019s appeal (and subsequent distraction, which was also carded as green).",
                 "official": "Zaiah Deards",
                 "protested": 1,
-                "resolved": false,
+                "resolved": true,
                 "scorer": "Zaiah Deards",
                 "started": true,
                 "teamOne": {
@@ -911,5 +911,5 @@
             }
         ]
     ],
-    "notes": "Tournament is today! Make sure you arrive on time (5:30).  Good Luck and happy balling."
+    "notes": ""
 }

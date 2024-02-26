@@ -1,7 +1,7 @@
 {
     "details": {
         "finals_generator": "Empty",
-        "fixtures_generator": "OneRound",
+        "fixtures_generator": "OneRoundEditable",
         "name": "SUSS Practice Season Four",
         "officials": "all",
         "ranked": true,
@@ -12,5 +12,5 @@
     "games": [
         []
     ],
-    "notes": "This tournament will not be active until the end of the fifth S.U.S.S. tournament is over."
+    "notes": ""
 }

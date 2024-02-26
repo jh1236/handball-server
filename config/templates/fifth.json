@@ -2,8 +2,24 @@
   "fixtures_generator": "Swiss6",
   "finals_generator": "BasicFinalsWithBronze",
   "name": "The Fifth SUSS Championship",
-  "officials": "signup",
-  "teams": "signup",
+  "officials": [
+    "Lachlan Banks",
+    "Jared Healy",
+    "Alex Soudure",
+    "James Sharpham",
+    "Aimee Soudure",
+    "Eva Hajigabriel",
+    "Zaiah Deards"
+  ],
+  "teams": [
+    "BCFing Fun",
+    "Bedwars Besties",
+    "Breaking Bad Boys",
+    "Ceebs",
+    "Enjoyers of Male Genitalia",
+    "Height Difference",
+    "Seanitha"
+  ],
   "twoCourts": true,
   "scorer": true
 }

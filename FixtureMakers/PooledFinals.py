@@ -3,7 +3,6 @@ import itertools
 from utils.util import n_chunks
 from structure.Game import Game
 from FixtureMakers.FixtureMaker import FixtureMaker
-from structure.Team import BYE
 
 
 
@@ -17,7 +16,7 @@ class PooledFinals(FixtureMaker):
         )
         for pool in pools:
             if len(pool) % 2 != 0:
-                pool += [BYE]
+                pool += [self.tournament.BYE]
 
         pool_one = sorted(pools[0], key=lambda a: (-a.percentage, -a.point_difference))
         pool_two = sorted(pools[1], key=lambda a: (-a.percentage, -a.point_difference))
@@ -26,7 +25,7 @@ class PooledFinals(FixtureMaker):
         games = []
         for t1, t2 in zip(pool_one[2:], pool_two[2:]):
             g = Game(t1, t2, self.tournament, True)
-            if BYE not in [t1, t2]:
+            if self.tournament.BYE not in [t1, t2]:
                 g.court = 1
                 games.append(g)
         yield [item for sublist in itertools.zip_longest([g1, g2], games) for item in sublist if item]

@@ -3,7 +3,7 @@ import typing
 
 from structure.OfficiatingBody import NoOfficial, Official
 from structure.Player import GamePlayer, Player, forfeit_player
-from structure.Team import BYE, Team
+from structure.Team import Team
 from utils.logging_handler import logger
 from utils.util import chunks_sized
 
@@ -16,7 +16,7 @@ class Game:
     @classmethod
     def from_map(cls, game_map, tournament, final=False):
         if game_map["teamOne"]["name"] == "BYE":
-            team_one = BYE
+            team_one = tournament.BYE
         else:
             team_one = [
                 i for i in tournament.teams if i.name == game_map["teamOne"]["name"]
@@ -33,7 +33,7 @@ class Game:
             else:
                 team_one = team_one[0]
         if game_map["teamTwo"]["name"] == "BYE":
-            team_two = BYE
+            team_two = tournament.BYE
         else:
             team_two = [
                 i for i in tournament.teams if i.name == game_map["teamTwo"]["name"]
@@ -124,19 +124,19 @@ class Game:
         if "bye" in [i.nice_name() for i in self.teams]:
             self.bye = True
             self.teams = (
-                [i for i in self.teams if i.team != BYE]
-                + [BYE.get_game_team(self), BYE.get_game_team(self)]
+                [i for i in self.teams if "bye" not in i.nice_name()]
+                + [tournament.BYE.get_game_team(self), tournament.BYE.get_game_team(self)]
             )[0:2]
             self.started = False
             self.best_player = self.teams[1].players[0]
-            if self.teams[0].team != BYE:
+            if "bye" not in self.teams[0].nice_name():
                 self.update_count = -1
                 self.teams[0].score = 11
             else:
                 self.super_bye = True
         self.ranked: bool = (
-            not final
-            and not any(i.nice_name().startswith("null") for i in self.players())
+            not final and
+            not any(i.nice_name().startswith("null") for i in self.players())
             and self.tournament.details.get("ranked", True)
         )
         self.first_team_serves: bool = False
@@ -191,13 +191,17 @@ class Game:
     @property
     def requires_action(self):
         return (
-            self.protested or any(i.red_cards for i in self.players() if "null" not in i.nice_name()) or self.notes.strip()
+            self.protested
+            or any(i.red_cards for i in self.players() if "null" not in i.nice_name())
+            or self.notes.strip()
         ) and not self.resolved
 
     @property
     def is_noteable(self):
         return (
-            self.protested or any(i.red_cards for i in self.players() if "null" not in i.nice_name()) or self.notes.strip()
+            self.protested
+            or any(i.red_cards for i in self.players() if "null" not in i.nice_name())
+            or self.notes.strip()
         )
 
     def set_primary_official(self, o):
@@ -259,6 +263,12 @@ class Game:
                 self.teams[1].players[0],
             ]
         return [*self.teams[0].players[:2], *self.teams[1].players[:2]]
+
+    def all_players(self) -> list[GamePlayer]:
+        if self.rounds:
+            return [*[i for i in self.teams[0].players if i.time_on_court], *[i for i in self.teams[1].players if i.time_on_court]]
+        else:
+            return self.players()
 
     def winner(self):
         if self.bye:
@@ -378,7 +388,7 @@ class Game:
                 raise Exception("Tournament can not be edited!")
             self.tournament.fixtures[-1].remove(self)
             if not self.tournament.fixtures[-1]:
-                self.tournament.fixtures[-1].append(Game(BYE, BYE, self.tournament))
+                self.tournament.fixtures[-1].append(Game(self.tournament.BYE,self.tournament.BYE, self.tournament))
             self.tournament.update_games()
         elif self.game_string == "":
             self.info(f"Undoing Game start")

@@ -7,10 +7,6 @@ from bs4 import BeautifulSoup
 
 T = TypeVar("T")
 
-K = 40.0
-initial_elo = 1500
-D = 3000.0
-
 def chunks_sized(lst: list[T], n: int) -> list[list[T]]:
     """Yield successive n-sized chunks from lst."""
     lizt = []
@@ -29,15 +25,6 @@ def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
     for i in range(0, n):
         yield l[i::n]
 
-
-def probability(other, me):
-    return  1.0 / (1.0 + math.pow(10, K * (other - me) / D))
-
-def calc_elo(elo, elo_other, first_won):
-    pa = probability(elo_other, elo)
-    ra = K * (first_won - pa)
-
-    return ra
 
 
 def fixture_sorter(fixtures: list[list[Any]]) -> list[list[Any]]:
