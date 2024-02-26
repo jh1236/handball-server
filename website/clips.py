@@ -77,7 +77,7 @@ def add_video_player(app, comps):
     @admin_only
     def rate_video(id):
         key = request.args.get("key", None)
-
+        url_tags = request.args.get("tags", "")
         official = next(i for i in get_all_officials() if i.key == key)
         rated_by_me = [i for i in clip if i["rater"] == official.nice_name()]
         not_by_me = [
