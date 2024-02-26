@@ -2,11 +2,11 @@ import os
 import re
 import threading
 import time
-from typing import Any
 
 from structure.Player import Player, GamePlayer
 from utils.logging_handler import logger
-from utils.util import calc_elo, google_image
+from utils.statistics import calc_elo, team_stats
+from utils.util import google_image
 
 images = {}
 team_names = {}
@@ -16,16 +16,8 @@ class Team:
     def __init__(self, name: str, players: list[Player]):
         self.name = name
         self.players: list[Player] = players
-        self.points_against: int = 0
-        self.points_for: int = 0
-        self.games_won: int = 0
-        self.games_played: int = 0
         self.tournament = None
-        self.green_cards: int = 0
-        self.yellow_cards: int = 0
-        self.red_cards: int = 0
-        self.faults: int = 0
-        self.timeouts: int = 0
+
         self.primary_color: str = "None/Unknown"
         self.secondary_color: str = "None/Unknown"
 
@@ -41,7 +33,7 @@ class Team:
         if not self.image_path:
             if self.name in images:
                 self.image_path = images[self.name]
-            elif False:
+            else:
                 threading.Thread(target=self.helper).start()
 
     def get_game_team(self, game):
@@ -49,11 +41,11 @@ class Team:
 
     @property
     def percentage(self):
-        return self.games_won / (self.games_played or 1)
+        return self.get_stats()["Games Won"] / (self.get_stats()["Games Played"] or 1)
 
     @property
     def cards(self):
-        return self.red_cards + self.green_cards + self.yellow_cards
+        return self.get_stats()["Green Cards"] + self.get_stats()["Red Cards"] + self.get_stats()["Yellow Cards"]
 
     def helper(self):
         self.image_path = google_image(self.name)
@@ -64,7 +56,11 @@ class Team:
 
     @property
     def point_difference(self):
-        return self.points_for - self.points_against
+        return self.get_stats()["Point Difference"]
+
+    @property
+    def games_played(self):
+        return self.get_stats()["Games Played"]
 
     @property
     def captain(self):
@@ -82,28 +78,22 @@ class Team:
 
     @property
     def teams_played(self) -> list:
-        if not self.tournament:
+        if "bye" in self.nice_name():
+            games = []
+            for i in self.tournament.games_to_list():
+                if not i.bye:
+                    continue
+                games.append(i)
+            return [next(j.team for j in i.teams if j.team != self) for i in games]
+        elif not self.tournament:
             return []
-        my_games = [
-            i
-            for i in self.tournament.games_to_list()
-            if self in [j.team for j in i.teams] and i.best_player
-        ]
-        return [next(j.team for j in i.teams if j.team != self) for i in my_games]
-
-    def reset(self):
-        [i.reset() for i in self.players]
-        self.points_against: int = 0
-        self.points_for: int = 0
-        self.listed_first: int = 0
-        self.court_one: int = 0
-        self.games_won: int = 0
-        self.games_played: int = 0
-        self.green_cards: int = 0
-        self.yellow_cards: int = 0
-        self.red_cards: int = 0
-        self.faults: int = 0
-        self.timeouts: int = 0
+        else:
+            games = []
+            for i in self.tournament.games_to_list():
+                if not self in [j.team for j in i.teams]:
+                    continue
+                games.append(i)
+            return [next(j.team for j in i.teams if j.team != self) for i in games]
 
     @property
     def elo(self):
@@ -111,56 +101,7 @@ class Team:
         return round(sum(true_players) / (len(true_players) or 1), 2)
 
     def get_stats(self, include_players=False):
-        game_teams: list[GameTeam] = []
-        for i in self.tournament.games_to_list():
-            team_names = [j.name for j in i.teams]
-            if i.in_progress() and self.name in team_names:
-                game_teams.append(i.teams[team_names.index(self.name)])
-
-        points_for = self.points_for + sum([i.score for i in game_teams])
-        points_against = self.points_against + sum(
-            [i.opponent.score for i in game_teams]
-        )
-        dif = points_for - points_against
-        green_cards = self.green_cards + sum([i.green_cards for i in game_teams])
-        yellow_cards = self.yellow_cards + sum([i.yellow_cards for i in game_teams])
-        red_cards = self.red_cards + sum([i.red_cards for i in game_teams])
-        timeouts = self.timeouts + sum([(1 - i.timeouts) for i in game_teams])
-        faults = self.faults + sum([i.faults for i in game_teams])
-        games_played = self.games_played + len(game_teams)
-        d = {
-            "Elo": round(self.elo, 2),
-            "Games Played": games_played,
-            "Games Won": self.games_won,
-            "Games Lost": self.games_played - self.games_won,
-            "Percentage": f"{100 * self.percentage: .1f}%"
-            if self.games_played > 0
-            else "-",
-            "Green Cards": green_cards,
-            "Yellow Cards": yellow_cards,
-            "Red Cards": red_cards,
-            "Faults": faults,
-            "Timeouts Called": timeouts,
-            "Points For": points_for,
-            "Points Against": points_against,
-            "Point Difference": dif,
-        }
-        if include_players:
-            d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]
-        return d
-
-    def add_stats(self, d: dict[str, Any]):
-        self.games_played += d.get("Games Played", 0)
-        self.games_won += d.get("Games Won", 0)
-        self.green_cards += d.get("Green Cards", 0)
-        self.yellow_cards += d.get("Yellow Cards", 0)
-        self.red_cards += d.get("Red Cards", 0)
-        self.faults += d.get("Faults", 0)
-        self.timeouts += d.get("Timeouts Called", 0)
-        self.points_for += d.get("Points For", 0)
-        self.points_against += d.get("Points Against", 0)
-        for p, i in zip(self.players, d.get("players", [])):
-            p.add_stats(i)
+        return team_stats(self.tournament, self, include_players)
 
     def nice_name(self):
         s = self.name.lower().replace(" ", "_").replace(",", "").replace("the_", "")
@@ -174,13 +115,17 @@ class Team:
             return self.name
 
     def first_ratio(self):
-        return self.listed_first / (self.games_played or 1)
+        if "bye" in self.nice_name():
+            return 999.0
+        return self.listed_first / (self.get_stats()["Games Played"] or 1)
 
     @classmethod
     def find_or_create(cls, tournament, name, players):
         if tournament:
             for i in tournament.teams:
-                if sorted([j.name for j in players]) == sorted([j.name for j in i.players]):
+                if sorted([j.name for j in players]) == sorted(
+                    [j.name for j in i.players]
+                ):
                     return i
         key = tuple(sorted(i.nice_name() for i in players))
         if key in team_names:
@@ -192,9 +137,6 @@ class Team:
         return t
 
 
-BYE = Team("BYE", [Player("Good bye"), Player("Good bye")])
-
-
 class GameTeam:
     def __init__(self, team: Team, game):
         self.time_out_time = -1
@@ -203,9 +145,12 @@ class GameTeam:
         self.team: Team = team
         self.name: str = self.team.name
         self.players: list[GamePlayer] = [
-            i.game_player(game, 1 - c) for c, i in enumerate(team.players)
+            i.game_player(game,self, 1 - c) for c, i in enumerate(team.players)
         ]
         self.has_sub = len(self.players) > 2
+        if self.has_sub:
+            self.players[2].started_sub = True
+        self.has_subbed:bool = False
         self.start_players = self.players.copy()
         self.green_cards: int = 0
         self.yellow_cards: int = 0
@@ -221,8 +166,10 @@ class GameTeam:
         self.first_player_serves: bool = True
         self.faulted: bool = False
 
+
     def __eq__(self, other):
         return isinstance(other, GameTeam) and other.name == self.name
+
 
     def info(self, text: str):
         if self.game.id < 0:
@@ -244,6 +191,7 @@ class GameTeam:
             self.change_elo(-self.elo_delta, self.game)
             self.elo_delta = None
         self.green_carded = False
+        self.has_subbed:bool = False
         self.score = 0
         self.serving = False
         self.faulted = False
@@ -253,7 +201,7 @@ class GameTeam:
         self.red_cards = 0
         self.faults = 0
         self.players = [
-            i.game_player(self.game, 1 - c > 0) for c, i in enumerate(self.team.players)
+            i.game_player(self.game,self,  1 - c > 0) for c, i in enumerate(self.team.players)
         ]
         self.has_sub = len(self.players) > 2
         if self.swapped:
@@ -264,7 +212,7 @@ class GameTeam:
     def start(self, serve_first: bool, swap_players: bool):
         self.swapped = swap_players
         # Guaranteed to work, just trust the process
-        self.opponent: GameTeam = [i for i in self.game.teams if i.name != self.name][0]
+        self.opponent: GameTeam = [i for i in self.game.teams if i.nice_name() != self.nice_name()][0]
         self.serving = serve_first
         self.first_player_serves = serve_first
         self.elo_at_start = self.team.elo
@@ -293,10 +241,21 @@ class GameTeam:
 
     def lost_point(self):
         if self.serving:
+            server_side = self.server().nice_name() == self.players[0].nice_name()
             self.server().points_served += 1
+            self.server().serve_streak[-1] += 1
+            self.server().serve_streak.append(0)
+            if self.server().ace_streak[-1]:
+                self.server().ace_streak.append(0)
+            #if you were serving and the other team won the point, they obviously returned the point
+            self.opponent.players[not server_side].serves_received += 1
+            self.opponent.players[not server_side].serve_return += 1
         self.serving = False
 
     def sub_player(self, first_player: bool):
+        self.players[not first_player].subbed_off = True
+        self.has_subbed = True
+        self.players[2].subbed_on = True
         self.players[not first_player], self.players[2] = (
             self.players[2],
             self.players[not first_player],
@@ -316,6 +275,7 @@ class GameTeam:
                 self.server().score_point(True)
             else:
                 self.players[not first_player].score_point(True)
+            self.server().ace_streak[-1] += 1
         elif first_player is not None:
             self.info(
                 f"Point Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}"
@@ -325,15 +285,22 @@ class GameTeam:
             self.info(
                 f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string()}"
             )
+            if self.server().ace_streak[-1]:
+                self.server().ace_streak.append(0)
         self.score += 1
         if self.serving and (first_player is not None or ace):
+            server_side = self.server().nice_name() == self.players[0].nice_name()
             self.server().points_served += 1
+            self.server().serve_streak[-1] += 1
             self.server().won_while_serving += 1
+            self.opponent.players[not server_side].serves_received += 1
+            self.opponent.players[not server_side].serve_return += not ace
         self.game.next_point()
         self.opponent.lost_point()
         if not self.serving:
             self.first_player_serves = not self.first_player_serves
             self.serving = True
+
         if first_player is not None or ace:
             string = "a" if ace else "s"
             string += "l" if first_player else "r"
@@ -399,7 +366,7 @@ class GameTeam:
     def red_card(self, first_player: bool):
         player = self.players[not first_player]
         if "null" in player.nice_name():
-                return
+            return
         self.red_cards += 1
         self.game.update_count += 1
         self.info(
@@ -426,14 +393,9 @@ class GameTeam:
 
     def card_time(self):
         players = [i for i in self.players if "null" not in i.nice_name()]
-        if (
-            0
-            > min(players, key=lambda a: a.card_time_remaining).card_time_remaining
-        ):
+        if 0 > min(players, key=lambda a: a.card_time_remaining).card_time_remaining:
             return -1
-        return max(
-            players, key=lambda a: a.card_time_remaining
-        ).card_time_remaining
+        return max(players, key=lambda a: a.card_time_remaining).card_time_remaining
 
     def card_duration(self):
         return max(self.players, key=lambda a: a.card_time_remaining).card_duration
@@ -445,25 +407,15 @@ class GameTeam:
             Exception("game ended twice!")
         won = self.game.winner() == self.team
         [i.end(won, final) for i in self.players]
-
-        self.team.points_for += self.score
-        self.team.points_against += self.opponent.score
-        self.team.games_played += 1
-        self.team.games_won += won
-        self.team.green_cards += self.green_cards
-        self.team.yellow_cards += self.yellow_cards
-        self.team.red_cards += self.red_cards
-        self.team.faults += self.faults
-        self.team.timeouts += 1 - self.timeouts
         self.game.primary_official.green_cards += self.green_cards
         self.game.primary_official.yellow_cards += self.yellow_cards
         self.game.primary_official.red_cards += self.red_cards
         self.game.primary_official.faults += self.faults
 
-            # either elo is not set, or it is positive, and we lost or negative, and we won
-            # meaning that the result of the game was changed
+        # either elo is not set, or it is positive, and we lost or negative, and we won
+        # meaning that the result of the game was changed
         if not self.game.ranked:
-                return
+            return
         if not self.elo_delta:
             self.elo_delta = calc_elo(
                 self.elo_at_start, self.opponent.elo_at_start, won
@@ -475,15 +427,6 @@ class GameTeam:
         if self.elo_delta:
             self.change_elo(-self.elo_delta, self.game)
         self.elo_delta = None
-        self.team.points_for -= self.score
-        self.team.points_against -= self.opponent.score
-        self.team.games_played -= 1
-        self.team.games_won -= self.game.winner() == self.team
-        self.team.green_cards -= self.green_cards
-        self.team.yellow_cards -= self.yellow_cards
-        self.team.red_cards -= self.red_cards
-        self.team.faults -= self.faults
-        self.team.timeouts -= 1 - self.timeouts
         self.game.primary_official.green_cards -= self.green_cards
         self.game.primary_official.yellow_cards -= self.yellow_cards
         self.game.primary_official.red_cards -= self.red_cards

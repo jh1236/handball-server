@@ -1,7 +1,5 @@
 let id = 0
 let key = 0
-let teamOutcome = 0
-let personalOutcome = 0
 let setup = (newId, newKey) => {
     id = newId
     key = newKey
@@ -9,12 +7,10 @@ let setup = (newId, newKey) => {
 
 setTeamOutcome = (outcome) => {
     document.getElementById("team").textContent = document.getElementById("team"+outcome).textContent
-    teamOutcome = outcome
 }
 
 setPersonalOutcome = (outcome) => {
     document.getElementById("personal").textContent = document.getElementById("personal"+outcome).textContent
-    personalOutcome = outcome
 }
 
 
@@ -30,7 +26,9 @@ function bookmark() {
     }).then(() => document.location.reload());
 }
 
-function submit() {
+function submit(urlTags = false) {
+    let teamOutcome = document.getElementById("team").textContent !== "Team Outcome"
+    let personalOutcome = document.getElementById("personal").textContent !== "Personal Outcome"
     if (!teamOutcome || !personalOutcome || !document.getElementById("tags").value || !document.getElementById("starring").value) {
         alert("The form is not complete!")
         return
@@ -53,7 +51,7 @@ function submit() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location = "/video/unrated?key=" + key);
+    }).then(() => document.location = "/video/next/admin?key=" + key + "&id="+id + (urlTags? "&tags=" + urlTags : ""));
 }
 
 function submitConflict() {
@@ -76,12 +74,13 @@ function submitConflict() {
     }).then(() => document.location = "/video/unrated?key=" + key);
 }
 
-function garbage() {
+function garbage(urlTags=false) {
     fetch("/api/clip/rate", {
         method: "POST", body: JSON.stringify({
             key: key,
             id: id,
             certain: false,
+            required: false,
             teamOutcome: "garbage",
             personalOutcome: "garbage",
             starring: "garbage",
@@ -90,12 +89,14 @@ function garbage() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location = "/video/unrated?key=" + key);
+    }).then(() => document.location = "/video/next/admin?key=" + key +"&id=" + id + (urlTags? "&tags=" + urlTags : ""));
 }
 
 
 
 function answer() {
+    let teamOutcome = document.getElementById("team").textContent !== "Team Outcome"
+    let personalOutcome = document.getElementById("personal") !== "Personal Outcome"
     if (!teamOutcome || !personalOutcome) {
         alert("The form is not complete!")
         return

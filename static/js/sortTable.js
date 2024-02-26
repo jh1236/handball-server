@@ -1,4 +1,4 @@
-function sortTable(id, n) {
+function sortTable(id, n, fix = true) {
     let table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
     table = document.getElementById("sort" + id);
     switching = true;
@@ -126,8 +126,8 @@ function sortTable(id, n) {
         testAgainst = "asc"
     }
     if (dir === testAgainst) {
-        rows[0].getElementsByTagName("TH")[n + 2].style.color = "#33ac33"
+        rows[0].getElementsByTagName("TH")[n +( fix ? 2 : 1)].style.color = "#33ac33"
     } else {
-        rows[0].getElementsByTagName("TH")[n + 2].style.color = "#ac3333"
+        rows[0].getElementsByTagName("TH")[n + (fix ? 2 : 1)].style.color = "#ac3333"
     }
 }

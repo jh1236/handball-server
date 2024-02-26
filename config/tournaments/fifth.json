@@ -1,0 +1,915 @@
+{
+    "details": {
+        "ref": "fifth"
+    },
+    "finals": [
+        [
+            {
+                "bestPlayer": "Eva Hajigabriel",
+                "cards": [
+                    "Time wasting"
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "slSRsrslsrsrglslsrSRSRslslslsr",
+                "id": 24,
+                "notes": " ",
+                "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "BCFing Fun",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Sean Robinson",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRslSRARSRSRslSRSLTTslslslslSRARttslarslSRslSRAR",
+                "id": 25,
+                "notes": " ",
+                "official": "Alex Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Eva Hajigabriel",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 12
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 10
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Sean Robinson",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSLSLSLSLSLttSLslSLslslslslarslslslfrslsl",
+                "id": 26,
+                "notes": " ",
+                "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Alex Soudure",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 8
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "flarflsrsrSRsrarsrSLSLsrslSLSRsrsrSRsr",
+                "id": 27,
+                "notes": " ",
+                "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "BCFing Fun",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Tomasz Sakowski"
+                    ],
+                    "score": 6
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            }
+        ]
+    ],
+    "games": [
+        [
+            {
+                "bestPlayer": "Tomasz Sakowski",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "SLSLSRslsrsrSLsrSLsrslarSLSLslsrflSLSRSRttslSRSL",
+                "id": 0,
+                "notes": " ",
+                "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "BCFing Fun",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 12
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 10
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "cards": [],
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 1,
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Breaking Bad Boys",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Tristan Nel",
+                "cards": [
+                    "Swearing "
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "FLSRSRGLSRSRslSRARSRsrSRsrsrflSLSLAR",
+                "id": 2,
+                "notes": " ",
+                "official": "Alex Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Ceebs",
+                    "players": [
+                        "Caitlin Milne",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Enjoyers of Male Genitalia",
+                    "players": [
+                        "Digby Ross",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 4
+                }
+            },
+            {
+                "bestPlayer": "Vangeli Hajigabriel",
+                "cards": [
+                    "Entering Bra without perm",
+                    "Swearing"
+                ],
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "SRFLGRSLSRslararTTglslslSRARslSRslSRARARslSLSL",
+                "id": 3,
+                "notes": " ",
+                "official": "James Sharpham",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 8
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Eva Hajigabriel",
+                "cards": [
+                    "Teammate speaking to umpire ",
+                    "Swearing"
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "srslslflSLGLGLsrsrsrSLXLslslflsrslsl",
+                "id": 4,
+                "notes": " ",
+                "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Breaking Bad Boys",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "BCFing Fun",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Tomasz Sakowski"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "cards": [],
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 5,
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Vangeli Hajigabriel",
+                "cards": [
+                    "Letting Non captain speak",
+                    "Time wasting",
+                    "Time wasting",
+                    "Skim",
+                    "Time wasting",
+                    "Skim"
+                ],
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "arGRsrGRarSRSRYRslarsrsrslGRsrslGLYRsr",
+                "id": 6,
+                "notes": " ",
+                "official": "Lachlan Banks",
+                "protested": 1,
+                "resolved": true,
+                "scorer": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "Ceebs",
+                    "players": [
+                        "Caitlin Milne",
+                        "Tristan Nel"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Alex Soudure",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Sean Robinson",
+                "cards": [],
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "slslsrsrslSRslslslslSRslsl",
+                "id": 7,
+                "notes": " ",
+                "official": "Zaiah Deards",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Enjoyers of Male Genitalia",
+                    "players": [
+                        "Digby Ross",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Good bye",
+                "cards": [],
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 8,
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "BCFing Fun",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Tomasz Sakowski"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "cards": [],
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "SRSLslSRslSRFLSRSLSRxlSRSRFLSRSL",
+                "id": 9,
+                "notes": " ",
+                "official": "Zaiah Deards",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Eva Hajigabriel",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Breaking Bad Boys",
+                    "players": [
+                        "Brigitte Gredziuk",
+                        "James Sharpham",
+                        "Sophie Lane"
+                    ],
+                    "score": 2
+                }
+            },
+            {
+                "bestPlayer": "Sean Robinson",
+                "cards": [
+                    "Teammate talking to umpire",
+                    "Talking to umpire"
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "ARyrSLARslflsrSLsrarSRslSLSLttFRSLSLSLGLSL",
+                "id": 10,
+                "notes": " ",
+                "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Ceebs",
+                    "players": [
+                        "Caitlin Milne",
+                        "Tristan Nel"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "Vangeli Hajigabriel",
+                "cards": [
+                    "Letting non captain speak ",
+                    "Danger: skims",
+                    "Swearing at official",
+                    "Swearing at official",
+                    "Disrespect towards official",
+                    "Disrespect not shaking hand",
+                    "Letting non captain speak "
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "GRGRsrYLarslararSLslTTSRslflslSLSRsrarVLYLYLYR",
+                "id": 11,
+                "notes": " ",
+                "official": "Jared Healy",
+                "protested": 0,
+                "resolved": true,
+                "scorer": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Enjoyers of Male Genitalia",
+                    "players": [
+                        "Digby Ross",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 4
+                },
+                "teamTwo": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Alex Soudure",
+                        "Vangeli Hajigabriel"
+                    ],
+                    "score": 11
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Alex Soudure",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SRSLSLFLSLARslflSLARsrarsrsrslsrsrsrSLSLSRslSLSL",
+                "id": 12,
+                "notes": " ",
+                "official": "Lachlan Banks",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Aimee Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 12
+                },
+                "teamTwo": {
+                    "name": "BCFing Fun",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Tomasz Sakowski"
+                    ],
+                    "score": 10
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Letting team mate talk to Ump"
+                ],
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "flsrSLslsrslsrSLsrsrflslslSLsrGLsr",
+                "id": 13,
+                "notes": " ",
+                "official": "Alex Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 3
+                },
+                "teamTwo": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Caitlin Milne",
+                "cards": [],
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "SLsrsrsrsrsrSRARARXLslSLSLslsrSRsrslSRSRsr",
+                "id": 14,
+                "notes": " ",
+                "official": "Zaiah Deards",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Jared Healy",
+                "started": true,
+                "teamOne": {
+                    "name": "Breaking Bad Boys",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 9
+                },
+                "teamTwo": {
+                    "name": "Ceebs",
+                    "players": [
+                        "Caitlin Milne",
+                        "Tristan Nel"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "cards": [],
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 15,
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Enjoyers of Male Genitalia",
+                    "players": [
+                        "Digby Ross",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Tristan Nel",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "srSRsrarfrsrSRARsrSLsrsrSRslsrsree",
+                "id": 16,
+                "notes": " ",
+                "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "BCFing Fun",
+                    "players": [
+                        "Tomasz Sakowski",
+                        "Eva Hajigabriel"
+                    ],
+                    "score": 12
+                },
+                "teamTwo": {
+                    "name": "Ceebs",
+                    "players": [
+                        "Caitlin Milne",
+                        "Tristan Nel"
+                    ],
+                    "score": 10
+                }
+            },
+            {
+                "bestPlayer": "Jared Healy",
+                "cards": [
+                    "Hinderance",
+                    "Skim",
+                    "Equipment abuse",
+                    "Swearing ",
+                    "Abusing officials"
+                ],
+                "court": 1,
+                "firstTeamServed": false,
+                "game": "slsrglSLSLFLSRslSRSRSRSRsrSLglFLSLFLslSRylvlvlAR",
+                "id": 17,
+                "notes": " ",
+                "official": "James Sharpham",
+                "protested": 0,
+                "resolved": true,
+                "scorer": "Alex Soudure",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Lachlan Banks",
+                        "Jared Healy"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Enjoyers of Male Genitalia",
+                    "players": [
+                        "Digby Ross",
+                        "Zebiah Peaker"
+                    ],
+                    "score": 5
+                }
+            },
+            {
+                "bestPlayer": "James Sharpham",
+                "cards": [
+                    "Interference "
+                ],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLslflSLARARSLslSRSLxrgrSRSLSLslSL",
+                "id": 18,
+                "notes": " ",
+                "official": "Jared Healy",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Lachlan Banks",
+                "started": true,
+                "teamOne": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Breaking Bad Boys",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 3
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "cards": [],
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 19,
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            }
+        ],
+        [
+            {
+                "bestPlayer": "Lachlan Banks",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": true,
+                "game": "SLSRSLSLARSLFLsrslsrarTTSRsrsrSLSRsrSLAR",
+                "id": 20,
+                "notes": " ",
+                "official": "Aimee Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "Eva Hajigabriel",
+                "started": true,
+                "teamOne": {
+                    "name": "Bedwars Besties",
+                    "players": [
+                        "Jared Healy",
+                        "Lachlan Banks"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Height Difference",
+                    "players": [
+                        "Vangeli Hajigabriel",
+                        "Alex Soudure"
+                    ],
+                    "score": 7
+                }
+            },
+            {
+                "bestPlayer": "Sean Robinson",
+                "cards": [],
+                "court": 0,
+                "firstTeamServed": false,
+                "game": "slslSLslslslSLFRslslslslslsl",
+                "id": 21,
+                "notes": " ",
+                "official": "Alex Soudure",
+                "protested": 0,
+                "resolved": false,
+                "scorer": "James Sharpham",
+                "started": true,
+                "teamOne": {
+                    "name": "BCFing Fun",
+                    "players": [
+                        "Eva Hajigabriel",
+                        "Tomasz Sakowski"
+                    ],
+                    "score": 2
+                },
+                "teamTwo": {
+                    "name": "Seanitha",
+                    "players": [
+                        "Sean Robinson",
+                        "Tabitha Blechynden"
+                    ],
+                    "score": 11
+                }
+            },
+            {
+                "bestPlayer": "Good bye",
+                "cards": [],
+                "court": -1,
+                "firstTeamServed": false,
+                "game": "",
+                "id": 22,
+                "notes": "",
+                "official": "No one",
+                "protested": null,
+                "resolved": false,
+                "scorer": "No one",
+                "started": true,
+                "teamOne": {
+                    "name": "Ceebs",
+                    "players": [
+                        "Tristan Nel",
+                        "Caitlin Milne"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "BYE",
+                    "players": [
+                        "Good bye",
+                        "Good bye"
+                    ],
+                    "score": 0
+                }
+            },
+            {
+                "bestPlayer": "Zebiah Peaker",
+                "cards": [
+                    "Clothes indecency ",
+                    "Clothes indecency ",
+                    "Equipmemt Abuse",
+                    "Calling Umpire a Cheat"
+                ],
+                "court": 1,
+                "firstTeamServed": true,
+                "game": "srarslslSLARSRsrSRxrSLSLARSRSLSLslGRglYRVRSL",
+                "id": 23,
+                "notes": " Protest: sexual discrimination against the bodily charm of two \u2018people\u2019(players Sharpy and Digby) who should be treated as equals. The umpire showed clear favouritism towards one player and their appeal, in that the distraction (which was carded as green) was far more impactful against the play of the game than that of the other player\u2019s appeal (and subsequent distraction, which was also carded as green).",
+                "official": "Zaiah Deards",
+                "protested": 1,
+                "resolved": true,
+                "scorer": "Zaiah Deards",
+                "started": true,
+                "teamOne": {
+                    "name": "Enjoyers of Male Genitalia",
+                    "players": [
+                        "Zebiah Peaker",
+                        "Digby Ross"
+                    ],
+                    "score": 11
+                },
+                "teamTwo": {
+                    "name": "Breaking Bad Boys",
+                    "players": [
+                        "James Sharpham",
+                        "Brigitte Gredziuk",
+                        "Sophie Lane"
+                    ],
+                    "score": 6
+                }
+            }
+        ]
+    ],
+    "notes": ""
+}

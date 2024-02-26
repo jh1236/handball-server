@@ -39,20 +39,21 @@
 <br>
 <div class="dropdown">
     <button onclick="myFunction(this)" id="team" class="smallBtn dropbtn" style="background-color: #2a5d88;">
-        Team Outcome
+        {{ team }}
     </button>
     <div class="dropdown-content">
         <p onclick="setTeamOutcome(1)" id="team1">Replay</p>
-        <p onclick="setTeamOutcome(2)" id="team2">Point for team</p>
-        <p onclick="setTeamOutcome(3)" id="team3">Point against team</p>
+        <p onclick="setTeamOutcome(2)" id="team2">Point Stairs Side</p>
+        <p onclick="setTeamOutcome(3)" id="team3">Point IGA Side</p>
         <p onclick="setTeamOutcome(4)" id="team4">Fault</p>
+        <p onclick="setTeamOutcome(5)" id="team5">Unclear</p>
     </div>
 </div>
 <br>
 <br>
 <div class="dropdown">
     <button onclick="myFunction(this)" id="personal" class="smallBtn dropbtn" style="background-color: #2a5d88;">
-        Personal Outcome
+        {{ personal }}
     </button>
     <div class="dropdown-content">
         <p onclick="setPersonalOutcome(1)" id="personal1">No Card</p>
@@ -67,7 +68,7 @@
 <br>
 <label>
     Certain?
-    <input type="checkbox" id="certain">
+    <input type="checkbox" id="certain" {% if certain %} checked {% endif %}>
 </label>
 <br>
 <br>
@@ -81,22 +82,23 @@
 <br>
 <label>
     Starring:
-    <input type="text" id="starring">
+    <input type="text" id="starring" value="{{ starring }}">
 </label>
 <h3>Tags (comma seperated)</h3>
 
-<textarea style="width: 600px;height: 100px" id="tags"></textarea>
+<textarea style="width: 600px;height: 100px" id="tags">{{ tags }}</textarea>
 <br>
 <br>
 <label>
     Set as Required?
-    <input type="checkbox" id="required">
+    <input type="checkbox" id="required"  {% if required %} checked {% endif %}>
 </label>
 
 <br>
 <br>
-<button class="button" style="color:#550000" onclick="garbage()">Garbage</button>
-<button class="button" onclick="submit()">Submit</button>
+<button class="button" style="color:#550000" onclick="garbage('{{ url_tags }}')">Garbage</button>
+<button class="button" onclick="submit('{{ url_tags }}')">Submit</button>
+
 
 </body>
 </html>

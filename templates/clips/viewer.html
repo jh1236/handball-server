@@ -14,7 +14,7 @@
     setup({{ id }}, "{{ key }}")
 </script>
 
-<h1><a href="/video?key={{ key }}" class="hide">Video Quiz!</a></h1>
+<h1><a href="/video?key={{ key }}" class="hide">Video {{ id }}</a></h1>
 <h3 style="display: inline">Starring:</h3> <i>{{ starring }}</i>
 
 <br>
@@ -23,22 +23,18 @@
 <br>
 <br>
 <div class="dropdown">
-    <button onclick="myFunction(this)" id="team" class="smallBtn dropbtn" style="background-color: #2a5d88;">
-        Team Outcome
-    </button>
+    <button onclick="myFunction(this)" id="team" class="smallBtn dropbtn" style="background-color: #2a5d88;">Team Outcome</button>
     <div class="dropdown-content">
         <p onclick="setTeamOutcome(1)" id="team1">Replay</p>
-        <p onclick="setTeamOutcome(2)" id="team2">Point for team</p>
-        <p onclick="setTeamOutcome(3)" id="team3">Point against team</p>
+        <p onclick="setTeamOutcome(2)" id="team2">Point Stairs Side</p>
+        <p onclick="setTeamOutcome(3)" id="team3">Point IGA Side</p>
         <p onclick="setTeamOutcome(4)" id="team4">Fault</p>
     </div>
 </div>
 <br>
 <br>
 <div class="dropdown">
-    <button onclick="myFunction(this)" id="personal" class="smallBtn dropbtn" style="background-color: #2a5d88;">
-        Personal Outcome
-    </button>
+    <button onclick="myFunction(this)" id="personal" class="smallBtn dropbtn" style="background-color: #2a5d88;">Personal Outcome</button>
     <div class="dropdown-content">
         <p onclick="setPersonalOutcome(1)" id="personal1">No Card</p>
         <p onclick="setPersonalOutcome(2)" id="personal2">Green Card</p>

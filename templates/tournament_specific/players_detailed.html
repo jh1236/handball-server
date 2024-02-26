@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Player Statistics</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_ladder.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
+<h1><a href="/{{tournament}}players/" class="hide">Players</a></h1>
+<table class="table" id="sort0">
+    <thead>
+    <tr>
+        {% for i, h in headers %}
+        <th onclick="sortTable(0, {{i}}, false)" style="width: 100px"><b>{{h}}</b></th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for i, image, link, player in players %}
+    <tr>
+                <th style="text-align: left;"><a href="/{{tournament}}players/{{link}}"
+                                         class="hide">{{i}}</a>
+        </th>
+        {% for stat in player %}
+                <td>{{ stat }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    <tr>
+        <th style="text-align: left;">Total</th>
+        {% for stat in total %}
+            <th>{{ stat }}</th>
+        {% endfor %}
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -57,9 +57,9 @@
     <table class="table">
         <tr>
             <td></td>
-            <th colspan="2"><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+            <th colspan="{{ game.teams[0].has_subbed + 2 }}"><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
                                   class="hide">{{ teams[0].name }}</a></b></th>
-            <th colspan="2"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+            <th colspan="{{ game.teams[1].has_subbed + 2 }}"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
                                                        class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
                 </a>{% endif %}</b></th>
             <th class="invisible">Spacerrrrrrr</th>
@@ -67,8 +67,8 @@
         {% for stat in stats %}
             <tr>
                 <th>{{ stat[0] }}:</th>
-                <td colspan="2">{{ stat[1] }}</td>
-                <td colspan="2">{{ stat[2] }}</td>
+                <td colspan="{{ game.teams[0].has_subbed + 2 }}">{{ stat[1] }}</td>
+                <td colspan="{{ game.teams[1].has_subbed + 2 }}">{{ stat[2] }}</td>
             </tr>
 
 
@@ -76,18 +76,18 @@
 
         <tr>
             <td></td>
-            {% for i in game.players() %}
-                <th><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}">{{ i }}</a></th>
+            {% for i in game.all_players() %}
+                <th><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}">{{ i }}{% if i.subbed_on %} (sub){% endif %}{% if i.subbed_off %}*{% endif %}
+                </a></th>
             {% endfor %}
 
         </tr>
-        {% for player in player_stats %}
+        {% for i, title in headings %}
             <tr>
-                <th>{{ player[0] }}:</th>
-                <td>{{ player[1] }}</td>
-                <td>{{ player[2] }}</td>
-                <td>{{ player[3] }}</td>
-                <td>{{ player[4] }}</td>
+                <th>{{ title }}:</th>
+                {% for j in game.all_players() %}
+                <td>{{ player_stats[j.nice_name()][i] }}</td>
+                {% endfor %}
             </tr>
         {% endfor %}
     </table>

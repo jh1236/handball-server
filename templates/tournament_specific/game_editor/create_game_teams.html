@@ -45,9 +45,8 @@
 <br>
 {% if officials.__len__() == 1 %}
     <button disabled class="button" id="umpire">Official</button>
-    <script>setOfficial('{{officials[0].nice_name()}}', '{{officials[0].tidy_name()}}')</script>
 {% else %}
-<div class="dropdown">
+    <div class="dropdown">
     <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
     <div class="dropdown-content">
         {% for i in officials %}
@@ -56,6 +55,8 @@
     </div>
 </div>
 {% endif %}
+<script>setOfficial('{{officials[0].nice_name()}}', '{{officials[0].tidy_name()}}')</script>
+
 <br>
 <br>
 <button onclick="createTeams()" class="button">Start</button>

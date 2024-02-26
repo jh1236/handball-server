@@ -1,0 +1,16 @@
+{
+    "details": {
+        "finals_generator": "Empty",
+        "fixtures_generator": "OneRoundEditable",
+        "name": "SUSS Practice Season Four",
+        "officials": "all",
+        "ranked": true,
+        "teams": "all",
+        "twoCourts": false
+    },
+    "finals": [],
+    "games": [
+        []
+    ],
+    "notes": ""
+}

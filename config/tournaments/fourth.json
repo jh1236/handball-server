@@ -20,7 +20,7 @@
                 "teamOne": {
                     "name": "Handchester United",
                     "players": [
-                        "Eddie Smith",
+                        "Edward Smith",
                         "Liam Cox"
                     ],
                     "score": 11
@@ -75,7 +75,7 @@
                 "official": "Zaiah Deards",
                 "protested": 0,
                 "resolved": false,
-                "scorer": "Eddie Smith",
+                "scorer": "Edward Smith",
                 "started": true,
                 "teamOne": {
                     "name": "Height Difference",
@@ -102,7 +102,7 @@
                 "game": "EE",
                 "id": 39,
                 "notes": " ",
-                "official": "Eddie Smith",
+                "official": "Edward Smith",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "Aimee Soudure",
@@ -173,7 +173,7 @@
                     "name": "Handchester United",
                     "players": [
                         "Liam Cox",
-                        "Eddie Smith"
+                        "Edward Smith"
                     ],
                     "score": 11
                 },
@@ -258,7 +258,7 @@
                 "game": "slSLSRSLSLSLSLARARSRSLSR",
                 "id": 1,
                 "notes": " ",
-                "official": "Eddie Smith",
+                "official": "Edward Smith",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "Aimee Soudure",
@@ -296,7 +296,7 @@
                 "teamOne": {
                     "name": "Handchester United",
                     "players": [
-                        "Eddie Smith",
+                        "Edward Smith",
                         "Liam Cox"
                     ],
                     "score": 7
@@ -446,7 +446,7 @@
                 "official": "Lachlan Banks",
                 "protested": 0,
                 "resolved": true,
-                "scorer": "Eddie Smith",
+                "scorer": "Edward Smith",
                 "started": true,
                 "teamOne": {
                     "name": "Team Weezer",
@@ -492,7 +492,7 @@
                     "name": "Handchester United",
                     "players": [
                         "Liam Cox",
-                        "Eddie Smith"
+                        "Edward Smith"
                     ],
                     "score": 12
                 }
@@ -565,7 +565,7 @@
                 "game": "slSLslararSLsrSLslarararfrsrar",
                 "id": 11,
                 "notes": " ",
-                "official": "Eddie Smith",
+                "official": "Edward Smith",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "Lachlan Banks",
@@ -643,7 +643,7 @@
                 "teamTwo": {
                     "name": "Handchester United",
                     "players": [
-                        "Eddie Smith",
+                        "Edward Smith",
                         "Liam Cox"
                     ],
                     "score": 11
@@ -689,10 +689,10 @@
                 "game": "slsrSLslslsrSRsrsrsrslarSRFRSLSLSLSRsl",
                 "id": 15,
                 "notes": " ",
-                "official": "Eddie Smith",
+                "official": "Edward Smith",
                 "protested": 0,
                 "resolved": false,
-                "scorer": "Eddie Smith",
+                "scorer": "Edward Smith",
                 "started": true,
                 "teamOne": {
                     "name": "*REDACTED*",
@@ -724,7 +724,7 @@
                 "official": "Lachlan Banks",
                 "protested": 0,
                 "resolved": false,
-                "scorer": "Eddie Smith",
+                "scorer": "Edward Smith",
                 "started": true,
                 "teamOne": {
                     "name": "Team Rocket",
@@ -804,7 +804,7 @@
                     "name": "Handchester United",
                     "players": [
                         "Liam Cox",
-                        "Eddie Smith"
+                        "Edward Smith"
                     ],
                     "score": 11
                 }
@@ -910,7 +910,7 @@
                 "game": "SRFLSLFLFLflSRslslslslGLslslSLslflSRgrSLslSRslSRsl",
                 "id": 22,
                 "notes": " ",
-                "official": "Eddie Smith",
+                "official": "Edward Smith",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "Alex Soudure",
@@ -1011,7 +1011,7 @@
                     "name": "Handchester United",
                     "players": [
                         "Liam Cox",
-                        "Eddie Smith"
+                        "Edward Smith"
                     ],
                     "score": 11
                 },
@@ -1035,7 +1035,7 @@
                 "official": "Alex Soudure",
                 "protested": 0,
                 "resolved": false,
-                "scorer": "Eddie Smith",
+                "scorer": "Edward Smith",
                 "started": true,
                 "teamOne": {
                     "name": "Operation Underkill",
@@ -1064,7 +1064,7 @@
                 "game": "SLyrARslslSLSRslSRARFLSRsrsrSLslSLSLslSL",
                 "id": 27,
                 "notes": " ",
-                "official": "Eddie Smith",
+                "official": "Edward Smith",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "Zaiah Deards",
@@ -1158,7 +1158,7 @@
                 "game": "SRsrSLsrSRsrsrSRsrarSRsrsrsrTTSRSLSRARARsrsrsr",
                 "id": 30,
                 "notes": " ",
-                "official": "Eddie Smith",
+                "official": "Edward Smith",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "Zaiah Deards",
@@ -1198,7 +1198,7 @@
                 "teamOne": {
                     "name": "Handchester United",
                     "players": [
-                        "Eddie Smith",
+                        "Edward Smith",
                         "Liam Cox"
                     ],
                     "score": 11
@@ -1223,7 +1223,7 @@
                 "official": "Jared Healy",
                 "protested": 0,
                 "resolved": false,
-                "scorer": "Eddie Smith",
+                "scorer": "Edward Smith",
                 "started": true,
                 "teamOne": {
                     "name": "GORGON WOOBT",

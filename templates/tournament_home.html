@@ -122,7 +122,7 @@
                     <td style="width:300px"><a class="hide"
                                                href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.name }}</a></td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.votes }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.get_stats()["B&F Votes"] }}</a>
                     </td>
                     <td style="width:140px; text-align: center"><a class="hide"
                                                                    href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.get_stats()["Points scored"] }}</a>

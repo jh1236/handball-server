@@ -1,12 +1,14 @@
-from utils.util import n_chunks
-from structure.Game import Game
 from FixtureMakers.FixtureMaker import FixtureMaker
-from structure.Team import BYE
+from structure.Game import Game
+from utils.util import n_chunks
 
 
 class Pooled(FixtureMaker):
     def get_generator(self):
-        pools = list(n_chunks(sorted(self.tournament.teams, key=lambda it: it.nice_name()), 2))
+        BYE = self.tournament.BYE
+        pools = list(
+            n_chunks(sorted(self.tournament.teams, key=lambda it: it.nice_name()), 2)
+        )
         for pool in pools:
             if len(pool) % 2 != 0:
                 pool += [BYE]

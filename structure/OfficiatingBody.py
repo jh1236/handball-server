@@ -3,10 +3,11 @@ from structure.Team import Team
 
 
 class Official:
-    def __init__(self, name: str, key: str, team: list[Team], primary: bool = False, finals: bool = False,
+    def __init__(self, name: str, key: str, team: list[Team], primary: bool = False, level: int = 1,
                  admin=False):
         self.admin = admin
-        self.finals: bool = finals
+        self.level: level = level
+        self.finals = 1
         self.name: str = name
         self._tidy_name: str = None
         self.team: list[Team] = team
@@ -87,7 +88,6 @@ class Official:
 
 NoOfficial = Official("No one", "", [])
 
-
 def get_officials(tournament) -> list[Official]:
     officials: list[Official] = []
     names = tournament.details["officials"]
@@ -97,7 +97,7 @@ def get_officials(tournament) -> list[Official]:
     with open("./config/officials.json", "r") as fp:
         for n, v in json.load(fp).items():
             team = [j for j in tournament.teams if n in [k.name for k in j.players]]
-            o: Official = Official(n, v["key"], team, primary=v["primary"], finals=v["finals"], admin = v["admin"])
+            o: Official = Official(n, v["key"], team, primary=v["primary"], level=v["level"], admin = v["admin"])
             if tournament.details["officials"] == "all" or n in names:
                 officials.append(o)
                 o.tournament = tournament

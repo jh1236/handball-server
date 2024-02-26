@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import List, Dict, Tuple
 
 from structure.Game import Game
-from structure.Team import BYE, Team
+from structure.Team import Team
 from FixtureMakers.FixtureMaker import FixtureMaker
 from utils.logging_handler import logger
 
@@ -22,7 +22,7 @@ class Swiss(FixtureMaker):
         """
         self.teams_fixed = self.tournament.teams.copy()
         if len(self.teams_fixed) % 2 == 1:
-            self.teams_fixed.append(BYE)
+            self.teams_fixed.append(self.tournament.BYE)
 
         self.max_rounds = len(self.teams_fixed) - 1
         for _ in range(self.round_count):
@@ -47,8 +47,8 @@ class Swiss(FixtureMaker):
         unfilled = sorted(
             self.teams_fixed,
             key=lambda a: (
-                -(a.games_won / (a.games_played or 1)),
-                a.points_for - a.points_against,
+                -(a.get_stats()["Games Won"] / (a.get_stats()["Games Played"] or 1)),
+                a.get_stats()["Point Difference"],
             ),
         )
 
@@ -58,7 +58,7 @@ class Swiss(FixtureMaker):
 
             for i, team in enumerate(unfilled):
                 if not target.has_played(team):
-                    roster.append(x := [target, unfilled.pop(i)])
+                    roster.append([target, unfilled.pop(i)])
                     break
             else:
                 # could not find a unique match,
