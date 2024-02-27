@@ -8,7 +8,7 @@ from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
 from structure.UniversalTournament import UniversalTournament
 from utils.statistics import get_player_stats
-from utils.permissions import admin_only, fetch_user, officials_only
+from utils.permissions import admin_only, fetch_user, officials_only, _no_permissions # Temporary till i make a function that can handle dynamic/game permissions
 from utils.util import fixture_sorter
 from website.website import numbers, sign
 
@@ -697,16 +697,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         team_two_players = [((1 - i), v) for i, v in enumerate(teams[1].players[:2])]
 
         # TODO: Write a permissions decorator for scorers and primary officials
-        if key not in [game.primary_official.key, game.scorer.key] + [
-            i.key for i in get_all_officials() if i.admin
-        ]:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/no_access.html",
-                    error="The password you entered is not correct",
-                ),
-                403,
-            )
+        if key not in [game.primary_official.key, game.scorer.key] + [i.key for i in get_all_officials() if i.admin]:
+            return _no_permissions()
         if not game.started:
             return (
                 render_template(
