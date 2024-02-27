@@ -28,6 +28,11 @@ def _no_permissions():
                 403,
             )
 
+def logout():
+    resp = redirect("/")
+    resp.delete_cookie("userKey")
+    return resp
+
 def login():
         stored_key =  request.cookies.get("userKey",None)
         if stored_key in [i.key for i in get_all_officials()]:
