@@ -11,9 +11,9 @@ let setup = (newId, newSwapped) => {
 
 function swap() {
     if (document.location.href.includes("swap")) {
-        document.location.href = window.location.href.replace("swap=true", "").replaceAll("&", "")
+        document.location.href = window.location.href.replace("?swap=true", "")
     } else {
-        document.location.href = window.location.href + "&swap=true"
+        document.location.href = window.location.href + "?swap=true"
     }
 }
 
@@ -40,6 +40,11 @@ let official = ""
 let setOfficial = (i, s) => {
     official = i
     document.getElementById("umpire").textContent = "Official: " + s
+}
+let scorer = ""
+let setScorer = (i, s) => {
+    scorer = i
+    document.getElementById("scorer").textContent = "Scorer: " + s
 }
 
 let lookup = ["Player One", "Player Two", "Substitute"]
@@ -81,6 +86,23 @@ setTeamServing = (i, s) => {
 }
 
 function start() {
+    if (official) {
+        fetch("/api/games/update/start", {
+            method: "POST",
+            body: JSON.stringify({
+                id: id,
+                firstTeamServed: lxor(first_serves, teamsSwapped),
+                swapTeamOne: left,
+                swapTeamTwo: right,
+                official: official,
+                scorer: scorer,
+                tournament: tournament.replace("/", "")
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(() => location.reload());
+    }
     fetch("/api/games/update/start", {
         method: "POST",
         body: JSON.stringify({
@@ -112,9 +134,8 @@ function createPlayers() {
         }
     }).then(
         (res) => {
-            let key = document.location.href.split("key=")[1]
             if (res.ok) {
-                document.location.href = `/${tournament}games/` + id + "/edit?key=" + key
+                document.location.href = `/${tournament}games/` + id + "/edit"
             } else {
                 alert("Error!")
             }
@@ -136,9 +157,8 @@ function createTeams() {
         }
     }).then(
         (res) => {
-            let key = document.location.href.split("key=")[1]
             if (res.ok) {
-                document.location.href = `/${tournament}games/` + id + "/edit?key=" + key
+                document.location.href = `/${tournament}games/` + id + "/edit"
             } else {
                 alert("Error!")
             }

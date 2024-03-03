@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ user.name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script>load("")</script>
+
+<a href="/user">
+    <img src="/api/users/image?name={{ user.nice_name() }}" class="title_logo"></a>
+<h1><a href="/user/" class="hide">{{ user.name }}</a></h1>
+
+<div>
+    <div style="bottom: 100%;width: 60%;float:left">
+        <div style="min-height: 200px">
+            <h2>Games To Play</h2>
+            {% if not to_play %}
+                <br>
+                <br>
+                <i>No Ongoing Games</i>
+            {% else %}
+                <table class="table">
+                <tbody>
+                <tr>
+                    <th>Team One</th>
+                    <td></td>
+                    <th>Team Two</th>
+                    <th>Court</th>
+                    {% for i in to_play %}
+                        <tr>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">{{ i.teams[0] }}</a></td>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">vs</a></td>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">{{ i.teams[1] }}</a></td>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">{{ i.court_display() }}</a></td>
+                        </tr>
+                    {% endfor %}
+            {% endif %}
+            </tbody>
+
+            </table>
+        </div>
+        <div style="min-height: 200px">
+            <h2>Games To Officiate</h2>
+            {% if not to_officiate %}
+                <br>
+                <br>
+                <i>No Ongoing Games</i>
+            {% else %}
+                <table class="table">
+                <tbody>
+                <tr>
+                    <th>Team One</th>
+                    <td></td>
+                    <th>Team Two</th>
+                    <th>Official</th>
+                    <th>Scorer</th>
+                    <th>Court</th>
+                    {% for i in to_play %}
+                        <tr>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">{{ i.teams[0] }}</a></td>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">vs</a></td>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">{{ i.teams[1] }}</a></td>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">{{ i.primary_official }}</a></td>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">{{ i.scorer }}</a></td>
+                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">{{ i.court_display() }}</a></td>
+                        </tr>
+                    {% endfor %}
+            {% endif %}
+            </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div style="float:left;width: 25%; height: 100%">
+        <div style="min-height: 200px">
+        <h2>Videos Set By UM</h2>
+        {% if reqd %}
+            {% for i in reqd %}
+                <p><a class="hide" href="/video/{{ i }}?key={{ key }}&tags=required,new"><i>Video {{ i }}</i></a></p>
+            {% endfor %}
+        {% else %}
+            <br>
+            <br>
+            <i>There are no required videos at this time</i>
+        {% endif %}
+        </div>
+        <div>
+        <h2><a class="hide" href="/players/{{ user.nice_name() }}">My Stats</a></h2>
+            {% for k, v in (user.get_stats()).items() %}
+                <p>{{ k }}:<i> {{ v }}</i></p>
+            {% endfor %}
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+<br>
+<br>
+</body>
+</html>

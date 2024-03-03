@@ -40,8 +40,7 @@ class Player:
         return self.name
 
     def total_cards(self):
-        total = 0
-        return total
+        return self.get_stats_detailed()["Cards"]
 
     def get_stats(self):
         return get_player_stats(self.tournament, self, 0)
@@ -253,6 +252,27 @@ class GamePlayer:
             "Green Cards": self.green_cards,
             "Yellow Cards": self.yellow_cards,
             "Red Cards": self.red_cards,
+        }
+
+    def get_stats_detailed(self):
+        return {
+            "Points scored": self.points_scored,
+            "Aces": self.aces_scored,
+            "Max Ace Streak": max(self.ace_streak),
+            "Max Serving Streak": max(self.serve_streak),
+            "Serves received": self.serves_received,
+            "Serves returned": self.serve_return,
+            "Percentage of Points scored": 100 * self.points_scored / (self.game.rounds or 1),
+            "Return Rate": 100 * self.serve_return / (self.serves_received or 1),
+            "Ace Rate": 100 * self.aces_scored / (self.serves_received or 1),
+            "Faults": self.faults,
+            "Double Faults": self.double_faults,
+            "Rounds Played": self.time_on_court,
+            "Rounds On Bench": self.time_carded,
+            "Green Cards": self.green_cards,
+            "Yellow Cards": self.yellow_cards,
+            "Red Cards": self.red_cards,
+            "Cards": self.red_cards + self.yellow_cards + self.green_cards,
         }
 
     def fault(self):

@@ -11,9 +11,9 @@ setTournament = t => tournament = t
 
 function swap() {
     if (document.location.href.includes("swap")) {
-        document.location.href = window.location.href.replace("swap=true", "").replaceAll("&", "")
+        document.location.href = window.location.href.replace("?swap=true", "")
     } else {
-        document.location.href = window.location.href + "&swap=true"
+        document.location.href = window.location.href + "?swap=true"
     }
 }
 

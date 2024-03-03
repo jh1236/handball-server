@@ -14,7 +14,8 @@
     <h1 class="big"><a class="hide" href="/{{ tournament }}games/{{ game.id }}/display">{{ game.score_string() }}</a>
     </h1>
     <p><b>Round:</b> <a class="hide"
-                        href="/{{ tournament }}fixtures/detailed?round={{ roundNumber - 1 + game.is_final * game.tournament.fixtures.__len__() }}"><i>{{ roundNumber }}</i></a></p>
+                        href="/{{ tournament }}fixtures/detailed?round={{ roundNumber - 1 + game.is_final * game.tournament.fixtures.__len__() }}"><i>{{ roundNumber }}</i></a>
+    </p>
     <p><b>Court:</b> <a class="hide"
                         href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court_display() }}</i></a>
     </p>
@@ -57,10 +58,12 @@
     <table class="table">
         <tr>
             <td></td>
-            <th colspan="{{ game.teams[0].has_subbed + 2 }}"><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
-                                  class="hide">{{ teams[0].name }}</a></b></th>
-            <th colspan="{{ game.teams[1].has_subbed + 2 }}"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
-                                                       class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
+            <th colspan="{{ game.teams[0].has_subbed + 2 }}"><b><a
+                    href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+                    class="hide">{{ teams[0].name }}</a></b></th>
+            <th colspan="{{ game.teams[1].has_subbed + 2 }}"><b>{% if not game.bye %}
+                <a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+                   class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
                 </a>{% endif %}</b></th>
             <th class="invisible">Spacerrrrrrr</th>
         </tr>
@@ -77,7 +80,10 @@
         <tr>
             <td></td>
             {% for i in game.all_players() %}
-                <th><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}">{{ i }}{% if i.subbed_on %} (sub){% endif %}{% if i.subbed_off %}*{% endif %}
+                <th {% if i.team.all_players().__len__() == 1 %}
+                    colspan="2" {% endif %}
+                ><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}">
+                    {{ i }}{% if i.subbed_on %} (sub){% endif %}{% if i.subbed_off %}*{% endif %}
                 </a></th>
             {% endfor %}
 
@@ -86,7 +92,10 @@
             <tr>
                 <th>{{ title }}:</th>
                 {% for j in game.all_players() %}
-                <td>{{ player_stats[j.nice_name()][i] }}</td>
+                    <td{% if j.team.all_players().__len__() == 1 %}
+                        colspan="2" {% endif %}
+                    >{{ player_stats[j.nice_name()][i] }}</td>
+
                 {% endfor %}
             </tr>
         {% endfor %}

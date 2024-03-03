@@ -9,7 +9,7 @@
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}", "{{ key }}")</script>
+<script>load("{{tournament}}", true)</script>
 
 <h1><a href="/{{tournament}}teams/" class="hide">Teams</a></h1>
 {% for i in teams %}

@@ -266,6 +266,9 @@ class GameTeam:
         if any(i.nice_name().startswith("null") for i in self.players[:2]):
             self.game.ranked = False
 
+    def all_players(self):
+        return [i for i in self.players if (not i.started_sub or i.started_sub and i.subbed_on) and not "null" in i.nice_name()]
+
     def score_point(self, first_player: bool | None = None, ace: bool = False):
         if ace:
             self.info(

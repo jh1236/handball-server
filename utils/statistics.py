@@ -2,7 +2,6 @@ import itertools
 import math
 
 
-
 K = 40.0
 initial_elo = 1500
 D = 3000.0
@@ -17,12 +16,62 @@ def probability(other, me):
 def calc_elo(elo, elo_other, first_won):
     pa = probability(elo_other, elo)
     ra = K * (first_won - pa)
-
     return ra
+
+
+def get_player_stats_categories(stats):
+    out = {
+        "Serving": {
+            "Points served": stats["Points served"],
+            "Aces scored": stats["Aces scored"],
+            "Faults": stats["Faults"],
+            "Double Faults": stats["Double Faults"],
+            "Aces Per Game": stats["Aces Per Game"],
+            "Faults Per Game": stats["Faults Per Game"],
+            "Serves Per Ace": stats["Serves Per Ace"],
+            "Serves Per Fault": stats["Serves Per Fault"],
+            "Serve Ace Rate": stats["Serve Ace Rate"],
+            "Serve Fault Rate": stats["Serve Fault Rate"],
+            "Serving Conversion Rate": stats["Serving Conversion Rate"],
+            "Average Serving Streak": stats["Average Serving Streak"],
+            "Max. Serving Streak": stats["Max. Serving Streak"],
+            "Max. Ace Streak": stats["Max. Ace Streak"],
+            "Serves Received": stats["Serves Received"],
+        },
+        "Misconduct": {
+            "Green Cards": stats["Green Cards"],
+            "Yellow Cards": stats["Yellow Cards"],
+            "Red Cards": stats["Red Cards"],
+            "Cards": stats["Cards"],
+            "Rounds Carded": stats["Rounds Carded"],
+            "Cards Per Game": stats["Cards Per Game"],
+            "Points Per Card": stats["Points Per Card"],
+        },
+        "Game Performance": {
+            "B&F Votes": stats["B&F Votes"],
+            "Elo": stats["Elo"],
+            "Games Played": stats["Games Played"],
+            "Games Won": stats["Games Won"],
+            "Percentage": stats["Percentage"],
+            "Net Elo Delta": stats["Net Elo Delta"],
+            "Average Elo Delta": stats["Average Elo Delta"],
+            "Votes Per 100 Games": stats["Votes Per 100 Games"],
+        },
+        "Point Performance": {
+            "Points scored": stats["Points scored"],
+            "Rounds on Court": stats["Rounds on Court"],
+            "Points Per Game": stats["Points Per Game"],
+            "Percentage of Points scored": stats["Percentage of Points scored"],
+            "Serves Returned": stats["Serves Returned"],
+            "Return Rate": stats["Return Rate"],
+        },
+    }
+    return out
 
 
 def get_player_stats(tournament, player, detail=0, team=None):
     from website.website import sign
+
     games = []
     game_players = []
     if tournament:
@@ -31,7 +80,6 @@ def get_player_stats(tournament, player, detail=0, team=None):
         from start import comps
 
         tournaments = comps.values()
-
 
     for t in tournaments:
         if player is None:
@@ -63,12 +111,16 @@ def get_player_stats(tournament, player, detail=0, team=None):
     faults = sum([i.faults for i in game_players])
     double_faults = sum([i.double_faults for i in game_players])
     played = len(game_players)
-    wins = played if not player else len(
-        [
-            i
-            for i in games
-            if player.nice_name() in [j.nice_name() for j in i.winner().players]
-        ]
+    wins = (
+        played
+        if not player
+        else len(
+            [
+                i
+                for i in games
+                if player.nice_name() in [j.nice_name() for j in i.winner().players]
+            ]
+        )
     )
     served = sum([i.points_served for i in game_players])
     won_while_serving = sum([i.won_while_serving for i in game_players])
@@ -102,8 +154,10 @@ def get_player_stats(tournament, player, detail=0, team=None):
     serves_received = sum(i.serves_received for i in game_players)
     serves_returned = sum(i.serve_return for i in game_players)
     total_elo_delta = sum(i.elo_delta for i in game_players if i.elo_delta)
-    avg_elo_delta = sum(i.elo_delta for i in game_players if i.elo_delta) / (len(game_players) or 1)
-    cards = (green_cards + yellow_cards + red_cards)
+    avg_elo_delta = sum(i.elo_delta for i in game_players if i.elo_delta) / (
+        len(game_players) or 1
+    )
+    cards = green_cards + yellow_cards + red_cards
     out |= {
         "Percentage": f"{100 * (wins / (played or 1)): .1f}%",
         "Net Elo Delta": f"{sign(total_elo_delta)}{abs(total_elo_delta):.2f}",
@@ -112,13 +166,13 @@ def get_player_stats(tournament, player, detail=0, team=None):
         "Points Per Game": round(points_scored / (played or 1), 2),
         "Aces Per Game": round(aces_scored / (played or 1), 2),
         "Faults Per Game": round(faults / (played or 1), 2),
-        "Cards Per Game": round(
-            cards / (played or 1), 2
-        ),
+        "Cards Per Game": round(cards / (played or 1), 2),
+        "Cards": cards,
         "Points Per Card": "∞" if not cards else round(time_on_court / cards, 2),
         "Serves Per Ace": "∞" if not aces_scored else round(served / aces_scored, 2),
         "Serves Per Fault": "∞" if not faults else round(served / faults, 2),
         "Serve Ace Rate": f"{aces_scored / (served or 1) * 100: .1f}%",
+        "Serve Fault Rate": f"{faults / (served or 1) * 100: .1f}%",
         "Percentage of Points scored": f"{points_scored / ((time_on_court + time_carded) or 1) * 100: .1f}%",
         "Serving Conversion Rate": f"{won_while_serving / (served or 1) * 100: .1f}%",
         "Average Serving Streak": round(avg_streak_len, 2),
@@ -208,12 +262,14 @@ def get_player_stats(tournament, player, detail=0, team=None):
                 "Points Per Game": round(court_points_scored / (court_played or 1), 2),
                 "Aces Per Game": round(court_aces_scored / (court_played or 1), 2),
                 "Faults Per Game": round(court_faults / (court_played or 1), 2),
+                "Cards": (court_green_cards + court_yellow_cards + court_red_cards),
                 "Cards Per Game": round(
                     (court_green_cards + court_yellow_cards + court_red_cards)
                     / (court_played or 1),
                     2,
                 ),
                 "Serve Ace Rate": f"{court_aces_scored / (court_served or 1) * 100: .1f}%",
+                "Serve Fault Rate": f"{court_faults / (court_served or 1) * 100: .1f}%",
                 "Percentage of Points scored": f"{court_points_scored / ((court_time_on_court + court_time_carded) or 1) * 100: .1f}%",
                 "Serving Conversion Rate": f"{court_won_while_serving / (court_served or 1) * 100: .1f}%",
                 "Average Serving Streak": round(court_avg_streak_len, 2),

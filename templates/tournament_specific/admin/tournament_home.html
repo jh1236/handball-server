@@ -10,7 +10,7 @@
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script>load("{{tournament}}", "{{ key }}")</script>
+<script>load("{{tournament}}", true)</script>
 
 <a href="/{{ tournament }}/admin">
     <img src="/api/tournaments/image?name={{ tourney.nice_name() }}" class="title_logo"></a>
@@ -89,19 +89,19 @@
             {% for p in players %}
                 <tr>
                     <td style="width:300px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.name }}</a>
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p }}</a>
                     </td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.green_cards }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats()["Green Cards"] }}</a>
                     </td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.yellow_cards }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats()["Yellow Cards"] }}</a>
                     </td>
                     <td style="width:140px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.red_cards }}</a>
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats()["Red Cards"] }}</a>
                     </td>
                     <td style="width:140px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.time_carded }}</a>
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats()["Rounds Carded"] }}</a>
                     </td>
                 </tr>
             {% endfor %}

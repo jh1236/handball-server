@@ -290,7 +290,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
             for i in comps[tournament].players()
-            if (i.played or len(comps[tournament].fixtures) < 2)
+            if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
             and not i.nice_name().startswith("null")
         ]
         headers = ["Name"] + [

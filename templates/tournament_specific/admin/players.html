@@ -9,7 +9,7 @@
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}", "{{ key }}")</script>
+<script>load("{{tournament}}", true)</script>
 
 <script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
 <h1><a href="/{{tournament}}players/admin" class="hide">Players</a></h1>

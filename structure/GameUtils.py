@@ -42,21 +42,29 @@ def game_string_to_commentary(game: Game) -> list[str]:
         players = teams[not j[1].isupper()]
         team = game.teams[not j[1].isupper()]
         player = players[not first].first_name()
+        if "null" in players[not first].nice_name():
+            player = players[first].first_name()
         team_mate = [i for i in players if i.first_name() != player][0].first_name()
         other_team = game.teams[j[1].isupper()]
         other_players = teams[j[1].isupper()]
         other_player = rand.choice(other_players[:2]).first_name()
+        if "null" in other_player.lower():
+            other_player = other_players[0].first_name()
         c = j[0].lower()
 
         if c == "a":
             other_player = other_players[
                 [i.first_name() for i in players].index(player)
             ].first_name()
+            if "null" in other_player.lower():
+                other_player = other_players[0].first_name()
         elif c == "t":
             player = rand.choice(players).first_name()
         elif c == "x":
             teams[not j[1].isupper()] = game.teams[not j[1].isupper()].players
             team_mate = players[-1].first_name()
+        if c == "v" and "null" in players[not first].nice_name():
+            continue
         if c.isdigit():
             if int(c) < 3:
                 c = int(c) + 10

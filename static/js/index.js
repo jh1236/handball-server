@@ -1,18 +1,43 @@
-let load = (s, admin=false) => {
-    let div = document.getElementById("navBar")
-    div.style = "position: fixed;top: 2%;left: 2%;right:100%;white-space:nowrap;"
+function logout() {
+    document.cookie.split(";").forEach(function (c) {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    if (location.toString().includes("admin")) {
+        document.location = location.toString().replace("/admin", "")
+    } else {
+        location.reload()
+    }
+
+
+}
+
+let load = (s, admin = false) => {
+    let masterDiv = document.getElementById("navBar")
+    let navDiv = document.createElement("div")
+    let userDiv = document.createElement("div")
+    masterDiv.append(userDiv)
+    masterDiv.append(navDiv)
+    navDiv.style = "position: fixed;top: 2%;left: 2%;right:100%;white-space:nowrap;"
+    navDiv.style.zIndex = "100"
+    userDiv.style = "top: 0%;left: 0%;width:100%;white-space:nowrap;height:20pxmargin-left: auto;margin-right: 0;"
+    userDiv.style.backgroundColor = getComputedStyle(masterDiv).getPropertyValue("--color-bg")
+    userDiv.style.zIndex = "99"
+// Add User info
+
+
+
 
 // Add Logo
     let para = document.createElement("p")
     let a = document.createElement('a');
     let image = document.createElement("img")
     if (admin) {
-        a.href = "/" + s + "admin?key=" + admin
+        a.href = "/" + s + "admin"
     } else {
         a.href = "/" + s
     }
     if (s) {
-        image.src = `/api/tournaments/image?name=${s.replace("/","")}`
+        image.src = `/api/tournaments/image?name=${s.replace("/", "")}`
     } else {
         image.src = "/api/image?name=SUSS"
     }
@@ -27,7 +52,7 @@ let load = (s, admin=false) => {
     image.className = "logo2"
     a.append(image)
     para.append(a)
-    div.append(para)
+    navDiv.append(para)
 
 
     //Add NavBar
@@ -37,7 +62,7 @@ let load = (s, admin=false) => {
         h.className = "nav"
         let a2 = document.createElement('a');
         if (admin && hasAdmin) {
-            a2.href = link + "/admin?key=" + admin
+            a2.href = link + "/admin"
         } else {
             a2.href = link
         }
@@ -57,12 +82,18 @@ let load = (s, admin=false) => {
     addToNavBar("Teams", `/${s}teams`, true)
     addToNavBar("Ladder", `/${s}ladder`, false)
     addToNavBar("Players", `/${s}players/`, true)
-    addToNavBar("Officials", `/${s}officials`,false)
+    addToNavBar("Officials", `/${s}officials`, false)
     addToNavBar("Documents", "/documents", false)
+    if (document.cookie.includes("userName")) {
+        addToNavBar(document.cookie.split("userName=")[1].split(";")[0].replaceAll('"',""),"/user")
+    } else {
+        addToNavBar("Log In", "/user")
+    }
     var toInsert = document.createElement("div");
     toInsert.innerHTML = "©2023 Squarers' United Sporting Syndicate. All rights reserved.";
     toInsert.style.position = "absolute";
     toInsert.style.bottom = "0px";
     toInsert.style.width = "100%";
-    toInsert.style.textAlign="center";
+    toInsert.style.textAlign = "center";
+    document.append(toInsert)
 }

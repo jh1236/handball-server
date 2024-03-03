@@ -43,6 +43,7 @@ def login():
         if key in [i.key for i in get_all_officials()]:
             resp = redirect(request.base_url) # TODO: find a nice way to do this that doesnt look so cancer
             resp.set_cookie("userKey",key)
+            resp.set_cookie("userName",next(i for i in get_all_officials() if i.key == key).name)
             return resp
         else:
             return _incorrect_password()

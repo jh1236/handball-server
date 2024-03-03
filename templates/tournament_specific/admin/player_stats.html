@@ -9,7 +9,7 @@
 <body>
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}", "{{ key }}")</script>
+<script>load("{{tournament}}", true)</script>
 
 <div style="top:0;left:0;bottom: 100%;width: 66%">
     <a href="/{{tournament}}teams/{{player.team.nice_name()}}/admin">

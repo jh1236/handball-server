@@ -50,6 +50,12 @@ function sortTable(id, n, fix = true) {
             if (y === "-") {
                 y = -1
             }
+            if (x === "∞") {
+                x = 99999
+            }
+            if (y === "∞") {
+                y = 99999
+            }
             if (!isNaN(x)) {
                 x = Number(x)
                 y = Number(y)

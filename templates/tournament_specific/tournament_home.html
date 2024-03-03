@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ tourney.name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div id="navBar"></div>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script>load("{{tournament}}")</script>
+
+<a href="/{{ tournament }}">
+    <img src="/api/tournaments/image?name={{ tourney.nice_name() }}" class="title_logo"></a>
+<h1><a href="/{{ tournament }}" class="hide">{{ tourney.name }}</a></h1>
+
+<div>
+    <div style="bottom: 100%;width: 60%;float:left">
+        <div style="min-height: 200px">
+            <h2>Ongoing Games</h2>
+
+            {% if not ongoing %}
+                <br>
+                <br>
+                <i>No Ongoing Games</i>
+            {% else %}
+                <table class="table">
+                <tbody>
+                <tr>
+                    <th>Team One</th>
+                    <td></td>
+                    <th>Team Two</th>
+                    <th>Score</th>
+                    {% for i in ongoing %}
+                        <tr>
+                            <td><a href="/{{ tournament }}games/{{ i.id }}" class="hide">{{ i.teams[0] }}</a></td>
+                            <td><a href="/{{ tournament }}games/{{ i.id }}" class="hide">vs</a></td>
+                            <td><a href="/{{ tournament }}games/{{ i.id }}" class="hide">{{ i.teams[1] }}</a></td>
+                            <td><a href="/{{ tournament }}games/{{ i.id }}" class="hide">{{ i.score_string() }}</a></td>
+                        </tr>
+                    {% endfor %}
+            {% endif %}
+            </tbody>
+
+            </table>
+        </div>
+        <div style="min-height: 200px">
+            <h2><a class="hide" href="/{{ tournament }}fixtures/">Current Round</a></h2>
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th>Team One</th>
+                    <td></td>
+                    <th>Team Two</th>
+                    <th>Score</th>
+                </tr>
+                {% for i in current_round %}
+                    <tr>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}" class="hide">{{ i.teams[0] }}</a></td>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}" class="hide">vs</a></td>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}" class="hide">{{ i.teams[1] }}</a></td>
+                        <td><a href="/{{ tournament }}games/{{ i.id }}" class="hide">{{ i.score_string() }}</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="min-height: 200px">
+            <a href="/{{ tournament }}admin" class="hide"><h2>Notices</h2></a>
+            <p><i>{{ notes }}</i></p>
+        </div>
+        {% if tourney.fixtures_class.manual_allowed() and not in_progress %}
+            <button class="button" onclick="document.location.href = '/{{ tournament }}/create'">New Game</button>
+        {% endif %}
+    </div>
+    <div style="float:left;width: 25%; height: 100%">
+        <h2><a class="hide" href="/{{ tournament }}ladder/">Ladder</a></h2>
+
+        <table class="table">
+
+            {% for i, l in ladder %}
+                <tr>
+                    <th colspan="4"><a class="hide" href="/{{ tournament }}ladder/">{{ i }}</a></th>
+                </tr>
+                <tr>
+                    <th style="width:30px">Rank</th>
+                    <th>Team</th>
+                    <th>Games Won</th>
+                    <th>Games Played</th>
+                </tr>
+                {% for j, team in l %}
+                <tr>
+                    <td style="width:30px"><a class="hide"
+                                              href="/{{ tournament }}teams/{{ team.nice_name() }}"><i>{{ j }}</i></a>
+                    </td>
+                    <td style="width:200px; text-align: center"><a class="hide"
+                                                                   href="/{{ tournament }}teams/{{ team.nice_name() }}">{{ team.name }}</a>
+                    </td>
+                    <td style="width:200px"><a class="hide"
+                                               href="/{{ tournament }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Won"] }}</a>
+                    </td>
+                    <td style="width:200px"><a class="hide"
+                                               href="/{{ tournament }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Played"] }}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+        <h2><a class="hide" href="/{{ tournament }}players/">Players</a></h2>
+
+        <table class="table">
+            <tr>
+                <th style="width:400px">Name</th>
+                <th style="width:140px; text-align: center">B&F Votes</th>
+                <th style="width:140px">Points Scored</th>
+                <th style="width:140px">Aces Scored</th>
+                <th style="width:140px">Cards Received</th>
+            </tr>
+            {% for p in players %}
+                <tr>
+                    <td style="width:300px"><a class="hide"
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.name }}</a></td>
+                    <td style="width:140px; text-align: center"><a class="hide"
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.get_stats()["B&F Votes"] }}</a>
+                    </td>
+                    <td style="width:140px; text-align: center"><a class="hide"
+                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.get_stats()["Points scored"] }}</a>
+                    </td>
+                    <td style="width:140px"><a class="hide"
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.get_stats()["Aces scored"] }}</a>
+                    </td>
+                    <td style="width:140px"><a class="hide"
+                                               href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.total_cards() }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <br>
+    <br>
+</div>
+<br>
+<br>
+</body>
+</html>

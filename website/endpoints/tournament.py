@@ -1,12 +1,17 @@
+import io
 import json
 import os
 
 from flask import request, send_file
 
+from structure.AllTournament import get_all_players
 from structure.Game import Game
 from structure.Team import Team
 from utils.logging_handler import logger
-
+import numpy as np
+from flask import request, send_file, Response
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 def add_tourney_endpoints(app, comps):
 

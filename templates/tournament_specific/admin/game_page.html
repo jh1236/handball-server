@@ -10,7 +10,7 @@
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-<script>load("{{tournament}}", "{{ key }}")</script>
+<script>load("{{tournament}}", true)</script>
 <script>setTournament("{{tournament}}")</script>
 <script>setId("{{game.id}}")</script>
 <div style="top:0;left:0;bottom: 100%;width: 66%">

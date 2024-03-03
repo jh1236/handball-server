@@ -55,8 +55,10 @@ def add_game_endpoints(app, comps):
         tournament = request.json["tournament"]
         logger.info(f"Request for start: {request.json}")
         game_id = request.json["id"]
-
-        comps[tournament].get_game(game_id).start(
+        game = comps[tournament].get_game(game_id)
+        if "official" in request.json:
+            game.set_primary_official(next(i for i in comps[tournament].officials if i.nice_name() == request.json["official"]))
+        game.start(
             request.json["firstTeamServed"],
             request.json["swapTeamOne"],
             request.json["swapTeamTwo"],
