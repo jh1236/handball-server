@@ -34,12 +34,11 @@ def logout():
     return resp
 
 def login():
-        stored_key =  request.cookies.get("userKey",None)
-        if stored_key in [i.key for i in get_all_officials()]:
-            return False # if the key already exists then we don't need to get the password
-        
         key = request.args.get("key", None)
-        if key is None:
+        if key is None: # this is done so if you want to change your password you can do it easily live
+            stored_key =  request.cookies.get("userKey",None)
+            if stored_key in [i.key for i in get_all_officials()]:
+                return False # if the key already exists then we don't need to get the password
             return _requires_password()
         if key in [i.key for i in get_all_officials()]:
             resp = redirect(request.base_url) # TODO: find a nice way to do this that doesnt look so cancer
