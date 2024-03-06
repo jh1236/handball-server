@@ -3,14 +3,17 @@ import json
 from flask import request, render_template
 
 from structure.AllTournament import get_all_games
-from structure.GameUtils import game_string_to_commentary
+from structure.GameUtils import game_string_to_commentary, game_string_to_list
 from structure.Player import Player
 from structure.Team import Team
 from structure.Tournament import Tournament
+from utils.statistics import get_player_stats
 from utils.util import fixture_sorter
 from website.website import sign
 
 from utils.permissions import admin_only, fetch_user
+
+
 def add_admin_pages(app, comps: dict[str, Tournament]):
     @app.get("/<tournament>/fixtures/admin")
     @admin_only
@@ -64,11 +67,11 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             ]
         if player is not None:
             fixtures = [
-                [j for j in i if player in [k.nice_name() for k in j.players()]]
+                [j for j in i if player in [k.nice_name() for k in j.all_players]]
                 for i in fixtures
             ]
             finals = [
-                [j for j in i if player in [k.nice_name() for k in j.players()]]
+                [j for j in i if player in [k.nice_name() for k in j.all_players]]
                 for i in finals
             ]
         fixtures = [
@@ -133,7 +136,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         team_dicts = [i.get_stats() for i in teams]
         stats = [(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]]
         best = game.best_player.tidy_name() if game.best_player else "TBD"
-        players = game.players()
+        players = game.current_players
         round_number = game.round_number + 1
         prev_matches = []
         for i in get_all_games():
@@ -187,7 +190,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 stats=stats,
                 player_stats=player_stats,
                 official=game.primary_official,
-                commentary=game_string_to_commentary(game),
+                commentary=game_string_to_list(game),
                 best=best,
                 roundNumber=round_number,
                 prev_matches=prev_matches,
@@ -228,7 +231,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                     )
 
         players = [
-            (i.name, i.nice_name(), [(k, v) for k, v in i.get_stats().items()])
+            (i.name, i.nice_name(), [(k, v) for k, v in get_player_stats(comps[tournament], i, team=team, detail=0).items()])
             for i in team.players
         ]
         return (
@@ -240,10 +243,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 key_games=key_matches,
                 tournament=f"{tournament}/",
                 players=players,
-                ),
+            ),
             200,
         )
-
 
     @app.get("/<tournament>/teams/admin")
     @admin_only
@@ -258,7 +260,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 "tournament_specific/admin/stats.html",
                 teams=teams,
                 tournament=f"{tournament}/",
-                ),
+            ),
             200,
         )
 
@@ -289,7 +291,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 i.nice_name(),
                 [(v, priority[k]) for k, v in i.get_stats().items()],
             )
-            for i in comps[tournament].players()
+            for i in comps[tournament].players
             if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
             and not i.nice_name().startswith("null")
         ]
@@ -302,14 +304,14 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
                 players=sorted(players),
                 tournament=f"{tournament}/",
-                ),
+            ),
             200,
         )
 
     @app.get("/<tournament>/players/<player_name>/admin")
     @admin_only
     def admin_player_stats(tournament, player_name):
-        if player_name not in [i.nice_name() for i in comps[tournament].players()]:
+        if player_name not in [i.nice_name() for i in comps[tournament].players]:
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -318,12 +320,12 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 400,
             )
         player = [
-            i for i in comps[tournament].players() if player_name == i.nice_name()
+            i for i in comps[tournament].players if player_name == i.nice_name()
         ][0]
         noteable_games = []
         cards = []
         for i in comps[tournament].games_to_list():
-            if player_name not in [j.nice_name() for j in i.players()] or i.bye:
+            if player_name not in [j.nice_name() for j in i.playing_players] or i.bye:
                 continue
             gt = next(
                 t for t in i.teams if player_name in [j.nice_name() for j in t.players]
@@ -364,7 +366,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 cards=cards,
                 noteable_games=noteable_games,
                 tournament=f"{tournament}/",
-                ),
+            ),
             200,
         )
 
@@ -397,7 +399,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             all([i.bye for i in current_round]) and len(comps[tournament].fixtures) > 1
         ):  # basically just for home and aways
             current_round = comps[tournament].fixtures[-2]
-        players = comps[tournament].players()
+        players = comps[tournament].players
         players = [i for i in players if "null" not in i.nice_name()]
         players.sort(key=lambda a: -a.total_cards())
         if len(players) > 10:

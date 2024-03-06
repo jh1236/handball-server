@@ -31,6 +31,7 @@ def _no_permissions():
 def logout():
     resp = redirect("/")
     resp.delete_cookie("userKey")
+    resp.delete_cookie("userName")
     return resp
 
 def login():

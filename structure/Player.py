@@ -100,6 +100,7 @@ class GamePlayer:
     @property
     def elo_delta_string(self):
         from website.website import sign
+
         return f"{round(self.elo_at_start, 2)}" + (
             f"  [{sign(self.elo_delta)}{round(abs(self.elo_delta), 2)}]"
             if self.elo_delta
@@ -142,7 +143,7 @@ class GamePlayer:
         if " " not in self.name:
             return self.name
         first, second = self.name.split(" ", 1)
-        others = self.game.players()
+        others = self.game.current_players
         for i in others:
             if i.name == self.name or " " not in i.name:
                 continue
@@ -226,7 +227,7 @@ class GamePlayer:
             self._tidy_name = self.name
             return self.name
         first, second = self.name.split(" ", 1)
-        others = self.game.tournament.players()
+        others = self.game.tournament.players
         for i in others:
             if i.name == self.name:
                 continue
@@ -255,16 +256,39 @@ class GamePlayer:
         }
 
     def get_stats_detailed(self):
+        from start import comps
+
+        games_total = 0
+        for i in comps.values():
+            if i.details["sort"] < self.game.tournament.details["sort"]:
+                for j in i.games_to_list():
+                    if j.ranked and self.nice_name() in [
+                        k.nice_name() for k in j.playing_players
+                    ]:
+                        games_total += 1
+        for i in self.game.tournament.games_to_list():
+            if i.id >= self.game.id:
+                break
+            if i.ranked and self.nice_name() in [
+                k.nice_name() for k in i.playing_players
+            ]:
+                games_total += 1
         return {
+            "Elo Delta": self.elo_delta if self.elo_delta else 0,
+            "Elo": self.elo_at_start + (self.elo_delta if self.elo_delta else 0),
             "Points scored": self.points_scored,
+            "Points served": self.points_served,
+            "Timeline": games_total,
             "Aces": self.aces_scored,
             "Max Ace Streak": max(self.ace_streak),
             "Max Serving Streak": max(self.serve_streak),
             "Serves received": self.serves_received,
             "Serves returned": self.serve_return,
-            "Percentage of Points scored": 100 * self.points_scored / (self.game.rounds or 1),
+            "Percentage of Points scored": 100
+            * self.points_scored
+            / (self.game.rounds or 1),
             "Return Rate": 100 * self.serve_return / (self.serves_received or 1),
-            "Ace Rate": 100 * self.aces_scored / (self.serves_received or 1),
+            "Ace Rate": 100 * self.aces_scored / (self.points_served or 1),
             "Faults": self.faults,
             "Double Faults": self.double_faults,
             "Rounds Played": self.time_on_court,
@@ -272,6 +296,7 @@ class GamePlayer:
             "Green Cards": self.green_cards,
             "Yellow Cards": self.yellow_cards,
             "Red Cards": self.red_cards,
+            "Point Difference": self.team.score - self.team.opponent.score,
             "Cards": self.red_cards + self.yellow_cards + self.green_cards,
         }
 
@@ -285,7 +310,7 @@ class GamePlayer:
         return self.name
 
     def serving(self):
-        return self.game.server() and self.game.server().nice_name() == self.nice_name()
+        return self.game.server and self.game.server.nice_name() == self.nice_name()
 
     def change_elo(self, delta, game):
         """

@@ -307,6 +307,7 @@ class Tournament:
                 if g.court == -1:
                     g.court = 0
 
+    @property
     def players(self):
         players = {}
         names = []

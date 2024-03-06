@@ -11,10 +11,10 @@
 <script src="{{ url_for('static', filename='js/clips.js') }}"></script>
 <script>
     load("")
-    setup({{ id }}, "{{ key }}")
+    setup({{ id }})
 </script>
 
-<h1><a href="/video?key={{ key }}" class="hide">Video {{ id }}</a></h1>
+<h1><a href="/video" class="hide">Video {{ id }}</a></h1>
 <h3 style="display: inline">Starring:</h3> <i>{{ starring }}</i>
 
 <br>
@@ -52,7 +52,7 @@
 {% else %}
     <form style="display: none" action="/video/{{ id }}/answer" method="POST" id="form">
 {% endif %}
-<input type="hidden" id="key" name="key" value="{{ key }}"/>
+<input type="hidden" id="key" name="key" value=""/>
 <input type="hidden" id="id" name="id" value="{{ id }}"/>
 <input type="hidden" id="teamOutcome" name="teamOutcome" value=""/>
 <input type="hidden" id="personalOutcome" name="personalOutcome" value=""/>

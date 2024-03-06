@@ -95,5 +95,4 @@ let load = (s, admin = false) => {
     toInsert.style.bottom = "0px";
     toInsert.style.width = "100%";
     toInsert.style.textAlign = "center";
-    document.append(toInsert)
 }

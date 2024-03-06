@@ -84,7 +84,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
     for t in tournaments:
         if player is None:
             games += t.games_to_list()
-            game_players += sum([i.all_players() for i in t.games_to_list()], [])
+            game_players += sum([i.playing_players for i in t.games_to_list()], [])
             print(game_players)
             continue
         for i in t.games_to_list():
@@ -118,13 +118,13 @@ def get_player_stats(tournament, player, detail=0, team=None):
             [
                 i
                 for i in games
-                if player.nice_name() in [j.nice_name() for j in i.winner().players]
+                if player.nice_name() in [j.nice_name() for j in i.winner.players]
             ]
         )
     )
     served = sum([i.points_served for i in game_players])
     won_while_serving = sum([i.won_while_serving for i in game_players])
-    votes = len([i for i in games if i.best_player.nice_name() == player.nice_name()])
+    votes = len([i for i in games if i.best_player.nice_name() == player.nice_name()]) if player else played
     out = {
         "B&F Votes": votes,
         "Elo": "-" if not player else round(player.elo, 2),
@@ -198,14 +198,14 @@ def get_player_stats(tournament, player, detail=0, team=None):
                 for i in court_games
             ]
         else:
-            court_players = sum((i.players() for i in court_games), [])
+            court_players = sum((i.current_players for i in court_games), [])
         court_wins = len(
             [
                 i
                 for i in court_games
-                if player.nice_name() in [j.nice_name() for j in i.winner().players]
+                if player.nice_name() in [j.nice_name() for j in i.winner.players]
             ]
-        )
+        ) if player else played
         court_points_scored = sum([i.points_scored for i in court_players])
         court_aces_scored = sum([i.aces_scored for i in court_players])
         court_green_cards = sum([i.green_cards for i in court_players])
@@ -225,22 +225,22 @@ def get_player_stats(tournament, player, detail=0, team=None):
                 if i.best_player.nice_name() == player.nice_name()
                 if i.court == j
             ]
-        )
+        ) if player else played
         court_serves_received = sum(i.serves_received for i in court_players)
         court_serves_returned = sum(i.serve_return for i in court_players)
         serving_streaks = []
         for i in court_players:
             serving_streaks += i.serve_streak
         ace_streak = []
-        for i in game_players:
+        for i in court_players:
             ace_streak += i.ace_streak
         serving_streaks = [i for i in serving_streaks if i]
         court_avg_streak_len = sum(serving_streaks) / (len(serving_streaks) or 1)
         court_max_streak_len = max(serving_streaks + [0])
         court_max_ace = max(ace_streak + [0])
-        court_elo_delta = sum(i.elo_delta for i in game_players if i.elo_delta)
-        court_avg_elo_delta = sum(i.elo_delta for i in game_players if i.elo_delta) / (
-            len(game_players) or 1
+        court_elo_delta = sum(i.elo_delta for i in court_players if i.elo_delta)
+        court_avg_elo_delta = sum(i.elo_delta for i in court_players if i.elo_delta) / (
+            len(court_players) or 1
         )
         out |= {
             f"Court {numbers[j]}": {
@@ -313,7 +313,7 @@ def team_stats(tournament, team, include_players=False):
 
     points_for = sum([i.score for i in game_teams])
     points_against = sum([i.opponent.score for i in game_teams])
-    games_won = len([i for i in games if i.winner().nice_name() == team.nice_name()])
+    games_won = len([i for i in games if i.winner.nice_name() == team.nice_name()])
     dif = points_for - points_against
     green_cards = sum([i.green_cards for i in game_teams])
     yellow_cards = sum([i.yellow_cards for i in game_teams])

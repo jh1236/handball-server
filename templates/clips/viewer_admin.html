@@ -9,17 +9,17 @@
 <body>
 {% if conflict %}
     <a class="hide" style="display:flex;position:fixed;left: 0;top:0;height: 50px;width: 100%;background-color: #9C1A1C;z-index:100;color: white;align-items: center; justify-content: center"
-       href="/video/conflict?key={{ key }}"><b style="font-size: 20px">You have one or more conflicting videos</b></a>
+       href="/video/conflict"><b style="font-size: 20px">You have one or more conflicting videos</b></a>
 {% endif %}
 <div id="navBar"></div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/clips.js') }}"></script>
 <script>
     load("")
-    setup({{ id }}, "{{ key }}")
+    setup({{ id }})
 </script>
 
-<h1><a href="/video/{{ id }}/admin?key={{ key }}" class="hide">Video Rating System</a>
+<h1><a href="/video/{{ id }}/admin" class="hide">Video Rating System</a>
     {% if bookmarked %}
         (★)
     {% else %}

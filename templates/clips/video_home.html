@@ -43,7 +43,7 @@
             <h2>Videos Set By UM</h2>
             {% if reqd %}
                 {% for i in reqd %}
-                    <p><a class="hide" href="/video/{{ i }}?key={{ key }}&tags=required,new"><i>Video {{ i }}</i></a></p>
+                    <p><a class="hide" href="/video/{{ i }}?tags=required,new"><i>Video {{ i }}</i></a></p>
                 {% endfor %}
             {% else %}
                 <br>
@@ -52,9 +52,9 @@
         </div>
         <div style="min-height: 200px">
             <h2>Random Videos</h2>
-            <p><a class="hide" href="/video/random?key={{ key }}"><i>Random Video</i></a></p>
-            <p><a class="hide" href="/video/random?key={{ key }}&tags=new"><i>Random Video I've never seen</i></a></p>
-            <p><a class="hide" href="/video/random?key={{ key }}&tags=old"><i>Random Video I've seen before</i></a></p>
+            <p><a class="hide" href="/video/random"><i>Random Video</i></a></p>
+            <p><a class="hide" href="/video/random?tags=new"><i>Random Video I've never seen</i></a></p>
+            <p><a class="hide" href="/video/random?tags=old"><i>Random Video I've seen before</i></a></p>
         </div>
     </div>
     <br>

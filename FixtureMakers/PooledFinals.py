@@ -29,6 +29,6 @@ class PooledFinals(FixtureMaker):
                 g.court = 1
                 games.append(g)
         yield [item for sublist in itertools.zip_longest([g1, g2], games) for item in sublist if item]
-        g3 = Game(g1.loser(), g2.loser(), self.tournament, True)
+        g3 = Game(g1.loser, g2.loser, self.tournament, True)
         g3.court = 1
-        yield [Game(g1.winner(), g2.winner(), self.tournament, True), g3]
+        yield [Game(g1.winner, g2.winner, self.tournament, True), g3]

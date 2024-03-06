@@ -9,7 +9,7 @@
 <body>
 {% if conflict %}
     <div style="position:fixed;left: 0;top:0;height: 50px;width: 100%;background-color: #9C1A1C;z-index:100"><p
-            style="color: white"><a href="/video/conflict?key={{ key }}">You have one or more conflicting videos</a></p>
+            style="color: white"><a href="/video/conflict">You have one or more conflicting videos</a></p>
     </div>
 {% endif %}
 <div id="navBar"></div>
@@ -17,10 +17,10 @@
 <script src="{{ url_for('static', filename='js/clips.js') }}"></script>
 <script>
     load("")
-    setup({{ id }}, "{{ key }}")
+    setup({{ id }})
 </script>
 
-<h1><a href="/video/{{ id }}?key={{ key }}" class="hide">Conflict Resolver</a></h1>
+<h1><a href="/video/{{ id }}" class="hide">Conflict Resolver</a></h1>
 
 <video src="/video/{{ id }}/raw" autoplay controls width="60%" poster="/api/image?name=SUSS_VIDEO"></video>
 <br>

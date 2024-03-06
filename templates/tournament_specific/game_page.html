@@ -17,7 +17,7 @@
                         href="/{{ tournament }}fixtures/detailed?round={{ roundNumber - 1 + game.is_final * game.tournament.fixtures.__len__() }}"><i>{{ roundNumber }}</i></a>
     </p>
     <p><b>Court:</b> <a class="hide"
-                        href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court_display() }}</i></a>
+                        href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court_display }}</i></a>
     </p>
     <p><b>Match Official:</b>{% if not game.bye %}
         <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %} <i>{{ official }}</i>
@@ -29,7 +29,9 @@
     {% endif %}
     <p>{% if not game.bye %}<a href="/{{ tournament }}games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
         {% if not game.bye %}</a>{% endif %} <i>{{ status }}</i></p>
-
+    {% if game.start_time > 0 %}
+        <p><b>Match Time:</b> <i>{{ game.nice_start_time }}</i></p>
+    {% endif %}
     {% if game.best_player %}
         <p><b>Best on Court:</b> <a class="hide"
                                     href="/{{ tournament }}players/{{ game.best_player.nice_name() }}"><i>{{ best }}</i></a>
@@ -79,7 +81,7 @@
 
         <tr>
             <td></td>
-            {% for i in game.all_players() %}
+            {% for i in game.playing_players %}
                 <th {% if i.team.all_players().__len__() == 1 %}
                     colspan="2" {% endif %}
                 ><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}">
@@ -91,7 +93,7 @@
         {% for i, title in headings %}
             <tr>
                 <th>{{ title }}:</th>
-                {% for j in game.all_players() %}
+                {% for j in game.playing_players %}
                     <td{% if j.team.all_players().__len__() == 1 %}
                         colspan="2" {% endif %}
                     >{{ player_stats[j.nice_name()][i] }}</td>

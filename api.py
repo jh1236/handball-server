@@ -261,7 +261,7 @@ def create():
     if "playersOne" in request.json:
         players = []
         for i in request.json["playersOne"]:
-            players += [j for j in tournament.players() if j.nice_name() == i]
+            players += [j for j in tournament.players if j.nice_name() == i]
 
         team_one = Team.find_or_create(tournament, request.json["teamOne"], players)
         if team_one not in tournament.teams:
@@ -275,7 +275,7 @@ def create():
     if "playersTwo" in request.json:
         players = []
         for i in request.json["playersTwo"]:
-            players += [j for j in tournament.players() if j.nice_name() == i]
+            players += [j for j in tournament.players if j.nice_name() == i]
         team_two = Team.find_or_create(tournament, request.json["teamTwo"], players)
         if team_two not in tournament.teams:
             tournament.add_team(team_two)

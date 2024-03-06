@@ -394,6 +394,7 @@ class GameTeam:
         self.time_out_time = -1
         self.game.event()
 
+
     def card_time(self):
         players = [i for i in self.players if "null" not in i.nice_name()]
         if 0 > min(players, key=lambda a: a.card_time_remaining).card_time_remaining:
@@ -401,14 +402,15 @@ class GameTeam:
         return max(players, key=lambda a: a.card_time_remaining).card_time_remaining
 
     def card_duration(self):
-        return max(self.players, key=lambda a: a.card_time_remaining).card_duration
+        players = [i for i in self.players if "null" not in i.nice_name()]
+        return max(players, key=lambda a: a.card_time_remaining).card_duration
 
     def end(self, final=False):
         if final:
             return
         if self.elo_delta:
             Exception("game ended twice!")
-        won = self.game.winner() == self.team
+        won = self.game.winner == self.team
         [i.end(won, final) for i in self.players]
         self.game.primary_official.green_cards += self.green_cards
         self.game.primary_official.yellow_cards += self.yellow_cards
@@ -426,7 +428,7 @@ class GameTeam:
             self.change_elo(self.elo_delta, self.game)
 
     def undo_end(self):
-        [i.undo_end(self.game.winner() == self.team) for i in self.players]
+        [i.undo_end(self.game.winner == self.team) for i in self.players]
         if self.elo_delta:
             self.change_elo(-self.elo_delta, self.game)
         self.elo_delta = None

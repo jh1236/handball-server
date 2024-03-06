@@ -2,7 +2,8 @@ import random
 
 from flask import render_template, send_file
 
-from structure.AllTournament import get_all_officials, get_all_players
+import utils.permissions
+from structure.AllTournament import get_all_officials, get_all_players, get_all_games
 from structure.Tournament import Tournament
 from utils.permissions import fetch_user, officials_only
 from website.endpoints.endpoints import add_endpoints
@@ -30,6 +31,10 @@ def init_api(app, comps: dict[str, Tournament]):
             render_template("rules.html"),
             200,
         )
+
+    @app.get("/logout/")
+    def logout():
+        return utils.permissions.logout()
 
     @app.get("/rules/current")
     def rules():
@@ -59,16 +64,29 @@ def init_api(app, comps: dict[str, Tournament]):
     def user_page():
         key = fetch_user()
         user = next(i for i in get_all_officials() if i.key == key)
-        player = next(i for i in get_all_players() if i.nice_name() == user.nice_name())
+        player = ([i for i in get_all_players if i.nice_name() == user.nice_name()] + ["This will never match!"])[0]
         with open("./clips/required.txt") as fp:
             reqd = [i.strip() for i in fp.readlines()]
         from website.clips import answers
 
         seen_videos = [str(j["id"]) for j in answers if j["name"] == user.nice_name()]
         reqd = [i for i in reqd if i not in seen_videos]
+        all_games = get_all_games()
+        to_officiate = []
+        to_play = []
+        for i in all_games:
+            if i.best_player: continue
+            if user.nice_name() in [i.primary_official.nice_name(), i.scorer.nice_name()]:
+                to_officiate.append(i)
+            if user.nice_name() in [k.nice_name() for k in i.all_players]:
+                to_play.append(i)
         if len(reqd) > 4:
             reqd = reqd[:4]
-        return render_template("user_file.html", user=user, player=player, reqd=reqd)
+        if len(to_officiate) > 4:
+            to_officiate = to_officiate[:4]
+        if len(to_play) > 4:
+            to_play = to_play[:4]
+        return render_template("user_file.html", user=user, player=player, reqd=reqd, to_play=to_play, to_officiate=to_officiate)
 
     from website.tournament_specific import add_tournament_specific
     from website.admin import add_admin_pages

@@ -19,7 +19,7 @@ class SingleElim(FixtureMaker):
         self.games = r
         yield r
         for g in self.games:
-            self.teams.append(g.winner())
+            self.teams.append(g.winner)
         while len(self.teams) > 1:
             r = []
             while len(self.teams) > 0:
@@ -30,4 +30,4 @@ class SingleElim(FixtureMaker):
             yield r
             self.games = r
             for g in self.games:
-                self.teams.insert(0, g.winner())
+                self.teams.insert(0, g.winner)

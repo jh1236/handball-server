@@ -1402,8 +1402,8 @@
                 "teamOne": {
                     "name": "ZL",
                     "players": [
-                        "Zaiah Deards",
-                        "Lachlan Banks"
+                        "Lachlan Banks",
+                        "Zaiah Deards"
                     ],
                     "score": 10
                 },
@@ -1875,7 +1875,7 @@
         ],
         [
             {
-                "bestPlayer": "Null2",
+                "bestPlayer": "Null",
                 "cards": [
                     "Not Provided",
                     "Not Provided",
@@ -1903,7 +1903,7 @@
                     "name": "Lach",
                     "players": [
                         "Lachlan Banks",
-                        "Null2"
+                        "Null"
                     ],
                     "score": 1
                 }
@@ -1928,7 +1928,7 @@
                     "name": "Lach",
                     "players": [
                         "Lachlan Banks",
-                        "Null2"
+                        "Null"
                     ],
                     "score": 1
                 },
@@ -2155,7 +2155,7 @@
                     "name": "Lach",
                     "players": [
                         "Lachlan Banks",
-                        "Null2"
+                        "Null"
                     ],
                     "score": 4
                 },
@@ -2230,7 +2230,7 @@
                     "name": "Lach",
                     "players": [
                         "Lachlan Banks",
-                        "Null2"
+                        "Null"
                     ],
                     "score": 2
                 }

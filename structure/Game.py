@@ -73,6 +73,7 @@ class Game:
             return game
         game.start(swapped, team_one_swap, team_two_swap)
         game.load_from_string(game_map["game"])
+        game.start_time = game_map.get("startTime", -1)
         if game_map.get("bestPlayer", False):
             game.end(
                 None if game_map["bestPlayer"] == "Forfeit" else game_map["bestPlayer"],
@@ -81,6 +82,7 @@ class Game:
             )
             game.protested = game_map.get("protested", 0)
             game.resolved = game_map.get("resolved", False)
+            game.start_time = game_map.get("length", -1)
 
         return game
 
@@ -92,7 +94,9 @@ class Game:
         final: bool = False,
         attempt_rebalance: bool = True,
     ):
-        self.resolved = False
+        self.start_time: float = -1
+        self.length: float = -1
+        self.resolved: bool = False
         self._serve_clock: int = -1
         self.update_count: int = 0
         self.tournament = tournament
@@ -109,8 +113,8 @@ class Game:
             team_one.get_game_team(self),
             team_two.get_game_team(self),
         ]
-        self.is_final = final
-        self.bye = False
+        self.is_final: bool = final
+        self.bye: bool = False
         if (
             attempt_rebalance
             and not final
@@ -136,7 +140,7 @@ class Game:
                 self.super_bye = True
         self.ranked: bool = (
             not final and
-            not any(i.nice_name().startswith("null") for i in self.players())
+            not any(i.nice_name().startswith("null") for i in self.all_players)
             and self.tournament.details.get("ranked", True)
         )
         self.first_team_serves: bool = False
@@ -151,25 +155,58 @@ class Game:
             self._serve_clock = -1
         return self._serve_clock
 
-    def event(self):
-        if not self.bye:
-            self.update_count += 1
-
-    def court_display(self) -> str:
-        if self.court > -1:
-            return f"Court {self.court + 1}"
-        return "-"
-
+    @property
+    def nice_start_time(self):
+        return time.strftime('%d/%m/%y (%H:%M)', time.localtime(self.start_time))
     @property
     def requires_action_string(self):
         if self.resolved:
             return "Resolved"
         return self.noteable_string(False)
 
+    @property
+    def court_display(self) -> str:
+        if self.court > -1:
+            return f"Court {self.court + 1}"
+        return "-"
+
+    @property
+    def requires_action(self):
+        return (
+                self.protested
+                or any(i.red_cards for i in self.all_players if "null" not in i.nice_name())
+                or self.notes.strip()
+        ) and not self.resolved
+
+    @property
+    def is_noteable(self):
+        return (
+                self.protested
+                or any(i.red_cards for i in self.all_players if "null" not in i.nice_name())
+                or self.notes.strip()
+        )
+
+    @property
+    def winner(self):
+        if self.bye:
+            return self.teams[0]
+        return max(self.teams, key=lambda a: a.score).team
+
+    @property
+    def loser(self):
+        if self.bye:
+            return self.teams[1]
+        return min(self.teams, key=lambda a: a.score).team
+
+
+    def event(self):
+        if not self.bye:
+            self.update_count += 1
+
     def noteable_string(self, include_yellows):
         if self.protested:
             return "Protested"
-        elif any(i.red_cards for i in self.players() if "null" not in i.nice_name()):
+        elif any(i.red_cards for i in self.all_players if "null" not in i.nice_name()):
             return "Red card awarded"
         elif any(i.yellow_cards for i in self.teams) and include_yellows:
             return "Yellow card awarded"
@@ -188,21 +225,6 @@ class Game:
         else:
             return "Waiting for toss"
 
-    @property
-    def requires_action(self):
-        return (
-            self.protested
-            or any(i.red_cards for i in self.players() if "null" not in i.nice_name())
-            or self.notes.strip()
-        ) and not self.resolved
-
-    @property
-    def is_noteable(self):
-        return (
-            self.protested
-            or any(i.red_cards for i in self.players() if "null" not in i.nice_name())
-            or self.notes.strip()
-        )
 
     def set_primary_official(self, o):
         if self.bye:
@@ -235,27 +257,32 @@ class Game:
         self.rounds += 1
         [i.next_point() for i in self.teams]
 
+
+    @property
     def team_serving(self):
         if self.bye or not self.started:
             return None
         return [i for i in self.teams if i.serving][0]
 
+    @property
     def server(self):
         if self.bye or not self.started:
             return None
-        serving_team = self.team_serving()
+        serving_team = self.team_serving
 
         server = serving_team.players[not serving_team.first_player_serves]
         if server.is_carded():
             server = serving_team.players[serving_team.first_player_serves]
         return server
 
+    @property
     def server_side(self):
         if self.bye or not self.started:
             return None
-        return ["Left", "Right"][not self.team_serving().first_player_serves]
+        return ["Left", "Right"][not self.team_serving.first_player_serves]
 
-    def players(self) -> list[GamePlayer]:
+    @property
+    def current_players(self) -> list[GamePlayer]:
         if self.bye:
             return [
                 *self.teams[0].players,
@@ -264,21 +291,17 @@ class Game:
             ]
         return [*self.teams[0].players[:2], *self.teams[1].players[:2]]
 
-    def all_players(self) -> list[GamePlayer]:
+    @property
+    def playing_players(self) -> list[GamePlayer]:
         if self.rounds:
             return [*[i for i in self.teams[0].players if i.time_on_court], *[i for i in self.teams[1].players if i.time_on_court]]
         else:
-            return self.players()
+            return self.current_players
 
-    def winner(self):
-        if self.bye:
-            return self.teams[0]
-        return max(self.teams, key=lambda a: a.score).team
+    @property
+    def all_players(self):
+        return self.teams[0].all_players() + self.teams[1].all_players()
 
-    def loser(self):
-        if self.bye:
-            return self.teams[1]
-        return min(self.teams, key=lambda a: a.score).team
 
     def print_gamestate(self):
         logger.info(
@@ -294,6 +317,8 @@ class Game:
 
     def start(self, team_one_serves, swap_team_one, swap_team_two):
         self.started = True
+        if self.start_time < 0:
+            self.start_time = time.time()
         if self.bye:
             return
         self.update_count += 1
@@ -301,7 +326,7 @@ class Game:
         self.teams[1].start(not team_one_serves, swap_team_two)
         self.first_team_serves = team_one_serves
         self.info(
-            f"Started, {self.server().nice_name()} serving from team {self.team_serving().nice_name()}"
+            f"Started, {self.server.nice_name()} serving from team {self.team_serving.nice_name()}"
         )
         # for i in self.teams:
         #     for j, v in enumerate(i.players):
@@ -340,7 +365,7 @@ class Game:
             if self.forfeit() and best_player is None:
                 self.best_player = forfeit_player(self)
             else:
-                for i in self.players():
+                for i in self.current_players:
                     if i.name == best_player:
                         self.best_player = i
                         i.best_player()
@@ -353,8 +378,9 @@ class Game:
             self.scorer.games_scored += 1
             self.primary_official.rounds_umpired += self.rounds
             self.info(
-                f"game {self.id} is over! Winner was {self.winner().nice_name()}, Best Player is {self.best_player.nice_name()}"
+                f"game {self.id} is over! Winner was {self.winner.nice_name()}, Best Player is {self.best_player.nice_name()}"
             )
+            self.length = time.time() - self.start_time
             self.tournament.update_games()
 
     def in_progress(self):
@@ -406,10 +432,6 @@ class Game:
             self.start(
                 self.first_team_serves, self.teams[0].swapped, self.teams[1].swapped
             )
-            # for i in self.teams:
-            #     for j, v in enumerate(i.players):
-            #         if "null" in v.nice_name():
-            #             i.red_card(not j)
             self.load_from_string(self.game_string)
             logger.info(f"Undoing Game End... game string is now {self.game_string}")
         else:
@@ -420,10 +442,6 @@ class Game:
             self.start(
                 self.first_team_serves, self.teams[0].swapped, self.teams[1].swapped
             )
-            # for i in self.teams:
-            #     for j, v in enumerate(i.players):
-            #         if "null" in v.nice_name():
-            #             i.red_card(not j)
             self.load_from_string(self.game_string)
             self.info(f"Undoing... game string is now {self.game_string}")
 
@@ -448,6 +466,7 @@ class Game:
             if self.primary_official
             else "No one",
             "scorer": self.scorer.name if self.scorer else "No one",
+            "startTime": self.start_time
         }
         if self.best_player:  # game has been submitted and finalised
             dct["bestPlayer"] = self.best_player.name
@@ -455,6 +474,7 @@ class Game:
             dct["notes"] = self.notes
             dct["protested"] = self.protested
             dct["resolved"] = self.resolved
+            dct["length"] = self.length
         return dct
 
     def display_map(self):

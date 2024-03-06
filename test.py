@@ -87,11 +87,11 @@ if __name__ == "__main__":
     once = False
     winners = True
     while not once or (
-        "Bedwars" not in competition.get_game(-1).winner().name and winners
+        "Bedwars" not in competition.get_game(-1).winner.name and winners
     ):
         once = True
         print(
-            f"Winner was {competition.get_game(-1).winner().name}, rejecting"
+            f"Winner was {competition.get_game(-1).winner.name}, rejecting"
         )
         competition.dump()
         game_id = 0
@@ -105,7 +105,7 @@ if __name__ == "__main__":
                     competition.get_game(game_id).start(r_bool(), r_bool(), r_bool())
                     continue
                 if competition.get_game(game_id).game_ended():
-                    game.end(game.players()[0].name)
+                    game.end(game.current_players[0].name)
                     game_id += 1
                     while competition.get_game(game_id).bye:  # the game is a bye
                         game_id += 1

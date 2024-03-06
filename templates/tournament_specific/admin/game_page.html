@@ -20,7 +20,7 @@
     <p><b>Round:</b> <a class="hide"
                         href="/{{ tournament }}fixtures/admin?round={{ roundNumber - 1 + game.is_final * game.tournament.fixtures.__len__() }}"><i>{{ roundNumber }}</i></a></p>
     <p><b>Court:</b> <a class="hide"
-                        href="/{{ tournament }}fixtures/admin??court={{ game.court }}"><i>{{ game.court_display() }}</i></a>
+                        href="/{{ tournament }}fixtures/admin??court={{ game.court }}"><i>{{ game.court_display }}</i></a>
     </p>
     <p><b>Match Official:</b>{% if not game.bye %}
         <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %} <i>{{ official }}</i>
@@ -80,7 +80,7 @@
 
         <tr>
             <td></td>
-            {% for i in game.players() %}
+            {% for i in game.current_players %}
                 <th><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}/admin">{{ i }}</a></th>
             {% endfor %}
 
@@ -129,6 +129,10 @@
             {% else %}
                 <button onclick="resolveGame()" class="button">Resolve</button>
             {% endif %}
+        <h2>Commentary</h2>
+        {% for line in commentary %}
+            <p style="color: black;">{{ line }}</p>
+        {% endfor %}
     </div>
 </div>
 </body>

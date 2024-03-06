@@ -20,14 +20,16 @@
                 "firstTeamServed": true,
                 "game": "SLSLslslSLTTSLSLslslSLslarslslSLGLslslSLARsl",
                 "id": 0,
+                "length": 831.9039733409882,
                 "notes": " ",
                 "official": "Jared Healy",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.722003,
                 "started": true,
                 "teamOne": {
-                    "name": "Lachie",
+                    "name": "Lach",
                     "players": [
                         "Lachlan Banks",
                         "Null"
@@ -50,11 +52,13 @@
                 "firstTeamServed": true,
                 "game": "slSLSLSLFRslslSLSLARARSLSLslSLslslSL",
                 "id": 1,
+                "length": 831.9039738178253,
                 "notes": " ",
                 "official": "Jared Healy",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.723002,
                 "started": true,
                 "teamOne": {
                     "name": "Jared\u21912 (Olivia swear jar)",
@@ -65,7 +69,7 @@
                     "score": 11
                 },
                 "teamTwo": {
-                    "name": "Lachie",
+                    "name": "Lach",
                     "players": [
                         "Lachlan Banks",
                         "Null"
@@ -80,11 +84,13 @@
                 "firstTeamServed": false,
                 "game": "SLARSLFLSLSLARARARslSLslSLSL",
                 "id": 2,
+                "length": 831.9039764404297,
                 "notes": " ",
                 "official": "Lachlan Banks",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7240012,
                 "started": true,
                 "teamOne": {
                     "name": "Jared\u21912 (Olivia swear jar)",
@@ -95,7 +101,7 @@
                     "score": 11
                 },
                 "teamTwo": {
-                    "name": "Lachie",
+                    "name": "Lach",
                     "players": [
                         "Lachlan Banks",
                         "Null"
@@ -110,14 +116,16 @@
                 "firstTeamServed": false,
                 "game": "slflSLARslSLSLslarSLslslslSLARslslslsl",
                 "id": 3,
+                "length": 831.903975725174,
                 "notes": " ",
                 "official": "Jared Healy",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7250016,
                 "started": true,
                 "teamOne": {
-                    "name": "Lachie",
+                    "name": "Lach",
                     "players": [
                         "Lachlan Banks",
                         "Null"
@@ -141,12 +149,14 @@
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "SLslflarSLslslarfrSLSLslslSLSLslarslSLSLARsl",
-                "id": 5,
+                "id": 4,
+                "length": 831.9039754867554,
                 "notes": " ",
                 "official": "Jared Healy",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7260022,
                 "started": true,
                 "teamOne": {
                     "name": "Alex",
@@ -171,12 +181,14 @@
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "slSLSLslSLslSLSLslslSLslslflSLslSLslSLslar",
-                "id": 6,
+                "id": 5,
+                "length": 831.9029755592346,
                 "notes": " ",
                 "official": "Alex Soudure",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7270014,
                 "started": true,
                 "teamOne": {
                     "name": "Alex",
@@ -203,12 +215,14 @@
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slslslSLSLARGLslslarSLslararSLARslfrfrARsl",
-                "id": 7,
+                "id": 6,
+                "length": 831.9029755592346,
                 "notes": " ",
                 "official": "Jared Healy",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7290013,
                 "started": true,
                 "teamOne": {
                     "name": "Digby",
@@ -233,12 +247,14 @@
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "FLslslslslflSLslarSLSLslarSLslslar",
-                "id": 8,
+                "id": 7,
+                "length": 831.9039740562439,
                 "notes": " ",
                 "official": "Alex Soudure",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7290013,
                 "started": true,
                 "teamOne": {
                     "name": "Digby",
@@ -265,12 +281,14 @@
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLslSLslglSLslSLSLARslslSLslslSLSLslflSLslSL",
-                "id": 9,
+                "id": 8,
+                "length": 831.9039754867554,
                 "notes": " ",
                 "official": "William Prozerska",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7310011,
                 "started": true,
                 "teamOne": {
                     "name": "Alex",
@@ -295,12 +313,14 @@
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "ARslslarslslSLARslslslslslSLsl",
-                "id": 10,
+                "id": 9,
+                "length": 831.9039752483368,
                 "notes": " ",
                 "official": "Alex Soudure",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7310011,
                 "started": true,
                 "teamOne": {
                     "name": "Digby",
@@ -325,12 +345,14 @@
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLslararslSLslSLSLSLSLARARSLARFLSL",
-                "id": 11,
+                "id": 10,
+                "length": 831.903975725174,
                 "notes": " ",
                 "official": "Jared Healy",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7320013,
                 "started": true,
                 "teamOne": {
                     "name": "Alex",
@@ -355,12 +377,14 @@
                 "court": 0,
                 "firstTeamServed": true,
                 "game": "slslSLSLARSLARSLFRslslSLSLFLARFLslSLFRslslSL",
-                "id": 12,
+                "id": 11,
+                "length": 831.903975725174,
                 "notes": " ",
                 "official": "Alex Soudure",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7330015,
                 "started": true,
                 "teamOne": {
                     "name": "Jared\u21912 (Olivia swear jar)",
@@ -387,12 +411,14 @@
                 "court": 0,
                 "firstTeamServed": false,
                 "game": "SLslfrSLslslSLSLslslfrarslSLSLslslSLSLslSLARslSL8l",
-                "id": 13,
+                "id": 12,
+                "length": 831.9049746990204,
                 "notes": " ",
                 "official": "Alex Soudure",
                 "protested": 0,
                 "resolved": false,
                 "scorer": "No one",
+                "startTime": 1709709638.7350008,
                 "started": true,
                 "teamOne": {
                     "name": "Jared\u21912 (Olivia swear jar)",
@@ -415,12 +441,13 @@
         [
             {
                 "court": 0,
-                "firstTeamServed": false,
+                "firstTeamServed": true,
                 "game": "",
-                "id": 15,
+                "id": 13,
                 "official": "Jared Healy",
                 "scorer": "No one",
-                "started": false,
+                "startTime": 1709710306.9836206,
+                "started": true,
                 "teamOne": {
                     "name": "AC Lads",
                     "players": [
@@ -430,10 +457,10 @@
                     "score": 0
                 },
                 "teamTwo": {
-                    "name": "Ball Fondlers",
+                    "name": "BCFing Fun",
                     "players": [
-                        "Charlie Wyatt",
-                        "Elizabeth Gover"
+                        "Eva Hajigabriel",
+                        "Tomasz Sakowski"
                     ],
                     "score": 0
                 }

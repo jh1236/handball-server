@@ -1,16 +1,16 @@
 let id = 0
 let key = 0
-let setup = (newId, newKey) => {
+let setup = (newId) => {
     id = newId
-    key = newKey
+    key = document.cookie.split("userKey=")[1].split(";")[0]
 }
 
 setTeamOutcome = (outcome) => {
-    document.getElementById("team").textContent = document.getElementById("team"+outcome).textContent
+    document.getElementById("team").textContent = document.getElementById("team" + outcome).textContent
 }
 
 setPersonalOutcome = (outcome) => {
-    document.getElementById("personal").textContent = document.getElementById("personal"+outcome).textContent
+    document.getElementById("personal").textContent = document.getElementById("personal" + outcome).textContent
 }
 
 
@@ -33,7 +33,7 @@ function submit(urlTags = false) {
         alert("The form is not complete!")
         return
     }
-    tags = document.getElementById("tags").value.replaceAll(",","|").replaceAll("\n","")
+    tags = document.getElementById("tags").value.replaceAll(",", "|").replaceAll("\n", "")
     if (tags.endsWith("|")) {
         tags = tags.trimEnd("|")
     }
@@ -41,21 +41,21 @@ function submit(urlTags = false) {
         method: "POST", body: JSON.stringify({
             key: key,
             id: id,
-            required:document.getElementById("required").checked,
+            required: document.getElementById("required").checked,
             certain: document.getElementById("certain").checked,
             teamOutcome: document.getElementById("team").textContent,
             personalOutcome: document.getElementById("personal").textContent,
-            starring: document.getElementById("starring").value.replaceAll(",","|"),
+            starring: document.getElementById("starring").value.replaceAll(",", "|"),
             quality: +document.getElementById("quality").value,
             tags: tags,
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location = "/video/next/admin?key=" + key + "&id="+id + (urlTags? "&tags=" + urlTags : ""));
+    }).then(() => document.location = "/video/next/admin?id=" + id + (urlTags ? "&tags=" + urlTags : ""));
 }
 
 function submitConflict() {
-    tags = document.getElementById("tags").value.replaceAll(",","|").replaceAll("\n","")
+    tags = document.getElementById("tags").value.replaceAll(",", "|").replaceAll("\n", "")
     if (tags.endsWith("|")) {
         tags = tags.trimEnd("|")
     }
@@ -63,10 +63,10 @@ function submitConflict() {
         method: "POST", body: JSON.stringify({
             key: key,
             id: id,
-            required:false,
+            required: false,
             certain: false,
-            teamOutcome: document.getElementById("team").textContent.replaceAll("\n",""),
-            personalOutcome: document.getElementById("personal").textContent.replaceAll("\n",""),
+            teamOutcome: document.getElementById("team").textContent.replaceAll("\n", ""),
+            personalOutcome: document.getElementById("personal").textContent.replaceAll("\n", ""),
             tags: tags,
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -74,7 +74,7 @@ function submitConflict() {
     }).then(() => document.location = "/video/unrated?key=" + key);
 }
 
-function garbage(urlTags=false) {
+function garbage(urlTags = false) {
     fetch("/api/clip/rate", {
         method: "POST", body: JSON.stringify({
             key: key,
@@ -89,9 +89,8 @@ function garbage(urlTags=false) {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location = "/video/next/admin?key=" + key +"&id=" + id + (urlTags? "&tags=" + urlTags : ""));
+    }).then(() => document.location = "/video/next/admin?key=" + key + "&id=" + id + (urlTags ? "&tags=" + urlTags : ""));
 }
-
 
 
 function answer() {
@@ -101,8 +100,9 @@ function answer() {
         alert("The form is not complete!")
         return
     }
+    document.getElementById("key").value = key
     document.getElementById("teamOutcome").value = document.getElementById("team").textContent
-    document.getElementById("personalOutcome").value =document.getElementById("personal").textContent
+    document.getElementById("personalOutcome").value = document.getElementById("personal").textContent
     document.getElementById("form").submit()
 }
 

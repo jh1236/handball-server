@@ -107,8 +107,8 @@
                     {% endif %}
                     {{ teams[0].players[i] }}
                     {% if teams[0].players[i].serving() %}
-                        {% if game.team_serving().carded %}
-                            ({{ game.server_side()[0] }})
+                        {% if game.team_serving.carded %}
+                            ({{ game.server_side[0] }})
                         {% endif %}
                         </b>
                         {% if teams[0].faulted %}
@@ -138,8 +138,8 @@
                     {% endif %}
                     {{ teams[1].players[i] }}
                     {% if teams[1].players[i].serving() %}
-                        {% if game.team_serving().carded %}
-                            ({{ game.server_side()[0] }})
+                        {% if game.team_serving.carded %}
+                            ({{ game.server_side[0] }})
                         {% endif %}
                         </b>
                         {% if teams[1].faulted %}

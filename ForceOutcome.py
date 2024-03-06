@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 continue
             print(game_id)
             if competition.get_game(game_id).game_ended():
-                game.end(game.players()[0].name)
+                game.end(game.current_players[0].name)
                 game_id += 1
                 while competition.get_game(game_id).bye:  # the game is a bye
                     game_id += 1

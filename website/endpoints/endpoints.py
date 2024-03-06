@@ -43,7 +43,11 @@ def add_endpoints(app, comps):
     @app.get("/api/users/image")
     def user_image():
         team = request.args.get("name", type=str)
-        return send_file(f"./resources/images/users/{team}.png", mimetype="image/png")
+        if os.path.isfile(f"./resources/images/teams/{team}.png"):
+            return send_file(f"./resources/images/users/{team}.png", mimetype="image/png")
+        else:
+            return send_file(f"./resources/images/umpire.png", mimetype="image/png")
+
 
     @app.get("/graph")
     def plot_png():
@@ -70,12 +74,16 @@ def add_endpoints(app, comps):
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         if tournament:
-            players = [next(k for k in i.all_players() if k.nice_name() == player) for i in comps[tournament].games_to_list() if player in [j.nice_name() for j in i.all_players()]]
+            players = [next(k for k in i.playing_players if k.nice_name() == player) for i in comps[tournament].games_to_list() if player in [j.nice_name() for j in i.playing_players] and i.ranked]
         else:
-            players = [next(k for k in i.all_players() if k.nice_name() == player) for i in get_all_games() if player in [j.nice_name() for j in i.all_players()]]
-        xs = np.array([float(str(i.get_stats_detailed()[x_stat]).strip("%").replace("∞", "inf")) for i in players])
-        ys = np.array([float(str(i.get_stats_detailed()[y_stat]).strip("%").replace("∞", "inf")) for i in players])
+            players = [next(k for k in i.playing_players if k.nice_name() == player) for i in get_all_games() if player in [j.nice_name() for j in i.playing_players] and i.ranked]
+        xs = np.array([float(str(i.get_stats_detailed()[x_stat]).strip("%").replace("∞", "inf")) for i in players if i.get_stats()["Rounds Played"]])
+        ys = np.array([float(str(i.get_stats_detailed()[y_stat]).strip("%").replace("∞", "inf")) for i in players if i.get_stats()["Rounds Played"]])
         axis.scatter(xs, ys)
+        if x_stat == "Timeline" and y_stat == "Elo":
+            x_sort = np.sort(xs)
+            y_sort = ys[np.argsort(xs)]
+            axis.plot(x_sort, y_sort)
         a, b = np.polyfit(xs, ys, 1)
         axis.plot(xs, a*xs+b)
         fig.supxlabel(x_stat)
@@ -86,9 +94,9 @@ def add_endpoints(app, comps):
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         if tournament:
-            players = [i for i in comps[tournament].players()]
+            players = [i for i in comps[tournament].players]
         else:
-            players = [i for i in get_all_players()]
+            players = [i for i in get_all_players]
         xs = np.array([float(str(i.get_stats_detailed()[x_stat]).strip("%").replace("∞", "inf")) for i in players if i.get_stats()["Rounds on Court"]])
         ys = np.array([float(str(i.get_stats_detailed()[y_stat]).strip("%").replace("∞", "inf")) for i in players if i.get_stats()["Rounds on Court"]])
         axis.scatter(xs, ys)

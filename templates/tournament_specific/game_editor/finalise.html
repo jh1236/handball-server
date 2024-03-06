@@ -23,7 +23,6 @@
         <p><b>Match Scorer:</b> <i>{{ game.scorer }}</i></p>
     {% endif %}
 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
-</p>
 <br>
 
 <table class="table">
@@ -77,7 +76,7 @@
         <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And Best</button>
     {% endif %}
     <div class="dropdown-content">
-        {% for i in game.players() %}
+        {% for i in game.playing_players %}
             <p onclick="setBest('{{ i.name }}', '{{ i.tidy_name() }}')">{{ i.tidy_name() }}</p>
         {% endfor %}
     </div>

@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 
@@ -64,6 +65,7 @@ def add_clip_endpoints(app, comps):
     @app.post("/api/clip/rate")
     @admin_only
     def rate_file():
+        print(request.json)
         key = fetch_user()
         name = next(
             i.nice_name() for i in get_all_officials() if i.key == key
