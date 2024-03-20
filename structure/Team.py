@@ -227,7 +227,7 @@ class GameTeam:
 
     def forfeit(self):
         self.game.add_to_game_string("ee", self)
-        while not self.game.game_ended():
+        while not self.game.game_ended:
             self.opponent.score_point()
 
     def change_elo(self, delta, a):
@@ -272,7 +272,7 @@ class GameTeam:
     def score_point(self, first_player: bool | None = None, ace: bool = False):
         if ace:
             self.info(
-                f"Ace Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}"
+                f"Ace Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string}"
             )
             if first_player is None:
                 self.server().score_point(True)
@@ -281,12 +281,12 @@ class GameTeam:
             self.server().ace_streak[-1] += 1
         elif first_player is not None:
             self.info(
-                f"Point Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string()}"
+                f"Point Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string}"
             )
             self.players[not first_player].score_point(False)
         else:
             self.info(
-                f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string()}"
+                f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string}"
             )
             if self.server().ace_streak[-1]:
                 self.server().ace_streak.append(0)
@@ -362,7 +362,7 @@ class GameTeam:
             )
         while (
             all([i.is_carded() for i in self.players[:2]])
-            and not self.game.game_ended()
+            and not self.game.game_ended
         ):
             self.opponent.score_point()
 
@@ -379,7 +379,7 @@ class GameTeam:
         self.game.add_to_game_string(f"v{'l' if first_player else 'r'}", self)
         while (
             all([i.is_carded() for i in self.players[:2]])
-            and not self.game.game_ended()
+            and not self.game.game_ended
         ):
             self.opponent.score_point()
 
@@ -454,3 +454,10 @@ class GameTeam:
         if include_players:
             d["players"] = [{"name": i.name} | i.get_stats() for i in self.players]
         return d
+
+    def swap_players(self, from_load = False):
+        self.game.add_to_game_string("!u", self)
+        self.game.event()
+        self.players[0], self.players[1] = self.players[1], self.players[0]
+        if not from_load:
+            self.game.reload()

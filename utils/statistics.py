@@ -6,6 +6,7 @@ K = 40.0
 initial_elo = 1500
 D = 3000.0
 
+
 numbers = {0: "One", 1: "Two", 2: "Three", 3: "Four"}
 
 
@@ -85,7 +86,6 @@ def get_player_stats(tournament, player, detail=0, team=None):
         if player is None:
             games += t.games_to_list()
             game_players += sum([i.playing_players for i in t.games_to_list()], [])
-            print(game_players)
             continue
         for i in t.games_to_list():
             player_names = [j.name for j in i.teams[0].players] + [
@@ -94,13 +94,14 @@ def get_player_stats(tournament, player, detail=0, team=None):
             players = i.teams[0].players + i.teams[1].players
             if (
                 player.name in player_names
-                and i.ranked
+                and (i.ranked or (tournament and not tournament.details.get("ranked", True)))
                 and (not team or team.nice_name() in [j.nice_name() for j in i.teams])
                 and i.started
                 and not i.bye
             ):
                 games.append(i)
                 game_players.append(players[player_names.index(player.name)])
+    played = len(game_players)
     points_scored = sum([i.points_scored for i in game_players])
     aces_scored = sum([i.aces_scored for i in game_players])
     green_cards = sum([i.green_cards for i in game_players])
@@ -110,7 +111,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
     time_carded = sum([i.time_carded for i in game_players])
     faults = sum([i.faults for i in game_players])
     double_faults = sum([i.double_faults for i in game_players])
-    played = len(game_players)
+
     wins = (
         played
         if not player
@@ -124,7 +125,17 @@ def get_player_stats(tournament, player, detail=0, team=None):
     )
     served = sum([i.points_served for i in game_players])
     won_while_serving = sum([i.won_while_serving for i in game_players])
-    votes = len([i for i in games if i.best_player.nice_name() == player.nice_name()]) if player else played
+    votes = (
+        len(
+            [
+                i
+                for i in games
+                if i.best_player and i.best_player.nice_name() == player.nice_name()
+            ]
+        )
+        if player
+        else played
+    )
     out = {
         "B&F Votes": votes,
         "Elo": "-" if not player else round(player.elo, 2),
@@ -157,13 +168,17 @@ def get_player_stats(tournament, player, detail=0, team=None):
     avg_elo_delta = sum(i.elo_delta for i in game_players if i.elo_delta) / (
         len(game_players) or 1
     )
+    points_per_loss = points_scored / ((played - wins) or 1)
+    points_scored_by_team = sum(i.team.score for i in game_players)
     cards = green_cards + yellow_cards + red_cards
+    left = len([i for i in games if player.nice_name() in [j.players[0].nice_name() for j in i.teams]])
     out |= {
         "Percentage": f"{100 * (wins / (played or 1)): .1f}%",
         "Net Elo Delta": f"{sign(total_elo_delta)}{abs(total_elo_delta):.2f}",
         "Average Elo Delta": f"{sign(avg_elo_delta)}{abs(avg_elo_delta):.2f}",
         "Points served": served,
         "Points Per Game": round(points_scored / (played or 1), 2),
+        "Points Per Loss": "∞" if wins == played else round(points_per_loss, 2),
         "Aces Per Game": round(aces_scored / (played or 1), 2),
         "Faults Per Game": round(faults / (played or 1), 2),
         "Cards Per Game": round(cards / (played or 1), 2),
@@ -174,6 +189,8 @@ def get_player_stats(tournament, player, detail=0, team=None):
         "Serve Ace Rate": f"{aces_scored / (served or 1) * 100: .1f}%",
         "Serve Fault Rate": f"{faults / (served or 1) * 100: .1f}%",
         "Percentage of Points scored": f"{points_scored / ((time_on_court + time_carded) or 1) * 100: .1f}%",
+        "Percentage of Points scored for Team": f"{points_scored / (points_scored_by_team or 1) * 100: .1f}%",
+        "Percentage of Games as Left Player": f"{left / (played or 1) * 100: .1f}%",
         "Serving Conversion Rate": f"{won_while_serving / (served or 1) * 100: .1f}%",
         "Average Serving Streak": round(avg_streak_len, 2),
         "Max. Serving Streak": max_streak_len,
@@ -199,13 +216,17 @@ def get_player_stats(tournament, player, detail=0, team=None):
             ]
         else:
             court_players = sum((i.current_players for i in court_games), [])
-        court_wins = len(
-            [
-                i
-                for i in court_games
-                if player.nice_name() in [j.nice_name() for j in i.winner.players]
-            ]
-        ) if player else played
+        court_wins = (
+            len(
+                [
+                    i
+                    for i in court_games
+                    if player.nice_name() in [j.nice_name() for j in i.winner.players]
+                ]
+            )
+            if player
+            else played
+        )
         court_points_scored = sum([i.points_scored for i in court_players])
         court_aces_scored = sum([i.aces_scored for i in court_players])
         court_green_cards = sum([i.green_cards for i in court_players])
@@ -218,14 +239,23 @@ def get_player_stats(tournament, player, detail=0, team=None):
         court_played = len(court_players)
         court_served = sum([i.points_served for i in court_players])
         court_won_while_serving = sum([i.won_while_serving for i in court_players])
-        court_votes = len(
-            [
-                i
-                for i in games
-                if i.best_player.nice_name() == player.nice_name()
-                if i.court == j
-            ]
-        ) if player else played
+        court_points_scored_by_team = sum(i.team.score for i in game_players)
+
+        court_votes = (
+            len(
+                [
+                    i
+                    for i in games
+                    if i.best_player
+                    and i.best_player.nice_name() == player.nice_name()
+                    and i.court == j
+                ]
+            )
+            if player
+            else played
+        )
+        court_left = len([i for i in games if player.nice_name() in [j.players[0].nice_name() for j in i.teams]])
+        court_cards = court_red_cards + court_yellow_cards + court_green_cards
         court_serves_received = sum(i.serves_received for i in court_players)
         court_serves_returned = sum(i.serve_return for i in court_players)
         serving_streaks = []
@@ -242,8 +272,11 @@ def get_player_stats(tournament, player, detail=0, team=None):
         court_avg_elo_delta = sum(i.elo_delta for i in court_players if i.elo_delta) / (
             len(court_players) or 1
         )
+        court_points_per_loss = court_points_scored / ((court_played - court_wins) or 1)
+
         out |= {
             f"Court {numbers[j]}": {
+                "B&F Votes": court_votes,
                 "Points scored": court_points_scored,
                 "Aces scored": court_aces_scored,
                 "Faults": court_faults,
@@ -255,22 +288,24 @@ def get_player_stats(tournament, player, detail=0, team=None):
                 "Rounds Carded": court_time_carded,
                 "Games Played": court_played,
                 "Games Won": court_wins,
-                "Percentage": f"{100 * (court_wins / (court_played or 1)):.1f}%",
+                "Percentage": f"{100 * (court_wins / (court_played or 1)): .1f}%",
                 "Net Elo Delta": f"{sign(court_elo_delta)}{abs(court_elo_delta):.2f}",
                 "Average Elo Delta": f"{sign(court_avg_elo_delta)}{abs(court_avg_elo_delta):.2f}",
                 "Points served": court_served,
                 "Points Per Game": round(court_points_scored / (court_played or 1), 2),
+                "Points Per Loss": "∞" if wins == played else round(court_points_per_loss, 2),
                 "Aces Per Game": round(court_aces_scored / (court_played or 1), 2),
                 "Faults Per Game": round(court_faults / (court_played or 1), 2),
-                "Cards": (court_green_cards + court_yellow_cards + court_red_cards),
-                "Cards Per Game": round(
-                    (court_green_cards + court_yellow_cards + court_red_cards)
-                    / (court_played or 1),
-                    2,
-                ),
+                "Cards Per Game": round(court_cards / (court_played or 1), 2),
+                "Cards": court_cards,
+                "Points Per Card": "∞" if not court_cards else round(court_time_on_court / court_cards, 2),
+                "Serves Per Ace": "∞" if not court_aces_scored else round(court_served / court_aces_scored, 2),
+                "Serves Per Fault": "∞" if not court_faults else round(court_served / court_faults, 2),
                 "Serve Ace Rate": f"{court_aces_scored / (court_served or 1) * 100: .1f}%",
                 "Serve Fault Rate": f"{court_faults / (court_served or 1) * 100: .1f}%",
                 "Percentage of Points scored": f"{court_points_scored / ((court_time_on_court + court_time_carded) or 1) * 100: .1f}%",
+                "Percentage of Points scored for Team": f"{court_points_scored / (court_points_scored_by_team or 1) * 100: .1f}%",
+                "Percentage of Games as Left Player": f"{court_left / (court_played or 1) * 100: .1f}%",
                 "Serving Conversion Rate": f"{court_won_while_serving / (court_served or 1) * 100: .1f}%",
                 "Average Serving Streak": round(court_avg_streak_len, 2),
                 "Max. Serving Streak": court_max_streak_len,
@@ -278,9 +313,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
                 "Serves Received": court_serves_received,
                 "Serves Returned": court_serves_returned,
                 "Return Rate": f"{100 * court_serves_returned / (court_serves_received or 1): .1f}%",
-                "Votes Per 100 Games": round(
-                    court_votes * 100 / (court_played or 1), 1
-                ),
+                "Votes Per 100 Games": round(court_votes * 100 / (court_played or 1), 1),
             }
         }
     return out

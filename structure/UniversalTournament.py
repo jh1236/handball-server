@@ -14,6 +14,7 @@ class UniversalTournament:
     def officials(self):
         return get_all_officials()
 
+    @property
     def players(self):
         return get_all_players()
 

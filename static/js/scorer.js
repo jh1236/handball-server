@@ -294,6 +294,40 @@ function undo() {
     }).then(() => location.reload());
 }
 
+function swapServe() {
+    fetch("/api/games/update/swapServe", {
+        method: "POST", body: JSON.stringify({
+            tournament: tournament.replace("/", ""),
+            id: id
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(() => location.reload());
+}
+
+function swapServeTeam() {
+    fetch("/api/games/update/swapServeTeam", {
+        method: "POST", body: JSON.stringify({
+            tournament: tournament.replace("/", ""),
+            id: id
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(() => location.reload());
+}
+
+function swapPlayerSides(first) {
+    fetch("/api/games/update/swapPlayerSides", {
+        method: "POST", body: JSON.stringify({
+            tournament: tournament.replace("/", ""),
+            id: id,
+            firstTeam: first
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(() => location.reload());
+}
+
 function myFunction(button) {
     button.parentElement.getElementsByClassName("dropdown-content")[0].classList.toggle("show")
 }

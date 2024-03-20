@@ -104,7 +104,7 @@ if __name__ == "__main__":
                     game_id += 1
                     competition.get_game(game_id).start(r_bool(), r_bool(), r_bool())
                     continue
-                if competition.get_game(game_id).game_ended():
+                if competition.get_game(game_id).game_ended:
                     game.end(game.current_players[0].name)
                     game_id += 1
                     while competition.get_game(game_id).bye:  # the game is a bye

@@ -17,7 +17,9 @@ function swap() {
     }
 }
 
-let setTournament = t => tournament = t
+let setTournament = t => {
+    tournament = t
+}
 let best = ""
 setBest = (i, s) => {
     best = i
@@ -102,6 +104,7 @@ function start() {
                 "Content-type": "application/json; charset=UTF-8"
             }
         }).then(() => location.reload());
+        return
     }
     fetch("/api/games/update/start", {
         method: "POST",
@@ -135,7 +138,11 @@ function createPlayers() {
     }).then(
         (res) => {
             if (res.ok) {
-                document.location.href = `/${tournament}games/` + id + "/edit"
+                res.json().then(
+                    o => {
+                        document.location.href = `/${tournament}games/` + o.id + "/edit"
+                    }
+                )
             } else {
                 alert("Error!")
             }
@@ -158,7 +165,11 @@ function createTeams() {
     }).then(
         (res) => {
             if (res.ok) {
-                document.location.href = `/${tournament}games/` + id + "/edit"
+                res.json().then(
+                    o => {
+                        document.location.href = `/${tournament}games/` + o.id + "/edit"
+                    }
+                )
             } else {
                 alert("Error!")
             }

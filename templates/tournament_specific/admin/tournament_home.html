@@ -7,7 +7,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-<div id="navBar"></div>
+<nav id="navBar"></nav>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>load("{{tournament}}", true)</script>
@@ -22,9 +22,15 @@
             <h2>Games Requiring Action</h2>
 
             {% if not require_action %}
-                <br>
-                <br>
-                <i>All games are currently resolved.</i>
+                {% if tourney.fixtures_class.manual_allowed() and not in_progress %}
+                    <button class="button" onclick="document.location.href = '/{{ tournament }}/create'">New Game</button>
+                    <br>
+                    <br>
+                    <button class="button" onclick="document.location.href = '/{{ tournament }}/round'">New Round</button>
+                {%  else %}
+                    <br><br>
+                    <i>No Ongoing Games</i>
+                {% endif %}
             {% else %}
                 {% for i in require_action %}
 
@@ -52,7 +58,7 @@
                         <td><a href="/{{ tournament }}games/{{ i.id }}/admin"
                                class="hide">{{ i.teams[1] }}</a></td>
                         <td><a href="/{{ tournament }}games/{{ i.id }}/admin"
-                               class="hide">{{ i.score_string() }}</a></td>
+                               class="hide">{{ i.score_string }}</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -66,11 +72,6 @@
             <br>
             <br>
         </div>
-        {% if tourney.fixtures_class.manual_allowed() and not in_progress %}
-            <button class="button" onclick="document.location.href = '/{{ tournament }}/create'">New Game</button>
-            <button class="button" onclick="document.location.href = '/{{ tournament }}/round'">New Round
-            </button>
-        {% endif %}
     </div>
     <div style="float:left;width: 25%; height: 100%">
         <h2><a class="hide" href="/{{ tournament }}players/admin">Umpiring Notes</a></h2>

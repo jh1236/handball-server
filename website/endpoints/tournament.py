@@ -1,8 +1,9 @@
 import io
 import json
 import os
+import time
 
-from flask import request, send_file
+from flask import request, send_file, jsonify
 
 from structure.AllTournament import get_all_players
 from structure.Game import Game
@@ -13,8 +14,8 @@ from flask import request, send_file, Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-def add_tourney_endpoints(app, comps):
 
+def add_tourney_endpoints(app, comps):
     @app.post("/api/note")
     def note():
         tournament = request.json["tournament"]
@@ -34,7 +35,10 @@ def add_tourney_endpoints(app, comps):
                 f"./resources/images/tournaments/{tournament}.png", mimetype="image/png"
             )
         else:
-            return send_file(f"./resources/images/teams/blank.png", mimetype="image/png")
+            return send_file(
+                f"./resources/images/teams/blank.png", mimetype="image/png"
+            )
+
     @app.get("/api/teams/stats")
     def stats():
         tournament = request.args.get("tournament", type=str)
@@ -45,14 +49,14 @@ def add_tourney_endpoints(app, comps):
     @app.get("/api/games/current_round")
     def current_round():
         tournament = request.args.get("tournament", type=str)
-        return [i.as_map() for i in comps[tournament].games_to_list() if not i.best_player]
-
+        return [
+            i.as_map() for i in comps[tournament].games_to_list() if not i.best_player
+        ]
 
     @app.get("/api/games/fixtures")
     def all_fixtures():
         tournament = request.args.get("tournament", type=str)
         return [i.as_map() for i in comps[tournament].games_to_list()]
-
 
     @app.get("/api/games/display")
     def display():
@@ -119,17 +123,15 @@ def add_tourney_endpoints(app, comps):
                 "court": "TBD",
             }
 
-
     @app.get("/api/games/game")
     def game():
         tournament = request.args.get("tournament", type=str)
         game_id = int(request.args["id"])
         return comps[tournament].get_game(game_id).as_map()
 
-
-
     @app.post("/api/games/update/create")
     def create():
+        print(request.json)
         tournament = comps[request.json["tournament"]]
         if not tournament.fixtures_class.manual_allowed():
             return "Not Allowed", 403
@@ -171,13 +173,18 @@ def add_tourney_endpoints(app, comps):
         g.court = 0
         if official:
             g.set_primary_official(official)
-        tournament.fixtures[-1][-1] = g
+        last_game = next(i for i in reversed(tournament.games_to_list()) if not i.bye)
+        if (
+            time.time()
+            - last_game.start_time
+            > 32400 and len([i for i in tournament.fixtures[-1] if not i.bye])
+        ):
+            print(tournament.fixtures)
+            tournament.update_games(True)
         tournament.update_games()
+        tournament.fixtures[-1][-1] = g
         tournament.save()
-        return "", 204
-
-
-
+        return jsonify({"id": g.id})
 
     @app.post("/api/games/update/resolve")
     def resolve():
@@ -187,9 +194,6 @@ def add_tourney_endpoints(app, comps):
         comps[tournament].get_game(game_id).resolve()
         comps[tournament].save()
         return "", 204
-
-
-
 
     @app.post("/api/signup")
     def signup():

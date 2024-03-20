@@ -64,7 +64,7 @@ def init_api(app, comps: dict[str, Tournament]):
     def user_page():
         key = fetch_user()
         user = next(i for i in get_all_officials() if i.key == key)
-        player = ([i for i in get_all_players if i.nice_name() == user.nice_name()] + ["This will never match!"])[0]
+        player = ([i for i in get_all_players() if i.nice_name() == user.nice_name()] + ["This will never match!"])[0]
         with open("./clips/required.txt") as fp:
             reqd = [i.strip() for i in fp.readlines()]
         from website.clips import answers

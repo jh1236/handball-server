@@ -169,16 +169,29 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         prev_matches = prev_matches or [("No other matches", -1, game.tournament)]
         if not game.started:
             status = "Waiting for toss"
-        elif game.in_timeout():
+        elif game.in_timeout:
             status = "In Timeout"
-        elif not game.game_ended():
+        elif not game.game_ended:
             status = "Game in Progress"
         elif not game.best_player:
             status = "Finished"
         else:
             status = "Official"
-        player_stats = [
-            (i, *[j.get_stats()[i] for j in players]) for i in players[0].get_stats()
+        player_stats = {}
+        for t in teams:
+            for i in t.players:
+                out = [i.elo_delta_string]
+                out += i.get_stats().values()
+                player_stats[i.nice_name()] = out
+        for t in teams:
+            if any(j.subbed_off for j in t.players):
+                sub = next(j for j in t.players if j.subbed_off)
+                out = [sub.elo_delta_string]
+                out += sub.get_stats().values()
+                player_stats[sub.nice_name()] = out
+        headings = [
+            (0, "Elo Delta"),
+            *[*enumerate(players[0].get_stats().keys(), start=1)],
         ]
         return (
             render_template(
@@ -188,6 +201,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 players=[i.tidy_name() for i in players],
                 teams=teams,
                 stats=stats,
+                headings=headings,
                 player_stats=player_stats,
                 official=game.primary_official,
                 commentary=game_string_to_list(game),
@@ -215,7 +229,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                     s = f" <{sign(gt.elo_delta)}{round(abs(gt.elo_delta), 2)}>"
                 recent_games.append(
                     (
-                        repr(i) + f" ({i.score_string()}){s}",
+                        repr(i) + f" ({i.score_string}){s}",
                         i.id,
                         i.tournament.nice_name(),
                     )
@@ -224,14 +238,14 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                     key_matches.append(
                         (
                             i.noteable_string(True),
-                            repr(i) + f" ({i.score_string()}){s}",
+                            repr(i) + f" ({i.score_string}){s}",
                             i.id,
                             i.tournament.nice_name(),
                         )
                     )
 
         players = [
-            (i.name, i.nice_name(), [(k, v) for k, v in get_player_stats(comps[tournament], i, team=team, detail=0).items()])
+            (i.name, i.nice_name(), [(k, v) for k, v in get_player_stats(comps[tournament], i, team=team, detail=1).items()])
             for i in team.players
         ]
         return (
@@ -351,7 +365,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                     noteable_games.append(
                         (
                             i.noteable_string(True),
-                            repr(i) + f" ({i.score_string()}){s}",
+                            repr(i) + f" ({i.score_string}){s}",
                             i.id,
                             i.tournament.nice_name(),
                         )
@@ -360,7 +374,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         return (
             render_template(
                 "tournament_specific/admin/player_stats.html",
-                stats=[(k, v) for k, v in player.get_stats_detailed().items()],
+                stats=[(k, v) for k, v in get_player_stats(comps[tournament], player, detail=2).items()],
                 name=player.name,
                 player=player,
                 cards=cards,
@@ -381,7 +395,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             if i.requires_action:
                 games_requiring_action.append(i)
         ongoing_games = [
-            i for i in comps[tournament].games_to_list() if i.in_progress()
+            i for i in comps[tournament].games_to_list() if i.in_progress
         ]
         current_round = fixture_sorter(
             [

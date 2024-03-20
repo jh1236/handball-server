@@ -7,7 +7,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-<div id="navBar"></div>
+<nav id="navBar"></nav>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script>load("{{tournament}}", true)</script>
 
@@ -18,11 +18,22 @@
     <table class="table">
         <tbody>
         {% for stat in stats %}
-            <tr>
-                <th>{{ stat[0] }}:</th>
-                <td></td>
-                <td>{{ stat[1] }}</td>
-            </tr>
+            {% if stat[1].__str__().startswith("{") %}
+                <tr><td colspan="10" style="text-align: center"><h2>{{ stat[0] }}</h2></td></tr>
+                {% for stat2 in stat[1].items() %}
+                    <tr>
+                        <th>{{ stat2[0] }}:</th>
+                        <td></td>
+                        <td>{{ stat2[1] }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <th>{{ stat[0] }}:</th>
+                    <td></td>
+                    <td>{{ stat[1] }}</td>
+                </tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>

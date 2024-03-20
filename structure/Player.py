@@ -262,9 +262,7 @@ class GamePlayer:
         for i in comps.values():
             if i.details["sort"] < self.game.tournament.details["sort"]:
                 for j in i.games_to_list():
-                    if j.ranked and self.nice_name() in [
-                        k.nice_name() for k in j.playing_players
-                    ]:
+                    if j.ranked and self.nice_name() in [k.nice_name() for k in j.playing_players]:
                         games_total += 1
         for i in self.game.tournament.games_to_list():
             if i.id >= self.game.id:
@@ -287,6 +285,9 @@ class GamePlayer:
             "Percentage of Points scored": 100
             * self.points_scored
             / (self.game.rounds or 1),
+            "Percentage of Points scored for Team": 100
+                                           * self.points_scored
+                                           / (self.team.score or 1),
             "Return Rate": 100 * self.serve_return / (self.serves_received or 1),
             "Ace Rate": 100 * self.aces_scored / (self.points_served or 1),
             "Faults": self.faults,

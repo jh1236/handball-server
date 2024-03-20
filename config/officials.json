@@ -64,5 +64,12 @@
     "admin": false,
     "key": "poo",
     "level": 0
+  },
+  "Digby Ross": {
+    "primary": true,
+    "admin": false,
+    "key": "craiG69",
+    "level": 0
   }
+
 }

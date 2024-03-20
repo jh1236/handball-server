@@ -76,3 +76,12 @@ def officials_only(func):
 
     inner.__name__ = func.__name__ # changing name of inner function so flask acts nicely <3
     return inner
+
+def user_on_mobile() -> bool:
+    user_agent = request.headers.get("User-Agent")
+    user_agent = user_agent.lower()
+    phones = ["android", "iphone"]
+
+    if any(x in user_agent for x in phones):
+        return True
+    return False

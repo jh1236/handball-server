@@ -8,8 +8,9 @@ from structure.Game import Game
 from structure.Team import Team
 from structure.Tournament import load_all_tournaments
 from utils.logging_handler import logger
-from website import init_api
 import json
+
+from website.website import init_api
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -297,7 +298,7 @@ def create():
     tournament.fixtures[-1][-1] = g
     tournament.update_games()
     tournament.save()
-    return "", 204
+    return jsonify({"id": g.id}), 204
 
 
 @app.post("/api/games/update/end")

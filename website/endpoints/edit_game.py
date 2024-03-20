@@ -161,6 +161,34 @@ def add_game_endpoints(app, comps):
         comps[tournament].save()
         return "", 204
 
+    @app.post("/api/games/update/swapServe")
+    def swap_serve():
+        tournament = request.json["tournament"]
+        logger.info(f"Request for swap: {request.json}")
+        game_id = request.json["id"]
+        comps[tournament].get_game(game_id).swap_serve()
+        comps[tournament].save()
+        return "", 204
+
+    @app.post("/api/games/update/swapServeTeam")
+    def swap_serve_team():
+        tournament = request.json["tournament"]
+        logger.info(f"Request for swap: {request.json}")
+        game_id = request.json["id"]
+        comps[tournament].get_game(game_id).swap_serve_team()
+        comps[tournament].save()
+        return "", 204
+
+    @app.post("/api/games/update/swapPlayerSides")
+    def swap_player_sides():
+        first_team = request.json.get("firstTeam", None)
+        tournament = request.json["tournament"]
+        logger.info(f"Request for swap: {request.json}")
+        game_id = request.json["id"]
+        comps[tournament].get_game(game_id).teams[not first_team].swap_players()
+        comps[tournament].save()
+        return "", 204
+
     @app.post("/api/games/update/card")
     def card():
         tournament = request.json["tournament"]
