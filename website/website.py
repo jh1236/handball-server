@@ -25,6 +25,10 @@ def init_api(app, comps: dict[str, Tournament]):
             200,
         )
 
+    @app.get("/pipe.mp3")
+    def pipe():
+        return send_file("./resources/pipe.mp3")
+
     @app.get("/documents/")
     def docs():
         return (

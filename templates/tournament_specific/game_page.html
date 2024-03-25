@@ -82,7 +82,7 @@
         <tr>
             <td></td>
             {% for i in game.playing_players %}
-                <th {% if i.team.all_players().__len__() == 1 %}
+                <th {% if i.team.all_players.__len__() == 1 %}
                     colspan="2" {% endif %}
                 ><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}">
                     {{ i }}{% if i.subbed_on %} (sub){% endif %}{% if i.subbed_off %}*{% endif %}
@@ -94,7 +94,7 @@
             <tr>
                 <th>{{ title }}:</th>
                 {% for j in game.playing_players %}
-                    <td{% if j.team.all_players().__len__() == 1 %}
+                    <td{% if j.team.all_players.__len__() == 1 %}
                         colspan="2" {% endif %}
                     >{{ player_stats[j.nice_name()][i] }}</td>
 

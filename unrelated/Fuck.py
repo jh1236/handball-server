@@ -67,6 +67,7 @@ def add_unrelated_endpoints(app, socketio):
                 emit("game won", {"winner": request.cookies.get("userName")}, broadcast=True)
                 for i in players:
                     players[i] = 15
+                stack_size = 0
                 send_gamestate()
             else:
                 send_gamestate()

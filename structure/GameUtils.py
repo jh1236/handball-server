@@ -1,5 +1,8 @@
 import json
 from random import Random
+from typing import Callable
+
+from werkzeug.datastructures import MultiDict
 
 from structure.Game import Game
 from utils.util import chunks_sized
@@ -127,6 +130,7 @@ def game_string_to_list(game: Game) -> list[str]:
             )
     teams = [i.start_players.copy() for i in game.teams]
     card_count = 0
+    first_team_served_before = False
     cards = [0, 0]
     score = [0, 0]
     for j in chunks_sized(game.game_string, 2):
@@ -217,3 +221,166 @@ def game_string_to_list(game: Game) -> list[str]:
             f"Game Over! Winner: {game.winner.name}, Best on court: {game.best_player.first_name()}"
         )
     return out
+
+def filter_games(games_to_check, args, get_details=False):
+    out: list[tuple[object, set]] = []
+    details = MultiDict((k, v) for k, v in args.items(multi=True) if k not in ["Tournament", "Player", "Team", "Umpire", "Scorer", "Official", "Count"] and not v.startswith("$"))
+    for i in games_to_check:
+        if i.bye:
+            continue
+        failed = False
+        players = set([j.nice_name() for j in i.all_players])
+        for k, v in args.items(multi=True):
+            marked = v[0] == "~"
+            v = v.strip("$~")
+            comparer: Callable
+            absolute = len(v) > 1 and v[0] == v[1] or v[0] == "="
+            if v.startswith("!"):
+                comparer = lambda i: str(i) != str(v)
+                v = v.strip("!")
+            elif v.startswith(">"):
+                comparer = lambda i: float(i) > float(v)
+                v = v.strip(">")
+            elif v.startswith("<"):
+                comparer = lambda i: float(i) < float(v)
+                v = v.strip("<")
+            elif v == "*":
+                comparer = lambda  i: True
+            else:
+                comparer = lambda i: str(i) == str(v)
+            any_all = all if absolute else any
+            v = v.strip("=")
+            match k:
+                case "Tournament":
+                    if not comparer(i.tournament.nice_name()):
+                        failed = True
+                        break
+                case "Player":
+                    if marked:
+                        players &= {j.nice_name() for j in i.all_players if comparer(j.nice_name())}
+                    if not any_all(comparer(j.nice_name()) for j in i.all_players if not marked or j.nice_name() in players):
+                        failed = True
+                        break
+                case "Team":
+                    if marked:
+                        players &= {i.nice_name() for i in next(k for k in i.teams if comparer(k.nice_name())).all_players}
+                    if not any_all(comparer(j.nice_name()) for j in i.teams if not marked or j.nice_name() in players):
+                        failed = True
+                        break
+                case "Umpire":
+                    if not comparer(i.primary_official.nice_name()):
+                        failed = True
+                        break
+                case "Scorer":
+                    if not comparer(i.scorer.nice_name()):
+                        failed = True
+                        break
+                case "Official":
+                    if not any_all(comparer(j.nice_name()) for j in [i.scorer, i.primary_official]):
+                        failed = True
+                        break
+                case "Count":
+                    if not comparer(len(players)):
+                        failed = True
+                        break
+                case _:
+                    if absolute and any(not comparer((j.get_game_details()|j.get_stats_detailed())[k]) for j in i.all_players if not marked or j.nice_name() in players):
+                        failed = True
+                        break
+                    current_players = set()
+                    for j in i.all_players:
+                        if comparer((j.get_game_details()|j.get_stats_detailed())[k]):
+                            current_players |= {j.nice_name()}
+                    if not current_players:
+                        failed = True
+                        break
+                    if marked:
+                        players &= current_players
+            if not players:
+                failed = True
+                break
+        if not failed:
+            out.append((i, players))
+    if get_details:
+        return out, details
+    return out
+
+def get_query_descriptor(details):
+    if not details:
+        return ""
+    s = "Games"
+    has_marked=False
+    for k, v in details.items(multi=True):
+        marked = v[0] == "~"
+        v = v.strip("~")
+        v = v.strip("$")
+        comparer: Callable
+        absolute = len(v) > 1 and v[0] == v[1] or v[0] == "="
+        v = v.strip("=")
+        if v.startswith("!"):
+            v = v.strip("!")
+            if absolute:
+                if marked and has_marked:
+                    s += f" where no specific players who have {v} {k}"
+                else:
+                    s += f" where no players who have {v} {k}"
+            else:
+                if marked:
+                    if has_marked:
+                        s += f" where that player does not have {v} {k}"
+                    else:
+                        s += f" where a specific player does not have {v} {k}"
+                else:
+                    s += f" where any player does not have {v} {k}"
+        elif v.startswith(">"):
+            v = v.strip(">")
+            if absolute:
+                if marked and has_marked:
+                    s += f" where all specific players have more than {v} {k}"
+                else:
+                    s += f" where every player has more than {v} {k}"
+            else:
+                if marked:
+                    if has_marked:
+                        s += f" where that player has more than {v} {k}"
+                    else:
+                        s += f" where a specific player has more than {v} {k}"
+                else:
+                    s += f" where any player has more than {v} {k}"
+        elif v.startswith("<"):
+            v = v.strip("<")
+            if absolute:
+                if marked and has_marked:
+                    s += f" where all specific players have less than {v} {k}"
+                else:
+                    s += f" where every player has less than {v} {k}"
+            else:
+                if marked:
+                    if has_marked:
+                        s += f" where that player has less than {v} {k}"
+                    else:
+                        s += f" where a specific player has less than {v} {k}"
+                else:
+                    s += f" where any player has less than {v} {k}"
+        elif v == "*":
+            pass
+        else:
+            has = f"has {v}"
+            if v in ["True", "False"]:
+                has = "is" + ("" if  v == "True" else " not")
+            if absolute:
+                if marked and has_marked:
+                    s += f" where all specific players have {v} {k}"
+                else:
+                    s += f" where every player {has} {k}"
+            else:
+                if marked:
+                    if has_marked:
+                        s += f" where that player {has} {k}"
+                    else:
+                        s += f" where a specific player {has} {k}"
+                else:
+                    s += f" where any player {has} {k}"
+        s += ", and"
+        has_marked |= (marked and not absolute)
+    return s[:-5]

@@ -93,7 +93,7 @@
             <tr>
                 <th>{{ title }}:</th>
                 {% for j in game.playing_players %}
-                    <td{% if j.team.all_players().__len__() == 1 %}
+                    <td{% if j.team.all_players.__len__() == 1 %}
                         colspan="2" {% endif %}
                     >{{ player_stats[j.nice_name()][i] }}</td>
 

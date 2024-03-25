@@ -59,6 +59,9 @@ class Tournament:
             game for r in self.finals for game in r
         ]
 
+    def finals_to_list(self) -> list[Game]:
+        return [game for r in self.finals for game in r]
+
     def ladder(self):
         if isinstance(self.fixtures_class, Pooled):
             pools = list(n_chunks(sorted(self.teams, key=lambda it: it.nice_name()), 2))
@@ -290,9 +293,7 @@ class Tournament:
             # court_one_games = sorted(r, key=lambda a: sum([i.team.court_one for i in a.teams]))
             court_one_games = sorted(
                 r,
-                key=lambda a: -sum(
-                    [i.team.percentage for i in a.teams]
-                ),
+                key=lambda a: -sum([i.team.percentage for i in a.teams]),
             )  # use for preferential treatment of wins
             court_one_games = [i for i in court_one_games if not i.bye]
             halfway = False

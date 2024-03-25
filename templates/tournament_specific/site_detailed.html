@@ -54,7 +54,7 @@
                               class="hide">{{ game.scorer }}</a></i></td> {% endif %}
                 {% if t.two_courts %}
                     <td><a href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"
-                           class="hide">{{ game.court_display() }}</a></td> {% endif %}
+                           class="hide">{{ game.court_display }}</a></td> {% endif %}
                 <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
             </tr>
         {% endfor %}
@@ -83,7 +83,7 @@
                                   class="hide">{{ game.scorer }}</a></i></td> {% endif %}
                     {% if t.two_courts %}
                         <td><a href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"
-                               class="hide">{{ game.court_display() }}</a></td> {% endif %}
+                               class="hide">{{ game.court_display }}</a></td> {% endif %}
                     <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
                 </tr>
 

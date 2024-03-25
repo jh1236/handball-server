@@ -255,6 +255,7 @@ class GamePlayer:
             "Red Cards": self.red_cards,
         }
 
+
     def get_stats_detailed(self):
         from start import comps
 
@@ -274,18 +275,23 @@ class GamePlayer:
         return {
             "Elo Delta": self.elo_delta if self.elo_delta else 0,
             "Elo": self.elo_at_start + (self.elo_delta if self.elo_delta else 0),
-            "Points scored": self.points_scored,
-            "Points served": self.points_served,
+            "Team Elo Difference": self.team.elo_at_start - self.team.opponent.elo_at_start,
+            "Teammate Elo Difference": self.elo_at_start - (self.team.elo_at_start * len(self.team.players) - self.elo_at_start) / (len(self.team.players) - 1),
+            "Solo Elo Difference": self.elo_at_start - self.team.opponent.elo_at_start,
+            "Points Scored": self.points_scored,
+            "Points Served": self.points_served,
             "Timeline": games_total,
-            "Aces": self.aces_scored,
+            "Length": self.game.length,
+            "Aces Scored": self.aces_scored,
             "Max Ace Streak": max(self.ace_streak),
             "Max Serving Streak": max(self.serve_streak),
-            "Serves received": self.serves_received,
-            "Serves returned": self.serve_return,
-            "Percentage of Points scored": 100
+            "Serves Received": self.serves_received,
+            "Serves Returned": self.serve_return,
+            "Serves Missed": self.serves_received - self.serve_return,
+            "Percentage of Points Scored": 100
             * self.points_scored
             / (self.game.rounds or 1),
-            "Percentage of Points scored for Team": 100
+            "Percentage of Points Scored for Team": 100
                                            * self.points_scored
                                            / (self.team.score or 1),
             "Return Rate": 100 * self.serve_return / (self.serves_received or 1),
@@ -293,12 +299,65 @@ class GamePlayer:
             "Faults": self.faults,
             "Double Faults": self.double_faults,
             "Rounds Played": self.time_on_court,
-            "Rounds On Bench": self.time_carded,
+            "Rounds Carded": self.time_carded,
+            "Rounds": self.game.rounds,
             "Green Cards": self.green_cards,
             "Yellow Cards": self.yellow_cards,
             "Red Cards": self.red_cards,
-            "Point Difference": self.team.score - self.team.opponent.score,
+            "Score Difference": (self.team.score - self.team.opponent.score) if self.team.opponent else 0,
             "Cards": self.red_cards + self.yellow_cards + self.green_cards,
+            "Result": int(self.game.winner.nice_name() == self.team.nice_name())
+        }
+
+    def get_game_details(self):
+        from start import comps
+
+        games_total = 0
+        for i in comps.values():
+            if i.details["sort"] < self.game.tournament.details["sort"]:
+                for j in i.games_to_list():
+                    if j.ranked and self.nice_name() in [k.nice_name() for k in j.playing_players]:
+                        games_total += 1
+        for i in self.game.tournament.games_to_list():
+            if i.id >= self.game.id:
+                break
+            if i.ranked and self.nice_name() in [
+                k.nice_name() for k in i.playing_players
+            ]:
+                games_total += 1
+        return {
+            "Points Scored": self.points_scored,
+            "Aces Scored": self.aces_scored,
+            "Faults": self.faults,
+            "Double Faults": self.double_faults,
+            "Green Cards": self.green_cards,
+            "Yellow Cards": self.yellow_cards,
+            "Red Cards": self.red_cards,
+            "Rounds Played": self.time_on_court,
+            "Rounds Carded": self.time_carded,
+            "Result": "Won" if self.game.winner.nice_name() == self.team.nice_name() else "Lost",
+            "Cards": self.red_cards + self.yellow_cards + self.green_cards,
+            "Points Served": self.points_served,
+            "Max Serving Streak": max(self.serve_streak),
+            "Max Ace Streak": max(self.ace_streak),
+            "Serves Received": self.serves_received,
+            "Serves Returned": self.serve_return,
+            "Serves Missed": self.serves_received - self.serve_return,
+            "Court": self.game.court + 1,
+            "Side": "Left" if self.team.players[0].nice_name() == self.nice_name() else "Right",
+            "Format": "Championship" if "championship" in self.game.tournament.nice_name() else "Practice",
+            "Team Size": len(self.team.playing_players),
+            "Round": self.game.round_number,
+            "Rounds": self.game.rounds,
+            "Length": round(self.game.length / 60),
+            "Forfeit": self.game.is_forfeited and self.game.winner.nice_name() != self.team.nice_name(),
+            "Finals": self.game.is_final,
+            "Best on Ground": self.game.best_player.nice_name() == self.nice_name(),
+            "Made Finals": any([self.team.nice_name() in [k.nice_name() for k in i.teams] for i in self.game.tournament.finals_to_list()]),
+            "Ranked": self.game.ranked,
+            "Official": self.game.primary_official.name,
+            "Served First": self.game.teams[not self.game.first_team_serves].nice_name() == self.team.nice_name(),
+            "Opponent": self.team.opponent.name
         }
 
     def fault(self):

@@ -27,9 +27,9 @@
 <table class="table">
     <tr>
         <td></td>
-        <th colspan="{{ teams[0].all_players().__len__() }}"><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+        <th colspan="{{ teams[0].all_players.__len__() }}"><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
                               class="hide">{{ teams[0].name }}</a></b></th>
-        <th colspan="{{ teams[1].all_players().__len__() }}"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+        <th colspan="{{ teams[1].all_players.__len__() }}"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
                                                    class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
             </a>{% endif %}</b></th>
         <th class="invisible">Spacerrrrrrr</th>
@@ -37,8 +37,8 @@
     {% for stat in stats %}
         <tr>
             <th>{{ stat[0] }}:</th>
-            <td colspan="{{ teams[0].all_players().__len__() }}">{{ stat[1] }}</td>
-            <td colspan="{{ teams[1].all_players().__len__() }}">{{ stat[2] }}</td>
+            <td colspan="{{ teams[0].all_players.__len__() }}">{{ stat[1] }}</td>
+            <td colspan="{{ teams[1].all_players.__len__() }}">{{ stat[2] }}</td>
         </tr>
 
 
