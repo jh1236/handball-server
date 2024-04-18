@@ -122,8 +122,8 @@
                 "teamTwo": {
                     "name": "Bedwars Besties",
                     "players": [
-                        "Jared Healy",
-                        "Lachlan Banks"
+                        "Lachlan Banks",
+                        "Jared Healy"
                     ],
                     "score": 11
                 }
@@ -653,7 +653,7 @@
         ],
         [
             {
-                "bestPlayer": "Forfeit",
+                "bestPlayer": "Tristan Nel",
                 "cards": [],
                 "court": 0,
                 "firstTeamServed": true,

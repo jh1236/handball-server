@@ -223,62 +223,35 @@ def game_string_to_list(game: Game) -> list[str]:
     return out
 
 def filter_games(games_to_check, args, get_details=False):
-    out: list[tuple[object, set]] = []
-    details = MultiDict((k, v) for k, v in args.items(multi=True) if k not in ["Tournament", "Player", "Team", "Umpire", "Scorer", "Official", "Count"] and not v.startswith("$"))
+    out: list[tuple[Game, set]] = []
+    details = MultiDict((k, v) for k, v in args.items(multi=True) if not v.startswith("$"))
+    sort = ([k for k, v in args.items(multi=True) if v.startswith("^")] + [None])[0]
     for i in games_to_check:
         if i.bye:
             continue
         failed = False
         players = set([j.nice_name() for j in i.all_players])
         for k, v in args.items(multi=True):
+            v = v.strip("$^")
             marked = v[0] == "~"
-            v = v.strip("$~")
+            v = v.strip("~")
             comparer: Callable
             absolute = len(v) > 1 and v[0] == v[1] or v[0] == "="
             if v.startswith("!"):
-                comparer = lambda i: str(i) != str(v)
                 v = v.strip("!")
+                comparer = lambda i: float(i) != float(v) if str(v).strip().isnumeric() else str(i) != str(v)
             elif v.startswith(">"):
-                comparer = lambda i: float(i) > float(v)
                 v = v.strip(">")
+                comparer = lambda i: float(i) > float(v)
             elif v.startswith("<"):
-                comparer = lambda i: float(i) < float(v)
                 v = v.strip("<")
+                comparer = lambda i: float(i) < float(v)
             elif v == "*":
                 comparer = lambda  i: True
             else:
-                comparer = lambda i: str(i) == str(v)
-            any_all = all if absolute else any
-            v = v.strip("=")
+                v = v.strip("=")
+                comparer = lambda i:  float(i) == float(v) if str(v).strip().isnumeric() else str(i) == str(v)
             match k:
-                case "Tournament":
-                    if not comparer(i.tournament.nice_name()):
-                        failed = True
-                        break
-                case "Player":
-                    if marked:
-                        players &= {j.nice_name() for j in i.all_players if comparer(j.nice_name())}
-                    if not any_all(comparer(j.nice_name()) for j in i.all_players if not marked or j.nice_name() in players):
-                        failed = True
-                        break
-                case "Team":
-                    if marked:
-                        players &= {i.nice_name() for i in next(k for k in i.teams if comparer(k.nice_name())).all_players}
-                    if not any_all(comparer(j.nice_name()) for j in i.teams if not marked or j.nice_name() in players):
-                        failed = True
-                        break
-                case "Umpire":
-                    if not comparer(i.primary_official.nice_name()):
-                        failed = True
-                        break
-                case "Scorer":
-                    if not comparer(i.scorer.nice_name()):
-                        failed = True
-                        break
-                case "Official":
-                    if not any_all(comparer(j.nice_name()) for j in [i.scorer, i.primary_official]):
-                        failed = True
-                        break
                 case "Count":
                     if not comparer(len(players)):
                         failed = True
@@ -301,6 +274,8 @@ def filter_games(games_to_check, args, get_details=False):
                 break
         if not failed:
             out.append((i, players))
+    if sort:
+        out.sort(key=lambda a: -max([(i.get_game_details()|i.get_stats_detailed())[sort] for i in a[0].all_players if i.nice_name() in a[1]]))
     if get_details:
         return out, details
     return out
@@ -321,9 +296,9 @@ def get_query_descriptor(details):
             v = v.strip("!")
             if absolute:
                 if marked and has_marked:
-                    s += f" where no specific players who have {v} {k}"
+                    s += f" where no specific players have {v} {k}"
                 else:
-                    s += f" where no players who have {v} {k}"
+                    s += f" where no players have {v} {k}"
             else:
                 if marked:
                     if has_marked:

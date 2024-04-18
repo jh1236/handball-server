@@ -3,7 +3,7 @@ import os
 from typing import Callable
 
 import numpy as np
-from flask import request, send_file, Response
+from flask import request, send_file, Response, render_template
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
@@ -66,40 +66,7 @@ def add_endpoints(app, comps):
             }
         return str(d), 200
 
-    @app.get("/api/game/find")
-    def game_finder():
-        details: set[str]
-        games: list[tuple[object, set]]
-        games, details = filter_games(get_all_games(), request.args, get_details=True)
-        print("\n".join(f"'{k}': '{v}'" for k, v in request.args.items(multi=True)))
-        if not games and any("," in i for i in request.args.values()):
-            return (
-                "<h1>Nothing Found.  Have you put a comma instead of an ampersand?</h1>"
-            )
-        output = [
-            f"<h1>Query returned {len(games)} results</h1>",
-            "<p>" + get_query_descriptor(details) + "</p>",
-        ]
-        for g, players in games:
-            s = f'<p><a href = "/{g.tournament.nice_name()}/games/{g.id}">'
-            s += g.full_name
-            if details:
-                s += " - "
-            for p in g.all_players:
-                if p.nice_name() not in players or not details:
-                    continue
-                s += f"({p.first_name()}: "
-                for j in details:
-                    stat = (p.get_game_details() | p.get_stats_detailed())[j]
-                    if isinstance(stat, str):
-                        s += f"{j}={stat},"
-                    else:
-                        s += f"{j}={round(stat, 2)},"
-                s += ")"
 
-            s += "</a></p>"
-            output.append(s)
-        return "\n".join(output)
 
     add_tourney_endpoints(app, comps)
     add_graph_endpoints(app, comps)

@@ -142,6 +142,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
     out = {
         "B&F Votes": votes,
         "Elo": "-" if not player else round(player.elo, 2),
+        "Peak Elo": round(max([i.elo_at_start for i in game_players ]+ [0]), 2),
         "Points Scored": points_scored,
         "Aces Scored": aces_scored,
         "Faults": faults,
@@ -186,7 +187,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
         else 0
     )
     out |= {
-        "Percentage": f"{100 * (wins / (played or 1)): .1f}%",
+        "Percentage": f"{100 * (wins / (played or 1)):.1f}%",
         "Net Elo Delta": f"{sign(total_elo_delta)}{abs(total_elo_delta):.2f}",
         "Average Elo Delta": f"{sign(avg_elo_delta)}{abs(avg_elo_delta):.2f}",
         "Points Served": served,
@@ -199,19 +200,19 @@ def get_player_stats(tournament, player, detail=0, team=None):
         "Points Per Card": "∞" if not cards else round(time_on_court / cards, 2),
         "Serves Per Ace": "∞" if not aces_scored else round(served / aces_scored, 2),
         "Serves Per Fault": "∞" if not faults else round(served / faults, 2),
-        "Serve Ace Rate": f"{aces_scored / (served or 1) * 100: .1f}%",
+        "Serve Ace Rate": f"{aces_scored / (served or 1) * 100:.1f}%",
         "Serve Fault Rate": f"{faults / (served or 1) * 100: .1f}%",
-        "Percentage of Points Scored": f"{points_scored / ((time_on_court + time_carded) or 1) * 100: .1f}%",
-        "Percentage of Points Scored for Team": f"{points_scored / (points_scored_by_team or 1) * 100: .1f}%",
-        "Percentage of Games as Left Player": f"{left / (played or 1) * 100: .1f}%",
-        "Serving Conversion Rate": f"{won_while_serving / (served or 1) * 100: .1f}%",
+        "Percentage of Points Scored": f"{points_scored / ((time_on_court + time_carded) or 1) * 100:.1f}%",
+        "Percentage of Points Scored for Team": f"{points_scored / (points_scored_by_team or 1) * 100:.1f}%",
+        "Percentage of Games as Left Player": f"{left / (played or 1) * 100:.1f}%",
+        "Serving Conversion Rate": f"{won_while_serving / (served or 1) * 100:.1f}%",
         "Average Serving Streak": round(avg_streak_len, 2),
         "Max. Serving Streak": max_streak_len,
         "Max. Ace Streak": max_ace_streak,
         "Serves Received": serves_received,
         "Serves Returned": serves_returned,
         "Serves Missed": serves_received - serves_returned,
-        "Return Rate": f"{100 *serves_returned / (serves_received or 1): .1f}%",
+        "Return Rate": f"{100 *serves_returned / (serves_received or 1):.1f}%",
         "Serves Missed Per Game": round(
             (serves_received - serves_returned) / (played or 1), 2
         ),
@@ -315,7 +316,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
                 "Rounds Carded": court_time_carded,
                 "Games Played": court_played,
                 "Games Won": court_wins,
-                "Percentage": f"{100 * (court_wins / (court_played or 1)): .1f}%",
+                "Percentage": f"{100 * (court_wins / (court_played or 1)):.1f}%",
                 "Net Elo Delta": f"{sign(court_elo_delta)}{abs(court_elo_delta):.2f}",
                 "Average Elo Delta": f"{sign(court_avg_elo_delta)}{abs(court_avg_elo_delta):.2f}",
                 "Points Served": court_served,
@@ -336,19 +337,19 @@ def get_player_stats(tournament, player, detail=0, team=None):
                 "Serves Per Fault": "∞"
                 if not court_faults
                 else round(court_served / court_faults, 2),
-                "Serve Ace Rate": f"{court_aces_scored / (court_served or 1) * 100: .1f}%",
-                "Serve Fault Rate": f"{court_faults / (court_served or 1) * 100: .1f}%",
+                "Serve Ace Rate": f"{court_aces_scored / (court_served or 1) * 100:.1f}%",
+                "Serve Fault Rate": f"{court_faults / (court_served or 1) * 100:.1f}%",
                 "Percentage of Points Scored": f"{court_points_scored / ((court_time_on_court + court_time_carded) or 1) * 100: .1f}%",
                 "Percentage of Points Scored for Team": f"{court_points_scored / (court_points_scored_by_team or 1) * 100: .1f}%",
-                "Percentage of Games as Left Player": f"{court_left / (court_played or 1) * 100: .1f}%",
-                "Serving Conversion Rate": f"{court_won_while_serving / (court_served or 1) * 100: .1f}%",
+                "Percentage of Games as Left Player": f"{court_left / (court_played or 1) * 100:.1f}%",
+                "Serving Conversion Rate": f"{court_won_while_serving / (court_served or 1) * 100:.1f}%",
                 "Average Serving Streak": round(court_avg_streak_len, 2),
                 "Max. Serving Streak": court_max_streak_len,
                 "Max. Ace Streak": court_max_ace,
                 "Serves Received": court_serves_received,
                 "Serves Returned": court_serves_returned,
                 "Serves Missed": court_serves_received - court_serves_returned,
-                "Return Rate": f"{100 * court_serves_returned / (court_serves_received or 1): .1f}%",
+                "Return Rate": f"{100 * court_serves_returned / (court_serves_received or 1):.1f}%",
                 "Serves Missed Per Game": round(
                     (court_serves_received - court_serves_returned) / (played or 1), 2
                 ),

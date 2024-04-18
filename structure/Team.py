@@ -145,7 +145,9 @@ class Team:
                 ):
                     return i
         key = tuple(sorted(i.nice_name() for i in players))
-        if key in team_names:
+        if len([i for i in players if not "null" in i.nice_name()]) == 1:
+            name = "(Solo) " + next(i for i in players if "null" not in i.nice_name()).name
+        elif key in team_names:
             name = team_names[key]
         if not name.strip():
             raise NameError("Team name is not valid!")

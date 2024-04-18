@@ -47,6 +47,9 @@ class Tournament:
     def nice_name(self):
         return self.name.lower().replace(" ", "_").replace("the_", "").replace("'", "")
 
+    def __repr__(self):
+        return self.name
+
     @property
     def BYE(self):
         if not self._bye:

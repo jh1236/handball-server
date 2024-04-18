@@ -365,19 +365,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         round_number = game.round_number + 1
         prev_matches = []
         for i in get_all_games():
-            if not all(
-                [
-                    k.nice_name() in [j.team.nice_name() for j in i.teams]
-                    for k in game.teams
-                ]
-            ):
-                continue
-            if not all(
-                [
-                    j.team.nice_name() in [k.nice_name() for k in game.teams]
-                    for j in i.teams
-                ]
-            ):
+            if sorted(j.nice_name() for j in i.teams) != sorted(j.nice_name() for j in teams):
                 continue
             if (
                 i.tournament.nice_name() == game.tournament.nice_name()

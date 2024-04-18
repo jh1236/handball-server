@@ -22,7 +22,7 @@ def colors(progress, m):
 
 
 def to_number(x):
-    intermediate: str = str(x).strip("%").replace("∞", "inf")
+    intermediate: str = str(x).strip("%").replace("∞", "inf").strip()
     if intermediate.replace(".", "").replace("-", "").isdecimal():
         return float(intermediate)
     return None
@@ -218,7 +218,7 @@ def add_graph_endpoints(app, comps):
             ys = ys[ys > 0]
         if "Elo" == y_stat:
             ys = ys - 1500
-        fig = Figure(figsize=(8, 6))  # figsize=(12,12)
+        fig = Figure(figsize=(12, 9))  # figsize=(12,12)
         ax = fig.add_subplot(1, 1, 1)
 
         a = ax.bar(xs, ys, 0.6)

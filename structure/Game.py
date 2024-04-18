@@ -84,7 +84,7 @@ class Game:
         game.start_time = game_map.get("startTime", -1)
         if game_map.get("bestPlayer", False):
             game.end(
-                None if game_map["bestPlayer"] == "Forfeit" else game_map["bestPlayer"],
+                game_map["bestPlayer"],
                 game_map.get("cards", None),
                 game_map.get("notes", None),
             )
@@ -447,15 +447,17 @@ class Game:
             if notes:
                 self.notes = notes
             self.best_player = None
-            if self.is_forfeited and best_player is None:
+
+            for i in self.current_players:
+                if i.name == best_player:
+                    self.best_player = i
+                    i.best_player()
+                    break
+            if self.is_forfeited and self.best_player is None:
                 self.best_player = forfeit_player(self)
-            else:
-                for i in self.current_players:
-                    if i.name == best_player:
-                        self.best_player = i
-                        i.best_player()
-                        break
-            if self.best_player == None:
+            elif all(len(i.all_players) == 1 for i in self.teams):
+                self.best_player = [i for i in self.teams[0].players + self.teams[1].players if "null" in i.nice_name()][0]
+            elif self.best_player is None:
                 raise Exception(f"Best Player '{best_player}' not found")
             self.update_count = -1
             [i.end(self.is_final) for i in self.teams]

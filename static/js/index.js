@@ -1,15 +1,4 @@
-function logout() {
-    document.cookie.split(";").forEach(function (c) {
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
-    if (location.toString().includes("admin")) {
-        document.location = location.toString().replace("/admin", "")
-    } else {
-        location.reload()
-    }
 
-
-}
 
 let load = (s, admin = false) => {
     let masterDiv = document.getElementById("navBar")
