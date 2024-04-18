@@ -36,11 +36,23 @@ class UniversalTournament:
             out += j.fixtures
         return out
 
+    @property
+    def link(self):
+        return "/"
+
+
+    def __repr__(self):
+        return self.name
+
     def nice_name(self):
         return "all_tournaments"
 
     def get_game(self, id):
         return self.games_to_list()[id]
+
+    @property
+    def name(self):
+        return "SUSS Handball"
 
     def ladder(self):
         return sorted(

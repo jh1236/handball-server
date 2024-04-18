@@ -15,7 +15,7 @@
     <a href="/{{tournament}}teams/{{player.team.nice_name()}}/admin">
         <img src="/api/teams/image?name={{player.team.nice_name()}}" class="team_logo"></a>
     <h1><a href="/{{tournament}}players/{{player.nice_name()}}/admin" class="hide">Statistics for {{player.name}}</a></h1>
-    <table class="table">
+    <table class="jaredTable">
         <tbody>
         {% for stat in stats %}
             {% if stat[1].__str__().startswith("{") %}

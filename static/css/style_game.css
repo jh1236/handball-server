@@ -5,32 +5,32 @@ h1.big {
     margin: 0;
 }
 
-.table tr td:first-child {
+.jaredTable tr td:first-child {
     width: 170px;
 }
 
-.table tr td:nth-child(2) {
+.jaredTable tr td:nth-child(2) {
     width: 120px;
     text-align: center;
 }
 
-.table tr td:nth-child(3) {
+.jaredTable tr td:nth-child(3) {
     width: 120px;
 }
 
-.table tr td:nth-child(4) {
+.jaredTable tr td:nth-child(4) {
     width: 120px;
 }
 
-.table tr td:nth-child(5) {
+.jaredTable tr td:nth-child(5) {
     width: 120px;
 }
 
-.table tr td:nth-child(6) {
+.jaredTable tr td:nth-child(6) {
     width: 120px;
 }
 
-.table tr td:nth-child(7) {
+.jaredTable tr td:nth-child(7) {
     width: 120px;
 }
 

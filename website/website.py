@@ -7,6 +7,7 @@ from structure.AllTournament import get_all_officials, get_all_players, get_all_
 from structure.GameUtils import filter_games, get_query_descriptor
 from structure.Tournament import Tournament
 from utils.permissions import fetch_user, officials_only
+from utils.sidebar_wrapper import render_template_sidebar
 from website.endpoints.endpoints import add_endpoints
 
 numbers = ["One", "Two", "Three", "Four", "Five", "Six"]
@@ -19,7 +20,7 @@ def init_api(app, comps: dict[str, Tournament]):
     @app.get("/")
     def root():
         return (
-            render_template(
+            render_template_sidebar(
                 "all_tournaments.html",
                 comps=comps.values(),
             ),
@@ -32,10 +33,8 @@ def init_api(app, comps: dict[str, Tournament]):
 
     @app.get("/documents/")
     def docs():
-        return (
-            render_template("rules.html"),
-            200,
-        )
+        return render_template_sidebar("rules.html"), 200
+
 
     @app.get("/logout/")
     def logout():
@@ -98,7 +97,7 @@ def init_api(app, comps: dict[str, Tournament]):
             to_officiate = to_officiate[:4]
         if len(to_play) > 4:
             to_play = to_play[:4]
-        return render_template(
+        return render_template_sidebar(
             "user_file.html",
             user=user,
             player=player,

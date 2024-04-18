@@ -142,7 +142,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
     out = {
         "B&F Votes": votes,
         "Elo": "-" if not player else round(player.elo, 2),
-        "Peak Elo": round(max([i.elo_at_start for i in game_players ]+ [0]), 2),
+
         "Points Scored": points_scored,
         "Aces Scored": aces_scored,
         "Faults": faults,
@@ -188,6 +188,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
     )
     out |= {
         "Percentage": f"{100 * (wins / (played or 1)):.1f}%",
+        "Peak Elo": round(max([i.elo_at_start for i in game_players ]+ [0]), 2),
         "Net Elo Delta": f"{sign(total_elo_delta)}{abs(total_elo_delta):.2f}",
         "Average Elo Delta": f"{sign(avg_elo_delta)}{abs(avg_elo_delta):.2f}",
         "Points Served": served,

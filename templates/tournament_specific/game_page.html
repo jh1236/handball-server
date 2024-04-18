@@ -1,14 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "base.html" %}
+
+{% block headBlock %}
     <title>{{ teams[0].name }} vs {{ teams[1].name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+{% endblock %}
+
+{% block bodyBlock %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}")</script>
 <div style="top:0;left:0;bottom: 100%;width: 66%">
     <h1><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ teams[0].name }} vs {{ teams[1].name }}</a></h1>
     <h1 class="big"><a class="hide" href="/{{ tournament }}games/{{ game.id }}/display">{{ game.score_string }}</a>
@@ -38,7 +37,7 @@
         </p>
     {% endif %}
     <br>
-    <table class="table">
+    <table class="jaredTable">
         <tr>
             <th><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
                    class="hide"><img
@@ -57,7 +56,7 @@
     <br>
     <br>
     <br>
-    <table class="table">
+    <table class="jaredTable">
         <tr>
             <td></td>
             <th colspan="{{ game.teams[0].has_subbed + 2 }}"><b><a
@@ -122,5 +121,4 @@
         <p style="color: black;">{{ line }}</p>
     {% endfor %}
 </div>
-</body>
-</html>
+{% endblock %}

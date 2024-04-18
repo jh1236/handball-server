@@ -57,6 +57,12 @@ class Tournament:
             self._bye.tournament = self
         return self._bye
 
+
+    @property
+    def link(self):
+        return f"/{self.nice_name()}/"
+
+
     def games_to_list(self) -> list[Game]:
         return [game for r in self.fixtures for game in r] + [
             game for r in self.finals for game in r

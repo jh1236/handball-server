@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "base.html" %}
+
+{% block headBlock %}
     <title>Tournaments</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("")</script>
+{% endblock %}
+
+{% block bodyBlock %}
 <h1><a href="/" class="hide">Tournaments</a></h1>
 {% for tournament in comps %}
-<table class="table">
+<table class="jaredTable">
     <tr>
         <td style="width:100px;"><a href="/{{tournament.nice_name()}}/"
                                     class="hide"><img
@@ -20,10 +17,9 @@
         ></a></td>
 
 
-        <td style="width:200px;"><a href="/{{tournament.nice_name()}}/" class="hide"><h3>{{tournament.name}}</h3></a></td>
+        <td style="width:200px;"><a href="/{{tournament.nice_name()}}/" class="hide"><p>{{tournament.name}}</p></a></td>
     </tr>
 </table>
 
 {% endfor %}
-</body>
-</html>
+{% endblock %}

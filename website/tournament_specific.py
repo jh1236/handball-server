@@ -7,6 +7,7 @@ from structure.AllTournament import (
 from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
 from structure.UniversalTournament import UniversalTournament
+from utils.sidebar_wrapper import render_template_sidebar
 from utils.statistics import get_player_stats, get_player_stats_categories
 from utils.permissions import admin_only, fetch_user, officials_only, _no_permissions, \
     user_on_mobile  # Temporary till i make a function that can handle dynamic/game permissions
@@ -74,15 +75,13 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
         notes = comps[tournament].notes or "Notices will appear here when posted"
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/tournament_home.html",
-                tourney=comps[tournament],
                 ongoing=ongoing_games,
                 current_round=current_round,
                 players=players,
                 notes=notes,
                 in_progress=in_progress,
-                tournament=link(tournament),
                 ladder=ladder,
             ),
             200,
@@ -103,7 +102,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         fixtures = [i for i in fixtures if i[1]]
         finals = [i for i in finals if i[1]]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/site.html",
                 fixtures=fixtures,
                 finals=finals,
@@ -197,7 +196,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         fixtures = [i for i in fixtures if i[1]]
         finals = [i for i in finals if i[1]]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/site_detailed.html",
                 fixtures=fixtures,
                 finals=finals,
@@ -222,7 +221,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             or not any(not i.super_bye for i in comps[tournament].games_to_list())
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/stats.html",
                 teams=teams,
                 tournament=link(tournament),
@@ -279,7 +278,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             for i in team.players
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/each_team_stats.html",
                 stats=[(k, v) for k, v in team.get_stats().items()],
                 team=team,
@@ -320,7 +319,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         else:
             status = "Official"
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/scoreboard.html",
                 game=game,
                 status=status,
@@ -409,7 +408,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         ]
 
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/game_page.html",
                 game=game,
                 status=status,
@@ -484,7 +483,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             )
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/ladder.html",
                 headers=[(i - 1, k, v) for i, (k, v) in enumerate(headers)],
                 teams=teams,
@@ -527,7 +526,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             i for i in comps[tournament].teams[0].players[0].get_stats()
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/players.html",
                 headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
                 players=sorted(players),
@@ -553,7 +552,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             i for i in comps[tournament].teams[0].players[0].get_stats_detailed()
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/players_detailed.html",
                 headers=[(i - 1, k) for i, k in enumerate(headers)],
                 players=sorted(players),
@@ -605,7 +604,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 upcoming_games.pop(0)
         if user_on_mobile():
             return (
-                render_template(
+                render_template_sidebar(
                     "tournament_specific/player_stats.html",
                     stats=[
                         (k, v) for k, v in get_player_stats(player.tournament, player, detail=2).items()
@@ -620,7 +619,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             )
         else:
             return (
-                render_template(
+                render_template_sidebar(
                     "tournament_specific/new_player_stats.html",
                     stats=[
                         (k, v) for k, v in get_player_stats(player.tournament, player, detail=2).items()
@@ -672,7 +671,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     )
                 )
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/official.html",
                 name=official.name,
                 link=official.nice_name(),
@@ -687,7 +686,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
     def official_directory_site(tournament):
         official = [(i, i.nice_name()) for i in comps[tournament].officials]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/all_officials.html",
                 officials=official,
                 tournament=link(tournament),

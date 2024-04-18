@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ user.name }}</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script>load("")</script>
+{% extends "base.html" %}
 
+{% block headBlock %}
+    <title>{{ user.name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+{% endblock %}
+
+{% block bodyBlock %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <a href="/user">
     <img src="/api/users/image?name={{ user.nice_name() }}" class="title_logo"></a>
 <h1><a href="/user/" class="hide">{{ user.name }}</a></h1><a class="hide" href="/logout/"><i>(Log out)</i></a>
@@ -24,7 +19,7 @@
                 <br>
                 <i>No Ongoing Games</i>
             {% else %}
-                <table class="table">
+                <table class="jaredTable">
                 <tbody>
                 <tr>
                     <th>Team One</th>
@@ -54,7 +49,7 @@
                 <br>
                 <i>No Ongoing Games</i>
             {% else %}
-                <table class="table">
+                <table class="jaredTable">
                 <tbody>
                 <tr>
                     <th>Team One</th>
@@ -109,5 +104,4 @@
 </div>
 <br>
 <br>
-</body>
-</html>
+{% endblock %}

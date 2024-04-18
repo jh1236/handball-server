@@ -16,7 +16,7 @@ body {
 }
 
 /* Fixtures table and its contents */
-.table {
+.jaredTable {
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-family);
@@ -31,15 +31,15 @@ a.hide {
     color: inherit;
 }
 
-.table tr td:first-child {
+.jaredTable tr td:first-child {
     width: 400px;
 }
 
-.table tr td:nth-child(2) {
+.jaredTable tr td:nth-child(2) {
     width: 200px;
 }
 
-.table tr td:nth-child(3) {
+.jaredTable tr td:nth-child(3) {
     width: 400px;
 }
 
