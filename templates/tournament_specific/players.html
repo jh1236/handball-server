@@ -2,7 +2,7 @@
 
 {% block headBlock %}
     <title>Player Stats</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_ladder.css') }}">
 {% endblock %}
 
 {% block bodyBlock %}
@@ -13,7 +13,7 @@
     <tr>
         <th class="invisible">This is an image</th>
         {% for i, h, p in headers %}
-        <th onclick="sortTable(0, {{i}})" class="priority-{{p}}" ><b>{{h}}</b></th>
+        <th onclick="sortTable(0, {{i}})" class="{{ p }}" ><b>{{h}}</b></th>
         {% endfor %}
     </tr>
     </thead>
@@ -28,7 +28,7 @@
                                          class="hide">{{i}}</a>
         </th>
         {% for stat, p in player %}
-        <td class="priority-{{p}}">{{ stat }}</td>
+        <td class="{{p}}">{{ stat }}</td>
         {% endfor %}
     </tr>
     {% endfor %}

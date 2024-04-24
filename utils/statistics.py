@@ -142,7 +142,6 @@ def get_player_stats(tournament, player, detail=0, team=None):
     out = {
         "B&F Votes": votes,
         "Elo": "-" if not player else round(player.elo, 2),
-
         "Points Scored": points_scored,
         "Aces Scored": aces_scored,
         "Faults": faults,
@@ -208,6 +207,7 @@ def get_player_stats(tournament, player, detail=0, team=None):
         "Percentage of Games as Left Player": f"{left / (played or 1) * 100:.1f}%",
         "Serving Conversion Rate": f"{won_while_serving / (served or 1) * 100:.1f}%",
         "Average Serving Streak": round(avg_streak_len, 2),
+        "Penalty Points": round(10 * red_cards + 5 * yellow_cards + 2 * green_cards),
         "Max. Serving Streak": max_streak_len,
         "Max. Ace Streak": max_ace_streak,
         "Serves Received": serves_received,

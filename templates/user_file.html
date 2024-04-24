@@ -2,7 +2,7 @@
 
 {% block headBlock %}
     <title>{{ user.name }}</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 {% endblock %}
 
 {% block bodyBlock %}
@@ -10,8 +10,8 @@
 <a href="/user">
     <img src="/api/users/image?name={{ user.nice_name() }}" class="title_logo"></a>
 <h1><a href="/user/" class="hide">{{ user.name }}</a></h1><a class="hide" href="/logout/"><i>(Log out)</i></a>
-<div>
-    <div style="bottom: 100%;width: 60%;float:left">
+<div class="row">
+    <div class="col">
         <div style="min-height: 200px">
             <h2>Games To Play</h2>
             {% if not to_play %}
@@ -79,7 +79,7 @@
             </table>
         </div>
     </div>
-    <div style="float:left;width: 25%; height: 100%">
+    <div class="col">
         <div style="min-height: 200px">
             <h2><a class="hide" href="/video/">Videos Set By UM</a></h2>
             {% if reqd %}

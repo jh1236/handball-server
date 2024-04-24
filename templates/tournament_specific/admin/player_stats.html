@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Statistics for {{player.name}}</title>
+{% extends "admin.html" %}
+
+{% block headBlock %}
+    <title>Statistics for {{ player.name }}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}", true)</script>
+{% endblock %}
 
+{% block bodyBlock %}
 <div style="top:0;left:0;bottom: 100%;width: 66%">
     <a href="/{{tournament}}teams/{{player.team.nice_name()}}/admin">
         <img src="/api/teams/image?name={{player.team.nice_name()}}" class="team_logo"></a>
@@ -52,8 +48,4 @@
     {% endfor %}
 </div>
 </div>
-
-
-
-</body>
-</html>
+{% endblock %}

@@ -2,141 +2,156 @@
 
 {% block headBlock %}
     <title>{{ current_tournament.name }}</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 {% endblock %}
 
 {% block bodyBlock %}
-<a href="{{ current_tournament.link }}">
-    <img src="/api/tournaments/image?name={{ current_tournament.nice_name() }}" class="title_logo"></a>
-<h1><a href="{{ current_tournament.link }}" class="hide">{{ current_tournament.name }}</a></h1>
+    <a href="{{ current_tournament.link }}">
+        <img src="/api/tournaments/image?name={{ current_tournament.nice_name() }}" class="title_logo"></a>
+    <h1><a href="{{ current_tournament.link }}" class="hide">{{ current_tournament.name }}</a></h1>
+    <br>
+    <br>
+    <div class="row">
 
-<div>
-    <div style="bottom: 100%;width: 60%;float:left">
-        <div style="min-height: 200px">
-            <h2>Ongoing Games</h2>
-            {% if not ongoing %}
-                {% if current_tournament.fixtures_class.manual_allowed() and not in_progress %}
-                    <br>
-                    <br>
-                    <button class="button" onclick="document.location.href = '{{ current_tournament.link }}create'">New Game</button>
-                {%  else %}
-                    <br><br>
-                    <i>No Ongoing Games</i>
+        <div class="col">
+            <div style="min-height: 200px">
+                <h2>Ongoing Games</h2>
+                {% if not ongoing %}
+                    {% if current_tournament.fixtures_class.manual_allowed() and not in_progress %}
+                        <br>
+                        <br>
+                        <button class="button" onclick="document.location.href = '{{ current_tournament.link }}create'">
+                            New Game
+                        </button>
+                    {% else %}
+                        <br><br>
+                        <i>No Ongoing Games</i>
+                    {% endif %}
+
+                {% else %}
+                    <table class="jaredTable">
+                    <tbody>
+                    <tr>
+                        <th>Team One</th>
+                        <td></td>
+                        <th>Team Two</th>
+                        <th>Score</th>
+                        {% for i in ongoing %}
+                            <tr>
+                                <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                       class="hide">{{ i.teams[0] }}</a></td>
+                                <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">vs</a></td>
+                                <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                       class="hide">{{ i.teams[1] }}</a></td>
+                                <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                       class="hide">{{ i.score_string }}</a></td>
+                            </tr>
+                        {% endfor %}
                 {% endif %}
+                </tbody>
 
-            {% else %}
+                </table>
+            </div>
+            <div style="min-height: 200px">
+                <h2><a class="hide" href="{{ current_tournament.link }}fixtures/">Current Round</a></h2>
                 <table class="jaredTable">
-                <tbody>
-                <tr>
-                    <th>Team One</th>
-                    <td></td>
-                    <th>Team Two</th>
-                    <th>Score</th>
-                    {% for i in ongoing %}
+                    <tbody>
+                    <tr>
+                        <th>Team One</th>
+                        <td></td>
+                        <th>Team Two</th>
+                        <th>Score</th>
+                    </tr>
+                    {% for i in current_round %}
                         <tr>
-                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">{{ i.teams[0] }}</a></td>
+                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                   class="hide">{{ i.teams[0] }}</a></td>
                             <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">vs</a></td>
-                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">{{ i.teams[1] }}</a></td>
-                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">{{ i.score_string }}</a></td>
+                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                   class="hide">{{ i.teams[1] }}</a></td>
+                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                   class="hide">{{ i.score_string }}</a></td>
                         </tr>
                     {% endfor %}
-            {% endif %}
-            </tbody>
-
-            </table>
+                    </tbody>
+                </table>
+            </div>
+            <div style="min-height: 200px">
+                <a href="{{ current_tournament.link }}admin" class="hide"><h2>Notices</h2></a>
+                <p><i>{{ notes }}</i></p>
+            </div>
         </div>
-        <div style="min-height: 200px">
-            <h2><a class="hide" href="{{ current_tournament.link }}fixtures/">Current Round</a></h2>
-            <table class="jaredTable">
-                <tbody>
-                <tr>
-                    <th>Team One</th>
-                    <td></td>
-                    <th>Team Two</th>
-                    <th>Score</th>
-                </tr>
-                {% for i in current_round %}
+        <div class="col">
+            <div>
+                <h2><a class="hide" href="{{ current_tournament.link }}ladder/">Ladder</a></h2>
+
+                <table class="jaredTable">
+
+                    {% for i, l in ladder %}
+                        <tr>
+                            <th colspan="4"><a class="hide" href="{{ current_tournament.link }}ladder/">{{ i }}</a></th>
+                        </tr>
+                        <tr>
+                            <th style="width:30px">Rank</th>
+                            <th>Team</th>
+                            <th>Games Won</th>
+                            <th>Games Played</th>
+                        </tr>
+                        {% for j, team in l %}
+                            <tr>
+                                <td style="width:30px"><a class="hide"
+                                                          href="{{ current_tournament.link }}teams/{{ team.nice_name() }}"><i>{{ j }}</i></a>
+                                </td>
+                                <td style="width:200px; text-align: center"><a class="hide"
+                                                                               href="{{ current_tournament.link }}teams/{{ team.nice_name() }}">{{ team.name }}</a>
+                                </td>
+                                <td style="width:200px"><a class="hide"
+                                                           href="{{ current_tournament.link }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Won"] }}</a>
+                                </td>
+                                <td style="width:200px"><a class="hide"
+                                                           href="{{ current_tournament.link }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Played"] }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </table>
+            </div>
+            <div>
+                <h2><a class="hide" href="{{ current_tournament.link }}players/">Players</a></h2>
+
+                <table class="jaredTable">
                     <tr>
-                        <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">{{ i.teams[0] }}</a></td>
-                        <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">vs</a></td>
-                        <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">{{ i.teams[1] }}</a></td>
-                        <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">{{ i.score_string }}</a></td>
+                        <th>Name</th>
+                        <th style="text-align: center">B&F Votes</th>
+                        <th>Points Scored</th>
+                        <th>Aces Scored</th>
+                        <th>Cards Received</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    {% for p in players %}
+                        <tr>
+                            <td><a class="hide"
+                                   href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.name }}</a>
+                            </td>
+                            <td style="text-align: center"><a class="hide"
+                                                              href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["B&F Votes"] }}</a>
+                            </td>
+                            <td style="text-align: center"><a class="hide"
+                                                              href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["Points Scored"] }}</a>
+                            </td>
+                            <td><a class="hide"
+                                   href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["Aces scored"] }}</a>
+                            </td>
+                            <td><a class="hide"
+                                   href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.total_cards() }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
         </div>
-        <div style="min-height: 200px">
-            <a href="{{ current_tournament.link }}admin" class="hide"><h2>Notices</h2></a>
-            <p><i>{{ notes }}</i></p>
-        </div>
-    </div>
-    <div style="float:left;width: 25%; height: 100%">
-        <h2><a class="hide" href="{{ current_tournament.link }}ladder/">Ladder</a></h2>
-
-        <table class="jaredTable">
-
-            {% for i, l in ladder %}
-                <tr>
-                    <th colspan="4"><a class="hide" href="{{ current_tournament.link }}ladder/">{{ i }}</a></th>
-                </tr>
-                <tr>
-                    <th style="width:30px">Rank</th>
-                    <th>Team</th>
-                    <th>Games Won</th>
-                    <th>Games Played</th>
-                </tr>
-                {% for j, team in l %}
-                <tr>
-                    <td style="width:30px"><a class="hide"
-                                              href="{{ current_tournament.link }}teams/{{ team.nice_name() }}"><i>{{ j }}</i></a>
-                    </td>
-                    <td style="width:200px; text-align: center"><a class="hide"
-                                                                   href="{{ current_tournament.link }}teams/{{ team.nice_name() }}">{{ team.name }}</a>
-                    </td>
-                    <td style="width:200px"><a class="hide"
-                                               href="{{ current_tournament.link }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Won"] }}</a>
-                    </td>
-                    <td style="width:200px"><a class="hide"
-                                               href="{{ current_tournament.link }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Played"] }}</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% endfor %}
-        </table>
-        <h2><a class="hide" href="{{ current_tournament.link }}players/">Players</a></h2>
-
-        <table class="jaredTable">
-            <tr>
-                <th style="width:400px">Name</th>
-                <th style="width:140px; text-align: center">B&F Votes</th>
-                <th style="width:140px">Points Scored</th>
-                <th style="width:140px">Aces Scored</th>
-                <th style="width:140px">Cards Received</th>
-            </tr>
-            {% for p in players %}
-                <tr>
-                    <td style="width:300px"><a class="hide"
-                                               href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.name }}</a></td>
-                    <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["B&F Votes"] }}</a>
-                    </td>
-                    <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["Points Scored"] }}</a>
-                    </td>
-                    <td style="width:140px"><a class="hide"
-                                               href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["Aces scored"] }}</a>
-                    </td>
-                    <td style="width:140px"><a class="hide"
-                                               href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.total_cards() }}</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+        <br>
+        <br>
     </div>
     <br>
     <br>
-</div>
-<br>
-<br>
 {% endblock %}

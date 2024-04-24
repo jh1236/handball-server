@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "admin.html" %}
+
+{% block headBlock %}
     <title>Player Statistics</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_ladder.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}", true)</script>
+{% endblock %}
 
+{% block bodyBlock %}
 <script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
 <h1><a href="/{{tournament}}players/admin" class="hide">Players</a></h1>
 <table class="jaredTable" id="sort0">
@@ -39,5 +35,4 @@
     {% endfor %}
     </tbody>
 </table>
-</body>
-</html>
+{% endblock %}

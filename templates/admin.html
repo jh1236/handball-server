@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
           integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <!-- Our Custom CSS -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar_admin.css') }}">
 
     <!-- Font Awesome JS -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js"
@@ -37,28 +37,28 @@
                        aria-expanded="false">Tournament</a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         {% for i in tournaments %}
-                            <li><a class="sidebar-link" href="/{{ i.nice_name() }}"><i>{{ i }}</i></a></li>
+                            <li><a class="sidebar-link" href="/{{ i.nice_name() }}/admin"><i>{{ i }}</i></a></li>
                         {% endfor %}
                     </ul>
                 </li>
                 <li>
                     {% if current_tournament.link != "/" %}
-                        <a class="sidebar-link" href="{{ current_tournament.link }}fixtures">Fixtures</a>
+                        <a class="sidebar-link" href="{{ current_tournament.link }}fixtures/admin">Fixtures</a>
                     {% else %}
                         <a class="sidebar-link" href="/signup">Sign-Up</a>
                     {% endif %}
                 </li>
                 <li>
-                    <a class="sidebar-link" href="{{ current_tournament.link }}teams">Teams</a>
+                    <a class="sidebar-link" href="{{ current_tournament.link }}teams/admin">Teams</a>
                 </li>
                 <li>
                     <a class="sidebar-link" href="{{ current_tournament.link }}ladder">Ladder</a>
                 </li>
                 <li>
-                    <a class="sidebar-link" href="{{ current_tournament.link }}players">Players</a>
+                    <a class="sidebar-link" href="{{ current_tournament.link }}players/admin">Players</a>
                 </li>
                 <li>
-                    <a class="sidebar-link" href="{{ current_tournament.link }}officials">Officials</a>
+                    <a class="sidebar-link" href="{{ current_tournament.link }}officials/admin">Officials</a>
                 </li>
                 <li>
                     <a class="sidebar-link" href="/documents">Documents</a>

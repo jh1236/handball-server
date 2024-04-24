@@ -14,6 +14,11 @@ from utils.permissions import admin_only, fetch_user, officials_only, _no_permis
 from utils.util import fixture_sorter
 from website.website import numbers, sign
 
+def priority_to_classname(p):
+    if p==1:
+        return ""
+    sizes = ["sm", "md","lg","xl"]
+    return f"d-none d-{sizes[p-2]}-table-cell"
 
 def link(tournament):
     if tournament:
@@ -434,7 +439,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             "Team Names": 1,
             "Games Played": 2,
             "Games Won": 1,
-            "Percentage": 3,
+            "Percentage": 1,
             "Games Lost": 3,
             "Green Cards": 5,
             "Yellow Cards": 4,
@@ -462,7 +467,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                         j.short_name,
                         j.nice_name(),
                         j.image(),
-                        [(v, priority[k]) for k, v in j.get_stats().items()],
+                        [(v, priority_to_classname(priority[k])) for k, v in j.get_stats().items()],
                     )
                     for _, j in l[1]
                     if j.games_played > 0
@@ -477,7 +482,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             for k, l in enumerate(ladder)
         ]
         headers = [
-            (i, priority[i])
+            (i, priority_to_classname(priority[i]))
             for i in (
                 ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
             )
@@ -516,7 +521,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 i.name,
                 i.team.nice_name(),
                 i.nice_name(),
-                [(v, priority[k]) for k, v in i.get_stats().items()],
+                [(v, priority_to_classname(priority[k])) for k, v in i.get_stats().items()],
             )
             for i in comps[tournament].players
             if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
@@ -528,7 +533,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         return (
             render_template_sidebar(
                 "tournament_specific/players.html",
-                headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
+                headers=[(i - 1, k, priority_to_classname(priority[k])) for i, k in enumerate(headers)],
                 players=sorted(players),
                 tournament=link(tournament),
             ),

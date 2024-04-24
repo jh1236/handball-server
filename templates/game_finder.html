@@ -22,25 +22,9 @@
 </select>
 <button onclick="addStatsButton()">+</button>
 <br>
+
 <div id="args">
-{% for k, v in args.items(True) %}
-    <label>Where {{ k }} of
-        <select class="scope">
-            <option value="any" {{ 'selected=selected' if v.strip('^$')[0] not in [v.strip('^$')[1], "=", "~"] else '' }}> any player </option>
-            <option value="all" {{ 'selected=selected' if v.strip('~^$')[0] in [v.strip('~^$')[1], "="] else '' }}> every player </option>
-            <option value="specific" {{ 'selected=selected' if v.strip('^$')[0] == "~" else '' }}> a specific player </option>
-        </select>
-        <select class="comparer">
-            <option value="=" {{ '' if v.strip('~^$')[0] in ['!','>','<'] else 'selected="selected"' }}> is equal to </option>
-            <option value="!" {{ 'selected=selected' if v.strip('~^$')[0] == "!" else '' }}>is not equal to</option>
-            <option value="&gt;" {{ 'selected=\"selected\"' if v.strip('~^$')[0] == ">" else '' }}>is greater than</option>
-            <option value="&lt;" {{ 'selected="selected"' if v.strip('~^$')[0] == "<" else '' }}>is less than</option>
-        </select>
-        <input name="{{ k }}" value="{{ v.strip('!>~<') }}" class="value">
-        <button onclick="removeStat(this)" type="button">-</button>
-        <br>
-    </label>
-{% endfor %}
+
 </div>
 <button onclick="processLookup()">Submit</button>
 <table class="jaredTable">
@@ -73,5 +57,8 @@
             </tr>
     {% endfor %}
 </table>
+{% for k, v in args.items(True) %}
+    <script>addStatsButton('{{ k }}', '{{ v }}')</script>
+{% endfor %}
 </body>
 </html>

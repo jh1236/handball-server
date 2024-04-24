@@ -7,6 +7,7 @@ from structure.GameUtils import game_string_to_commentary, game_string_to_list
 from structure.Player import Player
 from structure.Team import Team
 from structure.Tournament import Tournament
+from utils.sidebar_wrapper import render_template_sidebar
 from utils.statistics import get_player_stats
 from utils.util import fixture_sorter
 from website.website import sign
@@ -85,7 +86,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
         fixtures = [i for i in fixtures if i[1]]
         finals = [i for i in finals if i[1]]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/admin/site.html",
                 fixtures=fixtures,
                 finals=finals,
@@ -113,7 +114,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             teams.append(t)
         with open("config/signups/officials.json") as fp:
             umpires = json.load(fp)
-        return render_template(
+        return render_template_sidebar(
             "sign_up/admin.html",
             tournament="Fifth S.U.S.S. Championship",
             teams=teams,
@@ -194,7 +195,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             *[*enumerate(players[0].get_stats().keys(), start=1)],
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/admin/game_page.html",
                 game=game,
                 status=status,
@@ -249,7 +250,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             for i in team.players
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/admin/each_team_stats.html",
                 stats=[(k, v) for k, v in team.get_stats().items()],
                 team=team,
@@ -270,7 +271,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             if i.games_played > 0 or len(comps[tournament].teams) < 15
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/admin/stats.html",
                 teams=teams,
                 tournament=f"{tournament}/",
@@ -283,19 +284,20 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
     def admin_players_site(tournament):
         priority = {
             "Name": 1,
-            "B&F Votes": 1,
-            "Elo": 2,
-            "Points Scored": 2,
-            "Aces Scored": 2,
-            "Faults": 5,
+            "Penalty Points": 1,
+            "Cards": 1,
+            "Green Cards": 2,
+            "Yellow Cards": 2,
+            "Red Cards": 2,
+            "Games Played": 3,
+            "Rounds Carded": 3,
+            "Faults": 4,
             "Double Faults": 5,
-            "Green Cards": 4,
-            "Yellow Cards": 3,
-            "Red Cards": 3,
-            "Rounds Played": 5,
+            "Rounds Played": 4,
             "Points Served": 5,
-            "Rounds Carded": 5,
-            "Games Played": 5,
+            "Points Per Card": 5,
+            "Points Per Loss": 5,
+            "Votes Per 100 Games": 5,
             "Games Won": 4,
         }
         players = [
@@ -303,17 +305,17 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                 i.name,
                 i.team.nice_name(),
                 i.nice_name(),
-                [(v, priority[k]) for k, v in i.get_stats().items()],
+                [(i.get_stats_detailed()[k] , v) for k, v in priority.items() if not k == "Name"],
             )
             for i in comps[tournament].players
             if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
             and not i.nice_name().startswith("null")
         ]
-        headers = ["Name"] + [
-            i for i in comps[tournament].teams[0].players[0].get_stats()
+        headers = [
+            i for i in priority.keys()
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/admin/players.html",
                 headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
                 players=sorted(players),
@@ -372,7 +374,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                     )
 
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/admin/player_stats.html",
                 stats=[(k, v) for k, v in get_player_stats(comps[tournament], player, detail=2).items()],
                 name=player.name,
@@ -415,12 +417,12 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
             current_round = comps[tournament].fixtures[-2]
         players = comps[tournament].players
         players = [i for i in players if "null" not in i.nice_name()]
-        players.sort(key=lambda a: -a.total_cards())
+        players.sort(key=lambda a: -a.get_stats_detailed()["Penalty Points"])
         if len(players) > 10:
             players = players[0:10]
 
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/admin/tournament_home.html",
                 tourney=comps[tournament],
                 ongoing=ongoing_games,
