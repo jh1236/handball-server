@@ -61,6 +61,7 @@ class Player:
 
 class GamePlayer:
     def __init__(self, player: Player, game, team, captain):
+        
         self.team = team
         self.game = game
         self.player: Player = player

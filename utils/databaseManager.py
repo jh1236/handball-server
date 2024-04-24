@@ -1,5 +1,11 @@
 import sqlite3
 
+
+create_taunts_table = """CREATE TABLE IF NOT EXISTS taunts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event TEXT,
+    taunt TEXT
+);"""
 create_officials_table = """CREATE TABLE IF NOT EXISTS officials (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     personId INTEGER,
@@ -37,14 +43,16 @@ create_teams_table = """CREATE TABLE IF NOT EXISTS teams (
 create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
+    searchableName TEXT,
     fixturesGenerator TEXT,
     finalsGenerator TEXT,
     officials STRING,
     teams STRING,
     ranked INTEGER,
     twoCourts INTEGER,
+    isPooled INTEGER,
     notes STRING,
-    logoURL STRING
+    imageURL TEXT
 );"""
 
 # officials and teams is stored as sum(2**[officials/teams](id)) for each official/team in the tournament
@@ -88,6 +96,7 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     isFinal INTEGER,
     round INTEGER,
     notes TEXT,
+    pool INTEGER,
     
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (servingTeam) REFERENCES teams (id),
@@ -101,6 +110,7 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
 
 class DatabaseManager:
     def __init__(self):
+        self.closed = False
         self.conn = sqlite3.connect("./resources/database.db")
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.conn.commit()
@@ -113,7 +123,6 @@ class DatabaseManager:
         self.read_write_c.execute("PRAGMA query_only = OFF")
         
         self.create_tables()
-        self.closed = False
 
     def create_tables(self):
         self.read_write_c.execute(create_tournaments_table)
@@ -122,6 +131,7 @@ class DatabaseManager:
         self.read_write_c.execute(create_teams_table)
         self.read_write_c.execute(create_games_table)
         self.read_write_c.execute(create_punishments_table)
+        self.read_write_c.execute(create_taunts_table)
         self.conn.commit()
 
     def close_connection(self):

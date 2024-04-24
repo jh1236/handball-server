@@ -48,8 +48,7 @@ def team_image():
     team = request.args.get("name", type=str)
     if os.path.isfile(f"./resources/images/teams/{team}.png"):
         return send_file(f"./resources/images/teams/{team}.png", mimetype="image/png")
-    else:
-        return send_file(f"./resources/images/teams/blank.png", mimetype="image/png")
+    return send_file("./resources/images/teams/blank.png", mimetype="image/png")
 
 
 @app.get("/api/tournaments/image")

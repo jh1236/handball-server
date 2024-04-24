@@ -3,7 +3,7 @@ from utils.databaseManager import DatabaseManager
 from structure.Tournament import load_all_tournaments
 from structure.UniversalTournament import get_all_players, get_all_officials, get_all_teams
 import os
-
+import json
 
 def process_game(tournamentId, game, round, isFinal):
     servingTeam = s.execute("SELECT id FROM teams WHERE name = ?", (game.teams[0].name,)).fetchone()[0]
@@ -82,6 +82,22 @@ if __name__ == "__main__":
 
     with DatabaseManager() as s:
         comp = load_all_tournaments()
+        
+        with open("./resources/taunts.json", "r") as f:
+            for key,items in json.load(f).items():
+                for item in items:
+                    s.execute("INSERT INTO taunts (event, taunt) VALUES (?, ?)", (key, item))
+        
+        
+        # image_files = []
+        # for root, dirs, files in os.walk('.'):
+        #     for file in files:
+        #         if file.endswith(('.jpg', '.jpeg', '.png', '.gif')):
+        #             s.execute("INSERT INTO images (name, path) VALUES (?,?)", (file, os.path.join(root, file),))
+        #             image_files.append(os.path.join(root, file))
+
+
+        
         for player in get_all_players():
             s.execute("INSERT INTO people (name) VALUES (?)", (player.name,))
 
@@ -89,7 +105,7 @@ if __name__ == "__main__":
             s.execute("SELECT id FROM people WHERE name = ?", (official.name,))
             oid = s.fetchone()[0]
             s.execute("INSERT INTO officials (personId, isAdmin, proficiency) VALUES (?, ?, ?)", (oid,official.admin,official.level))
-            s.execute("UPDATE people SET password = ? WHERE id = ?", (official.key, oid))
+            # s.execute("UPDATE people SET password = ? WHERE id = ?", (official.key, oid))
         # add BYE team
         name = "BYE"
         nullPlayer = s.execute("SELECT id FROM people WHERE name = ?", ("Null",)).fetchone()[0]
@@ -107,6 +123,7 @@ if __name__ == "__main__":
                 # substitute INTEGER,
             name = team.name
             imageURL = team.image_path
+            print(imageURL)
             primaryColor = team.primary_color
             secondaryColor = team.secondary_color
             
@@ -146,7 +163,9 @@ if __name__ == "__main__":
             finalsGenerator = tournament.finals_class.get_name() 
             fixturesGenerator = tournament.fixtures_class.get_name()
             name = tournament.name
+            searchableName = tournament.nice_name()
             ranked = tournament.details.get("ranked", True)
+            isPooled = tournament.details.get("isPooled", False)
             teams = 0
             for team in tournament.teams:
                 s.execute("SELECT id FROM teams WHERE name = ?", (team.name,))
@@ -164,8 +183,8 @@ if __name__ == "__main__":
             
             twoCourts = tournament.two_courts
             s.execute(
-                "INSERT INTO tournaments (finalsGenerator, fixturesGenerator, name, officials, ranked, teams, twoCourts, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
-                (finalsGenerator, fixturesGenerator, name, officials, ranked, teams, twoCourts, notes)
+                "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, officials, ranked, teams, twoCourts, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+                (searchableName, finalsGenerator, fixturesGenerator, name, officials, ranked, teams, twoCourts, notes)
             )
             tournamentId = s.execute("SELECT id FROM tournaments ORDER BY id DESC LIMIT 1").fetchone()[0]
             # id INTEGER PRIMARY KEY AUTOINCREMENT,

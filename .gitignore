@@ -7,3 +7,4 @@ config/tournaments/*.*
 config/password.txt
 /clips/videos/
 /clips/videos - Copy/
+.DS_Store

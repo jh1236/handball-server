@@ -4,10 +4,16 @@ from random import Random
 from structure.Game import Game
 from utils.util import chunks_sized
 
-with open("./resources/taunts.json") as fp:
-    taunts = json.load(fp)
+from utils.databaseManager import DatabaseManager
+from collections import defaultdict
 
-
+with DatabaseManager() as db:
+    db.execute("SELECT event,taunt FROM taunts")
+    t = db.fetchall()
+    taunts = defaultdict(list)
+    for key,value in t:
+        taunts[key].append(value)
+    
 def copy_case(string: str, other: str) -> str:
     if other.isupper():
         return string.upper()
@@ -74,7 +80,7 @@ def game_string_to_commentary(game: Game) -> list[str]:
             and rand.randint(0, 15) == 0
             and c not in ["t", "a", "s", "f"]
         ):
-            string = char_to_taunt[c][0][:-1] + ", What a shocking call!!"
+            string = f"{char_to_taunt[c][0][:-1]}, What a shocking call!!"
         elif c == "!":
             if j[1].lower() == "u":
                 teams[not j[1].isupper()][0], teams[not j[1].isupper()][1] = (
