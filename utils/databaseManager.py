@@ -46,8 +46,6 @@ create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     searchableName TEXT,
     fixturesGenerator TEXT,
     finalsGenerator TEXT,
-    officials STRING,
-    teams STRING,
     ranked INTEGER,
     twoCourts INTEGER,
     isPooled INTEGER,
@@ -55,12 +53,6 @@ create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     imageURL TEXT
 );"""
 
-# officials and teams is stored as sum(2**[officials/teams](id)) for each official/team in the tournament
-# to get official or team for a tournament, do a bitwise AND with 2**[officials/teams](id) and tournaments([officials/teams])
-
-# kept as string because of int size limitations
-# will have a parse function so this is never revealed but here is the reasoning if someone ever looks at this
-# in the backend for whatever reason
 create_punishments_table = """CREATE TABLE IF NOT EXISTS punishments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     personId INTEGER,
@@ -106,7 +98,64 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     FOREIGN KEY (scorer) REFERENCES officials (id),
     FOREIGN KEY (IGASide) REFERENCES teams (id)
 );"""
-#
+
+create_tournament_teams_table = """CREATE TABLE IF NOT EXISTS tournamentTeams (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tournamentId INTEGER,
+    teamId INTEGER,
+    FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
+    FOREIGN KEY (teamId) REFERENCES teams (id)
+);"""
+
+create_tournament_officials_table = """CREATE TABLE IF NOT EXISTS tournamentOfficials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tournamentId INTEGER,
+    officialId INTEGER,
+    isUmpire INTEGER,
+    isScorer INTEGER,
+    FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
+    FOREIGN KEY (officialId) REFERENCES officials (id)
+);"""
+
+# player game stats
+create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    gameId INTEGER,
+    playerId INTEGER,
+    teamId INTEGER,
+    tournamentId INTEGER,
+    points INTEGER,
+    aces INTEGER,
+    faults INTEGER,
+    servedPoints INTEGER,
+    servedPointsWon INTEGER,
+    servesReceived INTEGER,
+    servesReturned INTEGER,
+    doubleFaults INTEGER,
+    greenCards INTEGER,
+    yellowCards INTEGER,
+    redCards INTEGER,
+    cardTime INTEGER,
+    cardTimeRemaining INTEGER,
+    roundsPlayed INTEGER,
+    roundsBenched INTEGER,
+    isBestPlayer INTEGER,
+    isFinal INTEGER,
+    FOREIGN KEY (gameId) REFERENCES games (id),
+    FOREIGN KEY (playerId) REFERENCES people (id),
+    FOREIGN KEY (teamId) REFERENCES teams (id),
+    FOREIGN KEY (tournamentId) REFERENCES tournaments (id)
+);"""
+
+# elo_change_table in its own table to make modification really easy
+create_elo_change_table = """CREATE TABLE IF NOT EXISTS eloChange (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    gameId INTEGER,
+    playerId INTEGER,
+    eloChange INTEGER,
+    FOREIGN KEY (gameId) REFERENCES games (id),
+    FOREIGN KEY (playerId) REFERENCES people (id)
+);"""
 
 class DatabaseManager:
     def __init__(self):
@@ -132,6 +181,10 @@ class DatabaseManager:
         self.read_write_c.execute(create_games_table)
         self.read_write_c.execute(create_punishments_table)
         self.read_write_c.execute(create_taunts_table)
+        self.read_write_c.execute(create_tournament_teams_table)
+        self.read_write_c.execute(create_tournament_officials_table)
+        self.read_write_c.execute(create_player_game_stats_table)
+        self.read_write_c.execute(create_elo_change_table)
         self.conn.commit()
 
     def close_connection(self):
@@ -161,3 +214,7 @@ class DatabaseManager:
         
     def __del__(self):
         self.close_connection()
+
+
+if __name__ == "__main__":
+    DatabaseManager()
