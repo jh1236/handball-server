@@ -32,9 +32,6 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/<tournament>/")
     def home_page(tournament):
-        in_progress = any(
-            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
-        )
         ladder = comps[tournament].ladder()
         if isinstance(ladder[0], list):
             ladder = [
@@ -86,7 +83,6 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 current_round=current_round,
                 players=players,
                 notes=notes,
-                in_progress=in_progress,
                 ladder=ladder,
             ),
             200,

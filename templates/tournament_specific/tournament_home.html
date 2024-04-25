@@ -17,7 +17,7 @@
             <div style="min-height: 200px">
 
                 {% if not ongoing %}
-                    {% if current_tournament.fixtures_class.manual_allowed() and not in_progress %}
+                    {% if current_tournament.fixtures_class.manual_allowed() %}
                         <h2>Create Games</h2>
                         <br>
                         <br>
