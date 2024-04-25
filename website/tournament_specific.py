@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from flask import render_template, request, redirect, Response
 
 from structure.AllTournament import (
@@ -10,6 +11,8 @@ from structure.UniversalTournament import UniversalTournament
 from utils.statistics import get_player_stats, get_player_stats_categories
 from utils.permissions import admin_only, fetch_user, officials_only, _no_permissions, \
     user_on_mobile  # Temporary till i make a function that can handle dynamic/game permissions
+
+from utils.databaseManager import DatabaseManager, get_tournament_id
 from utils.util import fixture_sorter
 from website.website import numbers, sign
 
@@ -25,28 +28,38 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
     comps[None] = UniversalTournament()
 
     @app.get("/<tournament>/")
-    def home_page(tournament):
-        in_progress = any(
-            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
-        )
-        ladder = comps[tournament].ladder()
-        if isinstance(ladder[0], list):
-            ladder = [
-                (
-                    f"Pool {numbers[i]}",
-                    list(enumerate(l if len(l) < 10 else l[:10], start=1)),
-                )
-                for i, l in enumerate(ladder)
-            ]
-        else:
-            ladder = [
-                (
-                    "",
-                    list(
-                        enumerate(ladder if len(ladder) < 10 else ladder[:10], start=1)
-                    ),
-                )
-            ]
+    def home_page(tournament: str):
+        tournamentId: int = get_tournament_id(tournament)
+        if tournament is None:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="This is not a real tournament",
+                ),
+                400,
+            )
+        with DatabaseManager() as c:
+            
+            in_progress = c.execute("SELECT not(isFinished) FROM tournaments WHERE id=?", (tournamentId,)).fetchone()[0]
+            # implement pooled later, haven't worked them out yet
+            
+            # ladder
+            @dataclass
+            class LadderTeam:
+                name: str
+                games_won: int
+                games_played: int
+                
+            # get all teams from the tournament and their stats
+            teams = c.execute("SELECT name, gamesWon, gamesPlayed FROM tournamentTeams INNER JOIN teams ON tournamentTeams.teamId = teams.id WHERE tournamentId = 2 ORDER BY gamesWon DESC, gamesPlayed ASC LIMIT 10;").fetchall()
+            ladder = [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]
+            
+            @dataclass
+            class Game:
+                id: int
+                name: str
+                tournament: str
+            
         ongoing_games = [
             i for i in comps[tournament].games_to_list() if i.in_progress
         ]

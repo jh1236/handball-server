@@ -1,6 +1,5 @@
 import sqlite3
 
-
 create_taunts_table = """CREATE TABLE IF NOT EXISTS taunts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event TEXT,
@@ -13,7 +12,6 @@ create_officials_table = """CREATE TABLE IF NOT EXISTS officials (
     proficiency INTEGER,
     FOREIGN KEY (personId) REFERENCES people (id)
 );"""
-
 create_people_table = """CREATE TABLE IF NOT EXISTS people (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -22,8 +20,6 @@ create_people_table = """CREATE TABLE IF NOT EXISTS people (
     sessionToken TEXT,
     tokenTimeout INTEGER
 );"""
-
-
 create_teams_table = """CREATE TABLE IF NOT EXISTS teams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -39,7 +35,6 @@ create_teams_table = """CREATE TABLE IF NOT EXISTS teams (
     FOREIGN KEY (nonCaptain) REFERENCES people (id),
     FOREIGN KEY (substitute) REFERENCES people (id)
 );"""
-
 create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -48,11 +43,11 @@ create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     finalsGenerator TEXT,
     ranked INTEGER,
     twoCourts INTEGER,
+    isFinished INTEGER,
     isPooled INTEGER,
     notes STRING,
     imageURL TEXT
 );"""
-
 create_punishments_table = """CREATE TABLE IF NOT EXISTS punishments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     personId INTEGER,
@@ -65,12 +60,12 @@ create_punishments_table = """CREATE TABLE IF NOT EXISTS punishments (
     FOREIGN KEY (officialId) REFERENCES officials (id),
     FOREIGN KEY (gameId) REFERENCES games (id)
     );"""
-
 create_games_table = """CREATE TABLE IF NOT EXISTS games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournamentId INTEGER,
     servingTeam INTEGER,
     receivingTeam INTEGER,
+    winningTeam INTEGER,
     bestPlayer INTEGER,
     official INTEGER,
     scorer INTEGER,
@@ -93,20 +88,22 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (servingTeam) REFERENCES teams (id),
     FOREIGN KEY (receivingTeam) REFERENCES teams (id),
+    FOREIGN KEY (winningTeam) REFERENCES teams (id),
     FOREIGN KEY (bestPlayer) REFERENCES people (id),
     FOREIGN KEY (official) REFERENCES officials (id),
     FOREIGN KEY (scorer) REFERENCES officials (id),
     FOREIGN KEY (IGASide) REFERENCES teams (id)
 );"""
-
 create_tournament_teams_table = """CREATE TABLE IF NOT EXISTS tournamentTeams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournamentId INTEGER,
     teamId INTEGER,
+    gamesWon INTEGER,
+    gamesPlayed INTEGER,
+    gamesLost INTEGER,
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (teamId) REFERENCES teams (id)
 );"""
-
 create_tournament_officials_table = """CREATE TABLE IF NOT EXISTS tournamentOfficials (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournamentId INTEGER,
@@ -116,8 +113,6 @@ create_tournament_officials_table = """CREATE TABLE IF NOT EXISTS tournamentOffi
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (officialId) REFERENCES officials (id)
 );"""
-
-# player game stats
 create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     gameId INTEGER,
@@ -146,8 +141,6 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
     FOREIGN KEY (teamId) REFERENCES teams (id),
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id)
 );"""
-
-# elo_change_table in its own table to make modification really easy
 create_elo_change_table = """CREATE TABLE IF NOT EXISTS eloChange (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     gameId INTEGER,
@@ -214,6 +207,12 @@ class DatabaseManager:
         
     def __del__(self):
         self.close_connection()
+
+
+def get_tournament_id(tournament_name):
+    with DatabaseManager() as c:
+        c.execute("SELECT id FROM tournaments WHERE name=?", (tournament_name,))
+        return c.fetchone()[0]
 
 
 if __name__ == "__main__":
