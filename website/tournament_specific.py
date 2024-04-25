@@ -31,7 +31,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
     @app.get("/<tournament>/")
     def home_page(tournament: str):
         tournamentId: int = get_tournament_id(tournament)
-        if tournament is None:
+        if tournamentId is None:
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -56,15 +56,12 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 searchableName: str
                 games_won: int
                 games_played: int
+
             @dataclass
             class Game:
-                id: int
-                name: str
-                tournament: str
-            @dataclass
-            class RoundGame:
                 teams: list[str]
                 score_string: str
+                id: int
             @dataclass
             class Player:
                 name: str
@@ -73,49 +70,83 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 points: int
                 aces: int
                 cards: int
-                
+                        
             # get all teams from the tournament and their stats
-            teams = c.execute("SELECT name, teams.searchableName, gamesWon, gamesPlayed FROM tournamentTeams INNER JOIN teams ON tournamentTeams.teamId = teams.id WHERE tournamentId = 2 ORDER BY gamesWon DESC, gamesPlayed ASC LIMIT 10;").fetchall()
-            ladder = [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]
+            teams = c.execute("""
+                            SELECT 
+                                name, teams.searchableName, gamesWon, gamesPlayed 
+                                FROM tournamentTeams 
+                                INNER JOIN teams ON tournamentTeams.teamId = teams.id 
+                                WHERE tournamentId = 2 
+                                ORDER BY 
+                                    gamesWon DESC, 
+                                    gamesPlayed ASC 
+                                LIMIT 10;""").fetchall()
+            ladder = [[(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]] # ladder is a list of pools
         
             # get unfinnished games
-            games = c.execute("SELECT id, name, tournament FROM games WHERE tournament = ? AND isFinished = 0;", (tournamentId,)).fetchall()
-            ongoing_games = [Game(*game) for game in games]
+            games = c.execute("""
+                            SELECT 
+                                serving.name, receiving.name, servingScore, receivingScore, games.id 
+                                FROM games 
+                                INNER JOIN teams AS serving ON games.servingTeam = serving.id 
+                                INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
+                                WHERE tournamentId = ? AND games.bestPlayer = NULL;
+                            """, 
+                            (tournamentId,)).fetchall()
+            ongoing_games = [Game(game[:1], f"{game[2]} - {game[3]}", game[4]) for game in games]
             
-            current_round = [] # get the current round
-            games = c.execute("select servingTeam, receivingTeam, servingScore, receivingScore from games where tournamentId = ? and isFinal = 1", (tournamentId,)).fetchone()[0]
-            if not games: # if there are not finals then get the normal games
-                # get max round
-                max_round = c.execute("SELECT MAX(roundNumber) FROM games WHERE tournamentId = ?", (tournamentId,)).fetchone()[0]
-                # get games from the max round
-                games = c.execute("SELECT servingTeam, receivingTeam, servingScore, receivingScore FROM games WHERE tournamentId = ? AND roundNumber = ?", (tournamentId, max_round)).fetchall()
-            for i in games:
-                teams = [c.execute("SELECT name FROM teams WHERE id = ?", (team,)).fetchone()[0] for team in i[:1]]
-                current_round.append(RoundGame(teams=teams, score_string=f"{i[2]} - {i[3]}"))
-
-            players = []
-            for player in c.execute("SELECT people.name, searchableName sum(isBestPlayer), sum(points), sum(aces), sum(redCards+yellowCards) FROM playerGameStats INNER JOIN people ON playerId = people.id WHERE tournamentId = ? GROUP BY playerId ORDER BY sum(isBestPlayer) DESC, sum(points) DESC, sum(aces) DESC, sum(redCards+yellowCards+greenCards) ASC  LIMIT 10;", (tournamentId,)).fetchall():
-                players.append(Player(*player))
+            games = c.execute("""
+                            SELECT 
+                                serving.name, receiving.name, servingScore, receivingScore, games.id
+                                FROM games 
+                                INNER JOIN teams AS serving ON games.servingTeam = serving.id 
+                                INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
+                                WHERE tournamentId = ? AND
+                                CASE -- if there is finals, return the finals, else return the last round
+                                    WHEN (SELECT count(*) FROM games WHERE tournamentId = ? AND isFinal = 1) > 0 THEN
+                                        isFinal = 1
+                                    ELSE
+                                        round = (SELECT max(round) FROM games WHERE tournamentId = ?) 
+                                END;""", 
+                            (tournamentId,)*3).fetchall()
+            current_round = [Game(game[:1], f"{game[2]} - {game[3]}", game[4]) for game in games]
+            
+            playerList =  c.execute("""
+                                SELECT 
+                                    people.name, searchableName, sum(isBestPlayer), sum(points), sum(aces), sum(redCards+yellowCards) 
+                                    FROM playerGameStats 
+                                    INNER JOIN people ON playerId = people.id WHERE tournamentId = ? 
+                                    GROUP BY playerId 
+                                    ORDER BY 
+                                        sum(isBestPlayer) DESC, 
+                                        sum(points) DESC, 
+                                        sum(aces) DESC, 
+                                        sum(redCards+yellowCards+greenCards) ASC  
+                                    LIMIT 10;""", 
+                                (tournamentId,)).fetchall()
+            players = [Player(*player) for player in playerList]
 
             notes = c.execute("SELECT notes FROM tournaments WHERE id = ?", (tournamentId,)).fetchone()[0]
-            tourney = c.execute("SELECT name, searchableName, fixturesGenerator from tournaments where id = ?", (tournamentId, )).fetchone()[0]
+            tourney = c.execute("SELECT name, searchableName, fixturesGenerator from tournaments where id = ?", (tournamentId, )).fetchone()
             
             iseditable = get_type_from_name(tourney[2]).manual_allowed()
-            tourney = Tourney(*tourney[:1],iseditable)
-        return (
-            render_template(
-                "tournament_specific/tournament_home.html",
-                tourney=tourney,
-                ongoing=ongoing_games,
-                current_round=current_round,
-                players=players,
-                notes=notes,
-                in_progress=in_progress,
-                tournament=link(tournament),
-                ladder=ladder,
-            ),
-            200,
-        )
+            tourney = Tourney(tourney[0],tourney[1],iseditable)
+            
+            return (
+                render_template(
+                    "tournament_specific/tournament_home.html",
+                    tourney=tourney,
+                    ongoing=ongoing_games,
+                    current_round=current_round,
+                    players=players,
+                    notes=notes,
+                    in_progress=in_progress,
+                    tournament=link(tournament),
+                    ladder=ladder,
+                ),
+                200,
+            )
 
     @app.get("/<tournament>/fixtures/")
     def fixtures(tournament):

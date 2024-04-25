@@ -55,7 +55,7 @@ create_punishments_table = """CREATE TABLE IF NOT EXISTS punishments (
     personId INTEGER,
     officialId INTEGER,
     gameId INTEGER,
-    color STRING,
+    color STRING, -- TODO: change to individual references for each type of punishment
     length INTEGER,
     reason STRING,
     FOREIGN KEY (personId) REFERENCES people (id),

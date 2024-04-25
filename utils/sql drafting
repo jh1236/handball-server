@@ -1,0 +1,25 @@
+-- database: /Users/lachlan/Documents/Handball-Website/matchmaking/resources/database.db
+
+-- Use the ▷ button in the top right corner to run the entire file.
+
+SELECT  -- get all unfinished games
+    serving.name, receiving.name, servingScore, receivingScore, games.id
+    FROM games 
+    INNER JOIN teams AS serving ON games.servingTeam = serving.id 
+    INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
+    WHERE tournamentId = 8 
+    AND games.bestPlayer = NULL;
+
+-- this will be a doozey, but we need to get the finals of a game if there are finals, but if there are not then
+SELECT 
+    serving.name, receiving.name, servingScore, receivingScore, games.id
+    FROM games 
+    INNER JOIN teams AS serving ON games.servingTeam = serving.id 
+    INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
+    WHERE tournamentId = 8 AND
+    CASE 
+        WHEN (SELECT count(*) FROM games WHERE tournamentId = 8 AND isFinal = 1) > 0 THEN
+            isFinal = 1
+        ELSE
+            round = (SELECT max(round) FROM games WHERE tournamentId = 8) 
+    END;
