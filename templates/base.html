@@ -31,7 +31,8 @@
             </div>
 
             <ul class="list-unstyled components">
-                <p class="tournament-name">{{ current_tournament }}</p>
+                <p class="tournament-name"><a href="{{ current_tournament.link }}"
+                                              class="hide">{{ current_tournament }}</a></p>
                 <li class="active">
                     <a class="sidebar-link dropdown-toggle" href="#homeSubmenu" data-toggle="collapse"
                        aria-expanded="false">Tournament</a>
@@ -66,16 +67,22 @@
                 <li>
                     <a class="sidebar-link" href="/find">Game Lookup</a>
                 </li>
-                <li>
-                    <a class="sidebar-link" href="/user">Log in</a>
-                </li>
+                {% if username %}
+                    <li>
+                        <a class="sidebar-link" href="/user">{{ username }}</a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a class="sidebar-link" href="/user">Log in</a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </nav>
 
     <!-- Page Content  -->
     <div id="content">
-        <div class="container-fluid" style="position: fixed; z-index: 1000;">
+        <div class="container" style="position: fixed; z-index: 1000;width:fit-content">
 
             <button type="button" id="sidebarCollapse" class="float-left btn btn-info">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list"

@@ -116,7 +116,7 @@ def init_api(app, comps: dict[str, Tournament]):
             return (
                 "<h1>Nothing Found.  Have you put a comma instead of an ampersand?</h1>"
             )
-        return render_template(
+        return render_template_sidebar(
             "game_finder.html",
             query=get_query_descriptor(details),
             games=games,

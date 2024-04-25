@@ -118,78 +118,75 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/<tournament>/fixtures/detailed")
     def detailed_fixtures(tournament):
-        court = request.args.get("court", None, type=int)
-        round = request.args.get("round", None, type=int)
-        umpire = request.args.get("umpire", None, type=str)
-        team = request.args.get("team", None, type=str)
-        player = request.args.get("player", None, type=str)
+
         fixtures = comps[tournament].fixtures
         finals = comps[tournament].finals
         fixtures = fixture_sorter(fixtures)
-        if court is not None:
-            fixtures = [[j for j in i if j.court == court] for i in fixtures]
-            finals = [[j for j in i if j.court == court] for i in finals]
-        if round is not None:
-            fixtures = [[j for j in i if j.round_number == round] for i in fixtures]
-            finals = [
-                [
-                    j
-                    for j in i
-                    if j.round_number + len(comps[tournament].fixtures) == round
-                ]
-                for i in finals
-            ]
-        if umpire is not None:
-            fixtures = [
-                [
-                    j
-                    for j in i
-                    if umpire in [j.primary_official.nice_name(), j.scorer.nice_name()]
-                ]
-                for i in fixtures
-            ]
-            finals = [
-                [
-                    j
-                    for j in i
-                    if umpire in [j.primary_official.nice_name(), j.scorer.nice_name()]
-                ]
-                for i in finals
-            ]
-        if team is not None:
-            fixtures = [
-                [j for j in i if team in [k.nice_name() for k in j.teams]]
-                for i in fixtures
-            ]
-            finals = [
-                [j for j in i if team in [k.nice_name() for k in j.teams]]
-                for i in finals
-            ]
-        if player is not None:
-            fixtures = [
-                [
-                    j
-                    for j in i
-                    if player
-                    in [
-                        k.nice_name()
-                        for k in [*j.current_players, j.scorer, j.primary_official]
+        for k, v in request.args.items(True):
+            if k == "court":
+                fixtures = [[j for j in i if j.court == int(v)] for i in fixtures]
+                finals = [[j for j in i if j.court == int(v)] for i in finals]
+            if k == "round":
+                fixtures = [[j for j in i if j.round_number == int(v)] for i in fixtures]
+                finals = [
+                    [
+                        j
+                        for j in i
+                        if j.round_number + len(comps[tournament].fixtures) == int(v)
                     ]
+                    for i in finals
                 ]
-                for i in fixtures
-            ]
-            finals = [
-                [
-                    j
-                    for j in i
-                    if player
-                    in [
-                        k.nice_name()
-                        for k in [*j.current_players, j.scorer, j.primary_official]
+            if k == "umpire":
+                fixtures = [
+                    [
+                        j
+                        for j in i
+                        if v in [j.primary_official.nice_name(), j.scorer.nice_name()]
                     ]
+                    for i in fixtures
                 ]
-                for i in finals
-            ]
+                finals = [
+                    [
+                        j
+                        for j in i
+                        if v in [j.primary_official.nice_name(), j.scorer.nice_name()]
+                    ]
+                    for i in finals
+                ]
+            if k == "team":
+                fixtures = [
+                    [j for j in i if v in [k.nice_name() for k in j.teams]]
+                    for i in fixtures
+                ]
+                finals = [
+                    [j for j in i if v in [k.nice_name() for k in j.teams]]
+                    for i in finals
+                ]
+            if k == "player":
+                fixtures = [
+                    [
+                        j
+                        for j in i
+                        if v
+                        in [
+                            k.nice_name()
+                            for k in [*j.current_players, j.scorer, j.primary_official]
+                        ]
+                    ]
+                    for i in fixtures
+                ]
+                finals = [
+                    [
+                        j
+                        for j in i
+                        if v
+                        in [
+                            k.nice_name()
+                            for k in [*j.current_players, j.scorer, j.primary_official]
+                        ]
+                    ]
+                    for i in finals
+                ]
         fixtures = [
             (n, [i for i in j if not i.bye or i.best_player])
             for n, j in enumerate(fixtures)
@@ -207,11 +204,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 finals=finals,
                 tournament=link(tournament),
                 t=comps[tournament],
-                reset=court is not None
-                or round is not None
-                or umpire is not None
-                or team is not None
-                or player is not None,
+                reset=bool(request.args),
             ),
             200,
         )
@@ -383,6 +376,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     i.tournament,
                 )
             )
+        while len(prev_matches) > 10:
+            prev_matches.pop(0)
         prev_matches = prev_matches or [("No other matches", -1, game.tournament)]
         if not game.started:
             status = "Waiting for toss"

@@ -15,20 +15,23 @@
 
         <div class="col">
             <div style="min-height: 200px">
-                <h2>Ongoing Games</h2>
+
                 {% if not ongoing %}
                     {% if current_tournament.fixtures_class.manual_allowed() and not in_progress %}
+                        <h2>Create Games</h2>
                         <br>
                         <br>
                         <button class="button" onclick="document.location.href = '{{ current_tournament.link }}create'">
                             New Game
                         </button>
                     {% else %}
+                        <h2>Ongoing Games</h2>
                         <br><br>
                         <i>No Ongoing Games</i>
                     {% endif %}
 
                 {% else %}
+                    <h2>Ongoing Games</h2>
                     <table class="jaredTable">
                     <tbody>
                     <tr>
@@ -139,7 +142,7 @@
                                                               href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["Points Scored"] }}</a>
                             </td>
                             <td><a class="hide"
-                                   href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["Aces scored"] }}</a>
+                                   href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.get_stats()["Aces Scored"] }}</a>
                             </td>
                             <td><a class="hide"
                                    href="{{ current_tournament.link }}players/{{ p.nice_name() }}">{{ p.total_cards() }}</a>

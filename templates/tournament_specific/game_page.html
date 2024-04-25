@@ -105,7 +105,7 @@
         </div>
         <div class="col-sm-3">
             <div style="min-height: 200px">
-                <h2>Other Matches</h2>
+                <h2><a class="hide" href="/{{ tournament }}fixtures/detailed?team={{ game.teams[0].nice_name() }}&team={{ game.teams[1].nice_name() }}">Other Matches</a></h2>
                 {% for line in prev_matches %}
                     <p style="color: black;">{% if line[1] > -1 %}
                         <a class="hide" href="/{{ line[2].nice_name() }}/games/{{ line[1] }}">

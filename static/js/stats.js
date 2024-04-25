@@ -25,6 +25,7 @@ function addStatsButton(category = null, value = null) {
     let removeBtn = document.createElement("button")
     let selectScopeBtn = document.createElement("select")
     let hiddenBtn = document.createElement("input")
+    let sortBtn = document.createElement("input")
     let selectComparerBtn = document.createElement("select")
     removeBtn.textContent = "-"
     removeBtn.type = "button"
@@ -36,6 +37,10 @@ function addStatsButton(category = null, value = null) {
     hiddenBtn.type = "checkbox"
     hiddenBtn.className = "isHidden"
     hiddenBtn.name = "hidden"
+    sortBtn.type = "checkbox"
+    sortBtn.className = "sort"
+    sortBtn.name = "hidden"
+    sortBtn.onclick = click_sort
     let absolute = false
     let marked = false
     let compare = "="
@@ -47,6 +52,7 @@ function addStatsButton(category = null, value = null) {
         }
         if (value[0] === "^") {
             value = value.substring(1)
+            sortBtn.checked = true
         }
         marked = value.length > 0 && value[0] === "~"
         if (marked) {
@@ -88,6 +94,8 @@ function addStatsButton(category = null, value = null) {
     lbl.append(obj)
     lbl.append(" hidden: ")
     lbl.append(hiddenBtn)
+    lbl.append(" sort: ")
+    lbl.append(sortBtn)
     lbl.append(removeBtn)
     lbl.append(document.createElement("br"))
     div.append(lbl)
@@ -100,35 +108,48 @@ function removeStat(button) {
     parent.removeChild(child)
 }
 
+function click_sort() {
+    let div = document.getElementById("args")
+    for (const i of document.getElementsByClassName("sort")) {
+        if (i === this) continue;
+        i.checked = false
+    }
+}
+
 function processLookup() {
     let div = document.getElementById("args")
     let newAddr = []
     console.log(div.children)
-    for (const i in div.children) {
-        let lbl = div.children[i]
+    for (const i of div.children) {
         let scope = null
         let hidden = null
+        let sort = null
         let name = null
         let val = null
         let comparer = null
-        for (const j in lbl.childNodes) {
-            let child = lbl.childNodes[j]
-            if (child.className === "scope") {
-                scope = child.value
-            } else if (child.className === "comparer") {
-                comparer = child.value
-            } else if (child.className === "value") {
-                name = child.name
-                val = child.value
-            } else if (child.className === "isHidden") {
-                hidden = child.checked;
+        for (const j of i.childNodes) {
+
+            if (j.className === "scope") {
+                scope = j.value
+            } else if (j.className === "comparer") {
+                comparer = j.value
+            } else if (j.className === "value") {
+                name = j.name
+                val = j.value
+            } else if (j.className === "isHidden") {
+                hidden = j.checked;
+            } else if (j.className === "sort") {
+                sort = j.checked;
             }
-            if (scope !== null && comparer !== null && name !== null && hidden !== null) break;
+            if (scope !== null && comparer !== null && name !== null && hidden !== null && sort !== null) break;
         }
         if (scope == null) break;
         let toAdd = name + "="
         if (hidden) {
             toAdd += "$"
+        }
+        if (sort) {
+            toAdd += "^"
         }
         if (scope === "all") {
             toAdd += comparer

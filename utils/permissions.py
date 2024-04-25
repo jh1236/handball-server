@@ -50,7 +50,10 @@ def login():
             return _incorrect_password()
         
 def fetch_user():
-    return request.cookies.get("userKey",None)
+    return request.cookies.get("userKey", None)
+
+def fetch_user_name():
+    return request.cookies.get("userName", None)
 
 def admin_only(func):
     def inner(*args, **kwargs):
