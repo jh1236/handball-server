@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from flask import render_template, request, redirect, Response
 
+from FixtureMakers.FixtureMaker import get_type_from_name
 from structure.AllTournament import (
     get_all_games,
     get_all_officials,
@@ -42,54 +43,69 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             
             in_progress = c.execute("SELECT not(isFinished) FROM tournaments WHERE id=?", (tournamentId,)).fetchone()[0]
             # implement pooled later, haven't worked them out yet
-            
+            @dataclass
+            class Tourney:
+                name: str
+                searchableName: str
+                editable: str
+                
             # ladder
             @dataclass
             class LadderTeam:
                 name: str
+                searchableName: str
                 games_won: int
                 games_played: int
-                
-            # get all teams from the tournament and their stats
-            teams = c.execute("SELECT name, gamesWon, gamesPlayed FROM tournamentTeams INNER JOIN teams ON tournamentTeams.teamId = teams.id WHERE tournamentId = 2 ORDER BY gamesWon DESC, gamesPlayed ASC LIMIT 10;").fetchall()
-            ladder = [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]
-            
             @dataclass
             class Game:
                 id: int
                 name: str
                 tournament: str
+            @dataclass
+            class RoundGame:
+                teams: list[str]
+                score_string: str
+            @dataclass
+            class Player:
+                name: str
+                searchableName: str
+                best: int
+                points: int
+                aces: int
+                cards: int
+                
+            # get all teams from the tournament and their stats
+            teams = c.execute("SELECT name, teams.searchableName, gamesWon, gamesPlayed FROM tournamentTeams INNER JOIN teams ON tournamentTeams.teamId = teams.id WHERE tournamentId = 2 ORDER BY gamesWon DESC, gamesPlayed ASC LIMIT 10;").fetchall()
+            ladder = [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]
+        
+            # get unfinnished games
+            games = c.execute("SELECT id, name, tournament FROM games WHERE tournament = ? AND isFinished = 0;", (tournamentId,)).fetchall()
+            ongoing_games = [Game(*game) for game in games]
             
-        ongoing_games = [
-            i for i in comps[tournament].games_to_list() if i.in_progress
-        ]
-        current_round = fixture_sorter(
-            [
-                [
-                    game
-                    for r in comps[tournament].finals
-                    for game in r
-                    if not game.super_bye
-                ]
-                if comps[tournament].in_finals
-                else comps[tournament].fixtures[-1]
-            ]
-        )[0]
-        if (
-            all([i.bye for i in current_round]) and len(comps[tournament].fixtures) > 1
-        ):  # basically just for home and aways
-            current_round = comps[tournament].fixtures[-2]
-        players = comps[tournament].players
-        players = [i for i in players if "null" not in i.nice_name()]
-        players.sort(key=lambda a: -a.get_stats()["B&F Votes"])
-        if len(players) > 10:
-            players = players[0:10]
+            current_round = [] # get the current round
+            games = c.execute("select servingTeam, receivingTeam, servingScore, receivingScore from games where tournamentId = ? and isFinal = 1", (tournamentId,)).fetchone()[0]
+            if not games: # if there are not finals then get the normal games
+                # get max round
+                max_round = c.execute("SELECT MAX(roundNumber) FROM games WHERE tournamentId = ?", (tournamentId,)).fetchone()[0]
+                # get games from the max round
+                games = c.execute("SELECT servingTeam, receivingTeam, servingScore, receivingScore FROM games WHERE tournamentId = ? AND roundNumber = ?", (tournamentId, max_round)).fetchall()
+            for i in games:
+                teams = [c.execute("SELECT name FROM teams WHERE id = ?", (team,)).fetchone()[0] for team in i[:1]]
+                current_round.append(RoundGame(teams=teams, score_string=f"{i[2]} - {i[3]}"))
 
-        notes = comps[tournament].notes or "Notices will appear here when posted"
+            players = []
+            for player in c.execute("SELECT people.name, searchableName sum(isBestPlayer), sum(points), sum(aces), sum(redCards+yellowCards) FROM playerGameStats INNER JOIN people ON playerId = people.id WHERE tournamentId = ? GROUP BY playerId ORDER BY sum(isBestPlayer) DESC, sum(points) DESC, sum(aces) DESC, sum(redCards+yellowCards+greenCards) ASC  LIMIT 10;", (tournamentId,)).fetchall():
+                players.append(Player(*player))
+
+            notes = c.execute("SELECT notes FROM tournaments WHERE id = ?", (tournamentId,)).fetchone()[0]
+            tourney = c.execute("SELECT name, searchableName, fixturesGenerator from tournaments where id = ?", (tournamentId, )).fetchone()[0]
+            
+            iseditable = get_type_from_name(tourney[2]).manual_allowed()
+            tourney = Tourney(*tourney[:1],iseditable)
         return (
             render_template(
                 "tournament_specific/tournament_home.html",
-                tourney=comps[tournament],
+                tourney=tourney,
                 ongoing=ongoing_games,
                 current_round=current_round,
                 players=players,

@@ -11,6 +11,7 @@ def process_game(tournamentId, game, round, isFinal, isRanked):
     servingScore = game.teams[0].score
     receivingScore = game.teams[1].score
     
+    
     if not game.first_team_serves:
         servingTeam, receivingTeam = receivingTeam, servingTeam
         servingScore, receivingScore = receivingScore, servingScore
@@ -144,9 +145,6 @@ if __name__ == "__main__":
     if os.path.exists(database_file):
         os.remove(database_file)
 
-    if os.path.exists(database_file):
-        raise("Database exists! this is meant to be a fresh start!")
-
     with DatabaseManager() as s:
         comp = load_all_tournaments()
 
@@ -156,13 +154,13 @@ if __name__ == "__main__":
                     s.execute("INSERT INTO taunts (event, taunt) VALUES (?, ?)", (key, item))
 
         for player in get_all_players():
-            s.execute("INSERT INTO people (name) VALUES (?)", (player.name,))
+            s.execute("INSERT INTO people (name, searchableName) VALUES (?, ?)", (player.name, player.nice_name()))
 
         for official in get_all_officials():
             s.execute("SELECT id FROM people WHERE name = ?", (official.name,))
             oid = s.fetchone()[0]
             s.execute("INSERT INTO officials (personId, isAdmin, proficiency) VALUES (?, ?, ?)", (oid,official.admin,official.level))
-            # s.execute("UPDATE people SET password = ? WHERE id = ?", (official.key, oid))
+            s.execute("UPDATE people SET password = ? WHERE id = ?", (official.key, oid))
         # add BYE team
         name = "BYE"
         nullPlayer = s.execute("SELECT id FROM people WHERE name = ?", ("Null",)).fetchone()[0]
@@ -170,6 +168,7 @@ if __name__ == "__main__":
         for team in get_all_teams():
                 # id INTEGER PRIMARY KEY AUTOINCREMENT,
                 # name TEXT,
+                # searchableName TEXT,
                 # imageURL TEXT,
                 # primaryColour INTEGER,
                 # secondaryColour INTEGER,
@@ -178,6 +177,8 @@ if __name__ == "__main__":
                 # captain INTEGER,
                 # nonCaptain INTEGER,
                 # substitute INTEGER,
+                
+            searchableName = team.nice_name()
             name = team.name
             imageURL = team.image_path
             print(imageURL)
@@ -185,7 +186,7 @@ if __name__ == "__main__":
             secondaryColor = team.secondary_color
 
             captain = s.execute("SELECT id FROM people WHERE name = ?", (team.captain.name,)).fetchone()[0]
-            s.execute("INSERT INTO teams (name, imageURL, primaryColor, secondaryColor, captain) VALUES (?, ?, ?, ?, ?)", (name, imageURL, primaryColor, secondaryColor, captain))
+            s.execute("INSERT INTO teams (name, searchableName, imageURL, primaryColor, secondaryColor, captain) VALUES (?, ?, ?, ?, ?, ?)", (name, searchableName, imageURL, primaryColor, secondaryColor, captain))
             if team.non_captain.name != "Null":
 
                 # get the most recent team
@@ -221,12 +222,7 @@ if __name__ == "__main__":
             searchableName = tournament.nice_name()
             ranked = tournament.details.get("ranked", True)
             isPooled = tournament.details.get("isPooled", False)
-            
-            #TODO: WHAT THE FUCK IS THIS SUPPOSED TO DO????, I CANT WORK IT OUT, ISN'T THIS REDUNDANT FROM ONEROUND/EDITABLE
-            isFinished = any(
-                not (i.best_player or i.bye)
-                for i in tournament.games_to_list()
-            )
+        
             notes = tournament.notes
 
 
@@ -234,8 +230,8 @@ if __name__ == "__main__":
             
             
             s.execute(
-                "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isFinished) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
-                (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isFinished)
+                "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+                (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes)
             )
             tournamentId = s.execute("SELECT id FROM tournaments ORDER BY id DESC LIMIT 1").fetchone()[0]
             # id INTEGER PRIMARY KEY AUTOINCREMENT,

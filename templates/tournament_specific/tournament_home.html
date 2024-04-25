@@ -12,7 +12,7 @@
 <script>load("{{tournament}}")</script>
 
 <a href="/{{ tournament }}">
-    <img src="/api/tournaments/image?name={{ tourney.nice_name() }}" class="title_logo"></a>
+    <img src="/api/tournaments/image?name={{ tourney.searchableName }}" class="title_logo"></a>
 <h1><a href="/{{ tournament }}" class="hide">{{ tourney.name }}</a></h1>
 
 <div>
@@ -20,7 +20,7 @@
         <div style="min-height: 200px">
             <h2>Ongoing Games</h2>
             {% if not ongoing %}
-                {% if tourney.fixtures_class.manual_allowed() and not in_progress %}
+                {% if tourney.editable and not in_progress %}
                     <br>
                     <br>
                     <button class="button" onclick="document.location.href = '/{{ tournament }}/create'">New Game</button>
@@ -94,16 +94,16 @@
                 {% for j, team in l %}
                 <tr>
                     <td style="width:30px"><a class="hide"
-                                              href="/{{ tournament }}teams/{{ team.nice_name() }}"><i>{{ j }}</i></a>
+                                              href="/{{ tournament }}teams/{{ team.searchableName }}"><i>{{ j }}</i></a>
                     </td>
                     <td style="width:200px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}teams/{{ team.nice_name() }}">{{ team.name }}</a>
+                                                                   href="/{{ tournament }}teams/{{ team.searchableName }}">{{ team.name }}</a>
                     </td>
                     <td style="width:200px"><a class="hide"
-                                               href="/{{ tournament }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Won"] }}</a>
+                                               href="/{{ tournament }}teams/{{ team.searchableName }}">{{ team.games_won }}</a>
                     </td>
                     <td style="width:200px"><a class="hide"
-                                               href="/{{ tournament }}teams/{{ team.nice_name() }}">{{ team.get_stats()["Games Played"] }}</a>
+                                               href="/{{ tournament }}teams/{{ team.searchableName }}">{{ team.games_played }}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -122,18 +122,18 @@
             {% for p in players %}
                 <tr>
                     <td style="width:300px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.name }}</a></td>
+                                               href="/{{ tournament }}players/{{ p.name }}">{{ p.name }}</a></td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.get_stats()["B&F Votes"] }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.get_stats()["B&F Votes"] }}</a>
                     </td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.get_stats()["Points scored"] }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.get_stats()["Points scored"] }}</a>
                     </td>
                     <td style="width:140px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.get_stats()["Aces scored"] }}</a>
+                                               href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.get_stats()["Aces scored"] }}</a>
                     </td>
                     <td style="width:140px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.nice_name() }}">{{ p.total_cards() }}</a>
+                                               href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.total_cards() }}</a>
                     </td>
                 </tr>
             {% endfor %}

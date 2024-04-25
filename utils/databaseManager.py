@@ -15,6 +15,7 @@ create_officials_table = """CREATE TABLE IF NOT EXISTS officials (
 create_people_table = """CREATE TABLE IF NOT EXISTS people (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
+    searchableName TEXT,
     password TEXT,
     imageURL TEXT,
     sessionToken TEXT,
@@ -23,6 +24,7 @@ create_people_table = """CREATE TABLE IF NOT EXISTS people (
 create_teams_table = """CREATE TABLE IF NOT EXISTS teams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
+    searchableName TEXT,
     imageURL TEXT,
     primaryColor TEXT,
     secondaryColor TEXT,
@@ -210,8 +212,9 @@ class DatabaseManager:
 
 
 def get_tournament_id(tournament_name):
+    print(tournament_name)
     with DatabaseManager() as c:
-        c.execute("SELECT id FROM tournaments WHERE name=?", (tournament_name,))
+        c.execute("SELECT id FROM tournaments WHERE searchableName=?", (tournament_name,))
         return c.fetchone()[0]
 
 
