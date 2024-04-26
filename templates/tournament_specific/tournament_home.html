@@ -122,18 +122,18 @@
             {% for p in players %}
                 <tr>
                     <td style="width:300px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.name }}">{{ p.name }}</a></td>
+                                               href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.name }}</a></td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.get_stats()["B&F Votes"] }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.best }}</a>
                     </td>
                     <td style="width:140px; text-align: center"><a class="hide"
-                                                                   href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.get_stats()["Points scored"] }}</a>
+                                                                   href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.points }}</a>
                     </td>
                     <td style="width:140px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.get_stats()["Aces scored"] }}</a>
+                                               href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.aces }}</a>
                     </td>
                     <td style="width:140px"><a class="hide"
-                                               href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.total_cards() }}</a>
+                                               href="/{{ tournament }}players/{{ p.searchableName }}">{{ p.cards }}</a>
                     </td>
                 </tr>
             {% endfor %}

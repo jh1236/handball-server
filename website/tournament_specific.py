@@ -28,7 +28,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
     comps = comps_in.copy()
     comps[None] = UniversalTournament()
 
-    @app.get("/<tournament>/")
+    @app.get("/<tournament>/") #TODO: Implement pooled
     def home_page(tournament: str):
         tournamentId: int = get_tournament_id(tournament)
         if tournamentId is None:
@@ -39,62 +39,62 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 ),
                 400,
             )
-        with DatabaseManager() as c:
+        @dataclass
+        class Tourney:
+            name: str
+            searchableName: str
+            editable: str
+        # ladder
+        @dataclass
+        class LadderTeam:
+            name: str
+            searchableName: str
+            games_won: int
+            games_played: int
+        @dataclass
+        class Game:
+            teams: list[str]
+            score_string: str
+            id: int
+        @dataclass
+        class Player:
+            name: str
+            searchableName: str
+            best: int
+            points: int
+            aces: int
+            cards: int
             
-            in_progress = c.execute("SELECT not(isFinished) FROM tournaments WHERE id=?", (tournamentId,)).fetchone()[0]
-            # implement pooled later, haven't worked them out yet
-            @dataclass
-            class Tourney:
-                name: str
-                searchableName: str
-                editable: str
-                
-            # ladder
-            @dataclass
-            class LadderTeam:
-                name: str
-                searchableName: str
-                games_won: int
-                games_played: int
-
-            @dataclass
-            class Game:
-                teams: list[str]
-                score_string: str
-                id: int
-            @dataclass
-            class Player:
-                name: str
-                searchableName: str
-                best: int
-                points: int
-                aces: int
-                cards: int
-                        
-            # get all teams from the tournament and their stats
+        with DatabaseManager() as c:            
             teams = c.execute("""
                             SELECT 
                                 name, teams.searchableName, gamesWon, gamesPlayed 
                                 FROM tournamentTeams 
                                 INNER JOIN teams ON tournamentTeams.teamId = teams.id 
-                                WHERE tournamentId = 2 
+                                WHERE tournamentId = ? 
                                 ORDER BY 
                                     gamesWon DESC, 
                                     gamesPlayed ASC 
-                                LIMIT 10;""").fetchall()
-            ladder = [[(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]] # ladder is a list of pools
-        
-            # get unfinnished games
+                                LIMIT 10;""", (tournamentId,)).fetchall()
+            ladder = [
+                        [
+                            None,
+                            [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]
+                        ]
+                    ]# there has to be a reason this is the required syntax but i can't work it ot
+ 
             games = c.execute("""
                             SELECT 
                                 serving.name, receiving.name, servingScore, receivingScore, games.id 
                                 FROM games 
                                 INNER JOIN teams AS serving ON games.servingTeam = serving.id 
                                 INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
-                                WHERE tournamentId = ? AND games.bestPlayer = NULL;
+                                WHERE 
+                                    tournamentId = ? AND 
+                                    games.bestPlayer = NULL;
                             """, 
                             (tournamentId,)).fetchall()
-            ongoing_games = [Game(game[:1], f"{game[2]} - {game[3]}", game[4]) for game in games]
+            ongoing_games = [Game(game[:2], f"{game[2]} - {game[3]}", game[4]) for game in games]
             
             games = c.execute("""
                             SELECT 
@@ -110,13 +110,16 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                         round = (SELECT max(round) FROM games WHERE tournamentId = ?) 
                                 END;""", 
                             (tournamentId,)*3).fetchall()
-            current_round = [Game(game[:1], f"{game[2]} - {game[3]}", game[4]) for game in games]
+            current_round = [Game(game[:2], f"{game[2]} - {game[3]}", game[4]) for game in games]
             
             playerList =  c.execute("""
                                 SELECT 
                                     people.name, searchableName, sum(isBestPlayer), sum(points), sum(aces), sum(redCards+yellowCards) 
                                     FROM playerGameStats 
-                                    INNER JOIN people ON playerId = people.id WHERE tournamentId = ? 
+                                    INNER JOIN people ON playerId = people.id 
+                                    WHERE 
+                                        tournamentId = ? AND
+                                        isFinal = 0
                                     GROUP BY playerId 
                                     ORDER BY 
                                         sum(isBestPlayer) DESC, 
@@ -127,9 +130,9 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 (tournamentId,)).fetchall()
             players = [Player(*player) for player in playerList]
 
-            notes = c.execute("SELECT notes FROM tournaments WHERE id = ?", (tournamentId,)).fetchone()[0]
+            notes = c.execute("SELECT notes FROM tournaments WHERE id = ?", (tournamentId,)).fetchone()[0] or "Notices will appear here when posted"
             tourney = c.execute("SELECT name, searchableName, fixturesGenerator from tournaments where id = ?", (tournamentId, )).fetchone()
-            
+            in_progress = c.execute("SELECT not(isFinished) FROM tournaments WHERE id=?", (tournamentId,)).fetchone()[0]
             iseditable = get_type_from_name(tourney[2]).manual_allowed()
             tourney = Tourney(tourney[0],tourney[1],iseditable)
             
