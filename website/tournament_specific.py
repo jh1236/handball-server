@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from flask import render_template, request, redirect, Response
 
@@ -19,10 +20,7 @@ from website.website import numbers, sign
 
 
 def link(tournament):
-    if tournament:
-        return tournament + "/"
-    return ""
-
+    return f"{tournament}/" if tournament else ""
 
 def add_tournament_specific(app, comps_in: dict[str, Tournament]):
     comps = comps_in.copy()
@@ -81,7 +79,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                             None,
                             [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]
                         ]
-                    ]# there has to be a reason this is the required syntax but i can't work it ot
+                    ] # there has to be a reason this is the required syntax but i can't work it out
  
             games = c.execute("""
                             SELECT 
@@ -106,7 +104,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 CASE -- if there is finals, return the finals, else return the last round
                                     WHEN (SELECT count(*) FROM games WHERE tournamentId = ? AND isFinal = 1) > 0 THEN
                                         isFinal = 1
-                                    ELSE
+                                    ELSE 
                                         round = (SELECT max(round) FROM games WHERE tournamentId = ?) 
                                 END;""", 
                             (tournamentId,)*3).fetchall()
@@ -153,23 +151,49 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/<tournament>/fixtures/")
     def fixtures(tournament):
-        fixtures = comps[tournament].fixtures
-        finals = comps[tournament].finals
-        fixtures = [
-            (n, [i for i in j if not i.bye or i.best_player])
-            for n, j in enumerate(fixture_sorter(fixtures))
-        ]
-        finals = [
-            (n, [i for i in j if not i.bye or i.best_player])
-            for n, j in enumerate(finals)
-        ]
-        fixtures = [i for i in fixtures if i[1]]
-        finals = [i for i in finals if i[1]]
+        @dataclass
+        class Game:
+            teams: list[str]
+            score_string: str
+            id: int
+        with DatabaseManager() as c:
+            tournamentId = get_tournament_id(tournament)
+            games = c.execute("""
+                            SELECT 
+                                serving.name, receiving.name, servingScore, receivingScore, games.id, round
+                                FROM games 
+                                INNER JOIN teams AS serving ON games.servingTeam = serving.id 
+                                INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+                                -- INNER JOIN people ON games.bestPlayer = people.id 
+                                WHERE 
+                                    tournamentId = ? AND
+                                    isFinal = 0;""", 
+                            (tournamentId,)).fetchall()
+            # me when i criticize Jareds code then write this abomination
+            fixtures = defaultdict(list)
+            for game in games:
+                fixtures[game[5]].append(Game(game[:2], f"{game[2]} - {game[3]}", game[4]))
+            
+            games = c.execute("""
+                            SELECT 
+                                serving.name, receiving.name, servingScore, receivingScore, games.id, round
+                                FROM games 
+                                INNER JOIN teams AS serving ON games.servingTeam = serving.id 
+                                INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+                                -- INNER JOIN people ON games.bestPlayer = people.id 
+                                WHERE 
+                                    tournamentId = ? AND
+                                    isFinal = 1;""", 
+                            (tournamentId,)).fetchall()
+            # idk something about glass houses?
+            finals = defaultdict(list)
+            for game in games:
+                finals[game[5]].append(Game(game[:2], f"{game[2]} - {game[3]}", game[4]))
         return (
             render_template(
                 "tournament_specific/site.html",
-                fixtures=fixtures,
-                finals=finals,
+                fixtures=fixtures.items(),
+                finals=finals.items(),
                 tournament=link(tournament),
             ),
             200,
