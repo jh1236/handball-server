@@ -201,100 +201,90 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/<tournament>/fixtures/detailed")
     def detailed_fixtures(tournament):
-        court = request.args.get("court", None, type=int)
-        round = request.args.get("round", None, type=int)
-        umpire = request.args.get("umpire", None, type=str)
-        team = request.args.get("team", None, type=str)
-        player = request.args.get("player", None, type=str)
-        fixtures = comps[tournament].fixtures
-        finals = comps[tournament].finals
-        fixtures = fixture_sorter(fixtures)
-        if court is not None:
-            fixtures = [[j for j in i if j.court == court] for i in fixtures]
-            finals = [[j for j in i if j.court == court] for i in finals]
-        if round is not None:
-            fixtures = [[j for j in i if j.round_number == round] for i in fixtures]
-            finals = [
-                [
-                    j
-                    for j in i
-                    if j.round_number + len(comps[tournament].fixtures) == round
-                ]
-                for i in finals
-            ]
-        if umpire is not None:
-            fixtures = [
-                [
-                    j
-                    for j in i
-                    if umpire in [j.primary_official.nice_name(), j.scorer.nice_name()]
-                ]
-                for i in fixtures
-            ]
-            finals = [
-                [
-                    j
-                    for j in i
-                    if umpire in [j.primary_official.nice_name(), j.scorer.nice_name()]
-                ]
-                for i in finals
-            ]
-        if team is not None:
-            fixtures = [
-                [j for j in i if team in [k.nice_name() for k in j.teams]]
-                for i in fixtures
-            ]
-            finals = [
-                [j for j in i if team in [k.nice_name() for k in j.teams]]
-                for i in finals
-            ]
-        if player is not None:
-            fixtures = [
-                [
-                    j
-                    for j in i
-                    if player
-                    in [
-                        k.nice_name()
-                        for k in [*j.current_players, j.scorer, j.primary_official]
-                    ]
-                ]
-                for i in fixtures
-            ]
-            finals = [
-                [
-                    j
-                    for j in i
-                    if player
-                    in [
-                        k.nice_name()
-                        for k in [*j.current_players, j.scorer, j.primary_official]
-                    ]
-                ]
-                for i in finals
-            ]
-        fixtures = [
-            (n, [i for i in j if not i.bye or i.best_player])
-            for n, j in enumerate(fixtures)
-        ]
-        finals = [
-            (n, [i for i in j if not i.bye or i.best_player])
-            for n, j in enumerate(finals)
-        ]
-        fixtures = [i for i in fixtures if i[1]]
-        finals = [i for i in finals if i[1]]
+        # TODO: jared said he wanted to do this, Thanks :)
+        
+        
+        # court = request.args.get("court", None, type=int)
+        # round = request.args.get("round", None, type=int)
+        # umpire = request.args.get("umpire", None, type=str)
+        # team = request.args.get("team", None, type=str)
+        # player = request.args.get("player", None, type=str)
+        @dataclass
+        class GameDetailed:
+            teams: list[str]
+            score_string: str
+            id: int
+            umpire: str
+            umpireSearchableName: str
+            scorer: str
+            scorerSearchableName: str
+            court: int
+            court_name: str
+        @dataclass
+        class Tourney:
+            twoCourts: bool
+            scorer: bool
+        with DatabaseManager() as c:
+            tournamentId = get_tournament_id(tournament)
+            
+            games = c.execute("""SELECT 
+                        serving.name, receiving.name, servingScore, receivingScore, games.id, 
+                        umpire.name, umpire.searchableName, scorer.name, scorer.searchableName, 
+                        court, round
+                        FROM games 
+                        INNER JOIN teams AS serving ON games.servingTeam = serving.id 
+                        INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+                        LEFT JOIN officials AS u ON games.official = u.id
+                            LEFT JOIN people AS umpire ON u.personId = umpire.id
+                        LEFT JOIN officials AS s ON games.scorer = s.id
+                            LEFT JOIN people AS scorer ON s.personId = scorer.id
+                        WHERE
+                            tournamentId = ? AND
+                            isFinal = 0;
+                            """, (tournamentId,))
+            fixtures = defaultdict(list)
+            for game in games:
+                fixtures[game[-1]].append(GameDetailed(game[:2], f"{game[2]} - {game[3]}", game[4], game[5], game[6], game[7], game[8], game[9],{-1: "-", 0:"Court 1",1:"Court 2"}.get(game[9])))
+            
+            games = c.execute("""SELECT 
+                        serving.name, receiving.name, servingScore, receivingScore, games.id, 
+                        umpire.name, umpire.searchableName, scorer.name, scorer.searchableName, 
+                        court, round
+                        FROM games 
+                        INNER JOIN teams AS serving ON games.servingTeam = serving.id 
+                        INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+                        LEFT JOIN officials AS u ON games.official = u.id
+                            LEFT JOIN people AS umpire ON u.personId = umpire.id
+                        LEFT JOIN officials AS s ON games.scorer = s.id
+                            LEFT JOIN people AS scorer ON s.personId = scorer.id
+                        WHERE
+                            tournamentId = ? AND
+                            isFinal = 1;
+                            """, (tournamentId,))
+            finals = defaultdict(list)
+            for game in games:
+                finals[game[-1]].append(GameDetailed(game[:2], f"{game[2]} - {game[3]}", game[4], game[5], game[6], game[7], game[8], game[9],{-1: "-", 0:"Court 1",1:"Court 2"}.get(game[9])))
+            
+            t =  Tourney(*c.execute("""SELECT
+                                twoCourts, count(scorer)>0
+                                FROM tournaments
+                                INNER JOIN games ON games.tournamentId = tournaments.id
+                                WHERE tournaments.id = ?;""",
+                                (tournamentId,)).fetchone())
+                        
         return (
             render_template(
                 "tournament_specific/site_detailed.html",
-                fixtures=fixtures,
-                finals=finals,
+                fixtures=fixtures.items(),
+                finals=finals.items(),
                 tournament=link(tournament),
-                t=comps[tournament],
-                reset=court is not None
-                or round is not None
-                or umpire is not None
-                or team is not None
-                or player is not None,
+                t=t,
+                reset=False # TODO: see todo above
+                # reset=court is not None 
+                # or round is not None
+                # or umpire is not None
+                # or team is not None
+                # or player is not None,
             ),
             200,
         )
