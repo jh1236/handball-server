@@ -11,8 +11,13 @@ from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
 from structure.UniversalTournament import UniversalTournament
 from utils.statistics import get_player_stats, get_player_stats_categories
-from utils.permissions import admin_only, fetch_user, officials_only, _no_permissions, \
-    user_on_mobile  # Temporary till i make a function that can handle dynamic/game permissions
+from utils.permissions import (
+    admin_only,
+    fetch_user,
+    officials_only,
+    _no_permissions,
+    user_on_mobile,
+)  # Temporary till i make a function that can handle dynamic/game permissions
 
 from utils.databaseManager import DatabaseManager, get_tournament_id
 from utils.util import fixture_sorter
@@ -22,11 +27,12 @@ from website.website import numbers, sign
 def link(tournament):
     return f"{tournament}/" if tournament else ""
 
+
 def add_tournament_specific(app, comps_in: dict[str, Tournament]):
     comps = comps_in.copy()
     comps[None] = UniversalTournament()
 
-    @app.get("/<tournament>/") #TODO: Implement pooled
+    @app.get("/<tournament>/")  # TODO: Implement pooled
     def home_page(tournament: str):
         tournamentId: int = get_tournament_id(tournament)
         if tournamentId is None:
@@ -37,11 +43,13 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 ),
                 400,
             )
+
         @dataclass
         class Tourney:
             name: str
             searchableName: str
             editable: str
+
         # ladder
         @dataclass
         class LadderTeam:
@@ -49,11 +57,13 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             searchableName: str
             games_won: int
             games_played: int
+
         @dataclass
         class Game:
             teams: list[str]
             score_string: str
             id: int
+
         @dataclass
         class Player:
             name: str
@@ -62,9 +72,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             points: int
             aces: int
             cards: int
-            
-        with DatabaseManager() as c:            
-            teams = c.execute("""
+
+        with DatabaseManager() as c:
+            teams = c.execute(
+                """
                             SELECT 
                                 name, teams.searchableName, gamesWon, gamesPlayed 
                                 FROM tournamentTeams 
@@ -73,15 +84,18 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 ORDER BY 
                                     gamesWon DESC, 
                                     gamesPlayed ASC 
-                                LIMIT 10;""", (tournamentId,)).fetchall()
+                                LIMIT 10;""",
+                (tournamentId,),
+            ).fetchall()
             ladder = [
-                        [
-                            None,
-                            [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)]
-                        ]
-                    ] # there has to be a reason this is the required syntax but i can't work it out
- 
-            games = c.execute("""
+                [
+                    None,
+                    [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)],
+                ]
+            ]  # there has to be a reason this is the required syntax but i can't work it out
+
+            games = c.execute(
+                """
                             SELECT 
                                 serving.name, receiving.name, servingScore, receivingScore, games.id 
                                 FROM games 
@@ -90,11 +104,15 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 WHERE 
                                     tournamentId = ? AND 
                                     games.bestPlayer = NULL;
-                            """, 
-                            (tournamentId,)).fetchall()
-            ongoing_games = [Game(game[:2], f"{game[2]} - {game[3]}", game[4]) for game in games]
-            
-            games = c.execute("""
+                            """,
+                (tournamentId,),
+            ).fetchall()
+            ongoing_games = [
+                Game(game[:2], f"{game[2]} - {game[3]}", game[4]) for game in games
+            ]
+
+            games = c.execute(
+                """
                             SELECT 
                                 serving.name, receiving.name, servingScore, receivingScore, games.id
                                 FROM games 
@@ -106,11 +124,15 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                         isFinal = 1
                                     ELSE 
                                         round = (SELECT max(round) FROM games WHERE tournamentId = ?) 
-                                END;""", 
-                            (tournamentId,)*3).fetchall()
-            current_round = [Game(game[:2], f"{game[2]} - {game[3]}", game[4]) for game in games]
-            
-            playerList =  c.execute("""
+                                END;""",
+                (tournamentId,) * 3,
+            ).fetchall()
+            current_round = [
+                Game(game[:2], f"{game[2]} - {game[3]}", game[4]) for game in games
+            ]
+
+            playerList = c.execute(
+                """
                                 SELECT 
                                     people.name, searchableName, sum(isBestPlayer), sum(points), sum(aces), sum(redCards+yellowCards) 
                                     FROM playerGameStats 
@@ -124,16 +146,27 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                         sum(points) DESC, 
                                         sum(aces) DESC, 
                                         sum(redCards+yellowCards+greenCards) ASC  
-                                    LIMIT 10;""", 
-                                (tournamentId,)).fetchall()
+                                    LIMIT 10;""",
+                (tournamentId,),
+            ).fetchall()
             players = [Player(*player) for player in playerList]
 
-            notes = c.execute("SELECT notes FROM tournaments WHERE id = ?", (tournamentId,)).fetchone()[0] or "Notices will appear here when posted"
-            tourney = c.execute("SELECT name, searchableName, fixturesGenerator from tournaments where id = ?", (tournamentId, )).fetchone()
-            in_progress = c.execute("SELECT not(isFinished) FROM tournaments WHERE id=?", (tournamentId,)).fetchone()[0]
+            notes = (
+                c.execute(
+                    "SELECT notes FROM tournaments WHERE id = ?", (tournamentId,)
+                ).fetchone()[0]
+                or "Notices will appear here when posted"
+            )
+            tourney = c.execute(
+                "SELECT name, searchableName, fixturesGenerator from tournaments where id = ?",
+                (tournamentId,),
+            ).fetchone()
+            in_progress = c.execute(
+                "SELECT not(isFinished) FROM tournaments WHERE id=?", (tournamentId,)
+            ).fetchone()[0]
             iseditable = get_type_from_name(tourney[2]).manual_allowed()
-            tourney = Tourney(tourney[0],tourney[1],iseditable)
-            
+            tourney = Tourney(tourney[0], tourney[1], iseditable)
+
             return (
                 render_template(
                     "tournament_specific/tournament_home.html",
@@ -156,9 +189,11 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             teams: list[str]
             score_string: str
             id: int
+
         with DatabaseManager() as c:
             tournamentId = get_tournament_id(tournament)
-            games = c.execute("""
+            games = c.execute(
+                """
                             SELECT 
                                 serving.name, receiving.name, servingScore, receivingScore, games.id, round
                                 FROM games 
@@ -167,14 +202,18 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 -- INNER JOIN people ON games.bestPlayer = people.id 
                                 WHERE 
                                     tournamentId = ? AND
-                                    isFinal = 0;""", 
-                            (tournamentId,)).fetchall()
+                                    isFinal = 0;""",
+                (tournamentId,),
+            ).fetchall()
             # me when i criticize Jareds code then write this abomination
             fixtures = defaultdict(list)
             for game in games:
-                fixtures[game[5]].append(Game(game[:2], f"{game[2]} - {game[3]}", game[4]))
-            
-            games = c.execute("""
+                fixtures[game[5]].append(
+                    Game(game[:2], f"{game[2]} - {game[3]}", game[4])
+                )
+
+            games = c.execute(
+                """
                             SELECT 
                                 serving.name, receiving.name, servingScore, receivingScore, games.id, round
                                 FROM games 
@@ -183,12 +222,15 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 -- INNER JOIN people ON games.bestPlayer = people.id 
                                 WHERE 
                                     tournamentId = ? AND
-                                    isFinal = 1;""", 
-                            (tournamentId,)).fetchall()
+                                    isFinal = 1;""",
+                (tournamentId,),
+            ).fetchall()
             # idk something about glass houses?
             finals = defaultdict(list)
             for game in games:
-                finals[game[5]].append(Game(game[:2], f"{game[2]} - {game[3]}", game[4]))
+                finals[game[5]].append(
+                    Game(game[:2], f"{game[2]} - {game[3]}", game[4])
+                )
         return (
             render_template(
                 "tournament_specific/site.html",
@@ -202,8 +244,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
     @app.get("/<tournament>/fixtures/detailed")
     def detailed_fixtures(tournament):
         # TODO: jared said he wanted to do this, Thanks :)
-        
-        
+
         # court = request.args.get("court", None, type=int)
         # round = request.args.get("round", None, type=int)
         # umpire = request.args.get("umpire", None, type=str)
@@ -220,14 +261,17 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             scorerSearchableName: str
             court: int
             court_name: str
+
         @dataclass
         class Tourney:
             twoCourts: bool
             scorer: bool
+
         with DatabaseManager() as c:
             tournamentId = get_tournament_id(tournament)
-            
-            games = c.execute("""SELECT 
+
+            games = c.execute(
+                """SELECT 
                         serving.name, receiving.name, servingScore, receivingScore, games.id, 
                         umpire.name, umpire.searchableName, scorer.name, scorer.searchableName, 
                         court, round
@@ -241,12 +285,27 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                         WHERE
                             tournamentId = ? AND
                             isFinal = 0;
-                            """, (tournamentId,))
+                            """,
+                (tournamentId,),
+            )
             fixtures = defaultdict(list)
             for game in games:
-                fixtures[game[-1]].append(GameDetailed(game[:2], f"{game[2]} - {game[3]}", game[4], game[5], game[6], game[7], game[8], game[9],{-1: "-", 0:"Court 1",1:"Court 2"}.get(game[9])))
-            
-            games = c.execute("""SELECT 
+                fixtures[game[-1]].append(
+                    GameDetailed(
+                        game[:2],
+                        f"{game[2]} - {game[3]}",
+                        game[4],
+                        game[5],
+                        game[6],
+                        game[7],
+                        game[8],
+                        game[9],
+                        {-1: "-", 0: "Court 1", 1: "Court 2"}.get(game[9]),
+                    )
+                )
+
+            games = c.execute(
+                """SELECT 
                         serving.name, receiving.name, servingScore, receivingScore, games.id, 
                         umpire.name, umpire.searchableName, scorer.name, scorer.searchableName, 
                         court, round
@@ -260,18 +319,36 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                         WHERE
                             tournamentId = ? AND
                             isFinal = 1;
-                            """, (tournamentId,))
+                            """,
+                (tournamentId,),
+            )
             finals = defaultdict(list)
             for game in games:
-                finals[game[-1]].append(GameDetailed(game[:2], f"{game[2]} - {game[3]}", game[4], game[5], game[6], game[7], game[8], game[9],{-1: "-", 0:"Court 1",1:"Court 2"}.get(game[9])))
-            
-            t =  Tourney(*c.execute("""SELECT
+                finals[game[-1]].append(
+                    GameDetailed(
+                        game[:2],
+                        f"{game[2]} - {game[3]}",
+                        game[4],
+                        game[5],
+                        game[6],
+                        game[7],
+                        game[8],
+                        game[9],
+                        {-1: "-", 0: "Court 1", 1: "Court 2"}.get(game[9]),
+                    )
+                )
+
+            t = Tourney(
+                *c.execute(
+                    """SELECT
                                 twoCourts, count(scorer)>0
                                 FROM tournaments
                                 INNER JOIN games ON games.tournamentId = tournaments.id
                                 WHERE tournaments.id = ?;""",
-                                (tournamentId,)).fetchone())
-                        
+                    (tournamentId,),
+                ).fetchone()
+            )
+
         return (
             render_template(
                 "tournament_specific/site_detailed.html",
@@ -279,8 +356,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 finals=finals.items(),
                 tournament=link(tournament),
                 t=t,
-                reset=False # TODO: see todo above
-                # reset=court is not None 
+                reset=False  # TODO: see todo above
+                # reset=court is not None
                 # or round is not None
                 # or umpire is not None
                 # or team is not None
@@ -296,10 +373,11 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             name: str
             searchableName: str
             image: str
-            
+
         with DatabaseManager() as c:
             tournamentId = get_tournament_id(tournament)
-            teams = c.execute("""
+            teams = c.execute(
+                """
                             SELECT 
                                 name, searchableName, 
                                     case 
@@ -312,9 +390,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId 
                                 WHERE tournamentId = ? AND
                                 tournamentTeams.gamesPlayed > 0;""",
-                            (tournamentId,)).fetchall()
+                (tournamentId,),
+            ).fetchall()
             teams = [Team(*team) for team in teams]
-            
+
         return (
             render_template(
                 "tournament_specific/stats.html",
@@ -344,7 +423,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             pointsFor: int
             pointsAgainst: int
             pointDifference: int
-        
+
         @dataclass
         class PlayerStats:
             name: str
@@ -360,12 +439,11 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             redCards: int
             roundsOnCourt: int
             roundsCarded: int
-            
-            
-            
+
         with DatabaseManager() as c:
             tournamentId = get_tournament_id(tournament)
-            team = c.execute("""
+            team = c.execute(
+                """
                         SELECT 
                             name, searchableName, 
                                 case 
@@ -376,8 +454,9 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 end  
                             FROM teams 
                             WHERE searchableName = ?;""",
-                        (team_name,)).fetchone()
-            
+                (team_name,),
+            ).fetchone()
+
             if not team:
                 return (
                     render_template(
@@ -387,7 +466,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     400,
                 )
             team = Team(*team)
-            players = c.execute("""
+            players = c.execute(
+                """
                         SELECT 
                             name, searchableName, sum(isBestPlayer), sum(points), sum(aces), sum(redCards+yellowCards) 
                             FROM playerGameStats 
@@ -401,7 +481,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 sum(points) DESC, 
                                 sum(aces) DESC, 
                                 sum(redCards+yellowCards+greenCards) ASC;""",
-                        (tournamentId, team_name)).fetchall()
+                (tournamentId, team_name),
+            ).fetchall()
         if team_name not in [i.nice_name() for i in comps[tournament].teams]:
             return (
                 render_template(
@@ -741,7 +822,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 "tournament_specific/players_detailed.html",
                 headers=[(i - 1, k) for i, k in enumerate(headers)],
                 players=sorted(players),
-                total=get_player_stats(comps[tournament], None,detail=2),
+                total=get_player_stats(comps[tournament], None, detail=2),
                 tournament=link(tournament),
             ),
             200,
@@ -757,9 +838,9 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 ),
                 400,
             )
-        player = [
-            i for i in comps[tournament].players if player_name == i.nice_name()
-        ][0]
+        player = [i for i in comps[tournament].players if player_name == i.nice_name()][
+            0
+        ]
         recent_games = []
         upcoming_games = []
         for i in comps[tournament].games_to_list():
@@ -792,7 +873,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 render_template(
                     "tournament_specific/player_stats.html",
                     stats=[
-                        (k, v) for k, v in get_player_stats(player.tournament, player, detail=2).items()
+                        (k, v)
+                        for k, v in get_player_stats(
+                            player.tournament, player, detail=2
+                        ).items()
                     ],
                     name=player.name,
                     player=player,
@@ -807,7 +891,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 render_template(
                     "tournament_specific/new_player_stats.html",
                     stats=[
-                        (k, v) for k, v in get_player_stats(player.tournament, player, detail=2).items()
+                        (k, v)
+                        for k, v in get_player_stats(
+                            player.tournament, player, detail=2
+                        ).items()
                     ],
                     name=player.name,
                     player=player,
@@ -819,10 +906,9 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     .get_stats_detailed()
                     .keys(),
                     tournament=link(tournament),
-                    ),
+                ),
                 200,
             )
-
 
     @app.get("/<tournament>/officials/<nice_name>/")
     def official_site(tournament, nice_name):
@@ -838,29 +924,94 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             i for i in comps[tournament].officials if i.nice_name() == nice_name
         ][0]
         recent_games = []
-        for i in comps[tournament].games_to_list():
-            if official.nice_name() == i.primary_official.nice_name():
-                recent_games.append(
-                    (
-                        f"{'Umpire ' if comps[tournament].details.get('scorer', False) else ''}Round {i.round_number + 1}: {repr(i)} ({i.score_string})",
-                        i.id,
-                        i.tournament.nice_name(),
-                    )
+        titles = [
+            "Green Cards Given",
+            "Yellow Cards Given",
+            "Red Cards Given",
+            "Cards Given",
+            "Cards Per Game",
+            "Faults Called",
+            "Faults Per Game",
+            "Games Umpired",
+            "Games Scored",
+            "Rounds Umpired",
+        ]
+        with DatabaseManager() as c:
+            values = c.execute(
+                """SELECT
+                                   SUM(punishments.color = "Green"),
+                                   SUM(punishments.color = "Yellow"),
+                                   SUM(punishments.color = "Red"),
+                                   COUNT(punishments.id),
+                                   ROUND(CAST(COUNT(punishments.id) AS REAL) / COUNT(DISTINCT games.id), 2),
+                                   (SELECT SUM(faults)
+                                    FROM games
+                                             INNER JOIN playerGameStats on games.id = playerGameStats.gameId
+                                    WHERE games.official = officials.id),
+                                   ROUND(CAST((SELECT SUM(faults)
+                                         FROM games
+                                                  INNER JOIN playerGameStats on games.id = playerGameStats.gameId
+                                         WHERE games.official = officials.id) AS REAL) / COUNT(DISTINCT games.id), 2),
+                                   COUNT(DISTINCT games.id),
+                                   COUNT((SELECT games.id FROM games WHERE games.scorer = officials.id)),
+                                   SUM((SELECT servingScore + receivingScore FROM games WHERE games.official = officials.id))
+                            
+                                    FROM officials
+                                             INNER JOIN people on people.id = officials.personId
+                                             INNER JOIN games on games.official = officials.id
+                                             LEFT JOIN punishments on games.id = punishments.gameId
+                                    WHERE people.searchableName = ?
+            """,
+                (nice_name,),
+            ).fetchall()
+            games = c.execute(
+                """SELECT DISTINCT games.id,
+                tournaments.searchableName,
+                po.searchableName = ?,
+                round,
+                st.name,
+                rt.name,
+                servingScore,
+                receivingScore
+            FROM games
+                     INNER JOIN officials o on games.official = o.id
+                     INNER JOIN tournaments on games.tournamentId = tournaments.id
+                     LEFT JOIN teams st on st.id = games.servingTeam
+                     LEFT JOIN teams rt on rt.id = games.receivingTeam
+                     LEFT JOIN officials s on games.scorer = s.id
+                     LEFT JOIN main.people po on po.id = o.personId
+                     LEFT JOIN main.people ps on ps.id = s.personId
+            WHERE po.searchableName = ?
+               or ps.searchableName = ?
+            ORDER BY games.id;
+            """,
+                (nice_name, nice_name, nice_name),
+            ).fetchall()
+            print(games)
+        for (
+            game_id,
+            tournament_nice_name,
+            umpire,
+            game_round,
+            team_one,
+            team_two,
+            score_one,
+            score_two,
+        ) in games:
+            recent_games.append(
+                (
+                    f"{'Umpire ' if umpire else 'Scorer'} Round {game_round + 1}: {team_one} - {team_two} ({score_one} - {score_two})",
+                    game_id,
+                    tournament_nice_name,
                 )
-            elif official.nice_name() == i.scorer.nice_name():
-                recent_games.append(
-                    (
-                        f"Scorer Round {i.round_number + 1}: {repr(i)} ({i.score_string})",
-                        i.id,
-                        i.tournament.nice_name(),
-                    )
-                )
+            )
+
         return (
             render_template(
                 "tournament_specific/official.html",
                 name=official.name,
                 link=official.nice_name(),
-                stats=[(k, v) for k, v in official.get_stats().items()],
+                stats=zip(titles, values[0]),
                 games=recent_games,
                 tournament=link(tournament),
             ),
@@ -950,9 +1101,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     swap=visual_str,
                     teams=teams,
                     game=game,
-                    headers=[
-                        i for i in players[0].get_stats().keys()
-                    ],
+                    headers=[i for i in players[0].get_stats().keys()],
                     stats=[(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]],
                     tournament=link(tournament),
                 ),
