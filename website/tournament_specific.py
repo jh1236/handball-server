@@ -291,13 +291,30 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/<tournament>/teams/")
     def stats_directory_site(tournament):
-        teams = [
-            i
-            for i in sorted(comps[tournament].teams, key=lambda a: a.nice_name())
-            if i.games_played > 0
-            or len(comps[tournament].teams) < 15
-            or not any(not i.super_bye for i in comps[tournament].games_to_list())
-        ]
+        @dataclass
+        class Team:
+            name: str
+            searchableName: str
+            image: str
+            
+        with DatabaseManager() as c:
+            tournamentId = get_tournament_id(tournament)
+            teams = c.execute("""
+                            SELECT 
+                                name, searchableName, 
+                                    case 
+                                        when imageURL is null 
+                                            then "/api/teams/image?name=blank" 
+                                        else 
+                                            imageURL
+                                    end  
+                                FROM teams 
+                                INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId 
+                                WHERE tournamentId = ? AND
+                                tournamentTeams.gamesPlayed > 0;""",
+                            (tournamentId,)).fetchall()
+            teams = [Team(*team) for team in teams]
+            
         return (
             render_template(
                 "tournament_specific/stats.html",
@@ -309,6 +326,82 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/<tournament>/teams/<team_name>/")
     def stats_site(tournament, team_name):
+        @dataclass
+        class TeamStats:
+            name: str
+            searchableName: str
+            image: str
+            elo: float
+            gamesPlayed: int
+            gamesWon: int
+            gamesLost: int
+            winPercentage: str
+            greenCards: int
+            yellowCards: int
+            redCards: int
+            faults: int
+            timeoutsCalled: int
+            pointsFor: int
+            pointsAgainst: int
+            pointDifference: int
+        
+        @dataclass
+        class PlayerStats:
+            name: str
+            searchableName: str
+            bestPlayer: int
+            elo: float
+            points: int
+            aces: int
+            faults: int
+            doubleFaults: int
+            greenCards: int
+            yellowCards: int
+            redCards: int
+            roundsOnCourt: int
+            roundsCarded: int
+            
+            
+            
+        with DatabaseManager() as c:
+            tournamentId = get_tournament_id(tournament)
+            team = c.execute("""
+                        SELECT 
+                            name, searchableName, 
+                                case 
+                                    when imageURL is null 
+                                        then "/api/teams/image?name=blank" 
+                                    else 
+                                        imageURL
+                                end  
+                            FROM teams 
+                            WHERE searchableName = ?;""",
+                        (team_name,)).fetchone()
+            
+            if not team:
+                return (
+                    render_template(
+                        "tournament_specific/game_editor/game_done.html",
+                        error="This is not a real team",
+                    ),
+                    400,
+                )
+            team = Team(*team)
+            players = c.execute("""
+                        SELECT 
+                            name, searchableName, sum(isBestPlayer), sum(points), sum(aces), sum(redCards+yellowCards) 
+                            FROM playerGameStats 
+                            INNER JOIN people ON playerId = people.id 
+                            WHERE 
+                                tournamentId = ? AND
+                                teamId = (SELECT id FROM teams WHERE searchableName = ?)
+                            GROUP BY playerId 
+                            ORDER BY 
+                                sum(isBestPlayer) DESC, 
+                                sum(points) DESC, 
+                                sum(aces) DESC, 
+                                sum(redCards+yellowCards+greenCards) ASC;""",
+                        (tournamentId, team_name)).fetchall()
         if team_name not in [i.nice_name() for i in comps[tournament].teams]:
             return (
                 render_template(
@@ -536,6 +629,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             "Point Difference": 2,
             "Elo": 3,
         }
+        with DatabaseManager() as c:
+            c.execute("SELECT ")
         ladder = comps[tournament].ladder()
         if isinstance(ladder[0], list):
             ladder = [

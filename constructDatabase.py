@@ -48,13 +48,14 @@ def process_game(tournamentId, game, round, isFinal, isRanked):
     resolved = game.resolved
     isFinal = game.is_final
     notes = game.notes
+    isBye = game.bye or game.super_bye
     
     winning_team = s.execute("SELECT id FROM teams WHERE name = ?", (game.winner.name,)).fetchone()[0]
     s.execute(
         """INSERT INTO games (
-            tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, gameStringVersion, servingScore, receivingScore, gameString, started, startTime, length, court, protested, resolved, isFinal, round, notes, winningTeam
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, 1,                servingScore, receivingScore, gameString, started, startTime, length, court, protested, resolved, isFinal, round, notes, winning_team)
+            tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, gameStringVersion, servingScore, receivingScore, gameString, started, startTime, length, court, protested, resolved, isFinal, round, notes, winningTeam, isBye
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, 1,                servingScore, receivingScore, gameString, started, startTime, length, court, protested, resolved, isFinal, round, notes, winning_team, isBye)
     )    
     s.execute("UPDATE tournamentTeams SET gamesPlayed = gamesPlayed + 1 WHERE teamId = ? AND tournamentId = ?", (servingTeam, tournamentId))
     s.execute("UPDATE tournamentTeams SET gamesPlayed = gamesPlayed + 1 WHERE teamId = ? AND tournamentId = ?", (receivingTeam, tournamentId))

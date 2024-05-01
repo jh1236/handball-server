@@ -85,6 +85,7 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     isFinal INTEGER,
     round INTEGER,
     notes TEXT,
+    isBye INTEGER,
     pool INTEGER,
     
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),

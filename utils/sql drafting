@@ -51,3 +51,83 @@ SELECT
     FROM tournaments
     INNER JOIN games ON games.tournamentId = tournaments.id
     WHERE tournaments.id = 3;
+
+SELECT 
+    name, searchableName, 
+        case 
+            when imageURL is null 
+                then "/api/teams/image?name=blank" 
+            else 
+                imageURL
+        end  
+    FROM teams 
+    INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId 
+    WHERE tournamentId = 8;
+
+SELECT 
+    t.name, sum(s.started), sum(s.servingScore - s.receivingScore)
+    FROM 
+        teams as t 
+        INNER JOIN games as s ON s.servingTeam = t.id OR s.receivingTeam = t.id
+    WHERE 
+        s.tournamentId = 7 --OR 
+        --r.tournamentId = 7
+    GROUP BY(t.name);
+
+SELECT 
+    teams.name, count(s.id)+count(r.id) as games
+    FROM teams
+    INNER JOIN games as s on s.servingTeam = teams.id
+    INNER JOIN games as r on r.receivingTeam = teams.id
+    WHERE 
+        s.tournamentId = 7 AND
+        (
+            s.servingTeam = teams.id OR
+            s.receivingTeam = teams.id
+        )
+    GROUP BY teams.name;
+
+SELECT 
+    teams.name, 
+    COUNT(games.id) as played,
+    SUM(
+        CASE 
+            WHEN games.servingTeam = teams.id 
+            THEN games.servingScore > games.receivingScore
+            ELSE games.receivingScore > games.servingScore 
+        END
+    ) as wins,
+    SUM(
+        CASE 
+            WHEN games.servingTeam = teams.id 
+            THEN games.servingScore > games.receivingScore
+            ELSE games.receivingScore > games.servingScore 
+        END
+    ) / CAST(COUNT(games.id) as REAL) as percentage,
+    SUM(
+        CASE 
+            WHEN games.servingTeam = teams.id 
+            THEN games.servingScore 
+            ELSE games.receivingScore 
+        END
+    ) AS total_points,
+    SUM(
+        CASE 
+            WHEN games.servingTeam = teams.id 
+            THEN games.servingScore < games.receivingScore
+            ELSE games.receivingScore < games.servingScore 
+        END
+    ) as losses,
+    SUM(
+        p.faults
+    ) as losses
+FROM teams
+INNER JOIN games ON games.servingTeam = teams.id OR games.receivingTeam = teams.id
+INNER JOIN playerGameStats as p ON p.gameId = games.id
+WHERE 
+    games.tournamentId = 7 AND
+    games.isFinal = 0 AND
+    games.isBye = 0
+GROUP BY teams.name;
+
+    
