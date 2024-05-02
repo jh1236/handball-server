@@ -1,12 +1,14 @@
 import io
 import os
+from typing import Callable
 
 import numpy as np
-from flask import request, send_file, Response
+from flask import request, send_file, Response, render_template
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 from structure.AllTournament import get_all_players, get_all_games
+from structure.GameUtils import filter_games, get_query_descriptor
 from utils.logging_handler import logger
 from website.endpoints.clips import add_clip_endpoints
 from website.endpoints.edit_game import add_game_endpoints
@@ -51,7 +53,6 @@ def add_endpoints(app, comps):
         else:
             return send_file(f"./resources/images/umpire.png", mimetype="image/png")
 
-
     # testing related endpoints
     @app.get("/api/mirror")
     def mirror():
@@ -64,6 +65,8 @@ def add_endpoints(app, comps):
                 "this is the sound of a robot": "ELELALAELE-BING-ALELILLELALE",
             }
         return str(d), 200
+
+
 
     add_tourney_endpoints(app, comps)
     add_graph_endpoints(app, comps)

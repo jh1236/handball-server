@@ -1,22 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "base.html" %}
+
+{% block headBlock %}
     <title>{{ user.name }}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script>load("")</script>
+{% endblock %}
 
+{% block bodyBlock %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <a href="/user">
     <img src="/api/users/image?name={{ user.nice_name() }}" class="title_logo"></a>
 <h1><a href="/user/" class="hide">{{ user.name }}</a></h1><a class="hide" href="/logout/"><i>(Log out)</i></a>
-<div>
-    <div style="bottom: 100%;width: 60%;float:left">
+<div class="row">
+    <div class="col">
         <div style="min-height: 200px">
             <h2>Games To Play</h2>
             {% if not to_play %}
@@ -24,7 +19,7 @@
                 <br>
                 <i>No Ongoing Games</i>
             {% else %}
-                <table class="table">
+                <table class="jaredTable">
                 <tbody>
                 <tr>
                     <th>Team One</th>
@@ -54,7 +49,7 @@
                 <br>
                 <i>No Ongoing Games</i>
             {% else %}
-                <table class="table">
+                <table class="jaredTable">
                 <tbody>
                 <tr>
                     <th>Team One</th>
@@ -84,7 +79,7 @@
             </table>
         </div>
     </div>
-    <div style="float:left;width: 25%; height: 100%">
+    <div class="col">
         <div style="min-height: 200px">
             <h2><a class="hide" href="/video/">Videos Set By UM</a></h2>
             {% if reqd %}
@@ -109,5 +104,4 @@
 </div>
 <br>
 <br>
-</body>
-</html>
+{% endblock %}

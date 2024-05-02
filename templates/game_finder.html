@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Find Game ({{ games.__len__() }} results)</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<nav id="navBar"></nav>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+<h1>Game Finder ({{ games.__len__() }} results)</h1>
+<i>{{ query }}</i>
+<br>
+<select id="stats">
+    {% for i in headings %}
+        <option value="{{ i }}">{{ i }}</option>
+    {% endfor %}
+</select>
+<button onclick="addStatsButton()">+</button>
+<br>
+
+<div id="args">
+
+</div>
+<button onclick="processLookup()">Submit</button>
+<table class="jaredTable">
+    <thead>
+    <tr>
+        <th>Game</th>
+        <th>Player</th>
+        {% for i in details %}
+            <th>{{ i }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    {% for game, players in games %}
+        <tr style="outline: 1px black solid">
+            <td style="width: 600px;text-align: center;vertical-align: top" rowspan="{{ players.__len__() }}">
+                <a class="hide" href="/{{ game.tournament.nice_name() }}/games/{{ game.id }}">{{ game }}</a>
+            </td>
+            {% for player in game.all_players if player.nice_name() in players %}
+                <td style="text-align: center;width: 150px"><a class="hide"
+                                                               href="/{{ game.tournament.nice_name() }}/games/{{ game.id }}">{{ player.name }}</a>
+                </td>
+                {% for d in details %}
+                    <td style="text-align: center;min-width: 50px;width: auto"><a class="hide"
+                                                                                  href="/{{ game.tournament.nice_name() }}/games/{{ game.id }}">{{ dict(player.get_game_details(), **player.get_stats_detailed())[d] }}</a>
+                    </td>
+                {% endfor %}
+                </tr>
+                <tr>
+            {% endfor %}
+            </tr>
+    {% endfor %}
+</table>
+{% for k, v in args.items(True) %}
+    <script>addStatsButton('{{ k }}', '{{ v }}')</script>
+{% endfor %}
+</body>
+</html>

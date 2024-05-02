@@ -1,16 +1,16 @@
 @import "style.css";
 
-.table tr td:first-child {
+.jaredTable tr td:first-child {
     width: 200px;
     text-align: left;
 }
 
-.table tr td:nth-child(2) {
+.jaredTable tr td:nth-child(2) {
     width: 100px;
     text-align: left;
 }
 
-.table tr td:nth-child(3) {
+.jaredTable tr td:nth-child(3) {
     width: 100px;
     text-align: left;
 }

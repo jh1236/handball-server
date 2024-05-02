@@ -4,6 +4,7 @@ from structure.AllTournament import (
     get_all_players,
 )
 from structure.Tournament import Tournament
+from utils.sidebar_wrapper import render_template_sidebar
 from utils.statistics import get_player_stats
 
 
@@ -13,7 +14,7 @@ def add_universal_tournament(app, comps: dict[str, Tournament]):
     def sign_up_page():
         tournament = "Fifth S.U.S.S Championship"
         return (
-            render_template(
+            render_template_sidebar(
                 "sign_up/new.html",
                 tournament=tournament,
             ),

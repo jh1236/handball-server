@@ -6,12 +6,9 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-
 <script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
 <h1><a href="/{{tournament}}players/" class="hide">Players</a></h1>
-<table class="table" id="sort0">
+<table class="jaredTable" id="sort0">
     <thead>
     <tr>
         {% for i, h in headers %}

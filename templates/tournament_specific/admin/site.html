@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "admin.html" %}
+
+{% block headBlock %}
     <title>Handball Tournament</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}", true)</script>
+{% endblock %}
 
+{% block bodyBlock %}
 <div>
     <h1><a href="/{{ tournament }}fixtures/admin" class="hide">Fixtures</a>
         {% if reset %}
@@ -18,7 +14,7 @@
         {% endif %}
     </h1>
 </div>
-<table class="table">
+<table class="jaredTable">
     <thead>
     <tr>
         <th style="width: 220px;"><b>First Team</b></th>
@@ -118,5 +114,4 @@
     {% endif %}
     </tbody>
 </table>
-</body>
-</html>
+{% endblock %}

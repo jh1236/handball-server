@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/css" src="{{ url_for('static', filename='css/index.js') }}"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <!-- Our Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar_admin.css') }}">
+
+    <!-- Font Awesome JS -->
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js"
+            integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ"
+            crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js"
+            integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY"
+            crossorigin="anonymous"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block headBlock %}{% endblock %}
+</head>
+<body>
+<div class="wrapper">
+    <!-- Sidebar  -->
+
+    <nav id="sidebar" style="top:0">
+        <div style="top:0; position:sticky;">
+            <div class="sidebar-header">
+                <a class="sidebar-link" href="/"><img src="/api/image?name=SUSS" class="logo"></a>
+            </div>
+
+            <ul class="list-unstyled components">
+                <p class="tournament-name">{{ current_tournament }}</p>
+                <li class="active">
+                    <a class="sidebar-link dropdown-toggle" href="#homeSubmenu" data-toggle="collapse"
+                       aria-expanded="false">Tournament</a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                        {% for i in tournaments %}
+                            <li><a class="sidebar-link" href="/{{ i.nice_name() }}/admin"><i>{{ i }}</i></a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                <li>
+                    {% if current_tournament.link != "/" %}
+                        <a class="sidebar-link" href="{{ current_tournament.link }}fixtures/admin">Fixtures</a>
+                    {% else %}
+                        <a class="sidebar-link" href="/signup">Sign-Up</a>
+                    {% endif %}
+                </li>
+                <li>
+                    <a class="sidebar-link" href="{{ current_tournament.link }}teams/admin">Teams</a>
+                </li>
+                <li>
+                    <a class="sidebar-link" href="{{ current_tournament.link }}ladder">Ladder</a>
+                </li>
+                <li>
+                    <a class="sidebar-link" href="{{ current_tournament.link }}players/admin">Players</a>
+                </li>
+                <li>
+                    <a class="sidebar-link" href="{{ current_tournament.link }}officials/admin">Officials</a>
+                </li>
+                <li>
+                    <a class="sidebar-link" href="/documents">Documents</a>
+                </li>
+                <li>
+                    <a class="sidebar-link" href="/find">Game Lookup</a>
+                </li>
+                <li>
+                    <a class="sidebar-link" href="/user">Log in</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content  -->
+    <div id="content">
+        <div class="container-fluid" style="position: fixed; z-index: 1000;">
+
+            <button type="button" id="sidebarCollapse" class="float-left btn btn-info">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list"
+                     viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                          d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"></path>
+                </svg>
+            </button>
+        </div>
+        {% block bodyBlock %}{% endblock %}
+    </div>
+</div>
+
+<!-- jQuery CDN - Slim version (=without AJAX) -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<!-- Popper.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
+        integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+        crossorigin="anonymous"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
+        integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+        crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar').toggleClass('active');
+        });
+    });
+    console.warn("{{ tournaments }}")
+</script>
+</body>
+</html>

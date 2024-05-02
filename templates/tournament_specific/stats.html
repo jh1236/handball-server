@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Teams List</title>
+{% extends "base.html" %}
+
+{% block headBlock %}
+    <title>Teams</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}")</script>
+{% endblock %}
+
+{% block bodyBlock %}
 
 <h1><a href="/{{tournament}}teams/" class="hide">Teams</a></h1>
 {% for i in teams %}
-<table class="table">
+<table class="jaredTable">
     <tr>
         <td style="width:100px;"><a href="/{{tournament}}teams/{{i.searchableName}}"
                                     class="hide"><img
@@ -26,5 +23,4 @@
 </table>
 
 {% endfor %}
-</body>
-</html>
+{% endblock %}

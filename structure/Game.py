@@ -13,6 +13,7 @@ if typing.TYPE_CHECKING:
 
 RANK_SOLO_GAMES = False
 
+
 class Game:
     @classmethod
     def from_map(cls, game_map, tournament, final=False):
@@ -62,11 +63,17 @@ class Game:
             game.set_primary_official(NoOfficial)
         else:
             game.set_primary_official(
-                [i for i in tournament.officials if i.name == game_map["official"]][0]
+                (
+                    [i for i in tournament.officials if i.name == game_map["official"]]
+                    + [NoOfficial]
+                )[0]
             )
         if game_map.get("scorer", "No one") != "No one":
             game.set_scorer(
-                [i for i in tournament.officials if i.name == game_map["scorer"]][0]
+                (
+                    [i for i in tournament.officials if i.name == game_map["scorer"]]
+                    + [NoOfficial]
+                )[0]
             )
         game.court = game_map["court"]
         game.id = game_map["id"]
@@ -77,7 +84,7 @@ class Game:
         game.start_time = game_map.get("startTime", -1)
         if game_map.get("bestPlayer", False):
             game.end(
-                None if game_map["bestPlayer"] == "Forfeit" else game_map["bestPlayer"],
+                game_map["bestPlayer"],
                 game_map.get("cards", None),
                 game_map.get("notes", None),
             )
@@ -142,19 +149,13 @@ class Game:
                 self.teams[0].score = 11
             else:
                 self.super_bye = True
-        self.ranked: bool = (
-            not final
-            and (not any(
-                i.nice_name().startswith("null")
-                for i in [*self.teams[0].players, *self.teams[1].players]
-            ) or RANK_SOLO_GAMES)
-            and self.tournament.details.get("ranked", True)
-        )
+        self.ranked: bool = True
         self.first_team_serves: bool = False
         self.primary_official: Official = NoOfficial
         self.scorer: Official = NoOfficial
         self.round_number: int = 0
         self.cards: list[Card] = []
+        self.is_solo: bool = all(len(i.all_players) == 1 for i in self.teams)
 
     @property
     def serve_clock(self):
@@ -247,21 +248,19 @@ class Game:
                 self.teams[1].players[0],
                 self.teams[1].players[0],
             ]
-        return [*self.teams[0].players[:2], *self.teams[1].players[:2]]
+        return self.teams[0].current_players + self.teams[1].current_players
 
     @property
     def playing_players(self) -> list[GamePlayer]:
         if self.rounds:
-            return [
-                *[i for i in self.teams[0].players if i.time_on_court],
-                *[i for i in self.teams[1].players if i.time_on_court],
-            ]
+            return self.teams[0].playing_players + self.teams[1].playing_players
         else:
             return self.current_players
 
     @property
     def all_players(self):
-        return self.teams[0].all_players() + self.teams[1].all_players()
+        return self.teams[0].all_players + self.teams[1].all_players
+
 
     @property
     def in_progress(self):
@@ -308,13 +307,18 @@ class Game:
         return self.game_string[-2:].lower() == "ee"
 
     def swap_serve(self):
-        self.team_serving.first_player_serves = not self.team_serving.first_player_serves
+        self.team_serving.first_player_serves = (
+            not self.team_serving.first_player_serves
+        )
         self.add_to_game_string("!h", self.team_serving)
         self.event()
 
     def swap_serve_team(self):
         not_serving = next(i for i in self.teams if not i == self.team_serving)
-        self.teams[0].first_player_serves, self.teams[1].first_player_serves = self.teams[1].first_player_serves, self.teams[0].first_player_serves
+        self.teams[0].first_player_serves, self.teams[1].first_player_serves = (
+            self.teams[1].first_player_serves,
+            self.teams[0].first_player_serves,
+        )
         self.team_serving.serving = False
         not_serving.serving = True
         self.add_to_game_string("!w", self.team_serving)
@@ -411,6 +415,15 @@ class Game:
         card_reasons: list[str] | None = None,
         notes: str | None = None,
     ):
+        self.ranked = (
+            all(len(i.all_players) > 1 for i in self.teams)
+            and not self.is_final
+            and (
+                not any(i.nice_name().startswith("null") for i in self.current_players)
+                or RANK_SOLO_GAMES
+            )
+            and self.tournament.details.get("ranked", True)
+        )
         if self.best_player is not None:
             return
         self.bye_check()
@@ -434,15 +447,17 @@ class Game:
             if notes:
                 self.notes = notes
             self.best_player = None
-            if self.is_forfeited and best_player is None:
+
+            for i in self.current_players:
+                if i.name == best_player:
+                    self.best_player = i
+                    i.best_player()
+                    break
+            if self.is_forfeited and self.best_player is None:
                 self.best_player = forfeit_player(self)
-            else:
-                for i in self.current_players:
-                    if i.name == best_player:
-                        self.best_player = i
-                        i.best_player()
-                        break
-            if self.best_player == None:
+            elif all(len(i.all_players) == 1 for i in self.teams):
+                self.best_player = [i for i in self.teams[0].players + self.teams[1].players if "null" in i.nice_name()][0]
+            elif self.best_player is None:
                 raise Exception(f"Best Player '{best_player}' not found")
             self.update_count = -1
             [i.end(self.is_final) for i in self.teams]
@@ -489,14 +504,11 @@ class Game:
             self.reload()
             self.info(f"Undoing... game string is now {self.game_string}")
 
-
     def reload(self):
         self._serve_clock = -1
         [i.end_timeout() for i in self.teams]
         self.cards.clear()
-        self.start(
-            self.first_team_serves, self.teams[0].swapped, self.teams[1].swapped
-        )
+        self.start(self.first_team_serves, self.teams[0].swapped, self.teams[1].swapped)
         self.load_from_string(self.game_string)
 
     def as_map(self):

@@ -47,6 +47,9 @@ class Tournament:
     def nice_name(self):
         return self.name.lower().replace(" ", "_").replace("the_", "").replace("'", "")
 
+    def __repr__(self):
+        return self.name
+
     @property
     def BYE(self):
         if not self._bye:
@@ -54,10 +57,19 @@ class Tournament:
             self._bye.tournament = self
         return self._bye
 
+
+    @property
+    def link(self):
+        return f"/{self.nice_name()}/"
+
+
     def games_to_list(self) -> list[Game]:
         return [game for r in self.fixtures for game in r] + [
             game for r in self.finals for game in r
         ]
+
+    def finals_to_list(self) -> list[Game]:
+        return [game for r in self.finals for game in r]
 
     def ladder(self):
         if isinstance(self.fixtures_class, Pooled):
@@ -290,9 +302,7 @@ class Tournament:
             # court_one_games = sorted(r, key=lambda a: sum([i.team.court_one for i in a.teams]))
             court_one_games = sorted(
                 r,
-                key=lambda a: -sum(
-                    [i.team.percentage for i in a.teams]
-                ),
+                key=lambda a: -sum([i.team.percentage for i in a.teams]),
             )  # use for preferential treatment of wins
             court_one_games = [i for i in court_one_games if not i.bye]
             halfway = False

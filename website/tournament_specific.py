@@ -10,6 +10,7 @@ from structure.AllTournament import (
 from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
 from structure.UniversalTournament import UniversalTournament
+from utils.sidebar_wrapper import render_template_sidebar
 from utils.statistics import get_player_stats, get_player_stats_categories
 from utils.permissions import (
     admin_only,
@@ -23,6 +24,11 @@ from utils.databaseManager import DatabaseManager, get_tournament_id
 from utils.util import fixture_sorter
 from website.website import numbers, sign
 
+def priority_to_classname(p):
+    if p==1:
+        return ""
+    sizes = ["sm", "md","lg","xl"]
+    return f"d-none d-{sizes[p-2]}-table-cell"
 
 def link(tournament):
     return f"{tournament}/" if tournament else ""
@@ -168,7 +174,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             tourney = Tourney(tourney[0], tourney[1], iseditable)
 
             return (
-                render_template(
+                render_template_sidebar(
                     "tournament_specific/tournament_home.html",
                     tourney=tourney,
                     ongoing=ongoing_games,
@@ -232,7 +238,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     Game(game[:2], f"{game[2]} - {game[3]}", game[4])
                 )
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/site.html",
                 fixtures=fixtures.items(),
                 finals=finals.items(),
@@ -350,7 +356,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             )
 
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/site_detailed.html",
                 fixtures=fixtures.items(),
                 finals=finals.items(),
@@ -395,7 +401,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             teams = [Team(*team) for team in teams]
 
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/stats.html",
                 teams=teams,
                 tournament=link(tournament),
@@ -530,7 +536,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             for i in team.players
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/each_team_stats.html",
                 stats=[(k, v) for k, v in team.get_stats().items()],
                 team=team,
@@ -571,7 +577,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         else:
             status = "Official"
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/scoreboard.html",
                 game=game,
                 status=status,
@@ -616,19 +622,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         round_number = game.round_number + 1
         prev_matches = []
         for i in get_all_games():
-            if not all(
-                [
-                    k.nice_name() in [j.team.nice_name() for j in i.teams]
-                    for k in game.teams
-                ]
-            ):
-                continue
-            if not all(
-                [
-                    j.team.nice_name() in [k.nice_name() for k in game.teams]
-                    for j in i.teams
-                ]
-            ):
+            if sorted(j.nice_name() for j in i.teams) != sorted(j.nice_name() for j in teams):
                 continue
             if (
                 i.tournament.nice_name() == game.tournament.nice_name()
@@ -642,6 +636,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     i.tournament,
                 )
             )
+        while len(prev_matches) > 10:
+            prev_matches.pop(0)
         prev_matches = prev_matches or [("No other matches", -1, game.tournament)]
         if not game.started:
             status = "Waiting for toss"
@@ -672,7 +668,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         ]
 
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/game_page.html",
                 game=game,
                 status=status,
@@ -698,7 +694,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             "Team Names": 1,
             "Games Played": 2,
             "Games Won": 1,
-            "Percentage": 3,
+            "Percentage": 1,
             "Games Lost": 3,
             "Green Cards": 5,
             "Yellow Cards": 4,
@@ -728,7 +724,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                         j.short_name,
                         j.nice_name(),
                         j.image(),
-                        [(v, priority[k]) for k, v in j.get_stats().items()],
+                        [(v, priority_to_classname(priority[k])) for k, v in j.get_stats().items()],
                     )
                     for _, j in l[1]
                     if j.games_played > 0
@@ -743,13 +739,13 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             for k, l in enumerate(ladder)
         ]
         headers = [
-            (i, priority[i])
+            (i, priority_to_classname(priority[i]))
             for i in (
                 ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
             )
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/ladder.html",
                 headers=[(i - 1, k, v) for i, (k, v) in enumerate(headers)],
                 teams=teams,
@@ -764,15 +760,15 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             "Name": 1,
             "B&F Votes": 1,
             "Elo": 2,
-            "Points scored": 2,
-            "Aces scored": 2,
+            "Points Scored": 2,
+            "Aces Scored": 2,
             "Faults": 5,
             "Double Faults": 5,
             "Green Cards": 4,
             "Yellow Cards": 3,
             "Red Cards": 3,
-            "Rounds on Court": 5,
-            "Points served": 5,
+            "Rounds Played": 5,
+            "Points Served": 5,
             "Rounds Carded": 5,
             "Games Played": 5,
             "Games Won": 4,
@@ -782,7 +778,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 i.name,
                 i.team.nice_name(),
                 i.nice_name(),
-                [(v, priority[k]) for k, v in i.get_stats().items()],
+                [(v, priority_to_classname(priority[k])) for k, v in i.get_stats().items()],
             )
             for i in comps[tournament].players
             if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
@@ -792,9 +788,9 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             i for i in comps[tournament].teams[0].players[0].get_stats()
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/players.html",
-                headers=[(i - 1, k, priority[k]) for i, k in enumerate(headers)],
+                headers=[(i - 1, k, priority_to_classname(priority[k])) for i, k in enumerate(headers)],
                 players=sorted(players),
                 tournament=link(tournament),
             ),
@@ -818,7 +814,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             i for i in comps[tournament].teams[0].players[0].get_stats_detailed()
         ]
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/players_detailed.html",
                 headers=[(i - 1, k) for i, k in enumerate(headers)],
                 players=sorted(players),
@@ -870,7 +866,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 upcoming_games.pop(0)
         if user_on_mobile():
             return (
-                render_template(
+                render_template_sidebar(
                     "tournament_specific/player_stats.html",
                     stats=[
                         (k, v)
@@ -888,7 +884,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             )
         else:
             return (
-                render_template(
+                render_template_sidebar(
                     "tournament_specific/new_player_stats.html",
                     stats=[
                         (k, v)
@@ -1006,7 +1002,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             )
 
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/official.html",
                 name=official.name,
                 link=official.nice_name(),
@@ -1024,7 +1020,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             SELECT name, searchableName from officials INNER JOIN people on people.id = officials.personId
             """).fetchall()
         return (
-            render_template(
+            render_template_sidebar(
                 "tournament_specific/all_officials.html",
                 officials=official,
                 tournament=link(tournament),

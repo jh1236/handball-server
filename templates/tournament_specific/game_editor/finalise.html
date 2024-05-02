@@ -25,7 +25,7 @@
 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
 <br>
 
-<table class="table">
+<table class="jaredTable">
     <tr>
         <th><img
                 src="{{ teams[0].image() }}"
@@ -46,7 +46,7 @@
 <br>
 {% if game.cards %}
     <h1>Card Reasons</h1>
-    <table class="table">
+    <table class="jaredTable">
 {% endif %}
 {% for i, v in cards %}
     <tr>

@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ tournament }} sign up</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<img src="/api/tournaments/image?name=fifth_suss_championship" class="title_logo">
+{% extends "base.html" %}
 
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("")</script>
+{% block headBlock %}
+    <title>Sign Up</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+{% endblock %}
+
+{% block bodyBlock %}
+<img src="/api/tournaments/image?name=fifth_suss_championship" class="title_logo">
 
 <script src="{{ url_for('static', filename='js/start_game.js') }}"></script>
 <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
@@ -81,5 +77,4 @@ Secondary Uniform Color:
 <br>
 <br>
 <button class="button" onclick="submit()">Submit</button>
-</body>
-</html>
+{% endblock %}
