@@ -987,7 +987,6 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             """,
                 (nice_name, nice_name, nice_name),
             ).fetchall()
-            print(games)
         for (
             game_id,
             tournament_nice_name,
@@ -1020,7 +1019,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/<tournament>/officials/")
     def official_directory_site(tournament):
-        official = [(i, i.nice_name()) for i in comps[tournament].officials]
+        with DatabaseManager() as c:
+            official = c.execute("""
+            SELECT name, searchableName from officials INNER JOIN people on people.id = officials.personId
+            """).fetchall()
         return (
             render_template(
                 "tournament_specific/all_officials.html",
