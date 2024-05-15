@@ -121,12 +121,12 @@ def process_game(tournamentId, game, round, isFinal, isRanked):
             # isBestPlayer INTEGER,
             isBestPlayer = player.best
             # isFinal INTEGER, +
-            
+            sideOfCourt = ["Left", "Right", "Substitute"][player.team.players.index(player)]
             s.execute(
                 """INSERT INTO playerGameStats (
-                    gameId,   playerId, teamId, tournamentId, points, aces, faults, servedPoints, servedPointsWon, servesReceived, servesReturned, doubleFaults, greenCards, yellowCards, redCards, cardTime, cardTimeRemaining, roundsPlayed, roundsBenched, isBestPlayer, isFinal
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", 
-                    (game_id, playerId, teamId, tournamentId, points, aces, faults, servedPoints, servedPointsWon, servesReceived, servesReturned, doubleFaults, greenCards, yellowCards, redCards, cardTime, cardTimeRemaining, roundPlayed, roundsBenched, isBestPlayer, isFinal)
+                    gameId,   playerId, teamId, tournamentId, points, aces, faults, servedPoints, servedPointsWon, servesReceived, servesReturned, doubleFaults, greenCards, yellowCards, redCards, cardTime, cardTimeRemaining, roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (game_id, playerId, teamId, tournamentId, points, aces, faults, servedPoints, servedPointsWon, servesReceived, servesReturned, doubleFaults, greenCards, yellowCards, redCards, cardTime, cardTimeRemaining, roundPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal)
             )
             
         

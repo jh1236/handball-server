@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 from dataclasses import dataclass
 from flask import render_template, request, redirect, Response
@@ -24,11 +25,13 @@ from utils.databaseManager import DatabaseManager, get_tournament_id
 from utils.util import fixture_sorter
 from website.website import numbers, sign
 
+
 def priority_to_classname(p):
-    if p==1:
+    if p == 1:
         return ""
-    sizes = ["sm", "md","lg","xl"]
+    sizes = ["sm", "md", "lg", "xl"]
     return f"d-none d-{sizes[p-2]}-table-cell"
+
 
 def link(tournament):
     return f"{tournament}/" if tournament else ""
@@ -373,7 +376,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         )
 
     @app.get("/<tournament>/teams/")
-    def stats_directory_site(tournament):
+    def team_directory_site(tournament):
         @dataclass
         class Team:
             name: str
@@ -410,7 +413,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         )
 
     @app.get("/<tournament>/teams/<team_name>/")
-    def stats_site(tournament, team_name):
+    def team_site(tournament, team_name):
         @dataclass
         class TeamStats:
             name: str
@@ -471,7 +474,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     ),
                     400,
                 )
-            team = Team(*team)
+            team = TeamStats(*team)
             players = c.execute(
                 """
                         SELECT 
@@ -486,7 +489,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 sum(isBestPlayer) DESC, 
                                 sum(points) DESC, 
                                 sum(aces) DESC, 
-                                sum(redCards+yellowCards+greenCards) ASC;""",
+                                sum(redCards+yellowCards+greenCards);""",
                 (tournamentId, team_name),
             ).fetchall()
         if team_name not in [i.nice_name() for i in comps[tournament].teams]:
@@ -595,7 +598,61 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/<tournament>/games/<game_id>/")
     def game_site(tournament, game_id):
-        if int(game_id) >= len(comps[tournament].games_to_list()):
+        with DatabaseManager() as c:
+            players = c.execute(
+                """SELECT people.name,
+                                       SUM(eloChange.eloChange) + 1500     as elo,
+                                       (SELECT eloChange
+                                        from eloChange
+                                        where eloChange.playerId = playerGameStats.playerId
+                                          and eloChange.gameId = games.id) as eloDelta,
+                                       playerGameStats.points,
+                                       playerGameStats.aces,
+                                       playerGameStats.faults, --5
+                                       playerGameStats.doubleFaults,
+                                       playerGameStats.roundsPlayed,
+                                       playerGameStats.roundsBenched,
+                                       playerGameStats.greenCards,
+                                       playerGameStats.yellowCards, --10
+                                       playerGameStats.redCards,
+                                       games.isBye,   --i[12]
+                                       tournaments.name,
+                                       tournaments.searchableName,
+                                       teams.name, --15
+                                       teams.searchableName,
+                                       games.servingTeam = teams.id,
+                                       games.servingScore,
+                                       games.receivingScore,
+                                       po.name, --20
+                                       po.searchableName,
+                                       ps.name,
+                                       ps.searchableName,
+                                       games.court,
+                                       games.round,--25
+                                       best.name,
+                                       best.searchableName,
+                                       games.startTime,
+                                       tournaments.searchableName,
+                                       teams.name, --30
+                                       teams.searchableName,
+                                       teams.imageURL
+                                FROM games
+                                         INNER JOIN playerGameStats on playerGameStats.gameId = games.id
+                                         INNER JOIN tournaments on tournaments.id = games.tournamentId
+                                         INNER JOIN officials o on o.id = games.official
+                                         INNER JOIN people po on po.id = o.id
+                                         INNER JOIN officials s on s.id = games.official
+                                         INNER JOIN people ps on o.id = s.id
+                                         INNER JOIN people on people.id = playerGameStats.playerId
+                                         INNER JOIN people best on best.id = games.bestPlayer
+                                         INNER JOIN teams on teams.id = playerGameStats.teamId
+                                         INNER JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
+                                WHERE games.id = ?
+                                GROUP BY people.name
+                                order by teams.id = games.servingTeam, playerGameStats.sideOfCourt;""",
+                (game_id,),
+            ).fetchall()
+        if not players:
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -603,84 +660,105 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 ),
                 400,
             )
-        game = comps[tournament].get_game(int(game_id))
-        teams = game.teams
-        team_dicts = []
-        for i in teams:
-            elo_display = {
-                "ELO": f"{i.elo_at_start}"
-                + (
-                    f"  [{sign(i.elo_delta)}{round(abs(i.elo_delta), 2)}]"
-                    if game.best_player and i.elo_delta is not None
-                    else ""
-                )
-            }
-            team_dicts.append(elo_display | i.get_stats())
-        stats = [(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]]
-        best = game.best_player.tidy_name() if game.best_player else "TBD"
 
-        round_number = game.round_number + 1
-        prev_matches = []
-        for i in get_all_games():
-            if sorted(j.nice_name() for j in i.teams) != sorted(j.nice_name() for j in teams):
-                continue
-            if (
-                i.tournament.nice_name() == game.tournament.nice_name()
-                and i.id == game.id
-            ):
-                continue
-            prev_matches.append(
-                (
-                    i.full_name,
-                    i.id,
-                    i.tournament,
-                )
-            )
-        while len(prev_matches) > 10:
-            prev_matches.pop(0)
-        prev_matches = prev_matches or [("No other matches", -1, game.tournament)]
-        if not game.started:
-            status = "Waiting for toss"
-        elif game.in_timeout:
-            status = "In timeout"
-        elif not game.game_ended:
-            status = "Game in progress"
-        elif not game.best_player:
-            status = "Finished"
-        else:
-            status = "Official"
-        players = game.playing_players
-        player_stats = {}
-        for t in teams:
-            for i in t.players:
-                out = [i.elo_delta_string]
-                out += i.get_stats().values()
-                player_stats[i.nice_name()] = out
-        for t in teams:
-            if any(j.subbed_off for j in t.players):
-                sub = next(j for j in t.players if j.subbed_off)
-                out = [sub.elo_delta_string]
-                out += sub.get_stats().values()
-                player_stats[sub.nice_name()] = out
-        headings = [
-            (0, "Elo Delta"),
-            *[*enumerate(players[0].get_stats().keys(), start=1)],
+        @dataclass
+        class Player:
+            name: str
+            stats: dict[str, any]
+
+        headers = [
+            "ELO",
+            "ELO Delta",
+            "Points Scored",
+            "Aces",
+            "Faults",
+            "Double Faults",
+            "Rounds Played",
+            "Rounds Benched",
+            "Green Cards",
+            "Yellow Cards",
+            "Red Cards",
         ]
 
+        def make_player(row):
+            name = row[0]
+            stats = row[1:11]
+
+            return Player(name, {k: v for k, v in zip(headers, stats)})
+
+        @dataclass
+        class Team:
+            players: list[Player]
+            image: str
+            name: str
+            searchableName: str
+
+        @dataclass
+        class Game:
+            players: list[Player]
+            teams: list[Team]
+            score_string: str
+            id: int
+            umpire: str
+            umpireSearchableName: str
+            scorer: str
+            scorerSearchableName: str
+            court: int
+            round: int
+            courtName: str
+            bye: bool
+            bestName: str
+            bestSearchableName: str
+            startTime: float
+            startTimeStr: str
+
+        playerStats = []
+        teams = {}
+        for i in players:
+            pl = make_player(i)
+            playerStats.append(pl)
+            if i[3] not in teams:
+                teams[i[3]] = Team([], i[32] if i[32] else "", i[30], i[31])
+            teams[i[3]].players.append(pl)
+        teams = list(teams.values())
+        time_float = float(players[0][28])
+
+        game = Game(
+            playerStats,
+            teams,
+            f"{players[0][18]} - {players[0][19]}",
+            game_id,
+            players[0][20],
+            players[0][21],
+            players[0][22],
+            players[0][23],
+            players[0][24],
+            players[0][25],
+            f"Court {players[0][24] + 1}",
+            players[0][12],
+            players[0][26],
+            players[0][27],
+            players[0][28],
+            "?"
+            if time_float < 0
+            else time.strftime("%d/%m/%y (%H:%M)", time.localtime(time_float)),
+        )
+
+        best = game.bestSearchableName if game.bestSearchableName else "TBD"
+
+        round_number = game.round
+        prev_matches = []
+        prev_matches = prev_matches or [("No other matches", -1, players[0][29])]
+        status = "Fix me"
         return (
             render_template_sidebar(
                 "tournament_specific/game_page.html",
                 game=game,
                 status=status,
-                players=[i.tidy_name() for i in players],
                 teams=teams,
-                stats=stats,
-                player_stats=player_stats,
-                sub_stats=player_stats,
-                headings=headings,
-                official=game.primary_official,
-                commentary=game_string_to_commentary(game),
                 best=best,
+                team_headings=teams_headings,
+                player_headings=headers,
                 roundNumber=round_number,
                 prev_matches=prev_matches,
                 tournament=link(tournament),
@@ -724,7 +802,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                         j.short_name,
                         j.nice_name(),
                         j.image(),
-                        [(v, priority_to_classname(priority[k])) for k, v in j.get_stats().items()],
+                        [
+                            (v, priority_to_classname(priority[k]))
+                            for k, v in j.get_stats().items()
+                        ],
                     )
                     for _, j in l[1]
                     if j.games_played > 0
@@ -778,7 +859,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 i.name,
                 i.team.nice_name(),
                 i.nice_name(),
-                [(v, priority_to_classname(priority[k])) for k, v in i.get_stats().items()],
+                [
+                    (v, priority_to_classname(priority[k]))
+                    for k, v in i.get_stats().items()
+                ],
             )
             for i in comps[tournament].players
             if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
@@ -790,7 +874,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         return (
             render_template_sidebar(
                 "tournament_specific/players.html",
-                headers=[(i - 1, k, priority_to_classname(priority[k])) for i, k in enumerate(headers)],
+                headers=[
+                    (i - 1, k, priority_to_classname(priority[k]))
+                    for i, k in enumerate(headers)
+                ],
                 players=sorted(players),
                 tournament=link(tournament),
             ),
@@ -1016,9 +1103,11 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
     @app.get("/<tournament>/officials/")
     def official_directory_site(tournament):
         with DatabaseManager() as c:
-            official = c.execute("""
+            official = c.execute(
+                """
             SELECT name, searchableName from officials INNER JOIN people on people.id = officials.personId
-            """).fetchall()
+            """
+            ).fetchall()
         return (
             render_template_sidebar(
                 "tournament_specific/all_officials.html",
@@ -1272,11 +1361,11 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
     @app.get("/teams/")
     def universal_stats_directory_site():
-        return stats_directory_site(None)
+        return team_directory_site(None)
 
     @app.get("/teams/<team_name>/")
     def universal_stats_site(team_name):
-        return stats_site(None, team_name)
+        return team_site(None, team_name)
 
     @app.get("/ladder/")
     def universal_ladder_site():

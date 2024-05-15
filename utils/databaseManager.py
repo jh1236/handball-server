@@ -138,6 +138,7 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
     roundsPlayed INTEGER,
     roundsBenched INTEGER,
     isBestPlayer INTEGER,
+    sideOfCourt TEXT,
     isFinal INTEGER,
     FOREIGN KEY (gameId) REFERENCES games (id),
     FOREIGN KEY (playerId) REFERENCES people (id),
