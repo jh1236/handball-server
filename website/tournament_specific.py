@@ -601,11 +601,11 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         with DatabaseManager() as c:
             players = c.execute(
                 """SELECT people.name,
-                                       SUM(eloChange.eloChange) + 1500     as elo,
-                                       (SELECT eloChange
+                                       round(SUM(eloChange.eloChange) + 1500, 2) as elo,
+                                       round((SELECT eloChange
                                         from eloChange
                                         where eloChange.playerId = playerGameStats.playerId
-                                          and eloChange.gameId = games.id) as eloDelta,
+                                          and eloChange.gameId = games.id), 3) as eloDelta,
                                        playerGameStats.points,
                                        playerGameStats.aces,
                                        playerGameStats.faults, --5
@@ -635,14 +635,21 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                        tournaments.searchableName,
                                        teams.name, --30
                                        teams.searchableName,
-                                       teams.imageURL
+                                       case 
+                                        when teams.imageURL is null 
+                                            then "/api/teams/image?name=blank" 
+                                        else 
+                                            teams.imageURL
+                                        end,
+                                       people.searchableName
+                                       
                                 FROM games
                                          INNER JOIN playerGameStats on playerGameStats.gameId = games.id
                                          INNER JOIN tournaments on tournaments.id = games.tournamentId
                                          INNER JOIN officials o on o.id = games.official
-                                         INNER JOIN people po on po.id = o.id
-                                         INNER JOIN officials s on s.id = games.official
-                                         INNER JOIN people ps on o.id = s.id
+                                         INNER JOIN people po on po.id = o.personId
+                                         INNER JOIN officials s on s.id = games.scorer
+                                         INNER JOIN people ps on ps.id = s.personId
                                          INNER JOIN people on people.id = playerGameStats.playerId
                                          INNER JOIN people best on best.id = games.bestPlayer
                                          INNER JOIN teams on teams.id = playerGameStats.teamId
@@ -664,9 +671,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         @dataclass
         class Player:
             name: str
+            searchableName: str
             stats: dict[str, any]
 
-        headers = [
+        player_headers = [
             "ELO",
             "ELO Delta",
             "Points Scored",
@@ -680,11 +688,18 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             "Red Cards",
         ]
 
+        team_headers = [
+            "Green Cards",
+            "Yellow Cards",
+            "Red Cards",
+            "Timeouts Remaining",
+        ]
+
         def make_player(row):
             name = row[0]
-            stats = row[1:11]
+            stats = row[1:12]
 
-            return Player(name, {k: v for k, v in zip(headers, stats)})
+            return Player(name, row[33], {k: v for k, v in zip(player_headers, stats)})
 
         @dataclass
         class Team:
@@ -692,6 +707,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             image: str
             name: str
             searchableName: str
+            stats: dict[str, any]
 
         @dataclass
         class Game:
@@ -712,19 +728,23 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             startTime: float
             startTimeStr: str
 
-        playerStats = []
+        player_stats = []
         teams = {}
         for i in players:
             pl = make_player(i)
-            playerStats.append(pl)
-            if i[3] not in teams:
-                teams[i[3]] = Team([], i[32] if i[32] else "", i[30], i[31])
-            teams[i[3]].players.append(pl)
+            player_stats.append(pl)
+            if i[30] not in teams:
+                teams[i[30]] = Team([], i[32] if i[32] else "", i[30], i[31], {})
+            teams[i[30]].players.append(pl)
+            teams[i[30]].stats["Green Cards"] = teams[i[30]].stats.get("Green Cards", 0) + i[9]
+            teams[i[30]].stats["Yellow Cards"] = teams[i[30]].stats.get("Yellow Cards", 0) + i[10]
+            teams[i[30]].stats["Red Cards"] = teams[i[30]].stats.get("Red Cards", 0) + i[11]
+            print(f"red = {pl.stats}")
         teams = list(teams.values())
         time_float = float(players[0][28])
 
         game = Game(
-            playerStats,
+            player_stats,
             teams,
             f"{players[0][18]} - {players[0][19]}",
             game_id,
@@ -757,8 +777,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                 status=status,
                 teams=teams,
                 best=best,
-                team_headings=teams_headings,
-                player_headings=headers,
+                team_headings=team_headers,
+                player_headings=player_headers,
                 roundNumber=round_number,
                 prev_matches=prev_matches,
                 tournament=link(tournament),

@@ -73,13 +73,18 @@
                 {% for i in team_headings %}
                     <tr>
                         <th>{{ i }}:</th>
-                        <td colspan="{{ teams[0].players.__len__() }}">Stat here</td>
-                        <td colspan="{{ teams[1].players.__len__() }}">Stat here</td>
+                        <td colspan="{{ teams[0].players.__len__() }}">{{ teams[0].stats[i] }}</td>
+                        <td colspan="{{ teams[1].players.__len__() }}">{{ teams[1].stats[i] }}</td>
                     </tr>
 
 
                 {% endfor %}
-
+                <tr>
+                <td></td>
+                    {% for i in game.players %}
+                        <th><b><a class = "hide" href="/players/{{ i.searchableName }}">{{ i.name }}</a></b></th>
+                    {% endfor %}
+                </tr>
                 {% for i in player_headings %}
                     <tr>
                         <th>{{ i }}:</th>
