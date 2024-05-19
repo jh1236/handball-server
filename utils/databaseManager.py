@@ -222,7 +222,6 @@ class DatabaseManager:
 
 
 def get_tournament_id(tournament_name):
-    print(tournament_name)
     with DatabaseManager() as c:
         c.execute("SELECT id FROM tournaments WHERE searchableName=?", (tournament_name,))
         return c.fetchone()[0]

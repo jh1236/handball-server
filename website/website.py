@@ -1,11 +1,13 @@
 import random
+from dataclasses import dataclass
 
-from flask import render_template, send_file, request
+from flask import send_file, request
 
 import utils.permissions
 from structure.AllTournament import get_all_officials, get_all_players, get_all_games
 from structure.GameUtils import filter_games, get_query_descriptor
 from structure.Tournament import Tournament
+from utils.databaseManager import DatabaseManager
 from utils.permissions import fetch_user, officials_only
 from utils.sidebar_wrapper import render_template_sidebar
 from website.endpoints.endpoints import add_endpoints
@@ -19,10 +21,24 @@ def init_api(app, comps: dict[str, Tournament]):
 
     @app.get("/")
     def root():
+        with DatabaseManager() as c:
+            comps = c.execute(
+                """
+                SELECT name, searchableName, imageURL
+                FROM tournaments
+                """,
+            ).fetchall()
+        @dataclass
+        class Tournament:
+            name: str
+            searchableName: str
+            image: str
+        comps = [Tournament(*i) for i in comps]
+
         return (
             render_template_sidebar(
                 "all_tournaments.html",
-                comps=comps.values(),
+                comps=comps,
             ),
             200,
         )
@@ -34,7 +50,6 @@ def init_api(app, comps: dict[str, Tournament]):
     @app.get("/documents/")
     def docs():
         return render_template_sidebar("rules.html"), 200
-
 
     @app.get("/logout/")
     def logout():
@@ -136,7 +151,7 @@ def init_api(app, comps: dict[str, Tournament]):
     from website.universal_stats import add_universal_tournament
     from website.clips import add_video_player
 
-    add_video_player(app, comps)
+    add_video_player(app)
     add_tournament_specific(app, comps)
     add_universal_tournament(app, comps)
     add_admin_pages(app, comps)

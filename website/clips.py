@@ -46,7 +46,7 @@ def process_videos(videos, tags, name):
     return videos
 
 
-def add_video_player(app, comps):
+def add_video_player(app):
     answers.clear()
     umpire_stats.clear()
     for i in get_all_officials():
