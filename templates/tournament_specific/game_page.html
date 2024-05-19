@@ -31,7 +31,7 @@
                     </a></p>
             {% endif %}
             <p>{% if not game.bye %}<a href="/{{ tournament }}games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
-                {% if not game.bye %}</a>{% endif %} <i>{{ status }}</i></p>
+                {% if not game.bye %}</a>{% endif %} <i>{{ game.status }}</i></p>
             {% if game.startTime > 0 %}
                 <p><b>Match Time:</b> <i>{{ game.startTimeStr }}</i></p>
             {% endif %}
@@ -102,7 +102,7 @@
                     Matches</a></h2>
                 {% for line in prev_matches %}
                     <p style="color: black;">{% if line[1] > -1 %}
-                        <a class="hide" href="/{{ line[2].nice_name() }}/games/{{ line[1] }}">
+                        <a class="hide" href="/{{ line[2] }}/games/{{ line[1] }}">
                     {% endif %}
                         {{ line[0] }}
                         {% if line[1] > -1 %}

@@ -1,18 +1,17 @@
 import time
 from collections import defaultdict
 from dataclasses import dataclass
+
 from flask import render_template, request, redirect, Response
 
 from FixtureMakers.FixtureMaker import get_type_from_name
 from structure.AllTournament import (
-    get_all_games,
     get_all_officials,
 )
 from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
 from structure.UniversalTournament import UniversalTournament
-from utils.sidebar_wrapper import render_template_sidebar
-from utils.statistics import get_player_stats, get_player_stats_categories
+from utils.databaseManager import DatabaseManager, get_tournament_id
 from utils.permissions import (
     admin_only,
     fetch_user,
@@ -20,9 +19,8 @@ from utils.permissions import (
     _no_permissions,
     user_on_mobile,
 )  # Temporary till i make a function that can handle dynamic/game permissions
-
-from utils.databaseManager import DatabaseManager, get_tournament_id
-from utils.util import fixture_sorter
+from utils.sidebar_wrapper import render_template_sidebar
+from utils.statistics import get_player_stats
 from website.website import numbers, sign
 
 
@@ -602,10 +600,18 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             players = c.execute(
                 """SELECT people.name,
                                        round(SUM(eloChange.eloChange) + 1500, 2) as elo,
-                                       round((SELECT eloChange
+                                       case 
+                                        when round((SELECT eloChange
                                         from eloChange
                                         where eloChange.playerId = playerGameStats.playerId
-                                          and eloChange.gameId = games.id), 3) as eloDelta,
+                                          and eloChange.gameId = games.id), 2) is null 
+                                            then 0 
+                                        else 
+                                            round((SELECT eloChange
+                                        from eloChange
+                                        where eloChange.playerId = playerGameStats.playerId
+                                          and eloChange.gameId = games.id), 2)
+                                        end as eloDelta,
                                        playerGameStats.points,
                                        playerGameStats.aces,
                                        playerGameStats.faults, --5
@@ -641,15 +647,19 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                         else 
                                             teams.imageURL
                                         end,
-                                       people.searchableName
-                                       
+                                       people.searchableName,
+                                       games.status,
+                                       games.gameString, --35
+                                       games.servingTimeouts,
+                                       games.receivingTimeouts
+                
                                 FROM games
                                          INNER JOIN playerGameStats on playerGameStats.gameId = games.id
                                          INNER JOIN tournaments on tournaments.id = games.tournamentId
-                                         INNER JOIN officials o on o.id = games.official
-                                         INNER JOIN people po on po.id = o.personId
-                                         INNER JOIN officials s on s.id = games.scorer
-                                         INNER JOIN people ps on ps.id = s.personId
+                                         LEFT JOIN officials o on o.id = games.official
+                                         LEFT JOIN people po on po.id = o.personId
+                                         LEFT JOIN officials s on s.id = games.scorer
+                                         LEFT JOIN people ps on ps.id = s.personId
                                          INNER JOIN people on people.id = playerGameStats.playerId
                                          INNER JOIN people best on best.id = games.bestPlayer
                                          INNER JOIN teams on teams.id = playerGameStats.teamId
@@ -659,13 +669,28 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 order by teams.id = games.servingTeam, playerGameStats.sideOfCourt;""",
                 (game_id,),
             ).fetchall()
+            other_matches = c.execute(
+                """ SELECT s.name, r.name, g2.servingScore, g2.receivingScore, g2.id, tournaments.searchableName
+                    FROM games g1
+                             INNER JOIN games g2
+                                        ON ((g2.servingTeam = g1.servingTeam AND g2.receivingTeam = g1.receivingTeam)
+                                            OR (g2.servingTeam = g1.receivingTeam AND g2.receivingTeam = g1.servingTeam))
+                                            AND g1.id <> g2.id --funny != symbol lol
+                             INNER JOIN tournaments on g2.tournamentId = tournaments.id
+                             INNER JOIN teams r on g2.receivingTeam = r.id
+                             INNER JOIN teams s on g2.servingTeam = s.id
+                    WHERE g1.id = ?
+                    ORDER BY g2.id DESC 
+                    LIMIT 20""",
+                (game_id,),
+            ).fetchall()
         if not players:
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
                     error="Game Does not exist",
                 ),
-                400,
+                404,
             )
 
         @dataclass
@@ -673,10 +698,11 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             name: str
             searchableName: str
             stats: dict[str, any]
+            elo: float
+            elo_delta: float
 
         player_headers = [
             "ELO",
-            "ELO Delta",
             "Points Scored",
             "Aces",
             "Faults",
@@ -689,6 +715,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
         ]
 
         team_headers = [
+            "Elo",
             "Green Cards",
             "Yellow Cards",
             "Red Cards",
@@ -697,9 +724,17 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
         def make_player(row):
             name = row[0]
-            stats = row[1:12]
-
-            return Player(name, row[33], {k: v for k, v in zip(player_headers, stats)})
+            elo = row[1]
+            elo_delta = row[2]
+            stats = [f"{row[1]} [{(row[2]) if row[2] <0 else '+' + str(row[2])}]"]
+            stats += list(row[3:12])
+            return Player(
+                name,
+                row[33],
+                {k: v for k, v in zip(player_headers, stats)},
+                elo,
+                elo_delta,
+            )
 
         @dataclass
         class Team:
@@ -708,6 +743,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             name: str
             searchableName: str
             stats: dict[str, any]
+            elo: int = 0
+            timeouts: int = 0
 
         @dataclass
         class Game:
@@ -727,6 +764,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             bestSearchableName: str
             startTime: float
             startTimeStr: str
+            status: str
 
         player_stats = []
         teams = {}
@@ -736,10 +774,27 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             if i[30] not in teams:
                 teams[i[30]] = Team([], i[32] if i[32] else "", i[30], i[31], {})
             teams[i[30]].players.append(pl)
-            teams[i[30]].stats["Green Cards"] = teams[i[30]].stats.get("Green Cards", 0) + i[9]
-            teams[i[30]].stats["Yellow Cards"] = teams[i[30]].stats.get("Yellow Cards", 0) + i[10]
-            teams[i[30]].stats["Red Cards"] = teams[i[30]].stats.get("Red Cards", 0) + i[11]
-            print(f"red = {pl.stats}")
+            teams[i[30]].stats["Green Cards"] = (
+                teams[i[30]].stats.get("Green Cards", 0) + i[9]
+            )
+            teams[i[30]].stats["Yellow Cards"] = (
+                teams[i[30]].stats.get("Yellow Cards", 0) + i[10]
+            )
+            teams[i[30]].stats["Red Cards"] = (
+                teams[i[30]].stats.get("Red Cards", 0) + i[11]
+            )
+        for i, team in enumerate(teams.values()):
+            if i:
+                team.stats["Timeouts Remaining"] = 1 - players[0][37]
+            else:
+                team.stats["Timeouts Remaining"] = 1 - players[0][36]
+
+        for i in teams.values():
+            i.elo = round(sum(j.elo for j in i.players) / len(i.players), 2)
+            i.elo_delta = round(sum(j.elo_delta for j in i.players) / len(i.players), 2)
+            i.stats[
+                "Elo"
+            ] = f"{i.elo} [{i.elo_delta if i.elo_delta < 0 else '+' + str(i.elo_delta)}]"
         teams = list(teams.values())
         time_float = float(players[0][28])
 
@@ -762,19 +817,21 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             "?"
             if time_float < 0
             else time.strftime("%d/%m/%y (%H:%M)", time.localtime(time_float)),
+            players[0][34],
         )
 
         best = game.bestSearchableName if game.bestSearchableName else "TBD"
 
         round_number = game.round
-        prev_matches = []
+        prev_matches = [
+            (f"{i[0]} vs {i[1]} [{i[2]} - {i[3]}]", i[4], i[5]) for i in other_matches
+        ]
         prev_matches = prev_matches or [("No other matches", -1, players[0][29])]
-        status = "Fix me"
+        print(players)
         return (
             render_template_sidebar(
                 "tournament_specific/game_page.html",
                 game=game,
-                status=status,
                 teams=teams,
                 best=best,
                 team_headings=team_headers,
@@ -804,52 +861,100 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             "Point Difference": 2,
             "Elo": 3,
         }
+
+        @dataclass
+        class Team:
+            name: str
+            searchableName: str
+            pool: int
+            image: str
+            stats: dict[str, object]
+
         with DatabaseManager() as c:
-            c.execute("SELECT ")
-        ladder = comps[tournament].ladder()
-        if isinstance(ladder[0], list):
+            teams = c.execute(
+                """SELECT tournaments.isPooled,
+                       teams.searchableName,
+                       teams.name,
+                       case
+                           when teams.imageURL is null
+                               then "/api/teams/image?name=blank"
+                           else
+                               teams.imageURL
+                           end,
+                       tournamentTeams.pool,
+                       tournamentTeams.gamesPlayed                                                                           as played,
+                       tournamentTeams.gamesWon                                                                              as wins,
+                       ROUND(100.0 * Cast(tournamentTeams.gamesWon AS REAL) / tournamentTeams.gamesPlayed,
+                             2)                                                                                              as percentage,
+                       tournamentTeams.gamesLost                                                                             as losses,
+                       SUM(playerGameStats.greenCards)                                                                       as greenCards,
+                       SUM(playerGameStats.yellowCards)                                                                      as yellowCards,
+                       SUM(playerGameStats.redCards)                                                                         as redCards,
+                       SUM(playerGameStats.faults)                                                                           as faults,
+                       tournamentTeams.timeoutsCalled                                                                        as timeouts,
+                       SUM(playerGameStats.points)                                                                           as pointsScored,
+                       SUM((SELECT playerGameStats.points
+                            FROM playerGameStats
+                            where playerGameStats.opponentId = teams.id))                                                    as pointsConceded,
+                       SUM(playerGameStats.points) - SUM((SELECT playerGameStats.points
+                                                          FROM playerGameStats
+                                                          where playerGameStats.opponentId = teams.id))                      as difference,
+                       ROUND(1500.0 + (SELECT SUM(eloChange)
+                                       from eloChange
+                                                INNER JOIN teams inside ON inside.id = teams.id
+                                                INNER JOIN people captain ON captain.id = inside.captain
+                                                LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
+                                                LEFT JOIN people sub ON sub.id = inside.substitute
+                                       where eloChange.playerId = sub.id
+                                          or eloChange.playerId = captain.id
+                                          or eloChange.playerId = nonCaptain.id)
+                           /
+                                      COUNT(DISTINCT playerGameStats.playerId), 2)                                           as elo
+                
+                FROM tournamentTeams
+                         INNER JOIN tournaments ON tournaments.id = tournamentTeams.tournamentId
+                         INNER JOIN teams ON teams.id = tournamentTeams.teamId
+                         INNER JOIN playerGameStats
+                                    ON teams.id = playerGameStats.teamId AND playerGameStats.tournamentId = tournaments.id
+                WHERE tournaments.searchableName = ?
+                GROUP BY teams.name
+                ORDER BY percentage DESC,
+                         difference DESC,
+                         pointsScored DESC,
+                         greenCards + yellowCards + redCards ASC,
+                         redCards ASC,
+                         yellowCards ASC,
+                         faults ASC,
+                         SUM(timeoutsCalled) ASC""",
+                (tournament,),
+            ).fetchall()
+        ladder = [
+            Team(i[2], i[1], i[4], i[3], {k: v for k, v in zip(priority, i[5:])})
+            for i in teams
+        ]
+        print(f"1: {ladder = }")
+        if teams[0][0]:  # this tournament is pooled
             ladder = [
-                (f"Pool {numbers[i]}", list(enumerate(l, start=1)))
-                for i, l in enumerate(ladder)
+                (
+                    f"Pool {numbers[i]}",
+                    i,
+                    list(enumerate((j for j in ladder if j.pool == i), start=1)),
+                )
+                for i, l in enumerate(ladder, start=1)
             ]
         else:
-            ladder = [("", list(enumerate(ladder, start=1)))]
-        ladder = [(i if len(i) <= 10 else i[:10]) for i in ladder]
-        teams = [
-            (
-                [
-                    (
-                        j.short_name,
-                        j.nice_name(),
-                        j.image(),
-                        [
-                            (v, priority_to_classname(priority[k]))
-                            for k, v in j.get_stats().items()
-                        ],
-                    )
-                    for _, j in l[1]
-                    if j.games_played > 0
-                    or len(comps[tournament].teams) < 15
-                    or not any(
-                        not i.super_bye for i in comps[tournament].games_to_list()
-                    )
-                ],
-                l[0],
-                k,
-            )
-            for k, l in enumerate(ladder)
-        ]
+            ladder = [("", 0, list(enumerate(ladder, start=1)))]
+        print(f"2: {ladder = }")
         headers = [
             (i, priority_to_classname(priority[i]))
-            for i in (
-                ["Team Names"] + [i for i in comps[tournament].teams[0].get_stats()]
-            )
+            for i in ([i for i in priority])
         ]
         return (
             render_template_sidebar(
                 "tournament_specific/ladder.html",
                 headers=[(i - 1, k, v) for i, (k, v) in enumerate(headers)],
-                teams=teams,
+                priority={k: priority_to_classname(v) for k, v in priority.items()},
+                ladder=ladder,
                 tournament=link(tournament),
             ),
             200,

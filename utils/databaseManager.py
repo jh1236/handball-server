@@ -75,6 +75,8 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     gameStringVersion INTEGER,
     servingScore INTEGER,
     receivingScore INTEGER,
+    servingTimeouts INTEGER,
+    receivingTimeouts INTEGER,
     gameString TEXT,
     started INTEGER,
     startTime INTEGER,
@@ -87,6 +89,8 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     notes TEXT,
     isBye INTEGER,
     pool INTEGER,
+    status TEXT,
+    adminStatus TEXT,
     
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (servingTeam) REFERENCES teams (id),
@@ -104,6 +108,8 @@ create_tournament_teams_table = """CREATE TABLE IF NOT EXISTS tournamentTeams (
     gamesWon INTEGER,
     gamesPlayed INTEGER,
     gamesLost INTEGER,
+    timeoutsCalled INTEGER,
+    pool INTEGER,
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (teamId) REFERENCES teams (id)
 );"""
@@ -121,6 +127,7 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
     gameId INTEGER,
     playerId INTEGER,
     teamId INTEGER,
+    opponentId INTEGER,
     tournamentId INTEGER,
     points INTEGER,
     aces INTEGER,
@@ -143,7 +150,8 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
     FOREIGN KEY (gameId) REFERENCES games (id),
     FOREIGN KEY (playerId) REFERENCES people (id),
     FOREIGN KEY (teamId) REFERENCES teams (id),
-    FOREIGN KEY (tournamentId) REFERENCES tournaments (id)
+    FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
+    FOREIGN KEY (opponentID) REFERENCES teams (id)
 );"""
 create_elo_change_table = """CREATE TABLE IF NOT EXISTS eloChange (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

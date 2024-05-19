@@ -261,7 +261,6 @@ class Game:
     def all_players(self):
         return self.teams[0].all_players + self.teams[1].all_players
 
-
     @property
     def in_progress(self):
         if self.bye:
@@ -329,17 +328,22 @@ class Game:
             self.update_count += 1
 
     def noteable_string(self, include_yellows):
-        if self.protested:
-            return "Protested"
-        elif any(i.red_cards for i in self.all_players if "null" not in i.nice_name()):
+        if any(i.red_cards for i in self.all_players if "null" not in i.nice_name()):
             return "Red card awarded"
-        elif any(i.yellow_cards for i in self.teams) and include_yellows:
-            return "Yellow card awarded"
+        elif self.protested:
+            return "Protested"
         elif self.notes.strip():
             return "Notes to review"
+        elif any(i.yellow_cards for i in self.teams) and include_yellows:
+            return "Yellow card awarded"
         elif "!" in self.game_string:
             return "Scorer Correction Present"
-        elif self.is_forfeited:
+        else:
+            return self.status_string
+
+    @property
+    def status_string(self):
+        if self.is_forfeited:
             return "Forfeited"
         elif self.best_player:
             return "Official"
@@ -456,7 +460,11 @@ class Game:
             if self.is_forfeited and self.best_player is None:
                 self.best_player = forfeit_player(self)
             elif all(len(i.all_players) == 1 for i in self.teams):
-                self.best_player = [i for i in self.teams[0].players + self.teams[1].players if "null" in i.nice_name()][0]
+                self.best_player = [
+                    i
+                    for i in self.teams[0].players + self.teams[1].players
+                    if "null" in i.nice_name()
+                ][0]
             elif self.best_player is None:
                 raise Exception(f"Best Player '{best_player}' not found")
             self.update_count = -1

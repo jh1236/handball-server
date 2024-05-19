@@ -10,7 +10,7 @@ from utils.permissions import fetch_user, officials_only
 from utils.sidebar_wrapper import render_template_sidebar
 from website.endpoints.endpoints import add_endpoints
 
-numbers = ["One", "Two", "Three", "Four", "Five", "Six"]
+numbers = ["Zero", "One", "Two", "Three", "Four", "Five", "Six"]
 
 
 def init_api(app, comps: dict[str, Tournament]):

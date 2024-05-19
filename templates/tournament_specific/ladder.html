@@ -8,30 +8,30 @@
 {% block bodyBlock %}
 <script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
 <h1><a href="/{{tournament}}ladder/" class="hide">Ladder</a></h1>
-{% for t, j, k in teams %}
-<table class="jaredTable" id="sort{{ k }}">
+{% for pool_name, pool_number, teams in ladder %}
+<table class="jaredTable" id="sort{{ pool_number }}">
     <h2>{{ j }}</h2>
     <thead>
     <tr>
         <th class="invisible">This is an image</th>
-        {% for i, h, p in headers %}
-        <th onclick="sortTable({{ k }}, {{i}})" class="{{p}}" ><b>{{h}}</b></th>
+        {% for i, header, priority in headers %}
+        <th onclick="sortTable({{ pool_number }}, {{i}})" class="{{priority}}" ><b>{{header}}</b></th>
         {% endfor %}
     </tr>
     </thead>
     <tbody>
 
-    {% for i, link, link2, team in t %}
+    {% for position, team in teams %}
     <tr>
-        <th><a href="/{{tournament}}teams/{{link}}" class="hide"
+        <th><a href="/{{tournament}}teams/{{team.searchableName}}" class="hide"
                style="left: 30%;"><img
-                src="{{link2}}" class="team_logo"
+                src="{{team.image}}" class="team_logo"
                 style="display: inline;left:70%;width: 50px;height: 50px;vertical-align:middle;"></a></th>
-        <th style="text-align: left;"><a href="/{{tournament}}teams/{{link}}"
-                                         class="hide">{{i}}</a>
+        <th style="text-align: left;"><a href="/{{tournament}}teams/{{team.searchableName}}"
+                                         class="hide">{{team.name}}</a>
         </th>
-        {% for stat, p in team %}
-        <td class="{{p}}">{{ stat }}</td>
+        {% for _, k, _ in headers %}
+        <td class="{{priority[k]}}">{{ team.stats[k] }}</td>
         {% endfor %}
     </tr>
     {% endfor %}
