@@ -932,7 +932,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             Team(i[2], i[1], i[4], i[3], {k: v for k, v in zip(priority, i[5:])})
             for i in teams
         ]
-        print(f"1: {ladder = }")
+        print(f"\n\n\n1: {ladder = }\n\n\n")
         if teams[0][0]:  # this tournament is pooled
             ladder = [
                 (
@@ -940,11 +940,11 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                     i,
                     list(enumerate((j for j in ladder if j.pool == i), start=1)),
                 )
-                for i, l in enumerate(ladder, start=1)
+                for i in range(1, 3)
             ]
         else:
             ladder = [("", 0, list(enumerate(ladder, start=1)))]
-        print(f"2: {ladder = }")
+        print(f"\n\n\n2: {ladder = }")
         headers = [
             (i, priority_to_classname(priority[i]))
             for i in ([i for i in priority])

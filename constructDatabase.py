@@ -66,7 +66,7 @@ def process_game(tournamentId, game, round, isFinal, isRanked):
             (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, 1, servingScore, receivingScore, servingTimeouts, receivingTimeouts, gameString, started, startTime, length, court, protested, resolved, isFinal, round, notes, winning_team, isBye, status, adminStatus)
     )
 
-    if not game.bye:
+    if not (game.bye or game.is_final):
         s.execute("UPDATE tournamentTeams SET gamesPlayed = gamesPlayed + 1 WHERE teamId = ? AND tournamentId = ?", (servingTeam, tournamentId))
         s.execute("UPDATE tournamentTeams SET gamesPlayed = gamesPlayed + 1 WHERE teamId = ? AND tournamentId = ?", (receivingTeam, tournamentId))
         s.execute("UPDATE tournamentTeams SET gamesWon = gamesWon + 1 WHERE teamId = ? AND tournamentId = ?", (winning_team, tournamentId))
@@ -240,17 +240,18 @@ if __name__ == "__main__":
             name = tournament.name
             searchableName = tournament.nice_name()
             ranked = tournament.details.get("ranked", True)
-            isPooled = tournament.details.get("isPooled", False)
+            isPooled = isinstance(tournament.fixtures_class, Pooled)
 
             notes = tournament.notes
+
 
 
             twoCourts = tournament.two_courts
 
 
             s.execute(
-                "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes)
+                "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, f"/api/tournaments/image?name={searchableName}")
             )
             tournamentId = s.execute("SELECT id FROM tournaments ORDER BY id DESC LIMIT 1").fetchone()[0]
             # id INTEGER PRIMARY KEY AUTOINCREMENT,
