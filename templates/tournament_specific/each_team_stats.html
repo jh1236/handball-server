@@ -23,14 +23,15 @@
         </tbody>
     </table>
     {% for player in players %}
-        <h3>Statistics for <a class="hide" href="/{{tournament}}players/{{player[1]}}">{{player[0]}}</a></h3>
+        <br>
+        <h3>Statistics for <a class="hide" href="/{{tournament}}players/{{player.searchableName}}">{{player.name}}</a></h3>
     <table class="jaredTable">
         <tbody>
-        {% for stat in player[2] %}
+        {% for header, stat in player.stats.items() %}
         <tr>
-            <th>{{ stat[0] }}:</th>
+            <th>{{ header }}:</th>
             <td></td>
-            <td>{{ stat[1] }}</td>
+            <td>{{ stat }}</td>
         </tr>
         {% endfor %}
         </tbody>

@@ -157,9 +157,11 @@ create_elo_change_table = """CREATE TABLE IF NOT EXISTS eloChange (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     gameId INTEGER,
     playerId INTEGER,
+    tournamentId INTEGER,
     eloChange INTEGER,
     FOREIGN KEY (gameId) REFERENCES games (id),
-    FOREIGN KEY (playerId) REFERENCES people (id)
+    FOREIGN KEY (playerId) REFERENCES people (id),
+    FOREIGN KEY (tournamentId) REFERENCES tournaments (id)
 );"""
 
 class DatabaseManager:

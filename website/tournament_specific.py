@@ -441,19 +441,45 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             searchableName: str
             stats: dict[str, object]
 
-        player_headers = [
-            "bestPlayer",
-            "elo",
-            "points",
-            "aces",
-            "faults",
-            "doubleFaults",
-            "greenCards",
-            "yellowCards",
-            "redCards",
-            "roundsOnCourt",
-            "roundsCarded",
-        ]
+        player_headers = ["B&F Votes",
+                          "Elo",
+                          "Points scored",
+                          "Aces scored",
+                          "Faults",
+                          "Double Faults",
+                          "Green Cards",
+                          "Yellow Cards",
+                          "Red Cards",
+                          "Rounds on Court",
+                          "Rounds Carded",
+                          "Games Played", #games played
+                          "Games Won",
+                          "Percentage",
+                          "Net Elo Delta",
+                          "Average Elo Delta",
+                          "Points served",
+                          "Points Per Game", # ppg
+                          "Points Per Loss",
+                          "Aces Per Game",
+                          "Faults Per Game",
+                          "Cards Per Game",
+                          "Cards",
+                          "Points Per Card",
+                          "Serves Per Ace",
+                          "Serves Per Fault",
+                          "Serve Ace Rate",
+                          "Serve Fault Rate",
+                          "Percentage of Points scored",
+                          "Percentage of Points scored for Team",
+                          "Percentage of Games as Left Player",
+                          "Serving Conversion Rate",
+                          "Average Serving Streak",
+                          "Max. Serving Streak",
+                          "Max. Ace Streak",
+                          "Serves Received",
+                          "Serves Returned",
+                          "Return Rate",
+                          "Votes Per 100 Games"]
 
         with DatabaseManager() as c:
             team = c.execute(
@@ -488,12 +514,12 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
        SUM(playerGameStats.faults),
        tournamentTeams.timeoutsCalled,
        SUM(playerGameStats.points),
-       SUM((SELECT playerGameStats.points
+       (SELECT SUM(playerGameStats.points)
             FROM playerGameStats
-            where playerGameStats.opponentId = teams.id)),
-       SUM(playerGameStats.points) - SUM((SELECT playerGameStats.points
-                                          FROM playerGameStats
-                                          where playerGameStats.opponentId = teams.id))
+            where playerGameStats.opponentId = teams.id and playerGameStats.tournamentId = tournaments.id),
+       SUM(playerGameStats.points) - (SELECT SUM(playerGameStats.points)
+                            FROM playerGameStats
+                            where playerGameStats.opponentId = teams.id and playerGameStats.tournamentId = tournaments.id) 
 FROM teams
          INNER JOIN tournaments on tournaments.searchableName = ?
          INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId and tournamentTeams.tournamentId = tournaments.id
@@ -534,10 +560,11 @@ where teams.searchableName = ?
        SUM(playerGameStats.roundsPlayed),
        SUM(playerGameStats.roundsBenched)
 FROM teams
-         INNER JOIN tournaments on tournaments.id = ?
+         INNER JOIN tournaments on tournaments.searchableName = ?
          INNER JOIN playerGameStats on teams.id = playerGameStats.teamId and playerGameStats.tournamentId = tournaments.id
          INNER JOIN people on playerGameStats.playerId = people.id
-         WHERE teams.searchableName = ? """,
+         WHERE teams.searchableName = ?
+          GROUP BY people.name""",
                 (tournament, team_name),
             ).fetchall()
         players = [PlayerStats(i[0], i[1], {k: v for k, v in zip(player_headers, i[2:])}) for i in players]
@@ -900,12 +927,12 @@ FROM teams
                        SUM(playerGameStats.faults)                                                                           as faults,
                        tournamentTeams.timeoutsCalled                                                                        as timeouts,
                        SUM(playerGameStats.points)                                                                           as pointsScored,
-                       SUM((SELECT playerGameStats.points
+                       (SELECT SUM(playerGameStats.points)
                             FROM playerGameStats
-                            where playerGameStats.opponentId = teams.id))                                                    as pointsConceded,
-                       SUM(playerGameStats.points) - SUM((SELECT playerGameStats.points
-                                                          FROM playerGameStats
-                                                          where playerGameStats.opponentId = teams.id))                      as difference,
+                            where playerGameStats.opponentId = teams.id and playerGameStats.tournamentId = tournaments.id)                                                    as pointsConceded,
+                       SUM(playerGameStats.points) - (SELECT SUM(playerGameStats.points)
+                            FROM playerGameStats
+                            where playerGameStats.opponentId = teams.id and playerGameStats.tournamentId = tournaments.id)                       as difference,
                        ROUND(1500.0 + (SELECT SUM(eloChange)
                                        from eloChange
                                                 INNER JOIN teams inside ON inside.id = teams.id

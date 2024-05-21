@@ -156,8 +156,8 @@ def process_game(tournamentId, game, round, isFinal, isRanked):
 
                 eloChange = player.elo_delta
                 s.execute(
-                    "INSERT INTO eloChange (gameId, playerId, eloChange) VALUES (?, ?, ?)",
-                    (game_id, playerId, eloChange)
+                    "INSERT INTO eloChange (gameId, playerId, eloChange, tournamentId) VALUES (?, ?, ?, ?)",
+                    (game_id, playerId, eloChange, tournamentId)
                 )
 if __name__ == "__main__":
     database_file = './resources/database.db'
