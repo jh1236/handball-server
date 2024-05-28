@@ -41,9 +41,16 @@
 <div style="top:70px;left:66% ; position: absolute;width: 33%">
     <div style="min-height: 400px">
         <h2><a class = "hide" href="/{{tournament}}fixtures/detailed?team={{ team.searchableName }}">Recent Matches</a></h2>
-    {% for line in recent_games %}
-    <p style="color: black;"><a class = "hide" href="/{{line[2]}}/games/{{line[1]}}">{{line[0]}}</a></p>
-    {% endfor %}
+        {% for line in recent_games %}
+            <p style="color: black;">{% if line[1] > -1 %}
+                <a class="hide" href="/{{ line[2] }}/games/{{ line[1] }}">
+            {% endif %}
+                {{ line[0] }}
+                {% if line[1] > -1 %}
+                    </a>
+                {% endif %}
+            </p>
+        {% endfor %}
     </div>
     <div>
         <h2><a class = "hide" href="/{{tournament}}fixtures/detailed?team={{ team.searchableName }}">Upcoming Matches</a></h2>

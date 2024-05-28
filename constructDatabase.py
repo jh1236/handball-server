@@ -76,7 +76,6 @@ def process_game(tournamentId, game, round, isFinal, isRanked):
     for team in game.teams:
         timeoutsCalled = 1 - team.timeouts
         s.execute("UPDATE tournamentTeams SET timeoutsCalled = timeoutsCalled + ? WHERE teamId = (SELECT id FROM teams WHERE name = ?) AND tournamentId = ?", (timeoutsCalled, team.name, tournamentId))
-        s.execute("UPDATE tournamentTeams SET pointsScored = pointsScored + ? WHERE teamId = (SELECT id FROM teams WHERE name = ?) AND tournamentId = ?", (team.score, team.name, tournamentId))
 
 
     game_id = s.execute("SELECT id FROM games ORDER BY id DESC LIMIT 1").fetchone()[0]

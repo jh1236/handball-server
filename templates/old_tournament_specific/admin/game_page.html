@@ -1,0 +1,166 @@
+{% extends "admin.html" %}
+
+{% block headBlock %}
+    <title>{{ teams[0].name }} vs {{ teams[1].name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
+{% endblock %}
+
+{% block bodyBlock %}
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script>setTournament("{{tournament}}")</script>
+    <script>setId("{{game.id}}")</script>
+    <div class="row">
+
+        <div class="col-sm-9">
+
+            <h1><a href="/{{ tournament }}games/{{ game.id }}/admin" class="hide">{{ teams[0].name }}
+                vs {{ teams[1].name }}</a></h1>
+            <h1 class="big"><a class="hide"
+                               href="/{{ tournament }}games/{{ game.id }}/display">{{ game.score_string }}</a>
+            </h1>
+            <p><b>Round:</b> <a class="hide"
+                                href="/{{ tournament }}fixtures/admin?round={{ roundNumber - 1 + game.is_final * game.tournament.fixtures.__len__() }}"><i>{{ roundNumber }}</i></a>
+            </p>
+            <p><b>Court:</b> <a class="hide"
+                                href="/{{ tournament }}fixtures/admin?court={{ game.court }}"><i>{{ game.court_display }}</i></a>
+            </p>
+            <p><b>Match Official:</b>{% if not game.bye %}
+                <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %}
+                <i>{{ official }}</i>
+                {% if not game.bye %}</a> {% endif %}</p>
+            {% if game.scorer.nice_name() != 'no_one' %}
+                <p><b>Match Scorer:</b>
+                    <a class="hide" href="/{{ tournament }}officials/{{ game.scorer.nice_name() }}">
+                        <i>{{ game.scorer }}</i>
+                    </a></p>
+            {% endif %}
+            {% if game.start_time > 0 %}
+                <p><b>Match Time:</b> <i>{{ game.nice_start_time }}</i></p>
+                <p><b>Match Length:</b> <i>{{ game.nice_game_length }}</i></p>
+            {% endif %}
+            <p>{% if not game.bye %}<a href="/{{ tournament }}games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
+                {% if not game.bye %}</a>{% endif %} <i>{{ status }}</i></p>
+
+            {% if game.best_player %}
+                <p><b>Best on Court:</b> <a class="hide"
+                                            href="/{{ tournament }}players/{{ game.best_player.nice_name() }}/admin"><i>{{ best }}</i></a>
+                </p>
+            {% endif %}
+            <br>
+            <table class="jaredTable">
+                <tr>
+                    <th></th>
+                    <th colspan="{{ game.teams[0].has_subbed + 2 }}"><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}/admin"
+                                                                        class="hide"><img
+                            src="{{ teams[0].image() }}"
+                            class="team_logo"
+                            style="display: inline;left:70%;vertical-align:middle;"></a></th>
+                    <th colspan="{{ game.teams[1].has_subbed + 2 }}">
+                        {% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}/admin"
+                                                class="hide">{% endif %}<img
+                            src="{{ teams[1].image() }}"
+                            class="team_logo"
+                            style="display: inline;left:70%;vertical-align:middle;">{% if not game.bye %}</a>{% endif %}
+                    </th>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <th style="min-width: 150px" colspan="{{ game.teams[0].has_subbed + 2 }}"><b><a
+                            href="/{{ tournament }}teams/{{ teams[0].nice_name() }}/admin"
+                            class="hide">{{ teams[0].name }}</a></b></th>
+                    <th style="min-width: 150px" colspan="{{ game.teams[1].has_subbed + 2 }}"><b>{% if not game.bye %}
+                        <a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}/admin"
+                           class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
+                        </a>{% endif %}</b></th>
+                    <th class="invisible">Spacerrrrrrr</th>
+                </tr>
+                {% for stat in stats %}
+                    <tr>
+                        <th>{{ stat[0] }}:</th>
+                        <td colspan="{{ game.teams[0].has_subbed + 2 }}">{{ stat[1] }}</td>
+                        <td colspan="{{ game.teams[1].has_subbed + 2 }}">{{ stat[2] }}</td>
+                    </tr>
+
+
+                {% endfor %}
+
+                <tr>
+                    <td></td>
+                    {% for i in game.playing_players %}
+                        <th {% if i.team.all_players.__len__() == 1 %}
+                            colspan="2" {% endif %}
+                        ><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}/admin">
+                            {{ i }}{% if i.subbed_on %} (sub){% endif %}{% if i.subbed_off %}*{% endif %}
+                        </a></th>
+                    {% endfor %}
+
+                </tr>
+                {% for i, title in headings %}
+                    <tr>
+                        <th>{{ title }}:</th>
+                        {% for j in game.playing_players %}
+                            <td{% if j.team.all_players.__len__() == 1 %}
+                                colspan="2" {% endif %}
+                            >{{ player_stats[j.nice_name()][i] }}</td>
+
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-sm-3">
+            <div style="min-height: 150px">
+                <h2>Notes</h2>
+            <br>
+                {% if not game.notes.strip() %}
+                    <i>No notes were left for this game</i>
+                {% else %}
+                    {{ game.notes }}
+                {% endif %}
+            </div><div style="min-height: 150px">
+                <h2>Cards</h2>
+                <br>
+                {% if not game.cards %}
+                    <i>No cards were awarded in this game</i>
+                {% endif %}
+                {% for i in game.cards %}
+                    <i>{{ i.player.first_name() }} has received a <a style="color: {{ i.hex }}">{{ i.color }}</a> card
+                        for</i> <b>{{ i.reason }}</b>
+                    <br>
+                    <br>
+                {% endfor %}
+        </div><div style="min-height: 150px">
+                <h2>Protests</h2>
+                <br>
+                {% if game.protested == 3 %}
+                    <b>Both Teams</b><i> have protested!</i>
+                {% elif not game.protested %}
+                    <i>No Teams have protested</i>
+                {% else %}
+                    <b>{{ game.teams[game.protested - 1] }}</b><i> have protested!</i>
+                {% endif %}
+        </div><div style="min-height: 150px">
+                <h2>Resolve</h2>
+            <br>
+                {% if not game.requires_action %}
+                    <i>This game does not need resolution</i>
+                {% else %}
+                    <button onclick="resolveGame()" class="button">Resolve</button>
+                {% endif %}
+        <br>
+        </div><div style="min-height: 100px">
+                <h2>Commentary</h2>
+                {% for line in commentary %}
+                    <p style="color: black;">{{ line }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

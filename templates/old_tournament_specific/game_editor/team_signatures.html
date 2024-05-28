@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Finalise Game {{ teams[0].name }} vs {{ teams[1].name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_editor.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<nav id="navBar"></nav>
+<script>load("{{tournament}}")</script>
+
+<script src="{{ url_for('static', filename='js/start_game.js') }}"></script>
+<script>
+    setup({{game.id}}, {{ swap }})
+    setTournament("{{tournament}}")
+</script>
+<h1>{{ teams[0].name }} vs {{ teams[1].name }} </h1>
+<h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
+<p><b>Round:</b> <i>{{ game.rounds }}</i></p>
+<p><b>Match Official:</b><i>{{ game.primary_official }}</i>
+    {% if game.scorer.nice_name() != 'none_one' %}
+        <p><b>Match Scorer:</b> <i>{{ game.scorer }}</i></p>
+    {% endif %}
+<p><b>Match Id:</b> <i>{{ game.id }}</i></p>
+<br>
+<table class="jaredTable">
+    <tr>
+        <td></td>
+        <th colspan="{{ teams[0].all_players.__len__() }}"><b><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+                              class="hide">{{ teams[0].name }}</a></b></th>
+        <th colspan="{{ teams[1].all_players.__len__() }}"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+                                                   class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
+            </a>{% endif %}</b></th>
+        <th class="invisible">Spacerrrrrrr</th>
+    </tr>
+    {% for stat in stats %}
+        <tr>
+            <th>{{ stat[0] }}:</th>
+            <td colspan="{{ teams[0].all_players.__len__() }}">{{ stat[1] }}</td>
+            <td colspan="{{ teams[1].all_players.__len__() }}">{{ stat[2] }}</td>
+        </tr>
+
+
+    {% endfor %}
+
+    <tr>
+        <td></td>
+        {% for i in game.all_players %}
+            <th><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}">{{ i }}</a></th>
+        {% endfor %}
+
+    </tr>
+    {% for stat in headers %}
+        <tr>
+            <th>{{ stat }}:</th>
+            {% for i in game.all_players %}
+                <td>{{ i.get_stats()[stat] }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+<br>
+<br>
+<h2>Do {{ game.teams[0] }} wish to protest? <input type="checkbox" id="protest0"></h2>
+<h2>Do {{ game.teams[1] }} wish to protest? <input type="checkbox" id="protest1"></h2>
+<br>
+<button style="background-color: #2a5d88;" class="button" onclick="undo()">Undo</button>
+
+<button onclick="protest()" class="button">Continue</button>
+
+<br>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block headBlock %}
+    <title>Teams</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+{% endblock %}
+
+{% block bodyBlock %}
+
+<h1><a href="/{{tournament}}teams/" class="hide">Teams</a></h1>
+{% for i in teams %}
+<table class="jaredTable">
+    <tr>
+        <td style="width:100px;"><a href="/{{tournament}}teams/{{i.nice_name()}}"
+                                    class="hide"><img
+                src="{{i.image()}}" class="team_logo"
+                style="width: 75px; height: 75px;"
+        ></a></td>
+
+
+        <td style="width:200px;"><a href="/{{tournament}}teams/{{i.nice_name()}}" class="hide"><h3>{{i.name}}</h3></a></td>
+    </tr>
+</table>
+
+{% endfor %}
+{% endblock %}

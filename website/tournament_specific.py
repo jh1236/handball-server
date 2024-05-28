@@ -204,8 +204,8 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                             SELECT 
                                 serving.name, receiving.name, servingScore, receivingScore, games.id, round
                                 FROM games 
-                                INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-                                INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+                                INNER JOIN teams serving ON games.servingTeam = serving.id
+                                INNER JOIN teams receiving ON games.receivingTeam = receiving.id
                                 -- INNER JOIN people ON games.bestPlayer = people.id 
                                 WHERE 
                                     tournamentId = ? AND
@@ -469,7 +469,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                           "Percentage of Points scored",
                           "Percentage of Points scored for Team",
                           "Percentage of Games as Left Player",
-                          # "Serving Conversion Rate",
+                          "Serving Conversion Rate",
                           # "Average Serving Streak",
                           # "Max. Serving Streak",
                           # "Max. Ace Streak",
@@ -504,7 +504,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
        tournamentTeams.gamesWon,
        tournamentTeams.gamesLost,
        ROUND(100.0 * Cast(tournamentTeams.gamesWon AS REAL) / tournamentTeams.gamesPlayed,
-             2),
+             2) || '%',
        SUM(playerGameStats.greenCards),
        SUM(playerGameStats.yellowCards),
        SUM(playerGameStats.redCards),
@@ -576,37 +576,60 @@ where teams.searchableName = ?
        ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 2),
        ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 2),
        ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(tournamentTeams.pointsScored)), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points) from playerGameStats i where i.teamId = teams.id and i.tournamentId = tournaments.id ), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints), 2)|| '%',
        SUM(playerGameStats.servesReturned),
        SUM(playerGameStats.servesReceived),
-       ROUND(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived), 2) || '%',
        ROUND(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT( DISTINCT playerGameStats.gameId), 2)
        
        
 FROM teams
          INNER JOIN tournaments on tournaments.searchableName = ?
-         INNER JOIN tournamentTeams on teams.id = tournamentTeams.teamId 
+         INNER JOIN tournamentTeams on teams.id = tournamentTeams.teamId and tournaments.id = tournamentTeams.tournamentId 
          INNER JOIN playerGameStats on teams.id = playerGameStats.teamId and playerGameStats.tournamentId = tournaments.id
          INNER JOIN people on playerGameStats.playerId = people.id
-         WHERE teams.searchableName = ?
+         INNER JOIN games on playerGameStats.gameId = games.id
+         WHERE teams.searchableName = ? and games.isBye = 0 and games.isFinal = 0
           GROUP BY people.name""",
                 (tournament, team_name),
             ).fetchall()
+            recent = c.execute(
+                """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
+                    FROM games g1
+                             INNER JOIN tournaments on g1.tournamentId = tournaments.id
+                             INNER JOIN teams r on g1.receivingTeam = r.id
+                             INNER JOIN teams s on g1.servingTeam = s.id
+                    WHERE (r.searchableName = ? or s.searchableName = ?) and tournaments.searchableName = ? and g1.started = 1
+                    ORDER BY g1.id DESC 
+                    LIMIT 20""",(team_name, team_name, tournament)).fetchall()
+            upcoming = c.execute(
+                """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
+                    FROM games g1
+                             INNER JOIN tournaments on g1.tournamentId = tournaments.id
+                             INNER JOIN teams r on g1.receivingTeam = r.id
+                             INNER JOIN teams s on g1.servingTeam = s.id
+                    WHERE (r.searchableName = ? or s.searchableName = ?) and tournaments.searchableName = ? and g1.started = 0
+                    ORDER BY g1.id DESC 
+                    LIMIT 20""",(team_name, team_name, tournament)).fetchall()
         players = [PlayerStats(i[0], i[1], {k: v for k, v in zip(player_headers, i[2:])}) for i in players]
-        recent_games = []
-        upcoming_games = []
+        recent = [
+            (f"{i[0]} vs {i[1]} [{i[2]} - {i[3]}]", i[4], i[5]) for i in recent
+        ]
+        upcoming = [
+            (f"{i[0]} vs {i[1]} [{i[2]} - {i[3]}]", i[4], i[5]) for i in upcoming
+        ]
         return (
             render_template_sidebar(
                 "tournament_specific/each_team_stats.html",
                 stats=[(k, v) for k, v in team.stats.items()],
                 team=team,
-                recent_games=recent_games,
-                upcoming_games=upcoming_games,
+                recent_games=recent,
+                upcoming_games=upcoming,
                 tournament=link(tournament),
                 players=players,
             ),
@@ -949,7 +972,7 @@ FROM teams
                        tournamentTeams.gamesPlayed                                                                           as played,
                        tournamentTeams.gamesWon                                                                              as wins,
                        ROUND(100.0 * Cast(tournamentTeams.gamesWon AS REAL) / tournamentTeams.gamesPlayed,
-                             2)                                                                                              as percentage,
+                             2)|| '%'                                                                                              as percentage,
                        tournamentTeams.gamesLost                                                                             as losses,
                        SUM(playerGameStats.greenCards)                                                                       as greenCards,
                        SUM(playerGameStats.yellowCards)                                                                      as yellowCards,
@@ -1107,6 +1130,98 @@ FROM teams
                 ),
                 400,
             )
+        player_headers = ["B&F Votes",
+                          "Elo",
+                          "Points scored",
+                          "Aces scored",
+                          "Faults",
+                          "Double Faults",
+                          "Green Cards",
+                          "Yellow Cards",
+                          "Red Cards",
+                          "Rounds on Court",
+                          "Rounds Carded",
+                          "Net Elo Delta",
+                          "Average Elo Delta",
+                          "Points served",
+                          "Points Per Game", # ppg
+                          "Points Per Loss",
+                          "Aces Per Game",
+                          "Faults Per Game",
+                          "Cards Per Game",
+                          "Cards",
+                          "Points Per Card",
+                          "Serves Per Ace",
+                          "Serves Per Fault",
+                          "Serve Ace Rate",
+                          "Serve Fault Rate",
+                          "Percentage of Points scored",
+                          "Percentage of Points scored for Team",
+                          "Percentage of Games as Left Player",
+                          "Serving Conversion Rate",
+                          # "Average Serving Streak",
+                          # "Max. Serving Streak",
+                          # "Max. Ace Streak",
+                          "Serves Received",
+                          "Serves Returned",
+                          "Return Rate",
+                          "Votes Per 100 Games"]
+        with DatabaseManager() as c:
+            players = c.execute(
+                """
+                        SELECT people.name,
+       SUM(playerGameStats.isBestPlayer),
+       ROUND(1500.0 + (SELECT SUM(eloChange)
+                       from eloChange
+                       where eloChange.playerId = people.id), 2) as elo,
+       SUM(playerGameStats.points),
+       SUM(playerGameStats.aces),
+       SUM(playerGameStats.faults),
+       SUM(playerGameStats.doubleFaults),
+       SUM(playerGameStats.greenCards),
+       SUM(playerGameStats.yellowCards),
+       SUM(playerGameStats.redCards),
+       SUM(playerGameStats.roundsPlayed),
+       SUM(playerGameStats.roundsBenched),
+       ROUND((SELECT SUM(eloChange)
+                       from eloChange
+                       INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id AND games.tournamentId = tournaments.id), 2),
+       ROUND((SELECT SUM(eloChange)                       from eloChange
+                       INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id AND games.tournamentId = tournaments.id) / COUNT(DISTINCT playerGameStats.gameId), 2) as elo,
+       SUM(playerGameStats.servedPoints),
+       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (COUNT(DISTINCT playerGameStats.gameId) - tournamentTeams.gamesWon), 2),
+       ROUND(CAST(SUM(playerGameStats.aces) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       ROUND(CAST(SUM(playerGameStats.faults) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       ROUND(CAST(SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards),
+       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 2),
+       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 2),
+       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points) from playerGameStats i where i.teamId = teams.id and i.tournamentId = tournaments.id ), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2)|| '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints), 2)|| '%',
+       SUM(playerGameStats.servesReturned),
+       SUM(playerGameStats.servesReceived),
+       ROUND(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived), 2) || '%',
+       ROUND(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT( DISTINCT playerGameStats.gameId), 2)
+       
+       
+FROM people 
+         INNER JOIN tournaments on tournaments.searchableName = ?
+         INNER JOIN playerGameStats on people.id = playerGameStats.playerId
+         INNER JOIN teams on playerGameStats.teamId = teams.id
+         INNER JOIN tournamentTeams on tournaments.id = tournamentTeams.tournamentId and teams.id = tournamentTeams.teamId
+         INNER JOIN games on playerGameStats.gameId = games.id
+         WHERE people.searchableName = ? and games.isBye = 0 and games.isFinal = 0 and games.tournamentId = ?
+          GROUP BY people.name""",
+                (tournament, player_name, tournament),).fetchall()
+
         player = [i for i in comps[tournament].players if player_name == i.nice_name()][
             0
         ]
@@ -1143,12 +1258,10 @@ FROM teams
                     "tournament_specific/player_stats.html",
                     stats=[
                         (k, v)
-                        for k, v in get_player_stats(
-                            player.tournament, player, detail=2
-                        ).items()
+                        for k, v in zip(player_headers, players[1:])
                     ],
-                    name=player.name,
-                    player=player,
+                    name=players[0],
+                    player=player_name,
                     recent_games=recent_games,
                     upcoming_games=upcoming_games,
                     tournament=link(tournament),

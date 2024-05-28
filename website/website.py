@@ -147,12 +147,14 @@ def init_api(app, comps: dict[str, Tournament]):
         )
 
     from website.tournament_specific import add_tournament_specific
+    from website.old_tournament import add_old_tournament_specific
     from website.admin import add_admin_pages
     from website.universal_stats import add_universal_tournament
     from website.clips import add_video_player
 
     add_video_player(app)
     add_tournament_specific(app, comps)
+    add_old_tournament_specific(app, comps)
     add_universal_tournament(app, comps)
     add_admin_pages(app, comps)
 

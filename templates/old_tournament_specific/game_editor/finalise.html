@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Finalise Game {{ teams[0].name }} vs {{ teams[1].name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_editor.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<nav id="navBar"></nav>
+<script>load("{{tournament}}")</script>
+
+<script src="{{ url_for('static', filename='js/start_game.js') }}"></script>
+<script>
+    setup({{game.id}}, {{ swap }})
+    setTournament("{{tournament}}")
+</script>
+<h1>{{ teams[0].name }} vs {{ teams[1].name }} </h1>
+<h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
+<p><b>Round:</b> <i>{{ game.rounds }}</i></p>
+<p><b>Match Official:</b><i>{{ game.primary_official }}</i>
+    {% if game.scorer.nice_name() != 'none_one' %}
+        <p><b>Match Scorer:</b> <i>{{ game.scorer }}</i></p>
+    {% endif %}
+<p><b>Match Id:</b> <i>{{ game.id }}</i></p>
+<br>
+
+<table class="jaredTable">
+    <tr>
+        <th><img
+                src="{{ teams[0].image() }}"
+                class="team_logo"
+                style="display: inline;left:70%;vertical-align:middle;"></th>
+        <th class="invisible">spacer..</th>
+        <th><img
+                src="{{ teams[1].image() }}"
+                class="team_logo"
+                style="display: inline;left:70%;vertical-align:middle;"></th>
+    </tr>
+    <tr>
+        <td><br></td>
+    </tr>
+</table>
+
+<br>
+<br>
+{% if game.cards %}
+    <h1>Card Reasons</h1>
+    <table class="jaredTable">
+{% endif %}
+{% for i, v in cards %}
+    <tr>
+        <td style="width: 275px; text-align: left">{{ i }}: {{ v.player.first_name() }} received a {{ v.color }} card
+        </td>
+        <td><input style="width: 330px;font-size: 20px" type="text" id="card{{ i }}" maxlength="30"></td>
+    </tr>
+    <tr>
+        <td></td>
+    </tr>
+
+{% endfor %}
+{% if game.cards %}
+    </table>
+    <br>
+    <br>
+{% endif %}
+<h1>Notes</h1>
+<textarea style="width: 330px; height: 100px" id="notes"> </textarea>
+<br>
+<br>
+<div class="dropdown">
+    {% if game.best_player %}
+        <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And
+            Best: {{ game.best_player.tidy_name() }}</button>
+    {% else %}
+        <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And Best</button>
+    {% endif %}
+    <div class="dropdown-content">
+        {% for i in game.playing_players %}
+            <p onclick="setBest('{{ i.name }}', '{{ i.tidy_name() }}')">{{ i.tidy_name() }}</p>
+        {% endfor %}
+    </div>
+</div>
+<br>
+<br>
+
+<button style="background-color: #2a5d88;" class="button" onclick="undo()">Undo</button>
+
+<button onclick="finish({{ game.cards.__len__() }})" class="button">Finalise</button>
+
+<br>
+</body>
+</html>

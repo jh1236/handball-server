@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block headBlock %}
+    <title>Official {{ name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
+{% endblock %}
+
+{% block bodyBlock %}
+<a href="/{{tournament}}officials/">
+    <img src="/api/image?name=umpire" class="team_logo"></a>
+<h1><a href="/{{tournament}}officials/{{link}}" class="hide">Statistics for {{name}}</a></h1>
+{% for stat in stats %}
+<p><b>{{ stat[0] }}:</b> {{ stat[1] }}</p>
+{% endfor %}
+
+<br>
+<br>
+<br>
+<h2><a class="hide" href="/{{tournament}}fixtures/detailed?umpire={{ link }}">Matches</a></h2>
+{% for line in games %}
+<p style="color: black;"><a class="hide" href="/{{line[2]}}/games/{{line[1]}}">{{line[0]}}</a></p>
+{% endfor %}
+{% endblock %}
