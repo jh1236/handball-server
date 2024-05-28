@@ -7,15 +7,15 @@
 
 {% block bodyBlock %}
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <a href="/{{tournament}}teams/{{player.team.nice_name()}}">
-        <img src="/api/teams/image?name={{player.team.nice_name()}}" class="team_logo"></a>
+    <a href="/{{tournament}}teams/{{team}}">
+        <img src="/api/teams/image?name={{team}}" class="team_logo"></a>
     <h1><a href="/{{tournament}}players/{{player}}" class="hide">Statistics for {{name}}</a></h1>
     <table class="jaredTable">
         <tbody>
-        {% for stat in stats %}
-            {% if stat[1].__str__().startswith("{") %}
-                <tr><td colspan="10" style="text-align: center"><h2>{{ stat[0] }}</h2></td></tr>
-                {% for stat2 in stat[1].items() %}
+        {% for k, v in stats.items() %}
+            {% if v.__str__().startswith("{") %}
+                <tr><td colspan="10" style="text-align: center"><h2>{{ k }}</h2></td></tr>
+                {% for stat2 in v.items() %}
                 <tr>
                     <th>{{ stat2[0] }}:</th>
                     <td></td>
@@ -24,9 +24,9 @@
                 {% endfor %}
             {% else %}
             <tr>
-                <th>{{ stat[0] }}:</th>
+                <th>{{ k }}:</th>
                 <td></td>
-                <td>{{ stat[1] }}</td>
+                <td>{{ v }}</td>
             </tr>
             {% endif %}
         {% endfor %}
