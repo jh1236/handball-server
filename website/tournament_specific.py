@@ -389,7 +389,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                                 name, searchableName, 
                                     case 
                                         when imageURL is null 
-                                            then "/api/teams/image?name=blank" 
+                                            then '/api/teams/image?name=blank' 
                                         else 
                                             imageURL
                                     end  
@@ -452,9 +452,6 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                           "Red Cards",
                           "Rounds on Court",
                           "Rounds Carded",
-                          "Games Played", #games played
-                          "Games Won",
-                          "Percentage",
                           "Net Elo Delta",
                           "Average Elo Delta",
                           "Points served",
@@ -472,10 +469,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                           "Percentage of Points scored",
                           "Percentage of Points scored for Team",
                           "Percentage of Games as Left Player",
-                          "Serving Conversion Rate",
-                          "Average Serving Streak",
-                          "Max. Serving Streak",
-                          "Max. Ace Streak",
+                          # "Serving Conversion Rate",
+                          # "Average Serving Streak",
+                          # "Max. Serving Streak",
+                          # "Max. Ace Streak",
                           "Serves Received",
                           "Serves Returned",
                           "Return Rate",
@@ -488,7 +485,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
        teams.searchableName,
        case 
             when teams.imageURL is null 
-                then "/api/teams/image?name=blank" 
+                then '/api/teams/image?name=blank' 
             else 
                 teams.imageURL
             end,
@@ -550,6 +547,9 @@ where teams.searchableName = ?
                         SELECT people.name,
        people.searchableName,
        SUM(playerGameStats.isBestPlayer),
+       ROUND(1500.0 + (SELECT SUM(eloChange)
+                       from eloChange
+                       where eloChange.playerId = people.id), 2) as elo,
        SUM(playerGameStats.points),
        SUM(playerGameStats.aces),
        SUM(playerGameStats.faults),
@@ -558,9 +558,39 @@ where teams.searchableName = ?
        SUM(playerGameStats.yellowCards),
        SUM(playerGameStats.redCards),
        SUM(playerGameStats.roundsPlayed),
-       SUM(playerGameStats.roundsBenched)
+       SUM(playerGameStats.roundsBenched),
+       ROUND((SELECT SUM(eloChange)
+                       from eloChange
+                       INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id AND games.tournamentId = tournaments.id), 2),
+       ROUND((SELECT SUM(eloChange)                       from eloChange
+                       INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id AND games.tournamentId = tournaments.id) / COUNT(DISTINCT playerGameStats.gameId), 2) as elo,
+       SUM(playerGameStats.servedPoints),
+       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (COUNT(DISTINCT playerGameStats.gameId) - tournamentTeams.gamesWon), 2),
+       ROUND(CAST(SUM(playerGameStats.aces) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       ROUND(CAST(SUM(playerGameStats.faults) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       ROUND(CAST(SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards),
+       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 2),
+       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 2),
+       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(tournamentTeams.pointsScored)), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints), 2),
+       SUM(playerGameStats.servesReturned),
+       SUM(playerGameStats.servesReceived),
+       ROUND(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived), 2),
+       ROUND(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT( DISTINCT playerGameStats.gameId), 2)
+       
+       
 FROM teams
          INNER JOIN tournaments on tournaments.searchableName = ?
+         INNER JOIN tournamentTeams on teams.id = tournamentTeams.teamId 
          INNER JOIN playerGameStats on teams.id = playerGameStats.teamId and playerGameStats.tournamentId = tournaments.id
          INNER JOIN people on playerGameStats.playerId = people.id
          WHERE teams.searchableName = ?
@@ -677,7 +707,7 @@ FROM teams
                                        teams.searchableName,
                                        case 
                                         when teams.imageURL is null 
-                                            then "/api/teams/image?name=blank" 
+                                            then '/api/teams/image?name=blank' 
                                         else 
                                             teams.imageURL
                                         end,
@@ -911,7 +941,7 @@ FROM teams
                        teams.name,
                        case
                            when teams.imageURL is null
-                               then "/api/teams/image?name=blank"
+                               then '/api/teams/image?name=blank'
                            else
                                teams.imageURL
                            end,
@@ -1178,9 +1208,9 @@ FROM teams
         with DatabaseManager() as c:
             values = c.execute(
                 """SELECT
-                                   SUM(punishments.color = "Green"),
-                                   SUM(punishments.color = "Yellow"),
-                                   SUM(punishments.color = "Red"),
+                                   SUM(punishments.color = 'Green'),
+                                   SUM(punishments.color = 'Yellow'),
+                                   SUM(punishments.color = 'Red'),
                                    COUNT(punishments.id),
                                    ROUND(CAST(COUNT(punishments.id) AS REAL) / COUNT(DISTINCT games.id), 2),
                                    (SELECT SUM(faults)

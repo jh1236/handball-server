@@ -108,6 +108,7 @@ create_tournament_teams_table = """CREATE TABLE IF NOT EXISTS tournamentTeams (
     gamesWon INTEGER,
     gamesPlayed INTEGER,
     gamesLost INTEGER,
+    pointsScored INTEGER,
     timeoutsCalled INTEGER,
     pool INTEGER,
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
