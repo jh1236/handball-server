@@ -188,11 +188,6 @@ class GameTeam:
     def __eq__(self, other: object) -> bool:
         return isinstance(other, GameTeam) and other.name == self.name
 
-    def info(self, text: str) -> None:
-        if self.game.id < 0:
-            return
-        logger.info(f"(Game {self.game.id}) {text}")
-
     def image(self) -> str:
         return self.team.image()
 
@@ -313,23 +308,14 @@ class GameTeam:
 
     def score_point(self, first_player: bool | None = None, ace: bool = False) -> None:
         if ace:
-            self.info(
-                f"Ace Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string}"
-            )
             if first_player is None:
                 self.server().score_point(True)
             else:
                 self.players[not first_player].score_point(True)
             self.server().ace_streak[-1] += 1
         elif first_player is not None:
-            self.info(
-                f"Point Scored by {self.players[not first_player].nice_name()} from team {self.nice_name()}. Score is {self.game.score_string}"
-            )
             self.players[not first_player].score_point(False)
         else:
-            self.info(
-                f"Penalty Point Awarded to team {self.nice_name()}.  Score is {self.game.score_string}"
-            )
             if self.server().ace_streak[-1]:
                 self.server().ace_streak.append(0)
         self.score += 1
@@ -364,9 +350,6 @@ class GameTeam:
         return [i for i in self.players if not i.captain[:2]][0]
 
     def fault(self) -> None:
-        self.info(
-            f"Fault by {self.players[not self.first_player_serves].nice_name()} from team {self.nice_name()}"
-        )
         self.server().fault()
         self.game.add_to_game_string(
             "f" + ("l" if self.first_player_serves else "r"), self
@@ -381,9 +364,6 @@ class GameTeam:
 
     def green_card(self, first_player: bool) -> None:
         self.game.update_count += 1
-        self.info(
-            f"Green Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
-        )
         self.green_carded = True
         self.green_cards += 1
         self.players[not first_player].green_card()
@@ -391,9 +371,6 @@ class GameTeam:
 
     def yellow_card(self, first_player: bool, time: int = 3) -> None:
         self.game.update_count += 1
-        self.info(
-            f"Yellow Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
-        )
         self.yellow_cards += 1
         self.players[not first_player].yellow_card(time)
         if time == 3:
@@ -413,9 +390,6 @@ class GameTeam:
             return
         self.red_cards += 1
         self.game.update_count += 1
-        self.info(
-            f"Red Card for {self.players[not first_player].nice_name()} from team {self.nice_name()}"
-        )
         player.red_card()
         self.game.add_to_game_string(f"v{'l' if first_player else 'r'}", self)
         while (
@@ -424,7 +398,6 @@ class GameTeam:
             self.opponent.score_point()
 
     def timeout(self) -> None:
-        self.info(f"Timeout called by {self.nice_name()}")
         self.game.add_to_game_string(f"tt", self)
         self.time_out_time = time.time()
         self.game.event()

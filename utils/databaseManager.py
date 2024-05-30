@@ -50,19 +50,17 @@ create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     notes STRING,
     imageURL TEXT
 );"""
-create_punishments_table = """CREATE TABLE IF NOT EXISTS punishments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    personId INTEGER,
-    officialId INTEGER,
-    gameId INTEGER,
-    color STRING, -- TODO: change to individual references for each type of punishment
-    length INTEGER,
-    reason STRING,
-    FOREIGN KEY (personId) REFERENCES people (id),
-    FOREIGN KEY (officialId) REFERENCES officials (id),
-    FOREIGN KEY (gameId) REFERENCES games (id)
-    );"""
-create_games_table = """CREATE TABLE IF NOT EXISTS games (
+create_punishments_view = """CREATE VIEW IF NOT EXISTS punishments AS
+SELECT playerId as playerId,
+       g.official as officialId,
+       g.id as gameId,
+       REPLACE(eventType, ' Card', '') as type,
+       gameEvents.notes as reason
+FROM gameEvents
+         INNER JOIN main.games g on gameEvents.gameId = g.id
+WHERE eventType LIKE '% Card'
+   or eventType = 'Warning';"""
+create_games_table = """CREATE TABLE IF NOT EXISTS gamesTable (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournamentId INTEGER,
     servingTeam INTEGER,
@@ -73,10 +71,6 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     scorer INTEGER,
     IGASide INTEGER,
     gameStringVersion INTEGER,
-    servingScore INTEGER,
-    receivingScore INTEGER,
-    servingTimeouts INTEGER,
-    receivingTimeouts INTEGER,
     gameString TEXT,
     started INTEGER,
     startTime INTEGER,
@@ -101,6 +95,19 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     FOREIGN KEY (scorer) REFERENCES officials (id),
     FOREIGN KEY (IGASide) REFERENCES teams (id)
 );"""
+
+create_live_games_view = """CREATE VIEW IF NOT EXISTS games AS
+SELECT
+    gamesTable.*,
+    SUM(gE.teamId = gamesTable.servingTeam and (gE.eventType = 'Score' or gE.eventType = 'Ace')) as servingScore,
+    SUM(gE.teamId = gamesTable.receivingTeam) as receivingScore,
+    lastGe.nextPlayerToServe as playerToServe,
+    lastGe.nextTeamToServe as teamToServe
+from gamesTable
+         LEFT JOIN gameEvents gE on gamesTable.id = gE.gameId
+         LEFT JOIN gameEvents lastGe on lastGe.id = (SELECT MAX(id) from gameEvents where gameEvents.gameId = gamesTable.id)
+group by gamesTable.id;"""
+
 create_tournament_teams_table = """CREATE TABLE IF NOT EXISTS tournamentTeams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournamentId INTEGER,
@@ -122,24 +129,13 @@ create_tournament_officials_table = """CREATE TABLE IF NOT EXISTS tournamentOffi
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (officialId) REFERENCES officials (id)
 );"""
-create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
+create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStatsTable (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     gameId INTEGER,
     playerId INTEGER,
     teamId INTEGER,
     opponentId INTEGER,
     tournamentId INTEGER,
-    points INTEGER,
-    aces INTEGER,
-    faults INTEGER,
-    servedPoints INTEGER,
-    servedPointsWon INTEGER,
-    servesReceived INTEGER,
-    servesReturned INTEGER,
-    doubleFaults INTEGER,
-    greenCards INTEGER,
-    yellowCards INTEGER,
-    redCards INTEGER,
     cardTime INTEGER,
     cardTimeRemaining INTEGER,
     roundsPlayed INTEGER,
@@ -147,19 +143,79 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
     isBestPlayer INTEGER,
     sideOfCourt TEXT,
     isFinal INTEGER,
-    FOREIGN KEY (gameId) REFERENCES games (id),
+    FOREIGN KEY (gameId) REFERENCES gamesTable (id),
     FOREIGN KEY (playerId) REFERENCES people (id),
     FOREIGN KEY (teamId) REFERENCES teams (id),
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (opponentID) REFERENCES teams (id)
 );"""
+create_player_game_stats_view = """
+CREATE VIEW IF NOT EXISTS playerGameStats AS SELECT playerGameStatsTable.*,
+       SUM((ge.eventType = 'Ace' or ge.eventType = 'Score') * ge.playerId = playerGameStatsTable.playerId) as points,
+       SUM((ge.eventType = 'Ace') * ge.playerId = playerGameStatsTable.playerId)                           as aces,
+       SUM((ge.eventType = 'Fault') * ge.playerId = playerGameStatsTable.playerId)                         as faults,
+       SUM(gE.gameId = playerGameStatsTable.gameId AND gE.nextPlayerToServe = playerGameStatsTable.playerId)    as servedPoints,
+       SUM(gE.gameId = playerGameStatsTable.gameId
+           AND gE.playerWhoServed = playerGameStatsTable.playerId
+           AND playerGameStatsTable.teamId = gE.teamId
+           AND
+           (gE.eventType = 'Score' or gE.eventType = 'Ace'))                                          as servedPointsWon,
+       SUM(gE.gameId = playerGameStatsTable.gameId
+           and gE.teamWhoServed <> playerGameStatsTable.teamId
+           AND gE.sideServed = playerGameStatsTable.sideOfCourt)                                           as servesReceived,
+       SUM(gE.gameId = playerGameStatsTable.gameId
+           and gE.teamWhoServed <> playerGameStatsTable.teamId
+           AND gE.sideServed = playerGameStatsTable.sideOfCourt
+           and gE.eventType <> 'Ace')                                                                 as servesReturned,
+       SUM(gE.gameId = playerGameStatsTable.gameId
+           AND gE.playerWhoServed = playerGameStatsTable.playerId
+           AND gE.eventType = 'Fault' AND gE.nextPlayerToServe <> playerGameStatsTable.playerId)           as doubleFaults,
+       SUM(gE.gameId = playerGameStatsTable.gameId
+           AND gE.playerId = playerGameStatsTable.playerId
+           AND gE.eventType = 'Green Card')                                                           as greenCards,
+       SUM(gE.gameId = playerGameStatsTable.gameId
+           AND gE.playerId = playerGameStatsTable.playerId
+           AND gE.eventType = 'Yellow Card')                                                          as yellowCards,
+       SUM(gE.gameId = playerGameStatsTable.gameId
+           AND gE.playerId = playerGameStatsTable.playerId
+           AND gE.eventType = 'Red Card')                                                          as redCards
+FROM playerGameStatsTable
+         LEFT JOIN gameEvents gE
+                   on playerGameStatsTable.gameId = gE.gameId
+group by playerGameStatsTable.id;
+"""
 create_elo_change_table = """CREATE TABLE IF NOT EXISTS eloChange (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     gameId INTEGER,
     playerId INTEGER,
     tournamentId INTEGER,
     eloChange INTEGER,
-    FOREIGN KEY (gameId) REFERENCES games (id),
+    FOREIGN KEY (gameId) REFERENCES gamesTable (id),
+    FOREIGN KEY (playerId) REFERENCES people (id),
+    FOREIGN KEY (tournamentId) REFERENCES tournaments (id)
+);"""
+create_game_event_table = """CREATE TABLE IF NOT EXISTS gameEvents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    gameId INTEGER,
+    teamId INTEGER,
+    playerId INTEGER,
+    tournamentId INTEGER,
+    eventType TEXT,
+    time REAL,
+    details INTEGER,
+    notes TEXT,
+    playerWhoServed INTEGER,
+    teamWhoServed INTEGER,
+    sideServed TEXT,
+    nextPlayerToServe INTEGER,
+    nextTeamToServe INTEGER,
+    nextServeSide TEXT,
+    FOREIGN KEY (gameId) REFERENCES gamesTable (id),
+    FOREIGN KEY (teamId) REFERENCES teams (id),
+    FOREIGN KEY (nextPlayerToServe) REFERENCES people (id),
+    FOREIGN KEY (nextTeamToServe) REFERENCES teams (id),
+    FOREIGN KEY (playerWhoServed) REFERENCES people (id),
+    FOREIGN KEY (teamWhoServed) REFERENCES teams (id),
     FOREIGN KEY (playerId) REFERENCES people (id),
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id)
 );"""
@@ -186,12 +242,15 @@ class DatabaseManager:
         self.read_write_c.execute(create_officials_table)
         self.read_write_c.execute(create_teams_table)
         self.read_write_c.execute(create_games_table)
-        self.read_write_c.execute(create_punishments_table)
         self.read_write_c.execute(create_taunts_table)
         self.read_write_c.execute(create_tournament_teams_table)
         self.read_write_c.execute(create_tournament_officials_table)
         self.read_write_c.execute(create_player_game_stats_table)
         self.read_write_c.execute(create_elo_change_table)
+        self.read_write_c.execute(create_game_event_table)
+        self.read_write_c.execute(create_live_games_view)
+        self.read_write_c.execute(create_punishments_view)
+        self.read_write_c.execute(create_player_game_stats_view)
         self.conn.commit()
 
     def close_connection(self):

@@ -476,6 +476,5 @@ def load_all_tournaments() -> dict[str, Tournament]:
             t = Tournament(filename)
             t.details["sort"] = i
             ret[t.nice_name()] = t
-            logger.info("------------------------------")
 
     return ret

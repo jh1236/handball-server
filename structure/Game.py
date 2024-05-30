@@ -4,7 +4,6 @@ import typing
 from structure.OfficiatingBody import NoOfficial, Official
 from structure.Player import GamePlayer, Player, forfeit_player
 from structure.Team import Team
-from utils.logging_handler import logger
 from utils.util import chunks_sized
 
 if typing.TYPE_CHECKING:
@@ -387,17 +386,6 @@ class Game:
         self.rounds += 1
         [i.next_point() for i in self.teams]
 
-    def print_gamestate(self):
-        logger.info(
-            f"         {self.teams[0].__repr__():^15}| {self.teams[1].__repr__():^15}"
-        )
-        logger.info(f"score   :{self.teams[0].score:^15}| {self.teams[1].score:^15}")
-        logger.info(
-            f"cards   :{self.teams[0].card_time():^15}| {self.teams[1].card_time():^15}"
-        )
-        logger.info(
-            f"timeouts:{self.teams[0].timeouts:^15}| {self.teams[1].timeouts:^15}"
-        )
 
     def start(self, team_one_serves, swap_team_one, swap_team_two):
         self.started = True
@@ -409,9 +397,6 @@ class Game:
         self.teams[0].start(team_one_serves, swap_team_one)
         self.teams[1].start(not team_one_serves, swap_team_two)
         self.first_team_serves = team_one_serves
-        self.info(
-            f"Started, {self.server.nice_name()} serving from team {self.team_serving.nice_name()}"
-        )
 
     def end(
         self,
@@ -472,9 +457,6 @@ class Game:
             self.primary_official.games_umpired += 1
             self.scorer.games_scored += 1
             self.primary_official.rounds_umpired += self.rounds
-            self.info(
-                f"game {self.id} is over! Winner was {self.winner.nice_name()}, Best Player is {self.best_player.nice_name()}"
-            )
             self.length = time.time() - self.start_time
             self.tournament.update_games()
 
@@ -490,7 +472,6 @@ class Game:
                 )
             self.tournament.update_games()
         elif self.game_string == "":
-            self.info(f"Undoing Game start")
             self.started = False
         elif self.protested != None:
             self.protested = None
@@ -506,16 +487,15 @@ class Game:
                 self.first_team_serves, self.teams[0].swapped, self.teams[1].swapped
             )
             self.load_from_string(self.game_string)
-            logger.info(f"Undoing Game End... game string is now {self.game_string}")
         else:
             self.game_string = self.game_string[:-2]
             self.reload()
-            self.info(f"Undoing... game string is now {self.game_string}")
 
     def reload(self):
         self._serve_clock = -1
         [i.end_timeout() for i in self.teams]
-        self.cards.clear()
+        [i.reset() for i in self.teams]
+        # self.cards.clear()
         self.start(self.first_team_serves, self.teams[0].swapped, self.teams[1].swapped)
         self.load_from_string(self.game_string)
 
@@ -674,10 +654,6 @@ class Game:
     def __repr__(self):
         return f"{self.teams[0].short_name} vs {self.teams[1].short_name}"
 
-    def info(self, message):
-        if self.id < 0:
-            return
-        logger.info(f"(Game {self.id}) {message}")
 
     def protest(self, first_team, second_team):
         self.protested = first_team + 2 * second_team

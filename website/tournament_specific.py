@@ -28,7 +28,7 @@ def priority_to_classname(p):
     if p == 1:
         return ""
     sizes = ["sm", "md", "lg", "xl"]
-    return f"d-none d-{sizes[p-2]}-table-cell"
+    return f"d-none d-{sizes[p - 2]}-table-cell"
 
 
 def link(tournament):
@@ -159,10 +159,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             players = [Player(*player) for player in playerList]
 
             notes = (
-                c.execute(
-                    "SELECT notes FROM tournaments WHERE id = ?", (tournamentId,)
-                ).fetchone()[0]
-                or "Notices will appear here when posted"
+                    c.execute(
+                        "SELECT notes FROM tournaments WHERE id = ?", (tournamentId,)
+                    ).fetchone()[0]
+                    or "Notices will appear here when posted"
             )
             tourney = c.execute(
                 "SELECT name, searchableName, fixturesGenerator from tournaments where id = ?",
@@ -455,7 +455,7 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
                           "Net Elo Delta",
                           "Average Elo Delta",
                           "Points served",
-                          "Points Per Game", # ppg
+                          "Points Per Game",  # ppg
                           "Points Per Loss",
                           "Aces Per Game",
                           "Faults Per Game",
@@ -606,7 +606,7 @@ FROM teams
                              INNER JOIN teams s on g1.servingTeam = s.id
                     WHERE (r.searchableName = ? or s.searchableName = ?) and tournaments.searchableName = ? and g1.started = 1
                     ORDER BY g1.id DESC 
-                    LIMIT 20""",(team_name, team_name, tournament)).fetchall()
+                    LIMIT 20""", (team_name, team_name, tournament)).fetchall()
             upcoming = c.execute(
                 """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
                     FROM games g1
@@ -615,7 +615,7 @@ FROM teams
                              INNER JOIN teams s on g1.servingTeam = s.id
                     WHERE (r.searchableName = ? or s.searchableName = ?) and tournaments.searchableName = ? and g1.started = 0
                     ORDER BY g1.id DESC 
-                    LIMIT 20""",(team_name, team_name, tournament)).fetchall()
+                    LIMIT 20""", (team_name, team_name, tournament)).fetchall()
         players = [PlayerStats(i[0], i[1], {k: v for k, v in zip(player_headers, i[2:])}) for i in players]
         recent = [
             (f"{i[0]} vs {i[1]} [{i[2]} - {i[3]}]", i[4], i[5]) for i in recent
@@ -813,7 +813,7 @@ FROM teams
             name = row[0]
             elo = row[1]
             elo_delta = row[2]
-            stats = [f"{row[1]} [{(row[2]) if row[2] <0 else '+' + str(row[2])}]"]
+            stats = [f"{row[1]} [{(row[2]) if row[2] < 0 else '+' + str(row[2])}]"]
             stats += list(row[3:12])
             return Player(
                 name,
@@ -862,13 +862,13 @@ FROM teams
                 teams[i[30]] = Team([], i[32] if i[32] else "", i[30], i[31], {})
             teams[i[30]].players.append(pl)
             teams[i[30]].stats["Green Cards"] = (
-                teams[i[30]].stats.get("Green Cards", 0) + i[9]
+                    teams[i[30]].stats.get("Green Cards", 0) + i[9]
             )
             teams[i[30]].stats["Yellow Cards"] = (
-                teams[i[30]].stats.get("Yellow Cards", 0) + i[10]
+                    teams[i[30]].stats.get("Yellow Cards", 0) + i[10]
             )
             teams[i[30]].stats["Red Cards"] = (
-                teams[i[30]].stats.get("Red Cards", 0) + i[11]
+                    teams[i[30]].stats.get("Red Cards", 0) + i[11]
             )
         for i, team in enumerate(teams.values()):
             if i:
@@ -1075,7 +1075,7 @@ FROM teams
             )
             for i in comps[tournament].players
             if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
-            and not i.nice_name().startswith("null")
+               and not i.nice_name().startswith("null")
         ]
         headers = ["Name"] + [
             i for i in comps[tournament].teams[0].players[0].get_stats()
@@ -1104,7 +1104,7 @@ FROM teams
             )
             for i in comps[tournament].players
             if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
-            and not i.nice_name().startswith("null")
+               and not i.nice_name().startswith("null")
         ]
         headers = ["Name"] + [
             i for i in comps[tournament].teams[0].players[0].get_stats_detailed()
@@ -1148,7 +1148,7 @@ FROM teams
                           "Net Elo Delta",
                           "Average Elo Delta",
                           "Points served",
-                          "Points Per Game", # ppg
+                          "Points Per Game",  # ppg
                           "Points Per Loss",
                           "Aces Per Game",
                           "Faults Per Game",
@@ -1170,7 +1170,7 @@ FROM teams
                           "Serves Returned",
                           "Return Rate",
                           "Votes Per 100 Games"]
-        #TODO (LACHIE): please help me make this less queries...
+        # TODO (LACHIE): please help me make this less queries...
         with DatabaseManager() as c:
             players = c.execute(
                 """SELECT people.name,
@@ -1227,7 +1227,7 @@ FROM people
          INNER JOIN tournamentTeams on tournaments.id = tournamentTeams.tournamentId and teams.id = tournamentTeams.teamId
          INNER JOIN games on playerGameStats.gameId = games.id
 WHERE people.searchableName = ? and games.isBye = 0 and games.isFinal = 0 and tournaments.searchableName = ?""",
-                (player_name, tournament),).fetchone()
+                (player_name, tournament), ).fetchone()
 
             courts = c.execute(
                 """SELECT people.name,
@@ -1285,7 +1285,7 @@ FROM people
          INNER JOIN games on playerGameStats.gameId = games.id
 WHERE people.searchableName = ? and games.isBye = 0 and games.isFinal = 0 and tournaments.searchableName = ?
 GROUP BY games.court""",
-                (player_name, tournament),).fetchall()
+                (player_name, tournament), ).fetchall()
 
             recent = c.execute(
                 """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
@@ -1297,7 +1297,7 @@ GROUP BY games.court""",
                              INNER JOIN people on playerGameStats.playerId = people.id
                     WHERE (people.searchableName = ?) and tournaments.searchableName = ? and g1.started = 1
                     ORDER BY g1.id DESC 
-                    LIMIT 20""",(player_name, tournament)).fetchall()
+                    LIMIT 20""", (player_name, tournament)).fetchall()
             upcoming = c.execute(
                 """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
                     FROM games g1
@@ -1308,7 +1308,7 @@ GROUP BY games.court""",
                              INNER JOIN people on playerGameStats.playerId = people.id
                     WHERE people.searchableName = ? and tournaments.searchableName = ? and g1.started = 0
                     ORDER BY g1.id DESC 
-                    LIMIT 20""",(player_name, tournament)).fetchall()
+                    LIMIT 20""", (player_name, tournament)).fetchall()
         recent = [
             (f"{i[0]} vs {i[1]} [{i[2]} - {i[3]}]", i[4], i[5]) for i in recent
         ]
@@ -1320,7 +1320,7 @@ GROUP BY games.court""",
         for k, v in zip(player_headers, players[2:]):
             stats[k] = v
         stats |= {
-            f"Court {i + 1}" : {k: v for k, v in zip(player_headers, j[2:])} for i, j in enumerate(courts)
+            f"Court {i + 1}": {k: v for k, v in zip(player_headers, j[2:])} for i, j in enumerate(courts)
         }
 
         print(stats)
@@ -1434,14 +1434,14 @@ GROUP BY games.court""",
                 (nice_name, nice_name, nice_name),
             ).fetchall()
         for (
-            game_id,
-            tournament_nice_name,
-            umpire,
-            game_round,
-            team_one,
-            team_two,
-            score_one,
-            score_two,
+                game_id,
+                tournament_nice_name,
+                umpire,
+                game_round,
+                team_one,
+                team_two,
+                score_one,
+                score_two,
         ) in games:
             recent_games.append(
                 (
@@ -1483,12 +1483,71 @@ GROUP BY games.court""",
     @app.get("/<tournament>/games/<game_id>/edit/")
     @officials_only
     def game_editor(tournament, game_id):
-        if int(game_id) >= len(comps[tournament].games_to_list()):
-            raise Exception("Game Does not exist!!")
         visual_swap = request.args.get("swap", "false") == "true"
         visual_str = "true" if visual_swap else "false"
-        game = comps[tournament].get_game(int(game_id))
-        teams = game.teams
+
+        with DatabaseManager() as c:
+            game_query = c.execute("""
+            SELECT isBye, po.name, po.searchableName, ps.name, ps.searchableName
+            FROM games
+                     INNER JOIN officials o ON games.official = o.id
+                     INNER JOIN people po ON o.personId = po.id
+                     INNER JOIN officials s ON games.scorer = o.id
+                     INNER JOIN people ps ON s.personId = ps.id
+            WHERE games.id = ?
+            """, (game_id,)).fetchone()
+
+            teams_query = c.execute("""SELECT teams.name,
+       teams.searchableName,
+       Case
+           WHEN games.receivingTeam = teams.id THEN
+               games.receivingScore
+           ELSE
+               games.servingScore END,
+       case
+           when teams.imageURL is null
+               then '/api/teams/image?name=blank'
+           else
+               teams.imageURL
+           end
+FROM games
+         INNER JOIN tournaments on games.tournamentId = tournaments.id
+         INNER JOIN teams on (games.receivingTeam = teams.id or games.servingTeam = teams.id)
+         INNER JOIN tournamentTeams
+                    on teams.id = tournamentTeams.teamId and tournaments.id = tournamentTeams.tournamentId;
+""").fetchall()
+
+        @dataclass
+        class Game:
+            id: int
+            bye: bool
+            official: str
+            officialSearchableName: str
+            scorer: str
+            scorerSearchableName: str
+            hasScorer: bool
+            deletable: bool
+
+        @dataclass
+        class Player:
+            name: str
+            searchableName: str
+
+        @dataclass
+        class Team:
+            name: str
+            searchableName: str
+            score: str
+            imageUrl: str
+            cards: list[str]
+            players: list[Player]
+
+        teams = []
+        game = Game(game_id, *game_query, True, False)
+        for i in teams_query:
+            teams.append(Team(*i,))
+        allOfficials = [()]
+        teams = []
         if visual_swap:
             teams = list(reversed(teams))
         key = fetch_user()
@@ -1514,6 +1573,8 @@ GROUP BY games.court""",
                     "tournament_specific/game_editor/game_start.html",
                     players=[i.tidy_name() for i in players],
                     teams=teams,
+                    teamOneNames=[i.nice_name() for i in game.teams[0].players],
+                    teamTwoNames=[i.nice_name() for i in game.teams[1].players],
                     game=game,
                     tournament=link(tournament),
                     swap=visual_str,
@@ -1536,7 +1597,7 @@ GROUP BY games.court""",
                     enum_teams=enumerate(teams),
                     game=game,
                     timeout_time=30000
-                    + max(i.time_out_time for i in game.teams) * 1000,
+                                 + max(i.time_out_time for i in game.teams) * 1000,
                     timeout_first=1 - game.teams.index(timeout_team),
                     tournament=link(tournament),
                 ),
@@ -1593,7 +1654,7 @@ GROUP BY games.court""",
                 400,
             )
         elif any(
-            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         ):
             return (
                 render_template(
@@ -1638,7 +1699,7 @@ GROUP BY games.court""",
                 400,
             )
         elif any(
-            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         ):
             return (
                 render_template(
@@ -1664,7 +1725,7 @@ GROUP BY games.court""",
                 400,
             )
         elif any(
-            [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
+                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
         ):
             return (
                 render_template(
@@ -1700,7 +1761,7 @@ GROUP BY games.court""",
         players = comps[tournament].players
         headers = []
         for k, v in get_player_stats(
-            players[0].tournament, players[0], detail=3
+                players[0].tournament, players[0], detail=3
         ).items():
             if isinstance(v, dict):
                 headers += [f"{k} {i}" for i in v]

@@ -22,14 +22,14 @@ let lxor = (a, b) => a ? !b : b
 
 let timeoutTime = -1
 
-function score(firstTeam, firstPlayer) {
+function score(firstTeam, leftPlayer) {
     fetch("/api/games/update/score", {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
             tournament: tournament.replace("/", ""),
-            firstPlayer: firstPlayer,
-            ace: false
+            leftPlayer: leftPlayer,
+            ace: falseq
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -275,7 +275,6 @@ function fault() {
     fetch("/api/games/update/fault", {
         method: "POST", body: JSON.stringify({
             id: id,
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
