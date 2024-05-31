@@ -1913,28 +1913,6 @@
                     "score": 4
                 }
             }
-        ],
-        [
-            {
-                "court": 0,
-                "firstTeamServed": false,
-                "game": "",
-                "id": -1,
-                "official": "Jared Healy",
-                "scorer": "No one",
-                "startTime": -1,
-                "started": false,
-                "teamOne": {
-                    "name": "AC Lads",
-                    "players": [],
-                    "score": 0
-                },
-                "teamTwo": {
-                    "name": "The Baes",
-                    "players": [],
-                    "score": 0
-                }
-            }
         ]
     ],
     "notes": ""

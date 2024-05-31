@@ -272,6 +272,8 @@ def end_game(game_id, bestPlayer, notes):
             if not allowed:
                 raise ValueError("Best Player was not provided")
         best = c.execute("""SELECT id FROM people WHERE searchableName = ?""", (bestPlayer,)).fetchone()
+        if best:
+            best = best[0]
         _add_to_game(game_id, c, 'o', None, None, notes=notes, details=best, add_to_string=False)
 
 def create_game(tournamentId, teamOne, teamTwo, official):

@@ -56,6 +56,7 @@ def load_from_string(self, game_string: str, s):
             penalty_team = self.team_serving
             penalty_count = 1 - self.team_serving.faulted
         elif c == "t":
+            first = None
             team.timeout()
             team.end_timeout()
         elif c == "x":
@@ -79,8 +80,11 @@ def load_from_string(self, game_string: str, s):
             penalty_count = self.teams[j[1].isupper()].score - other_score
 
         team_id = s.execute("""SELECT id FROM teams WHERE searchableName = ?""", (team.nice_name(),)).fetchone()[0]
-        player_id = s.execute("""SELECT id FROM people WHERE searchableName = ?""",
-                              (team.players[not first].nice_name(),)).fetchone()[0]
+        if first is None:
+            player_id = None
+        else:
+            player_id = s.execute("""SELECT id FROM people WHERE searchableName = ?""",
+                                  (team.players[not first].nice_name(),)).fetchone()[0]
 
         event_type = game_string_lookup(c)
         if not event_type: continue
