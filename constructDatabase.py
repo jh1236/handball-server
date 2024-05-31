@@ -62,11 +62,11 @@ def process_game(tournamentId, game, round, isRanked):
 
     s.execute(
         """INSERT INTO gamesTable (
-            tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, gameStringVersion,  gameString, started, startTime, length, court, protested, resolved, isFinal, round, notes, winningTeam, isBye, status, adminStatus
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, gameStringVersion,  gameString, started, startTime, length, court, protested, resolved, isFinal, round, notes, isBye, status, adminStatus
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, 1, gameString, started, startTime,
          length, court, protested, resolved,
-         isFinal, round, notes, winning_team, isBye, status, adminStatus)
+         isFinal, round, notes, isBye, status, adminStatus)
     )
 
     if not (game.bye or game.is_final):
@@ -112,10 +112,9 @@ def process_game(tournamentId, game, round, isRanked):
             sideOfCourt = ["Left", "Right", "Substitute"][player.team.players.index(player)]
             s.execute(
                 """INSERT INTO playerGameStatsTable (
-                    gameId,   playerId, teamId, opponentId, tournamentId, cardTime, cardTimeRemaining, roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal
-                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
-                (game_id, playerId, teamId, opponentId, tournamentId,
-                 cardTime, cardTimeRemaining, roundPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal)
+                    gameId,   playerId, teamId, opponentId, tournamentId,roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal
+                    ) VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                (game_id, playerId, teamId, opponentId, tournamentId, roundPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal)
             )
 
             if isRanked and (not isFinal) and player.elo_delta:

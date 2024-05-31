@@ -9,9 +9,14 @@ from utils.logging_handler import logger
 def add_game_endpoints(app, comps):
     @app.get("/api/games/change_code")
     def change_code():
-        tournament = request.args.get("tournament", type=str)
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+            }
+        """
         game_id = int(request.args["id"])
-        return jsonify({"code": comps[tournament].get_game(game_id).update_count})
+        return jsonify({"code": manageGame.change_code(game_id)})
 
     @app.post("/api/games/update/start")
     def start():
@@ -28,7 +33,8 @@ def add_game_endpoints(app, comps):
             }
         """
         game_id = int(request.args["id"])
-        manageGame.start_game(game_id, request.json["swapService"], request.json["teamOne"], request.json["teamTwo"], request.json["teamOneIGA"],
+        manageGame.start_game(game_id, request.json["swapService"], request.json["teamOne"], request.json["teamTwo"],
+                              request.json["teamOneIGA"],
                               request.json.get("official", None), request.json.get("scorer", None))
         return "", 204
 
@@ -83,15 +89,18 @@ def add_game_endpoints(app, comps):
 
     @app.post("/api/games/update/end")
     def end():
-        tournament = request.json["tournament"]
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+                bestPlayer: <str> = the name of the best on ground
+                notes: <str> (OPTIONAL) = any notes the umpire wishes to leave
+            }
+        """
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
-        comps[tournament].get_game(game_id).end(
-            request.json["bestPlayer"],
-            request.json.get("cards", None),
-            request.json.get("notes", None),
-        )
-        comps[tournament].save()
+        best = request.json.get("bestPlayer", None)
+        manageGame.end_game(game_id,  best, request.json.get("notes", None))
         return "", 204
 
     @app.post("/api/games/update/protest")
@@ -107,31 +116,45 @@ def add_game_endpoints(app, comps):
 
     @app.post("/api/games/update/timeout")
     def timeout():
-        tournament = request.json["tournament"]
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+                firstTeam: <bool> = if the team listed first called the timeout
+            }
+        """
         logger.info(f"Request for timeout: {request.json}")
         first_team = request.json["firstTeam"]
         game_id = request.json["id"]
-        comps[tournament].get_game(game_id).teams[not first_team].timeout()
-        comps[tournament].save()
+        manageGame.time_out(game_id, first_team)
         return "", 204
 
     @app.post("/api/games/update/forfeit")
     def forfeit():
-        tournament = request.json["tournament"]
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+                firstTeam: <bool> = if the team listed first forfeited
+            }
+        """
         logger.info(f"Request for forfeit: {request.json}")
         first_team = request.json["firstTeam"]
         game_id = request.json["id"]
-        comps[tournament].get_game(game_id).teams[not first_team].forfeit()
-        comps[tournament].save()
+        manageGame.forfeit(game_id, first_team)
         return "", 204
 
     @app.post("/api/games/update/endTimeout")
     def end_timeout():
-        tournament = request.json["tournament"]
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+            }
+        """
         logger.info(f"Request for endTimeout: {request.json}")
         game_id = request.json["id"]
-        [i.end_timeout() for i in comps[tournament].get_game(game_id).teams]
-        comps[tournament].save()
+        manageGame.end_timeout(game_id)
         return "", 204
 
     @app.post("/api/games/update/serve_clock")
@@ -162,11 +185,15 @@ def add_game_endpoints(app, comps):
 
     @app.post("/api/games/update/undo")
     def undo():
-        tournament = request.json["tournament"]
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+            }
+        """
         logger.info(f"Request for undo: {request.json}")
         game_id = request.json["id"]
-        comps[tournament].get_game(game_id).undo()
-        comps[tournament].save()
+        manageGame.undo(game_id)
         return "", 204
 
     @app.post("/api/games/update/swapServe")
@@ -199,28 +226,24 @@ def add_game_endpoints(app, comps):
 
     @app.post("/api/games/update/card")
     def card():
-        tournament = request.json["tournament"]
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+                firstTeam: <bool> = if the team listed first received the card
+                leftPlayer: <bool> = if the player listed as left received the card
+                color: <str> = the type of card ("Red", "Yellow", "Green", "Warning")
+                duration: <int> = the amount of rounds the card carries
+                reason: <str> = the reason for the card
+            }
+        """
         logger.info(f"Request for card: {request.json}")
         color = request.json["color"]
         first_team = request.json["firstTeam"]
-        first_player = request.json["firstPlayer"]
+        left_player = request.json["leftPlayer"]
         game_id = request.json["id"]
-        time = request.json["time"]
-        if time < 3:
-            time += 10
-        if color == "green":
-            comps[tournament].get_game(game_id, ).teams[
-                not first_team
-            ].green_card(first_player)
-        elif color == "yellow":
-            comps[tournament].get_game(game_id).teams[not first_team].yellow_card(
-                first_player, time
-            )
-        elif color == "red":
-            comps[tournament].get_game(game_id).teams[not first_team].red_card(
-                first_player
-            )
+        duration = request.json["duration"]
+        reason = request.json["reason"]
 
-        comps[tournament].get_game(game_id).print_gamestate()
-        comps[tournament].save()
+        manageGame.card(game_id, first_team, left_player, color, duration, reason)
         return "", 204

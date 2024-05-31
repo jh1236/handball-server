@@ -65,7 +65,6 @@ create_games_table = """CREATE TABLE IF NOT EXISTS gamesTable (
     tournamentId INTEGER,
     servingTeam INTEGER,
     receivingTeam INTEGER,
-    winningTeam INTEGER,
     bestPlayer INTEGER,
     official INTEGER,
     scorer INTEGER,
@@ -89,7 +88,6 @@ create_games_table = """CREATE TABLE IF NOT EXISTS gamesTable (
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (servingTeam) REFERENCES teams (id),
     FOREIGN KEY (receivingTeam) REFERENCES teams (id),
-    FOREIGN KEY (winningTeam) REFERENCES teams (id),
     FOREIGN KEY (bestPlayer) REFERENCES people (id),
     FOREIGN KEY (official) REFERENCES officials (id),
     FOREIGN KEY (scorer) REFERENCES officials (id),
@@ -99,10 +97,20 @@ create_games_table = """CREATE TABLE IF NOT EXISTS gamesTable (
 create_live_games_view = """CREATE VIEW IF NOT EXISTS games AS
 SELECT
     gamesTable.*,
-    SUM(gE.teamId = gamesTable.servingTeam and (gE.eventType = 'Score' or gE.eventType = 'Ace')) as servingScore,
-    SUM(gE.teamId = gamesTable.receivingTeam) as receivingScore,
+    SUM(gE.teamId = gamesTable.servingTeam and gE.eventType = 'Score') as servingScore,
+    SUM(gE.teamId = gamesTable.receivingTeam and gE.eventType = 'Score') as receivingScore,
+    SUM(gE.teamId = gamesTable.servingTeam and gE.eventType = 'Timeout') as servingTimeouts,
+    SUM(gE.teamId = gamesTable.receivingTeam and gE.eventType = 'Timeout') as receivingTimeouts,
     lastGe.nextPlayerToServe as playerToServe,
-    lastGe.nextTeamToServe as teamToServe
+    lastGe.nextTeamToServe as teamToServe,
+    (ABS(SUM(gE.teamId = gamesTable.servingTeam and (gE.eventType = 'Score')) -
+            SUM(gE.teamId = gamesTable.receivingTeam and (gE.eventType = 'Score'))) >= 2 AND
+        max(SUM(gE.teamId = gamesTable.servingTeam and (gE.eventType = 'Score')),
+            SUM(gE.teamId = gamesTable.receivingTeam and (gE.eventType = 'Score'))) >= 11) or
+       SUM(gE.eventType = 'Forfeit') > 0 as finished,
+       IIf(SUM(gE.eventType = 'Forfeit') > 0, servingTeam + receivingTeam - SUM((gE.eventType = 'Forfeit') * gE.teamId),
+           iif(SUM(gE.teamId = gamesTable.servingTeam and (gE.eventType = 'Score')) >
+               SUM(gE.teamId = gamesTable.receivingTeam and (gE.eventType = 'Score')), servingTeam, receivingTeam)) as winningTeam
 from gamesTable
          LEFT JOIN gameEvents gE on gamesTable.id = gE.gameId
          LEFT JOIN gameEvents lastGe on lastGe.id = (SELECT MAX(id) from gameEvents where gameEvents.gameId = gamesTable.id)
@@ -136,8 +144,6 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStatsTa
     teamId INTEGER,
     opponentId INTEGER,
     tournamentId INTEGER,
-    cardTime INTEGER,
-    cardTimeRemaining INTEGER,
     roundsPlayed INTEGER,
     roundsBenched INTEGER,
     isBestPlayer INTEGER,
@@ -151,22 +157,25 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStatsTa
 );"""
 create_player_game_stats_view = """
 CREATE VIEW IF NOT EXISTS playerGameStats AS SELECT playerGameStatsTable.*,
-       SUM((ge.eventType = 'Ace' or ge.eventType = 'Score') * ge.playerId = playerGameStatsTable.playerId) as points,
-       SUM((ge.eventType = 'Ace') * ge.playerId = playerGameStatsTable.playerId)                           as aces,
-       SUM((ge.eventType = 'Fault') * ge.playerId = playerGameStatsTable.playerId)                         as faults,
+       SUM((ge.eventType = 'Score' or ge.eventType = 'Ace') and ge.playerId = playerGameStatsTable.playerId) as points,
+       SUM(ge.eventType = 'Ace' and ge.playerId = playerGameStatsTable.playerId)                           as aces,
+       SUM(ge.eventType = 'Fault' and ge.playerId = playerGameStatsTable.playerId)                         as faults,
        SUM(gE.gameId = playerGameStatsTable.gameId AND gE.nextPlayerToServe = playerGameStatsTable.playerId)    as servedPoints,
        SUM(gE.gameId = playerGameStatsTable.gameId
            AND gE.playerWhoServed = playerGameStatsTable.playerId
            AND playerGameStatsTable.teamId = gE.teamId
-           AND
-           (gE.eventType = 'Score' or gE.eventType = 'Ace'))                                          as servedPointsWon,
+           AND gE.eventType = 'Score')                                          as servedPointsWon,
        SUM(gE.gameId = playerGameStatsTable.gameId
            and gE.teamWhoServed <> playerGameStatsTable.teamId
            AND gE.sideServed = playerGameStatsTable.sideOfCourt)                                           as servesReceived,
        SUM(gE.gameId = playerGameStatsTable.gameId
            and gE.teamWhoServed <> playerGameStatsTable.teamId
            AND gE.sideServed = playerGameStatsTable.sideOfCourt
-           and gE.eventType <> 'Ace')                                                                 as servesReturned,
+           and gE.eventType == 'Score') - 
+       SUM(gE.gameId = playerGameStatsTable.gameId
+           and gE.teamWhoServed <> playerGameStatsTable.teamId
+           AND gE.sideServed = playerGameStatsTable.sideOfCourt
+           and gE.eventType == 'Ace')                                                                 as servesReturned,
        SUM(gE.gameId = playerGameStatsTable.gameId
            AND gE.playerWhoServed = playerGameStatsTable.playerId
            AND gE.eventType = 'Fault' AND gE.nextPlayerToServe <> playerGameStatsTable.playerId)           as doubleFaults,
@@ -178,7 +187,31 @@ CREATE VIEW IF NOT EXISTS playerGameStats AS SELECT playerGameStatsTable.*,
            AND gE.eventType = 'Yellow Card')                                                          as yellowCards,
        SUM(gE.gameId = playerGameStatsTable.gameId
            AND gE.playerId = playerGameStatsTable.playerId
-           AND gE.eventType = 'Red Card')                                                          as redCards
+           AND gE.eventType = 'Red Card')                                                          as redCards,
+           
+       IIF(
+               MIN(IIF(gE.eventType = 'Red Card' and gE.playerId = playerGameStatsTable.playerId, -1, 0)) = -1, -1,
+               max(
+                       IIF(gE.eventType LIKE '% Card' and gE.playerId = playerGameStatsTable.playerId,
+                           details - (SELECT COUNT(id)
+                                      FROM gameEvents
+                                      WHERE gameEvents.gameId = playerGameStatsTable.gameId
+                                        AND gameEvents.id > gE.id
+                                        AND gameEvents.eventType = 'Score'),
+                           0)
+               )
+       ) as cardTimeRemaining,
+       IIF(
+               MIN(IIF(gE.eventType = 'Red Card' and gE.playerId = playerGameStatsTable.playerId, -1, 0)) = -1, -1,
+               (SELECT details
+                FROM gameEvents
+                WHERE gameEvents.gameId = playerGameStatsTable.gameId
+                  AND gameEvents.playerId = playerGameStatsTable.playerId
+                  AND gameEvents.eventType LIKE '% Card'
+                ORDER BY id desc
+                LIMIT 1)
+       ) as cardTime
+
 FROM playerGameStatsTable
          LEFT JOIN gameEvents gE
                    on playerGameStatsTable.gameId = gE.gameId

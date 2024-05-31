@@ -22,6 +22,8 @@ def load_from_string(self, game_string: str, s):
         """INSERT INTO gameEvents (gameId, playerId, teamId, tournamentId, eventType, time, details, nextPlayerToServe, nextTeamToServe, sideServed, nextServeSide) VALUES (?,?,?,?, 'Start', -1, null, ?, ?, null, 'Left')""",
         (game_id, None, None, tournament, servingPlayer, servingTeam))
     for j in chunks_sized(game_string, 2):
+        penalty_count = 0
+        penalty_team = None
         oldServingTeam = \
         s.execute("SELECT id FROM teams WHERE searchableName = ?", (self.team_serving.nice_name(),)).fetchone()[0]
         oldServingPlayer = \
@@ -30,20 +32,29 @@ def load_from_string(self, game_string: str, s):
         team = self.teams[not j[1].isupper()]
         first = j[1].upper() == "L"
         c = j[0].lower()
+        other_score = self.teams[j[1].isupper()].score
         if c == "s":
             team.score_point(first)
         elif c == "a":
             team.score_point(None, True)
             first = self.server.nice_name() == team.players[0].nice_name()
+            penalty_team = self.team_serving
+            penalty_count = 1
         elif c == "g":
             team.green_card(first)
         elif c == "y":
             team.yellow_card(first)
+            penalty_team = self.teams[j[1].isupper()]
+            penalty_count = self.teams[j[1].isupper()].score - other_score
         elif c == "v":
             team.red_card(first)
+            penalty_team = self.teams[j[1].isupper()]
+            penalty_count = self.teams[j[1].isupper()].score - other_score
         elif c == "f":
             first = self.server.nice_name() == team.players[0].nice_name()
             team.fault()
+            penalty_team = self.team_serving
+            penalty_count = 1 - self.team_serving.faulted
         elif c == "t":
             team.timeout()
             team.end_timeout()
@@ -64,6 +75,8 @@ def load_from_string(self, game_string: str, s):
                 team.yellow_card(first, int(c) + 10)
             else:
                 team.yellow_card(first, int(c))
+            penalty_team = self.teams[j[1].isupper()]
+            penalty_count = self.teams[j[1].isupper()].score - other_score
 
         team_id = s.execute("""SELECT id FROM teams WHERE searchableName = ?""", (team.nice_name(),)).fetchone()[0]
         player_id = s.execute("""SELECT id FROM people WHERE searchableName = ?""",
@@ -73,6 +86,11 @@ def load_from_string(self, game_string: str, s):
         if not event_type: continue
         details = None
         notes = None
+        servingTeam = \
+            s.execute("SELECT id FROM teams WHERE searchableName = ?", (self.team_serving.nice_name(),)).fetchone()[0]
+        servingPlayer = \
+            s.execute("SELECT id FROM people WHERE searchableName = ?", (self.server.nice_name(),)).fetchone()[0]
+        serving_side = "Left" if self.team_serving.first_player_serves else "Right"
         if event_type.endswith(" Card"):
             if "null" in team.players[not first].nice_name(): continue
             notes = self.cards[card_count].reason
@@ -87,15 +105,25 @@ def load_from_string(self, game_string: str, s):
                 """SELECT playerId FROM playerGameStats WHERE gameId = ? and sideOfCourt = 'Substitute' and teamId = ?""",
                 (game_id, team_id)).fetchone()
             if details: details = details[0]
-        servingTeam = \
-        s.execute("SELECT id FROM teams WHERE searchableName = ?", (self.team_serving.nice_name(),)).fetchone()[0]
-        servingPlayer = \
-        s.execute("SELECT id FROM people WHERE searchableName = ?", (self.server.nice_name(),)).fetchone()[0]
-        serving_side = "Left" if self.team_serving.first_player_serves else "Right"
+
         if self.game_ended:
             servingTeam = servingPlayer = serving_side = None
         s.execute(
             """INSERT INTO gameEvents (gameId, playerId, teamId, tournamentId, eventType, time, details, nextPlayerToServe, nextTeamToServe, playerWhoServed, teamWhoServed, sideServed, nextServeSide, notes) VALUES (?,?,?,?,?, -1,?, ?, ?, ?, ?, ?, ?, ?)""",
             (game_id, player_id, team_id, tournament, event_type, details, servingPlayer, servingTeam, oldServingPlayer,
              oldServingTeam, side_served_from, serving_side, notes))
-    self.game_string = game_string
+        if penalty_count > 0:
+            team = s.execute("SELECT id FROM teams WHERE searchableName = ?", (penalty_team.nice_name(),)).fetchone()[0]
+            for i in range(penalty_count):
+                s.execute(
+                    """INSERT INTO gameEvents (gameId, teamId, tournamentId, eventType, time, nextPlayerToServe, nextTeamToServe, playerWhoServed, teamWhoServed, sideServed, nextServeSide, notes) VALUES (?,?,?,'Score', -1,?, ?, ?, ?, ?, ?, 'Penalty')""",
+                    (game_id, team, tournament, servingPlayer, servingTeam, oldServingPlayer,
+                     oldServingTeam, side_served_from, serving_side))
+    details = s.execute(
+        """SELECT id FROM people WHERE searchableName = ?""",
+        (self.best_player.nice_name(),)).fetchone()
+    if details:
+        details = details[0]
+    s.execute(
+        """INSERT INTO gameEvents (gameId,  tournamentId, eventType, time, details, notes) VALUES (?,?,'End Game', -1,?, ?)""",
+        (game_id,  tournament, details, self.notes))

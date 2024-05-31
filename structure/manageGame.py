@@ -16,6 +16,7 @@ def game_string_lookup(char: str):
         "t": "Timeout",
         "x": "Substitute",
         "e": "Forfeit",
+        "n": "End Timeout"
     }
     if char in d:
         return d[char]
@@ -90,7 +91,8 @@ def _get_serve_details(game_id, c):
         (game_id,)).fetchone())
 
 
-def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=None, details=None, notes=None, add_to_string = True):
+def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=None, details=None, notes=None,
+                 add_to_string=True):
     if left_player is not None:
         string = char + "L" if left_player else "R"
     else:
@@ -106,13 +108,11 @@ def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=N
         next_team_to_serve, next_player_to_serve, next_serve_side = team_who_served, player_who_served, serve_side
     else:
         next_player_to_serve, next_serve_side = _swap_server(game_id, next_team_to_serve, c)
-    c.execute("""INSERT INTO gameEvents (gameId, playerId, tournamentId, eventType, time) VALUES (?, ?, ?, ?, ?)""",
-              (game_id, player if left_player is not None else None, team, tournament, game_string_lookup(char),
-               time.time()))
 
     c.execute("""INSERT INTO gameEvents(gameId, teamId, playerId, tournamentId, eventType, time, details, notes, playerWhoServed, teamWhoServed, sideServed, nextPlayerToServe, nextTeamToServe, nextServeSide)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)""", (
-        game_id, team, player if left_player is not None else None, tournament, game_string_lookup(char), time.time(),
+        game_id, team if team is not None else None, player if left_player is not None else None, tournament,
+        game_string_lookup(char), time.time(),
         details, notes,
         player_who_served, team_who_served, serve_side,
         next_team_to_serve, next_player_to_serve, next_serve_side))
@@ -167,7 +167,7 @@ def start_game(game_id, swapService, teamOne, teamTwo, teamOneIGA, official=None
 
 def score_point(game_id, first_team, left_player):
     with DatabaseManager() as c:
-        _add_to_game(game_id, c, "s", first_team, left_player)
+        _add_to_game(game_id, c, "s", first_team, left_player, add_to_string=left_player is not None)
         _next_point(game_id, c)
 
 
@@ -178,12 +178,6 @@ def ace(game_id):
         left_player = bool(c.execute(
             """SELECT servingTeam = 'Left' FROM games INNER JOIN playerGameStats ON games.playerToServe = playerGameStats.id and games.id = playerGameStats.gameId WHERE games.id = ?""",
             (game_id,)).fetchone())
-        c.execute("""
-                UPDATE games SET servingTeam = servingTeam + (servingTeam == teamToServe), receivingTeam = receivingTeam + (receivingTeam == teamToServe) WHERE id = ?
-            """, (game_id,))
-        c.execute("""UPDATE playerGameStats SET points = points + 1, aces = aces + 1 WHERE gameId = ? and playerId = 
-                (SELECT playerToServe FROM games WHERE id = ?)""",
-                  (game_id, game_id))
         _add_to_game(game_id, c, "a", first_team, left_player)
         _next_point(game_id, c)
 
@@ -191,16 +185,10 @@ def ace(game_id):
 def fault(game_id):
     with DatabaseManager() as c:
         first_team = bool(
-            c.execute("""SELECT servingTeam = teamToServe FROM games WHERE games.id = ?""", (game_id,)).fetchone())
+            c.execute("""SELECT servingTeam = teamToServe FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0])
         left_player = bool(c.execute(
             """SELECT servingTeam = 'Left' FROM games INNER JOIN playerGameStats ON games.playerToServe = playerGameStats.id and games.id = playerGameStats.gameId WHERE games.id = ?""",
-            (game_id,)).fetchone())
-        c.execute("""
-                UPDATE games SET servingTeam = servingTeam + (servingTeam = teamToServe), receivingTeam = receivingTeam + (receivingTeam= teamToServe) WHERE id = ?
-            """, (game_id,))
-        c.execute("""UPDATE playerGameStats SET points = points + 1, aces = aces + 1 WHERE gameId = ? and playerId = 
-                (SELECT playerToServe FROM games WHERE id = ?)""",
-                  (game_id, game_id))
+            (game_id,)).fetchone()[0])
         prev_event = c.execute(
             """SELECT eventType FROM gameEvents WHERE gameId = ? ORDER BY id DESC LIMIT 1""").fetchone()
         if prev_event:
@@ -212,32 +200,76 @@ def fault(game_id):
 
 def card(game_id, first_team, left_player, color, duration, reason):
     with DatabaseManager() as c:
-        if first_team:
-            if color == "Red":
-                c.execute("""UPDATE playerGameStatsTable 
-                             SET cardTimeRemaining = -1, cardTime = -1
-                                 WHERE gameId = ? and sideOfCourt = ? and teamID = 
-                                     (SELECT servingTeam FROM games WHERE id = ?)""",
-                                           (duration, duration, game_id, SIDES[not left_player], game_id))
-            else:
-                c.execute("""UPDATE playerGameStatsTable 
-                             SET cardTimeRemaining = cardTimeRemaining + ?,
-                              cardTime = cardTimeRemaining + ? WHERE gameId = ? and sideOfCourt = ? and cardTime >= 0 and
-                               teamID = (SELECT servingTeam FROM games WHERE id = ?)""",
-                                       (duration, duration, game_id, SIDES[not left_player], game_id))
-            while not c.execute("""SELECT id from playerGameStats WHERE cardTimeRemaining = 0""").fetchone():
-                _add_to_game(game_id, c, 's', False, None, team_to_serve=False, notes="Penalty", )
-        else:
-            if color == "Red":
-                c.execute("""UPDATE playerGameStatsTable 
-                             SET cardTimeRemaining = -1, cardTime = -1
-                                 WHERE gameId = ? and sideOfCourt = ? and teamID = 
-                                     (SELECT receivingTeam FROM games WHERE id = ?)""",
-                          (duration, duration, game_id, SIDES[not left_player], game_id))
-            else:
-                c.execute("""UPDATE playerGameStatsTable 
-                             SET cardTimeRemaining = cardTimeRemaining + ?,
-                              cardTime = cardTimeRemaining + ? WHERE gameId = ? and sideOfCourt = ? and cardTime >= 0 and
-                               teamID = (SELECT receivingTeam FROM games WHERE id = ?)""",
-                          (duration, duration, game_id, SIDES[not left_player], game_id))
-        _add_to_game(game_id, color[0], "s", first_team, left_player, notes=reason, details=duration)
+        _add_to_game(game_id, c, color[0], first_team, left_player, notes=reason, details=duration)
+        while not c.execute(
+                """SELECT id FROM playerGameStats WHERE gameId = ? and teamId = ? and cardTimeRemaining <> 0""").fetchone() or \
+                c.execute("""SELECT finished FROM games WHERE id = ?""", (game_id,)).fetchone()[0]:
+            score_point(game_id, not first_team, None)
+
+
+def undo(game_id):
+    with DatabaseManager() as c:
+        while \
+                c.execute("""SELECT notes FROM gameEvents WHERE gameId = ? ORDER BY id DESC LIMIT 1""",
+                          (game_id,)).fetchone()[
+                    0] == "Penalty":
+            c.execute("""DELETE FROM gameEvents 
+                     WHERE 
+                       gameEvents.ID IN ( 
+                          SELECT t.ID 
+                          FROM 
+                             gameEvents t
+                          WHERE t.gameId = ? 
+                          ORDER BY 
+                             t.id DESC
+                          LIMIT 1
+                        )""", (game_id,))
+
+        c.execute("""DELETE FROM gameEvents 
+                     WHERE 
+                       gameEvents.ID IN ( 
+                          SELECT t.ID 
+                          FROM 
+                             gameEvents t
+                          WHERE t.gameId = ? 
+                          ORDER BY 
+                             t.id DESC
+                          LIMIT 1
+                        )""", (game_id,))
+
+
+def change_code(game_id):
+    with DatabaseManager() as c:
+        return (c.execute("""SELECT id 
+                          FROM 
+                             gameEvents
+                          WHERE gameId = ? 
+                          ORDER BY 
+                             id DESC
+                          LIMIT 1""", (game_id,)).fetchone() or (0))[0]
+
+
+def time_out(game_id, first_team):
+    with DatabaseManager() as c:
+        _add_to_game(game_id, c, 't', first_team, None)
+
+
+def forfeit(game_id, first_team):
+    with DatabaseManager() as c:
+        _add_to_game(game_id, c, 'e', first_team, None)
+
+
+def end_timeout(game_id):
+    with DatabaseManager() as c:
+        _add_to_game(game_id, c, 'n', None, None, add_to_string=False)
+
+
+def end_game(game_id, bestPlayer, notes):
+    with DatabaseManager() as c:
+        if bestPlayer is None:
+            allowed = c.execute("""SELECT SUM(eventType = 'Forfeit') > 0 FROM gameEvents WHERE gameId = ?""",(game_id,)).fetchone()[0]
+            allowed |= c.execute("""SELECT COUNT(DISTINCT playerID) < 2 FROM playerGameStats WHERE gameId = ? GROUP BY teamId""",(game_id,)).fetchone()[0]
+            if not allowed:
+                raise ValueError("Best Player was not provided")
+        best = c.execute("""SELECT id FROM people WHERE searchableName = ?""", (bestPlayer,)).fetchone()
+        _add_to_game(game_id, c, 'o', None, None, notes=notes, details=best, add_to_string=False)
