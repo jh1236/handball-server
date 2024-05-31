@@ -1385,11 +1385,11 @@ GROUP BY games.court""",
         with DatabaseManager() as c:
             values = c.execute(
                 """SELECT
-                                   SUM(punishments.color = 'Green'),
-                                   SUM(punishments.color = 'Yellow'),
-                                   SUM(punishments.color = 'Red'),
-                                   COUNT(punishments.id),
-                                   ROUND(CAST(COUNT(punishments.id) AS REAL) / COUNT(DISTINCT games.id), 2),
+                                   SUM(punishments.type = 'Green'),
+                                   SUM(punishments.type = 'Yellow'),
+                                   SUM(punishments.type = 'Red'),
+                                   COUNT(punishments.reason),
+                                   ROUND(CAST(COUNT(punishments.reason) AS REAL) / COUNT(DISTINCT games.id), 2),
                                    (SELECT SUM(faults)
                                     FROM games
                                              INNER JOIN playerGameStats on games.id = playerGameStats.gameId
@@ -1516,6 +1516,15 @@ FROM games
          INNER JOIN tournamentTeams
                     on teams.id = tournamentTeams.teamId and tournaments.id = tournamentTeams.tournamentId;
 """).fetchall()
+            players_query = c.execute("""SELECT teams.name, people.name, people.searchableName
+FROM games
+         INNER JOIN playerGameStats on games.id = playerGameStats.gameId
+         INNER JOIN people on people.id = playerGameStats.playerId
+         INNER JOIN teams on teams.id = playerGameStats.teamId
+""").fetchall()
+            officials_query = c.execute("""SELECT searchableName, name 
+FROM officials INNER JOIN people on officials.personId = people.id
+""").fetchall()
 
         @dataclass
         class Game:
@@ -1539,27 +1548,32 @@ FROM games
             searchableName: str
             score: str
             imageUrl: str
-            cards: list[str]
             players: list[Player]
+            cards: list[str]
 
-        teams = []
+        teams = {}
         game = Game(game_id, *game_query, True, False)
+        players = []
         for i in teams_query:
-            teams.append(Team(*i,))
-        allOfficials = [()]
-        teams = []
+            teams[i[0]] = (Team(*i, [], []))
+        for i in players_query:
+            player = Player(*i[1:])
+            teams[i[0]].players.append(player)
+            players.append(player)
+        allOfficials = officials_query
+        teams = list(teams.values())
         if visual_swap:
             teams = list(reversed(teams))
         key = fetch_user()
         is_admin = key in [i.key for i in get_all_officials() if i.admin]
-        players = [i for i in game.current_players]
         team_one_players = [((1 - i), v) for i, v in enumerate(teams[0].players[:2])]
         team_two_players = [((1 - i), v) for i, v in enumerate(teams[1].players[:2])]
 
         # TODO: Write a permissions decorator for scorers and primary officials
-        if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
-            return _no_permissions()
-        elif game.bye:
+        # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
+        #     return _no_permissions()
+        # el
+        if game.bye:
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -1571,14 +1585,15 @@ FROM games
             return (
                 render_template(
                     "tournament_specific/game_editor/game_start.html",
-                    players=[i.tidy_name() for i in players],
+                    players=[i.searchableName for i in players],
                     teams=teams,
-                    teamOneNames=[i.nice_name() for i in game.teams[0].players],
-                    teamTwoNames=[i.nice_name() for i in game.teams[1].players],
+                    allOfficials=allOfficials,
+                    teamOneNames=[i.searchableName for i in teams[0].players],
+                    teamTwoNames=[i.searchableName for i in teams[1].players],
                     game=game,
                     tournament=link(tournament),
                     swap=visual_str,
-                    admin=key in [i.key for i in get_all_officials() if i.admin],
+                    admin=True,  # key in [i.key for i in get_all_officials() if i.admin]
                 ),
                 200,
             )

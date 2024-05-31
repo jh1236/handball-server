@@ -132,58 +132,7 @@ def add_tourney_endpoints(app, comps):
     @app.post("/api/games/update/create")
     def create():
         print(request.json)
-        tournament = comps[request.json["tournament"]]
-        if not tournament.fixtures_class.manual_allowed():
-            return "Not Allowed", 403
-        if any([not (i.best_player or i.bye) for i in tournament.games_to_list()]):
-            return "Not Allowed", 403
-        if "playersOne" in request.json:
-            players = []
-            for i in request.json["playersOne"]:
-                players += [j for j in tournament.players if j.nice_name() == i]
 
-            team_one = Team.find_or_create(tournament, request.json["teamOne"], players)
-            if team_one not in tournament.teams:
-                tournament.add_team(team_one)
-        else:
-            team_one = [
-                i
-                for i in tournament.teams
-                if request.json["teamOne"] in [i.nice_name(), i.name]
-            ][0]
-        if "playersTwo" in request.json:
-            players = []
-            for i in request.json["playersTwo"]:
-                players += [j for j in tournament.players if j.nice_name() == i]
-            team_two = Team.find_or_create(tournament, request.json["teamTwo"], players)
-            if team_two not in tournament.teams:
-                tournament.add_team(team_two)
-        else:
-            team_two = [
-                i
-                for i in tournament.teams
-                if request.json["teamTwo"] in [i.nice_name(), i.name]
-            ][0]
-        official = [
-            i
-            for i in tournament.officials
-            if request.json["official"] in [i.nice_name(), i.name]
-        ][0]
-        g = Game(team_one, team_two, tournament)
-        g.court = 0
-        if official:
-            g.set_primary_official(official)
-        last_game = next(i for i in reversed(tournament.games_to_list()) if not i.bye)
-        if (
-            time.time()
-            - last_game.start_time
-            > 32400 and len([i for i in tournament.fixtures[-1] if not i.bye])
-        ):
-            print(tournament.fixtures)
-            tournament.update_games(True)
-        tournament.update_games()
-        tournament.fixtures[-1][-1] = g
-        tournament.save()
         return jsonify({"id": g.id})
 
     @app.post("/api/games/update/resolve")

@@ -36,24 +36,23 @@
             <p><b>Court:</b> <a class="hide"
                                 href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court + 1 }}</i></a>
             </p>
-            <p><b>Official:</b>{% if not game.bye %}
-                <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">{% endif %}
+            <p><b>Official:</b>
+                <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">
                 <i>{{ official }}</i>
-                {% if not game.bye %}</a> {% endif %}</p>
-            {% if game.scorer.nice_name() != 'none_one' %}
+               </a></p>
+            {% if game.scorerSearchableName != 'none_one' %}
                 <p><b>Scorer:</b>
-                    <a class="hide" href="/{{ tournament }}officials/{{ game.scorer.nice_name() }}"> <i>{{ game.scorer }}</i>
+                    <a class="hide" href="/{{ tournament }}officials/{{ game.scorerSearchableName }}"> <i>{{ game.scorer }}</i>
                     </a></p>
             {% endif %}
             <h1 id="serveClock" style="font-size: 50px; color:#000000">0.0</h1>
             <script>serveClock({{ serve_time }})</script>
         </th>
-        <th>
-            {% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
-                                    class="hide">{% endif %}<img
+        <th><a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+                                    class="hide"><img
                 src="{{ teams[1].image() }}"
                 class="team_logo"
-                style="display: inline;left:70%;vertical-align:middle;">{% if not game.bye %}</a>{% endif %}</th>
+                style="display: inline;left:70%;vertical-align:middle;"></a></th>
     </tr>
     <tr>
         <td style="font-size: 20px; color:#{{ '006600' if teams[0].timeouts > 0 else '660000' }}"><b>Timeout</b></td>

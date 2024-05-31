@@ -273,3 +273,43 @@ def end_game(game_id, bestPlayer, notes):
                 raise ValueError("Best Player was not provided")
         best = c.execute("""SELECT id FROM people WHERE searchableName = ?""", (bestPlayer,)).fetchone()
         _add_to_game(game_id, c, 'o', None, None, notes=notes, details=best, add_to_string=False)
+
+def create_game(tournamentId, teamOne, teamTwo, official):
+    with DatabaseManager() as c:
+        if isinstance(teamOne, list):
+            players = []
+            for i in teamOne:
+                players.append(c.execute("""SELECT id FROM people WHERE people.searchableName = ?""", (i,)).fetchone()[0])
+
+            team_one = None
+            while not team_one:
+                temp = c.execute("""SELECT id FROM teams WHERE captain = """)
+                if temp:
+                    team_one = temp[0]
+        else:
+            team_one = c.execute("""SELECT id FROM teams WHERE searchableName = ?""", (teamOne,)).fetchone()[0]
+
+
+        official = [
+            i
+            for i in tournament.officials
+            if request.json["official"] in [i.nice_name(), i.name]
+        ][0]
+
+
+
+        if official:
+            g.set_primary_official(official)
+
+
+        last_game = next(i for i in reversed(tournament.games_to_list()) if not i.bye)
+        if (
+                time.time()
+                - last_game.start_time
+                > 32400 and len([i for i in tournament.fixtures[-1] if not i.bye])
+        ):
+            print(tournament.fixtures)
+            tournament.update_games(True)
+        tournament.update_games()
+        tournament.fixtures[-1][-1] = g
+        tournament.save()
