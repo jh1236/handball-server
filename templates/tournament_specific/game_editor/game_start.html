@@ -11,15 +11,15 @@
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script>load("{{tournament}}")</script>
 
-<script src="{{ url_for('static', filename='js/startGame.js') }}" teamOne='{{ ','.join(teamOneNames) }}' teamTwo='{{ ','.join(teamTwoNames) }}'></script>
+<script src="{{ url_for('static', filename='js/startGame.js') }}" teamOne='{{ ','.join(teamOneNames) }}'
+        teamTwo='{{ ','.join(teamTwoNames) }}'></script>
 <script>
     setup({{game.id}}, {{ swap }})
     setTournament("{{tournament}}")
 </script>
-<h1>{{ teams[0].name }} vs {{ teams[1].name }} </h1>
-<h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
+<h1 class="big">{{ teams[0].name }} vs {{ teams[1].name }} </h1>
 <p><b>Match Official: </b><i>{{ game.official }}</i></p>
-{% if game.scorerSearchableName != 'none_one' %}
+{% if game.scorersearchable_name != 'none_one' %}
     <p><b>Match Scorer:</b> <i>{{ game.scorer }}</i></p>
 {% endif %}
 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
@@ -29,12 +29,12 @@
 <table class="jaredTable">
     <tr>
         <th><img
-                src="{{ teams[0].image() }}"
+                src="{{ teams[0].image_url }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></th>
         <th class="invisible">spacer..</th>
         <th><img
-                src="{{ teams[1].image() }}"
+                src="{{ teams[1].image_url }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></th>
     </tr>
@@ -45,10 +45,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" id="teamOneLeft" class="button dropbtn">Left
-                    Player: {{ teams[0].players[0].tidy_name() }}</button>
+                    Player: {{ teams[0].players[0].name }}</button>
                 <div class="dropdown-content">
                     {% for i in teams[0].players %}
-                    <p onclick="setTeamOneLeftPlayer('{{ i.nice_name() }}', '{{ i.tidy_name() }}')">{{ i.tidy_name() }}</p>
+                        <p onclick="setTeamOneLeftPlayer('{{ i.searchable_name }}', '{{ i.name }}')">{{ i.name }}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -66,52 +66,59 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" id="teamTwoLeft" class="button dropbtn">Left
-                    Player: {{ teams[1].players[0].tidy_name() }}</button>
+                    Player: {{ teams[1].players[0].name }}</button>
                 <div class="dropdown-content">
                     {% for i in teams[1].players %}
-                        <p onclick="setTeamTwoLeftPlayer('{{ i.nice_name() }}', '{{ i.tidy_name() }}')">{{ i.tidy_name() }}</p>
+                        <p onclick="setTeamTwoLeftPlayer('{{ i.searchable_name }}', '{{ i.name }}')">{{ i.name }}</p>
                     {% endfor %}
                 </div>
             </div>
         </td>
     </tr>
-    {% if teams[0].players.__len__() > 2 or teams[1].players.__len__() > 2 %}
-        <tr>
-            <td>
-                {% if teams[0].players.__len__() > 2 %}
-                    <div class="dropdown">
-                        <button onclick="myFunction(this)" id="teamOneRight" class="button dropbtn">Right
-                            Player: {{ teams[0].players[1].tidy_name() }}</button>
-                        <div class="dropdown-content">
-                            {% for i in teams[0].players %}
-                                <p onclick="setTeamOneRightPlayer('{{ i.nice_name() }}', '{{ i.tidy_name() }}')">{{ i.tidy_name() }}</p>
-                            {% endfor %}
-                        </div>
+    <tr>
+        <td>
+            {% if teams[0].players.__len__() > 2 %}
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" id="teamOneRight" class="button dropbtn">Right
+                        Player: {{ teams[0].players[1].name }}</button>
+                    <div class="dropdown-content">
+                        {% for i in teams[0].players %}
+                            <p onclick="setTeamOneRightPlayer('{{ i.searchable_name }}', '{{ i.name }}')">{{ i.name }}</p>
+                        {% endfor %}
                     </div>
-                {% endif %}
-            </td>
-            <td></td>
-            <td>
-                {% if teams[1].players.__len__() > 2 %}
-                    <div class="dropdown">
-                        <button onclick="myFunction(this)" id="teamTwoRight" class="button dropbtn">Right
-                            Player: {{ teams[1].players[1].tidy_name() }}</button>
-                        <div class="dropdown-content">
-                            {% for i in teams[1].players %}
-                                <p onclick="setTeamTwoRightPlayer('{{ i.nice_name() }}', '{{ i.tidy_name() }}')">{{ i.tidy_name() }}</p>
-                            {% endfor %}
-                        </div>
+                </div>
+            {% endif %}
+        </td>
+        <td>
+            <div class="dropdown">
+                <button onclick="myFunction(this)" id="iga" class="button dropbtn">Team
+                    IGA Side: {{ teams[0].name }}</button>
+                <div class="dropdown-content">
+                    <p onclick="setTeamIGA(true, '{{ teams[0].name }}')">{{ teams[0].name }}</p>
+                    <p onclick="setTeamIGA(false, '{{ teams[1].name }}')">{{ teams[1].name }}</p>
+                </div>
+            </div>
+        </td>
+        <td>
+            {% if teams[1].players.__len__() > 2 %}
+                <div class="dropdown">
+                    <button onclick="myFunction(this)" id="teamTwoRight" class="button dropbtn">Right
+                        Player: {{ teams[1].players[1].name }}</button>
+                    <div class="dropdown-content">
+                        {% for i in teams[1].players %}
+                            <p onclick="setTeamTwoRightPlayer('{{ i.name }}', '{{ i.name }}')">{{ i.name }}</p>
+                        {% endfor %}
                     </div>
-                {% endif %}
-            </td>
-        </tr>
-    {% endif %}
+                </div>
+            {% endif %}
+        </td>
+    </tr>
     <tr>
         <td><br></td>
     </tr>
     {% if admin %}
         <tr>
-            {% if game.hasScorer %}
+            {% if game.has_scorer %}
                 <td colspan="3">
                     {% else %}
                 <td></td>
@@ -121,18 +128,18 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="umpire">
                     Official: {{ game.officials }}</button>
                 <div class="dropdown-content">
-                    {% for i in allOfficials %}
+                    {% for i in all_officials %}
                         <p onclick="setOfficial('{{ i[0] }}', '{{ i[1] }}')">{{ i[1] }}</p>
                     {% endfor %}
                 </div>
             </div>
-            {% if game.hasScorer %}
+            {% if game.has_scorer %}
                 <div class="dropdown">
                     <button onclick="myFunction(this)" class="button dropbtn" id="scorer">
                         Scorer: {{ game.scorer }}</button>
                     <div class="dropdown-content">
-                        {% for i in allOfficials %}
-                            <p onclick="setScorer('{{ i[0] }}', '{{ i[0] }}')">{{ i[0] }}</p>
+                        {% for i in all_officials %}
+                            <p onclick="setScorer('{{ i[0] }}', '{{ i[1] }}')">{{ i[1] }}</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -145,7 +152,7 @@
     {% endif %}
     <tr>
         <td style="vertical-align: top">
-            {% for i in teams[0].cards() %}
+            {% for i in teams[0].cards %}
                 <i>{{ i.player.first_name() }} has received a <a style="color: {{ i.hex }}">{{ i.color }}</a> card
                     for</i> <b>{{ i.reason }}</b>
                 <br>
@@ -156,7 +163,7 @@
             <button onclick="start()" class="button">Start</button>
         </td>
         <td style="vertical-align: top">
-            {% for i in teams[1].cards() %}
+            {% for i in teams[1].cards %}
                 <i>{{ i.player.first_name() }} has received a <a style="color: {{ i.hex }}">{{ i.color }}</a> card
                     for</i> <b>{{ i.reason }}</b>
                 <br>

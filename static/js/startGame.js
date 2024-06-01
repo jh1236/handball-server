@@ -28,6 +28,7 @@ setBest = (i, s) => {
 }
 
 let firstServes = true
+let firstIga = true
 
 let official = ""
 let setOfficial = (i, s) => {
@@ -43,7 +44,13 @@ let setScorer = (i, s) => {
 let teamOnePlayers = document.currentScript.getAttribute('teamOne').split(",")
 let teamTwoPlayers = document.currentScript.getAttribute('teamTwo').split(",")
 
-function setTeamOneLeftPlayer(i, s) {
+let playerLookup = {}
+for (let i of teamOnePlayers.concat(teamTwoPlayers)) {
+    playerLookup[i.split(":")[0]] = i.split(":")[1]
+}
+teamOnePlayers = teamOnePlayers.map(i => i.split(":")[0])
+teamTwoPlayers = teamTwoPlayers.map(i => i.split(":")[0])
+function setTeamOneLeftPlayer(i) {
     if (teamsSwapped) {
         for (const j in teamTwoPlayers) {
             console.log(`${j} === ${i}`)
@@ -52,9 +59,9 @@ function setTeamOneLeftPlayer(i, s) {
                 break
             }
         }
-        document.getElementById("teamOneLeft").textContent = "Left Player: " + teamTwoPlayers[0]
+        document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
         if (teamTwoPlayers.length > 2) {
-            document.getElementById("teamOneRight").textContent = "Right Player: " + teamTwoPlayers[1]
+            document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
         }
     } else {
         for (const j in teamOnePlayers) {
@@ -64,9 +71,9 @@ function setTeamOneLeftPlayer(i, s) {
                 break
             }
         }
-        document.getElementById("teamOneLeft").textContent = "Left Player: " + teamOnePlayers[0]
+        document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
         if (teamOnePlayers.length > 2) {
-            document.getElementById("teamOneRight").textContent = "Right Player: " + teamOnePlayers[1]
+            document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
         }
     }
     console.log(teamOnePlayers)
@@ -81,9 +88,9 @@ function setTeamTwoLeftPlayer(i, s) {
                 break
             }
         }
-        document.getElementById("teamTwoLeft").textContent = "Left Player: " + teamOnePlayers[0]
+        document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
         if (teamOnePlayers.length > 2) {
-            document.getElementById("teamTwoRight").textContent = "Right Player: " + teamOnePlayers[1]
+            document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
         }
     } else {
         for (const j in teamTwoPlayers) {
@@ -92,9 +99,9 @@ function setTeamTwoLeftPlayer(i, s) {
                 break
             }
         }
-        document.getElementById("teamTwoLeft").textContent = "Left Player: " + teamTwoPlayers[0]
+        document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
         if (teamTwoPlayers.length > 2) {
-            document.getElementById("teamTwoRight").textContent = "Right Player: " + teamTwoPlayers[1]
+            document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
         }
     }
     console.log(teamOnePlayers)
@@ -109,9 +116,9 @@ function setTeamOneRightPlayer(i, s) {
                 break
             }
         }
-        document.getElementById("teamOneLeft").textContent = "Left Player: " + teamTwoPlayers[0]
+        document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
         if (teamTwoPlayers.length > 2) {
-            document.getElementById("teamOneRight").textContent = "Right Player: " + teamTwoPlayers[1]
+            document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
         }
     } else {
         for (const j in teamOnePlayers) {
@@ -120,9 +127,9 @@ function setTeamOneRightPlayer(i, s) {
                 break
             }
         }
-        document.getElementById("teamOneLeft").textContent = "Left Player: " + teamOnePlayers[0]
+        document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
         if (teamOnePlayers.length > 2) {
-            document.getElementById("teamOneRight").textContent = "Right Player: " + teamOnePlayers[1]
+            document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
         }
     }
     console.log(teamOnePlayers)
@@ -138,9 +145,9 @@ function setTeamTwoRightPlayer(i, s) {
                 break
             }
         }
-        document.getElementById("teamTwoLeft").textContent = "Left Player: " + teamOnePlayers[0]
+        document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
         if (teamOnePlayers.length > 2) {
-            document.getElementById("teamTwoRight").textContent = "Right Player: " + teamOnePlayers[1]
+            document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
         }
     } else {
         for (const j in teamTwoPlayers) {
@@ -149,9 +156,9 @@ function setTeamTwoRightPlayer(i, s) {
                 break
             }
         }
-        document.getElementById("teamTwoLeft").textContent = "Left Player: " + teamTwoPlayers[0]
+        document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
         if (teamTwoPlayers.length > 2) {
-            document.getElementById("teamTwoRight").textContent = "Right Player: " + teamTwoPlayers[1]
+            document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
         }
     }
     console.log(teamOnePlayers)
@@ -163,13 +170,19 @@ function setTeamServing(i, s) {
     document.getElementById("team").textContent = "Team Serving: " + s
 }
 
+function setTeamIGA(i, s) {
+    firstIga = i
+    document.getElementById("iga").textContent = "IGA Side: " + s
+}
+
 function start() {
     if (official || scorer) {
         fetch("/api/games/update/start", {
             method: "POST",
             body: JSON.stringify({
                 id: id,
-                swapService: lxor(firstServes, teamsSwapped),
+                swapService: !lxor(firstServes, teamsSwapped),
+                teamOneIGA: firstIga,
                 teamOne: teamOnePlayers,
                 teamTwo: teamTwoPlayers,
                 official: official,
@@ -185,7 +198,8 @@ function start() {
         method: "POST",
         body: JSON.stringify({
             id: id,
-            swapService: lxor(firstServes, teamsSwapped),
+            swapService: !lxor(firstServes, teamsSwapped),
+            teamOneIGA: firstIga,
             teamOne: teamOnePlayers,
             teamTwo: teamTwoPlayers,
         }),

@@ -3,19 +3,19 @@
 -- Use the ▷ button in the top right corner to run the entire file.
 
 SELECT  -- get all unfinished games
-    serving.name, receiving.name, servingScore, receivingScore, games.id
+    serving.name, receiving.name, teamOneScore, teamTwoScore, games.id
     FROM games 
-    INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-    INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
+    INNER JOIN teams AS serving ON games.teamOne = serving.id
+    INNER JOIN teams as receiving ON games.teamTwo = receiving.id
     WHERE tournamentId = 8 
     AND games.bestPlayer = NULL;
 
 -- this will be a doozey, but we need to get the finals of a game if there are finals, but if there are not then
 SELECT 
-    serving.name, receiving.name, servingScore, receivingScore, games.id
+    serving.name, receiving.name, teamOneScore, teamTwoScore, games.id
     FROM games 
-    INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-    INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
+    INNER JOIN teams AS serving ON games.teamOne = serving.id
+    INNER JOIN teams as receiving ON games.teamTwo = receiving.id
     WHERE tournamentId = 8 AND
     CASE 
         WHEN (SELECT count(*) FROM games WHERE tournamentId = 8 AND isFinal = 1) > 0 THEN
@@ -34,10 +34,10 @@ SELECT
     
 
 SELECT 
-    serving.name, receiving.name, servingScore, receivingScore, games.id, round, umpire.name, scorer.name, court 
+    serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, round, umpire.name, scorer.name, court
     FROM games 
-    INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-    INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+    INNER JOIN teams AS serving ON games.teamOne = serving.id
+    INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
     LEFT JOIN officials AS u ON games.official = u.id
         LEFT JOIN people AS umpire ON u.personId = umpire.id
     LEFT JOIN officials AS s ON games.scorer = s.id
@@ -65,10 +65,10 @@ SELECT
     WHERE tournamentId = 8;
 
 SELECT 
-    t.name, sum(s.started), sum(s.servingScore - s.receivingScore)
+    t.name, sum(s.started), sum(s.teamOneScore - s.teamTwoScore)
     FROM 
         teams as t 
-        INNER JOIN games as s ON s.servingTeam = t.id OR s.receivingTeam = t.id
+        INNER JOIN games as s ON s.servingTeam = t.id OR s.teamTwo = t.id
     WHERE 
         s.tournamentId = 7 --OR 
         --r.tournamentId = 7
@@ -92,37 +92,37 @@ SELECT
     COUNT(games.id) as played,
     SUM(
         CASE 
-            WHEN games.servingTeam = teams.id 
-            THEN games.servingScore > games.receivingScore
-            ELSE games.receivingScore > games.servingScore 
+            WHEN games.teamOne = teams.id
+            THEN games.teamOneScore > games.teamTwoScore
+            ELSE games.teamTwoScore > games.teamOneScore
         END
     ) as wins,
     SUM(
         CASE 
-            WHEN games.servingTeam = teams.id 
-            THEN games.servingScore > games.receivingScore
-            ELSE games.receivingScore > games.servingScore 
+            WHEN games.teamOne = teams.id
+            THEN games.teamOneScore > games.teamTwoScore
+            ELSE games.teamTwoScore > games.teamOneScore
         END
     ) / CAST(COUNT(games.id) as REAL) as percentage,
     SUM(
         CASE 
-            WHEN games.servingTeam = teams.id 
-            THEN games.servingScore 
-            ELSE games.receivingScore 
+            WHEN games.teamOne = teams.id
+            THEN games.teamOneScore
+            ELSE games.teamTwoScore
         END
     ) AS total_points,
     SUM(
         CASE 
-            WHEN games.servingTeam = teams.id 
-            THEN games.servingScore < games.receivingScore
-            ELSE games.receivingScore < games.servingScore 
+            WHEN games.teamOne = teams.id
+            THEN games.teamOneScore < games.teamTwoScore
+            ELSE games.teamTwoScore < games.teamOneScore
         END
     ) as losses,
     SUM(
         p.faults
     ) as losses
 FROM teams
-INNER JOIN games ON games.servingTeam = teams.id OR games.receivingTeam = teams.id
+INNER JOIN games ON games.teamOne = teams.id OR games.teamTwo = teams.id
 INNER JOIN playerGameStats as p ON p.gameId = games.id
 WHERE 
     games.tournamentId = 7 AND

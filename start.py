@@ -12,5 +12,5 @@ comps = load_all_tournaments()
 init_api(app, comps)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)
+    app.run(host="0.0.0.0", port=80, debug=True, use_reloader=False)
     # 5000: arbitrary port but one with higher value, lower ones might be reserved

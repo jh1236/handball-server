@@ -8,7 +8,6 @@ from FixtureMakers.FixtureMaker import get_type_from_name
 from structure.AllTournament import (
     get_all_officials,
 )
-from structure.GameUtils import game_string_to_commentary
 from structure.Tournament import Tournament
 from structure.UniversalTournament import UniversalTournament
 from utils.databaseManager import DatabaseManager, get_tournament_id
@@ -16,12 +15,13 @@ from utils.permissions import (
     admin_only,
     fetch_user,
     officials_only,
-    _no_permissions,
     user_on_mobile,
 )  # Temporary till i make a function that can handle dynamic/game permissions
 from utils.sidebar_wrapper import render_template_sidebar
 from utils.statistics import get_player_stats
-from website.website import numbers, sign
+from website.website import numbers
+
+VERBAL_WARNINGS = True
 
 
 def priority_to_classname(p):
@@ -104,10 +104,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             games = c.execute(
                 """
                             SELECT 
-                                serving.name, receiving.name, servingScore, receivingScore, games.id 
+                                serving.name, receiving.name, teamOneScore, teamTwoScore, games.id 
                                 FROM games 
-                                INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-                                INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
+                                INNER JOIN teams AS serving ON games.teamOne = serving.id 
+                                INNER JOIN teams as receiving ON games.teamTwo = receiving.id 
                                 WHERE 
                                     tournamentId = ? AND 
                                     games.bestPlayer = NULL;
@@ -121,10 +121,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             games = c.execute(
                 """
                             SELECT 
-                                serving.name, receiving.name, servingScore, receivingScore, games.id
+                                serving.name, receiving.name, teamOneScore, teamTwoScore, games.id
                                 FROM games 
-                                INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-                                INNER JOIN teams as receiving ON games.receivingTeam = receiving.id 
+                                INNER JOIN teams AS serving ON games.teamOne = serving.id 
+                                INNER JOIN teams as receiving ON games.teamTwo = receiving.id 
                                 WHERE tournamentId = ? AND
                                 CASE -- if there is finals, return the finals, else return the last round
                                     WHEN (SELECT count(*) FROM games WHERE tournamentId = ? AND isFinal = 1) > 0 THEN
@@ -202,10 +202,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             games = c.execute(
                 """
                             SELECT 
-                                serving.name, receiving.name, servingScore, receivingScore, games.id, round
+                                serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, round
                                 FROM games 
-                                INNER JOIN teams serving ON games.servingTeam = serving.id
-                                INNER JOIN teams receiving ON games.receivingTeam = receiving.id
+                                INNER JOIN teams serving ON games.teamOne = serving.id
+                                INNER JOIN teams receiving ON games.teamTwo = receiving.id
                                 -- INNER JOIN people ON games.bestPlayer = people.id 
                                 WHERE 
                                     tournamentId = ? AND
@@ -222,10 +222,10 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
             games = c.execute(
                 """
                             SELECT 
-                                serving.name, receiving.name, servingScore, receivingScore, games.id, round
+                                serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, round
                                 FROM games 
-                                INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-                                INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+                                INNER JOIN teams AS serving ON games.teamOne = serving.id 
+                                INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
                                 -- INNER JOIN people ON games.bestPlayer = people.id 
                                 WHERE 
                                     tournamentId = ? AND
@@ -279,12 +279,12 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
             games = c.execute(
                 """SELECT 
-                        serving.name, receiving.name, servingScore, receivingScore, games.id, 
+                        serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, 
                         umpire.name, umpire.searchableName, scorer.name, scorer.searchableName, 
                         court, round
                         FROM games 
-                        INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-                        INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+                        INNER JOIN teams AS serving ON games.teamOne = serving.id 
+                        INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
                         LEFT JOIN officials AS u ON games.official = u.id
                             LEFT JOIN people AS umpire ON u.personId = umpire.id
                         LEFT JOIN officials AS s ON games.scorer = s.id
@@ -313,12 +313,12 @@ def add_tournament_specific(app, comps_in: dict[str, Tournament]):
 
             games = c.execute(
                 """SELECT 
-                        serving.name, receiving.name, servingScore, receivingScore, games.id, 
+                        serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, 
                         umpire.name, umpire.searchableName, scorer.name, scorer.searchableName, 
                         court, round
                         FROM games 
-                        INNER JOIN teams AS serving ON games.servingTeam = serving.id 
-                        INNER JOIN teams AS receiving ON games.receivingTeam = receiving.id
+                        INNER JOIN teams AS serving ON games.teamOne = serving.id 
+                        INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
                         LEFT JOIN officials AS u ON games.official = u.id
                             LEFT JOIN people AS umpire ON u.personId = umpire.id
                         LEFT JOIN officials AS s ON games.scorer = s.id
@@ -599,20 +599,20 @@ FROM teams
                 (tournament, team_name),
             ).fetchall()
             recent = c.execute(
-                """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
+                """ SELECT s.name, r.name, g1.teamOneScore, g1.teamTwoScore, g1.id, tournaments.searchableName
                     FROM games g1
                              INNER JOIN tournaments on g1.tournamentId = tournaments.id
-                             INNER JOIN teams r on g1.receivingTeam = r.id
-                             INNER JOIN teams s on g1.servingTeam = s.id
+                             INNER JOIN teams r on g1.teamTwo = r.id
+                             INNER JOIN teams s on g1.teamOne = s.id
                     WHERE (r.searchableName = ? or s.searchableName = ?) and tournaments.searchableName = ? and g1.started = 1
                     ORDER BY g1.id DESC 
                     LIMIT 20""", (team_name, team_name, tournament)).fetchall()
             upcoming = c.execute(
-                """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
+                """ SELECT s.name, r.name, g1.teamOneScore, g1.teamTwoScore, g1.id, tournaments.searchableName
                     FROM games g1
                              INNER JOIN tournaments on g1.tournamentId = tournaments.id
-                             INNER JOIN teams r on g1.receivingTeam = r.id
-                             INNER JOIN teams s on g1.servingTeam = s.id
+                             INNER JOIN teams r on g1.teamTwo = r.id
+                             INNER JOIN teams s on g1.teamOne = s.id
                     WHERE (r.searchableName = ? or s.searchableName = ?) and tournaments.searchableName = ? and g1.started = 0
                     ORDER BY g1.id DESC 
                     LIMIT 20""", (team_name, team_name, tournament)).fetchall()
@@ -713,9 +713,9 @@ FROM teams
                                        tournaments.searchableName,
                                        teams.name, --15
                                        teams.searchableName,
-                                       games.servingTeam = teams.id,
-                                       games.servingScore,
-                                       games.receivingScore,
+                                       games.teamOne = teams.id,
+                                       games.teamOneScore,
+                                       games.teamTwoScore,
                                        po.name, --20
                                        po.searchableName,
                                        ps.name,
@@ -737,8 +737,8 @@ FROM teams
                                        people.searchableName,
                                        games.status,
                                        games.gameString, --35
-                                       games.servingTimeouts,
-                                       games.receivingTimeouts
+                                       games.teamOneTimeouts,
+                                       games.teamTwoTimeouts
                 
                                 FROM games
                                          INNER JOIN playerGameStats on playerGameStats.gameId = games.id
@@ -748,24 +748,24 @@ FROM teams
                                          LEFT JOIN officials s on s.id = games.scorer
                                          LEFT JOIN people ps on ps.id = s.personId
                                          INNER JOIN people on people.id = playerGameStats.playerId
-                                         INNER JOIN people best on best.id = games.bestPlayer
+                                         LEFT JOIN people best on best.id = games.bestPlayer
                                          INNER JOIN teams on teams.id = playerGameStats.teamId
                                          INNER JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
                                 WHERE games.id = ?
                                 GROUP BY people.name
-                                order by teams.id = games.servingTeam, playerGameStats.sideOfCourt;""",
+                                order by teams.id = games.teamOne, playerGameStats.sideOfCourt;""",
                 (game_id,),
             ).fetchall()
             other_matches = c.execute(
-                """ SELECT s.name, r.name, g2.servingScore, g2.receivingScore, g2.id, tournaments.searchableName
+                """ SELECT s.name, r.name, g2.teamOneScore, g2.teamTwoScore, g2.id, tournaments.searchableName
                     FROM games g1
                              INNER JOIN games g2
-                                        ON ((g2.servingTeam = g1.servingTeam AND g2.receivingTeam = g1.receivingTeam)
-                                            OR (g2.servingTeam = g1.receivingTeam AND g2.receivingTeam = g1.servingTeam))
+                                        ON ((g2.teamOne = g1.teamOne AND g2.teamTwo = g1.teamTwo)
+                                            OR (g2.teamOne = g1.teamTwo AND g2.teamTwo = g1.teamOne))
                                             AND g1.id <> g2.id --funny != symbol lol
                              INNER JOIN tournaments on g2.tournamentId = tournaments.id
-                             INNER JOIN teams r on g2.receivingTeam = r.id
-                             INNER JOIN teams s on g2.servingTeam = s.id
+                             INNER JOIN teams r on g2.teamTwo = r.id
+                             INNER JOIN teams s on g2.teamOne = s.id
                     WHERE g1.id = ?
                     ORDER BY g2.id DESC 
                     LIMIT 20""",
@@ -1288,22 +1288,22 @@ GROUP BY games.court""",
                 (player_name, tournament), ).fetchall()
 
             recent = c.execute(
-                """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
+                """ SELECT s.name, r.name, g1.teamOneScore, g1.teamTwoScore, g1.id, tournaments.searchableName
                     FROM games g1
                              INNER JOIN tournaments on g1.tournamentId = tournaments.id
-                             INNER JOIN teams r on g1.receivingTeam = r.id
-                             INNER JOIN teams s on g1.servingTeam = s.id
+                             INNER JOIN teams r on g1.teamTwo = r.id
+                             INNER JOIN teams s on g1.teamOne = s.id
                              INNER JOIN playerGameStats on g1.id = playerGameStats.gameId
                              INNER JOIN people on playerGameStats.playerId = people.id
                     WHERE (people.searchableName = ?) and tournaments.searchableName = ? and g1.started = 1
                     ORDER BY g1.id DESC 
                     LIMIT 20""", (player_name, tournament)).fetchall()
             upcoming = c.execute(
-                """ SELECT s.name, r.name, g1.servingScore, g1.receivingScore, g1.id, tournaments.searchableName
+                """ SELECT s.name, r.name, g1.teamOneScore, g1.teamTwoScore, g1.id, tournaments.searchableName
                     FROM games g1
                              INNER JOIN tournaments on g1.tournamentId = tournaments.id
-                             INNER JOIN teams r on g1.receivingTeam = r.id
-                             INNER JOIN teams s on g1.servingTeam = s.id
+                             INNER JOIN teams r on g1.teamTwo = r.id
+                             INNER JOIN teams s on g1.teamOne = s.id
                              INNER JOIN playerGameStats on g1.id = playerGameStats.gameId
                              INNER JOIN people on playerGameStats.playerId = people.id
                     WHERE people.searchableName = ? and tournaments.searchableName = ? and g1.started = 0
@@ -1400,7 +1400,7 @@ GROUP BY games.court""",
                                          WHERE games.official = officials.id) AS REAL) / COUNT(DISTINCT games.id), 2),
                                    COUNT(DISTINCT games.id),
                                    COUNT((SELECT games.id FROM games WHERE games.scorer = officials.id)),
-                                   SUM((SELECT servingScore + receivingScore FROM games WHERE games.official = officials.id))
+                                   SUM((SELECT teamOneScore + teamTwoScore FROM games WHERE games.official = officials.id))
                             
                                     FROM officials
                                              INNER JOIN people on people.id = officials.personId
@@ -1417,13 +1417,13 @@ GROUP BY games.court""",
                 round,
                 st.name,
                 rt.name,
-                servingScore,
-                receivingScore
+                teamOneScore,
+                teamTwoScore
             FROM games
                      INNER JOIN officials o on games.official = o.id
                      INNER JOIN tournaments on games.tournamentId = tournaments.id
-                     LEFT JOIN teams st on st.id = games.servingTeam
-                     LEFT JOIN teams rt on rt.id = games.receivingTeam
+                     LEFT JOIN teams st on st.id = games.teamOne
+                     LEFT JOIN teams rt on rt.id = games.teamTwo
                      LEFT JOIN officials s on games.scorer = s.id
                      LEFT JOIN main.people po on po.id = o.personId
                      LEFT JOIN main.people ps on ps.id = s.personId
@@ -1488,79 +1488,143 @@ GROUP BY games.court""",
 
         with DatabaseManager() as c:
             game_query = c.execute("""
-            SELECT isBye, po.name, po.searchableName, ps.name, ps.searchableName
-            FROM games
-                     INNER JOIN officials o ON games.official = o.id
-                     INNER JOIN people po ON o.personId = po.id
-                     INNER JOIN officials s ON games.scorer = o.id
-                     INNER JOIN people ps ON s.personId = ps.id
-            WHERE games.id = ?
+SELECT games.tournamentId,
+       isBye,
+       po.name,
+       po.searchableName,
+       ps.name,
+       ps.searchableName,
+       started,
+       finished,
+       tournaments.imageURL,
+       gameEvents.eventType = 'Fault',
+       server.name,
+       lastGe.nextServeSide
+FROM games
+         INNER JOIN tournaments ON games.tournamentId = tournaments.id
+         INNER JOIN officials o ON games.official = o.id
+         INNER JOIN people po ON o.personId = po.id
+         LEFT JOIN officials s ON games.scorer = o.id
+         LEFT JOIN people ps ON s.personId = ps.id
+         LEFT JOIN gameEvents ON games.id = gameEvents.gameId AND gameEvents.id =
+                                                                  (SELECT MAX(id)
+                                                                   FROM gameEvents
+                                                                   WHERE games.id = gameEvents.gameId
+                                                                     AND (gameEvents.eventType = 'Fault' or gameEvents.eventType = 'Score'))
+         LEFT JOIN gameEvents lastGE ON games.id = lastGE.gameId AND lastGE.id =
+                                                                     (SELECT MAX(id)
+                                                                      FROM gameEvents
+                                                                      WHERE games.id = gameEvents.gameId)
+         LEFT JOIN people server on lastGE.nextPlayerToServe = server.id
+WHERE games.id = ?
             """, (game_id,)).fetchone()
 
-            teams_query = c.execute("""SELECT teams.name,
+            teams_query = c.execute("""SELECT teams.id, teams.name,
        teams.searchableName,
+       teams.id <> games.teamOne,
        Case
-           WHEN games.receivingTeam = teams.id THEN
-               games.receivingScore
+           WHEN games.teamTwo = teams.id THEN
+               games.teamTwoScore
            ELSE
-               games.servingScore END,
+               games.teamOneScore END,
        case
            when teams.imageURL is null
                then '/api/teams/image?name=blank'
            else
                teams.imageURL
-           end
+           end,
+        teams.id = games.teamToServe,
+        IIF(sum(playerGameStats.redCards) > 0, -1, max(playerGameStats.cardTimeRemaining)),
+        max(IIF(playerGameStats.cardTime is null, 0, playerGameStats.cardTime)),
+        max(playerGameStats.greenCards) > 0,
+        Case
+           WHEN games.teamTwo = teams.id THEN
+               games.teamTwoTimeouts
+           ELSE
+               games.teamOneTimeouts END
 FROM games
          INNER JOIN tournaments on games.tournamentId = tournaments.id
-         INNER JOIN teams on (games.receivingTeam = teams.id or games.servingTeam = teams.id)
-         INNER JOIN tournamentTeams
-                    on teams.id = tournamentTeams.teamId and tournaments.id = tournamentTeams.tournamentId;
-""").fetchall()
-            players_query = c.execute("""SELECT teams.name, people.name, people.searchableName
+         INNER JOIN teams on (games.teamTwo = teams.id or games.teamOne = teams.id)
+         INNER JOIN playerGameStats on playerGameStats.teamId = teams.id AND playerGameStats.gameId = games.id 
+                    WHERE games.id = ?
+                    GROUP BY teams.id
+ORDER BY teams.id <> games.teamOne
+""", (game_id,)).fetchall()
+            players_query = c.execute("""SELECT playerGameStats.teamId, people.name, people.searchableName, playerGameStats.cardTimeRemaining <> 0
 FROM games
          INNER JOIN playerGameStats on games.id = playerGameStats.gameId
          INNER JOIN people on people.id = playerGameStats.playerId
-         INNER JOIN teams on teams.id = playerGameStats.teamId
-""").fetchall()
+         WHERE gameId = ?
+""", (game_id,)).fetchall()
+            cards_query = c.execute("""SELECT people.name, playerGameStats.teamId, type, reason, hex 
+            FROM punishments 
+            INNER JOIN people on people.id = punishments.playerId
+            INNER JOIN playerGameStats on playerGameStats.playerId = punishments.playerId and playerGameStats.gameId = ?
+         WHERE playerGameStats.tournamentId = punishments.tournamentId
+""", (game_id,)).fetchall()
             officials_query = c.execute("""SELECT searchableName, name 
 FROM officials INNER JOIN people on officials.personId = people.id
 """).fetchall()
+
+        @dataclass
+        class Player:
+            name: str
+            searchable_name: str
+            is_carded: bool
+
+        @dataclass
+        class Card:
+            player: str
+            team: int
+            type: str
+            reason: str
+            hex: str
+
+        @dataclass
+        class Team:
+            name: str
+            searchable_name: str
+            sort: int
+            score: int
+            image_url: str
+            serving: bool
+            card_time_remaining: int
+            card_time: int
+            green_carded: bool
+            timeouts: int
+            players: list[Player]
+            cards: list[Card]
 
         @dataclass
         class Game:
             id: int
             bye: bool
             official: str
-            officialSearchableName: str
+            official_searchable_name: str
             scorer: str
-            scorerSearchableName: str
-            hasScorer: bool
+            scorer_searchable_name: str
+            started: bool
+            finished: bool
+            image: str
+            faulted: bool
+            server: str
+            serve_side: str
+            has_scorer: bool
             deletable: bool
 
-        @dataclass
-        class Player:
-            name: str
-            searchableName: str
-
-        @dataclass
-        class Team:
-            name: str
-            searchableName: str
-            score: str
-            imageUrl: str
-            players: list[Player]
-            cards: list[str]
-
         teams = {}
-        game = Game(game_id, *game_query, True, False)
+        cards = [Card(*i) for i in cards_query]
+        game = Game(game_id, *game_query[1:], True, False)
         players = []
         for i in teams_query:
-            teams[i[0]] = (Team(*i, [], []))
+            teams[i[0]] = (Team(*i[1:], [], []))
+            teams[i[0]].cards = [j for j in cards if j.team == i[0]]
         for i in players_query:
             player = Player(*i[1:])
             teams[i[0]].players.append(player)
             players.append(player)
-        allOfficials = officials_query
+        all_officials = officials_query
+        # teams = sorted(list(teams.values()), key=lambda a: a.sort)
         teams = list(teams.values())
         if visual_swap:
             teams = list(reversed(teams))
@@ -1585,11 +1649,11 @@ FROM officials INNER JOIN people on officials.personId = people.id
             return (
                 render_template(
                     "tournament_specific/game_editor/game_start.html",
-                    players=[i.searchableName for i in players],
+                    players=[i.searchable_name for i in players],
                     teams=teams,
-                    allOfficials=allOfficials,
-                    teamOneNames=[i.searchableName for i in teams[0].players],
-                    teamTwoNames=[i.searchableName for i in teams[1].players],
+                    all_officials=all_officials,
+                    teamOneNames=[f"{i.searchable_name}:{i.name}" for i in teams[0].players],
+                    teamTwoNames=[f"{i.searchable_name}:{i.name}" for i in teams[1].players],
                     game=game,
                     tournament=link(tournament),
                     swap=visual_str,
@@ -1597,24 +1661,26 @@ FROM officials INNER JOIN people on officials.personId = people.id
                 ),
                 200,
             )
-        elif not game.game_ended:
+        elif not game.finished:
             # for i in teams:
             #     i.end_timeout()
-            timeout_team = max(game.teams, key=lambda a: a.time_out_time)
             return (
                 render_template(
-                    f"tournament_specific/{'' if not is_admin else 'admin/'}game_editor/edit_game.html",
-                    players=[i.tidy_name() for i in players],
+                    f"tournament_specific/game_editor/edit_game.html",
+                    players=[i.searchable_name for i in players],
                     teamOnePlayers=team_one_players,
                     teamTwoPlayers=team_two_players,
+                    teamOneNames=[f"{i.searchable_name}:{i.name}" for i in teams[0].players],
+                    teamTwoNames=[f"{i.searchable_name}:{i.name}" for i in teams[1].players],
                     swap=visual_str,
                     teams=teams,
                     enum_teams=enumerate(teams),
                     game=game,
-                    timeout_time=30000
-                                 + max(i.time_out_time for i in game.teams) * 1000,
-                    timeout_first=1 - game.teams.index(timeout_team),
+                    timeout_time=0,
+                    timeout_first=0,
                     tournament=link(tournament),
+                    match_points=0 if max([i.score for i in teams]) < 10 else abs(teams[0].score - teams[1].score),
+                    VERBAL_WARNINGS = VERBAL_WARNINGS
                 ),
                 200,
             )

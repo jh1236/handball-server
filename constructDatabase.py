@@ -62,9 +62,9 @@ def process_game(tournamentId, game, round, isRanked):
 
     s.execute(
         """INSERT INTO gamesTable (
-            tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, gameStringVersion,  gameString, started, startTime, length, court, protested, resolved, isFinal, round, notes, isBye, status, adminStatus
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, 1, gameString, started, startTime,
+            tournamentId, teamOne, teamTwo, bestPlayer, official, scorer, gameStringVersion,  gameString, startTime, length, court, protested, resolved, isFinal, round, notes, isBye, status, adminStatus
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, gameString, started, startTime,
          length, court, protested, resolved,
          isFinal, round, notes, isBye, status, adminStatus)
     )
@@ -235,8 +235,8 @@ if __name__ == "__main__":
             # scorer INTEGER,
             # IGASide INTEGER,
             # gameStringVersion INTEGER,
-            # servingScore INTEGER,
-            # receivingScore INTEGER,
+            # teamOneScore INTEGER,
+            # teamTwoScore INTEGER,
             # gameString TEXT,
             # started INTEGER,
             # startTime INTEGER,

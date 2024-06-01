@@ -32,10 +32,17 @@ def add_game_endpoints(app, comps):
                 scorer: <str> (OPTIONAL) = the scorer who is actually scoring the game
             }
         """
-        game_id = int(request.args["id"])
-        manageGame.start_game(game_id, request.json["swapService"], request.json["teamOne"], request.json["teamTwo"],
-                              request.json["teamOneIGA"],
-                              request.json.get("official", None), request.json.get("scorer", None))
+        logger.info(f"Request for score: {request.json}")
+        game_id = int(request.json["id"])
+        swap_serve = request.json["swapService"]
+        team_one = request.json["teamOne"]
+        team_two = request.json["teamTwo"]
+        first_is_iga = request.json["teamOneIGA"]
+        umpire = request.json.get("official", None)
+        scorer = request.json.get("scorer", None)
+        manageGame.start_game(game_id, swap_serve, team_one, team_two,
+                              first_is_iga,
+                              umpire, scorer)
         return "", 204
 
     @app.post("/api/games/update/score")
@@ -49,8 +56,10 @@ def add_game_endpoints(app, comps):
             }
         """
         logger.info(f"Request for score: {request.json}")
-        game_id = int(request.args["id"])
-        manageGame.score_point(game_id, request.json["firstTeam"], request.json["leftPlayer"])
+        game_id = int(request.json["id"])
+        first_team = request.json["firstTeam"]
+        left_player = request.json["leftPlayer"]
+        manageGame.score_point(game_id, first_team, left_player)
         return "", 204
 
     @app.post("/api/games/update/ace")
@@ -242,7 +251,7 @@ def add_game_endpoints(app, comps):
         first_team = request.json["firstTeam"]
         left_player = request.json["leftPlayer"]
         game_id = request.json["id"]
-        duration = request.json["duration"]
+        duration = -1 if color == "Red" else request.json.get("duration", 3) if color == "Yellow" else 0
         reason = request.json["reason"]
 
         manageGame.card(game_id, first_team, left_player, color, duration, reason)

@@ -5,6 +5,7 @@ import time
 
 from flask import request, send_file, jsonify
 
+from structure import manageGame
 from structure.AllTournament import get_all_players
 from structure.Game import Game
 from structure.Team import Team
@@ -132,8 +133,8 @@ def add_tourney_endpoints(app, comps):
     @app.post("/api/games/update/create")
     def create():
         print(request.json)
-
-        return jsonify({"id": g.id})
+        gid = manageGame.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"], request.json["official"])
+        return jsonify({"id": gid})
 
     @app.post("/api/games/update/resolve")
     def resolve():

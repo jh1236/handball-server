@@ -116,6 +116,19 @@ img.logo2 {
     font-size: 16px;
 }
 
+.gray_button {
+    background-color: #999999; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    width: 220px;
+    min-height: 70px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
 .yellow_button {
     background-color: #FCCE6E;
     border: none;

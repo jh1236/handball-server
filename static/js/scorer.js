@@ -3,6 +3,35 @@ let tournament = ""
 let teamsSwapped = false
 let teamName = ""
 let startTime = -1
+
+const CARDS = {
+    Warning: {
+        "swearing": "Audible Swearing",
+        "dissent": "Disrespect Towards Officials",
+        "timeWasting": "Delay of Game",
+        "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
+        "allowedNonCaptain": "Allowed Non Captain to Speak To Umpire",
+    },
+    Yellow: {
+        "directedSwearing": "Swearing Towards Players or Officials",
+        "badDissent": "Continuous or Egregious Disrespect Towards Officials",
+        "badTimeWasting": "Deliberate Delay of Game",
+        "equipmentAbuse": "Equipment Abuse",
+        "danger": "Dangerous Play (James)",
+        "misconduct": "Misconduct Whilst Carded",
+        "aggression": "Displays of Aggression towards Officials or Players"
+    },
+    Red: {
+        "violence": "Violence Towards Any Player, Official Or Spectator",
+        "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+        "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+        "cheatingAccusation": "Accusations Of Cheating",
+        "discrimination": "Any Form of Discrimination"
+    },
+}
+
+CARDS.Green = CARDS.Warning
+
 let setup = (newId, newSwapped) => {
     id = newId
     teamsSwapped = newSwapped
@@ -17,6 +46,15 @@ function swap() {
     }
 }
 
+let teamOnePlayers = document.currentScript.getAttribute('teamOne').split(",")
+let teamTwoPlayers = document.currentScript.getAttribute('teamTwo').split(",")
+
+let playerLookup = {}
+for (let i of teamOnePlayers.concat(teamTwoPlayers)) {
+    playerLookup[i.split(":")[0]] = i.split(":")[1]
+}
+teamOnePlayers = teamOnePlayers.map(i => i.split(":")[0])
+teamTwoPlayers = teamTwoPlayers.map(i => i.split(":")[0])
 
 let lxor = (a, b) => a ? !b : b
 
@@ -27,9 +65,7 @@ function score(firstTeam, leftPlayer) {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            tournament: tournament.replace("/", ""),
-            leftPlayer: leftPlayer,
-            ace: falseq
+            leftPlayer: leftPlayer
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -53,7 +89,6 @@ function ace() {
     fetch("/api/games/update/ace", {
         method: "POST", body: JSON.stringify({
             id: id,
-            tournament: tournament.replace("/", "")
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -61,68 +96,72 @@ function ace() {
 }
 
 
-function card(firstTeam, firstPlayer, color) {
-    fetch("/api/games/update/card", {
-        method: "POST", body: JSON.stringify({
-            id: id,
-            tournament: tournament.replace("/", ""),
-            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            firstPlayer: firstPlayer,
-            color: color, time: 3
-        }), headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    }).then(() => location.reload());
-}
+let first = null
+let color = null
 
-
-let firstPlayerSelected = true
-let firstTeamSelected = true
-
-function selectTwo() {
-    firstPlayerSelected = false
-    document.getElementById("nameTwo").style = "color:green;"
-    document.getElementById("nameOne").style = "color:white;"
-}
-
-function selectOne() {
-    firstPlayerSelected = true
-    document.getElementById("nameTwo").style = "color:white;"
-    document.getElementById("nameOne").style = "color:green;"
-}
-
-
-let added = false
-
-function openCustomCard(firstTeam, playerOne, playerTwo) {
+function openCardModal(colorIn, firstTeam, teamName) {
+    first = firstTeam
+    color = colorIn
+    players = firstTeam ? teamOnePlayers : teamTwoPlayers
+    document.getElementById("myModal").style.display = "block";
+    document.getElementById("cardHeader").textContent = `${colorIn} Card for ${teamName}`;
     firstTeamSelected = firstTeam
-    document.getElementById("nameOne").textContent = playerOne
-    document.getElementById("nameTwo").textContent = playerTwo
-    document.getElementById("cardSelect").style.width = "100%";
-    document.getElementById("duration").value = "4"
-    document.getElementById("durationText").textContent = "Duration (4)"
-    window.scrollTo(0, 0);
-    window.onscroll = function () {
-        window.scrollTo(0, 0);
-    };
-    if (!added) {
-        added = true
-        console.warn("found!")
-        document.getElementById("duration").addEventListener("input", (event) => {
-            document.getElementById("durationText").textContent = `Duration (${event.target.value})`;
-        });
+    console.log(players)
+    document.getElementById("nameOne").textContent = playerLookup[players[0]]
+    document.getElementById("nameTwo").textContent = playerLookup[players[1]]
+    if (colorIn === "Yellow") {
+        document.getElementById("duration").style.display = "block"
+        document.getElementById("durationText").style.display = "block"
+        document.getElementById("duration").value = "3"
+        document.getElementById("durationText").textContent = "Duration (3)"
+    } else {
+        document.getElementById("duration").style.display = "none"
+        document.getElementById("durationText").style.display = "none"
     }
+    const reasons = document.getElementById("reason")
+    reasons.replaceChildren()
+    for (const k in CARDS[colorIn]) {
+        const v = CARDS[colorIn][k]
+        reasons.insertAdjacentHTML( 'beforeend',`<input type="radio" name="reason" id="${k}" value="${k}"><label for="${k}">${v}</label><br>`)
+    }
+    if (colorIn !== "Green" && colorIn !== "Warning") {
+        reasons.insertAdjacentHTML( 'beforeend',`<input type="radio" name="reason" id="repeated" value="repeated"><label for="repeat">Repeated :`)
+        let sel = "<select id='repeatedSelect'>"
+        for (const k in CARDS.Warning) {
+            const v = CARDS.Warning[k]
+            sel += `<option id="${k}" name="${k}">${v}</option>`
+        }
+        if (colorIn === "Red") {
+            for (const k in CARDS.Yellow) {
+                const v = CARDS.Yellow[k]
+                sel += `<option id="${k}" name="${k}">${v}</option>`
+            }
+        }
+        sel += "</select></label><br>"
+        reasons.insertAdjacentHTML( 'beforeend',sel)
+    }
+    reasons.insertAdjacentHTML( 'beforeend',`<input type="radio" name="reason" id="other" value="other"><input type="text" id="otherText"><br>`)
 }
 
 function sendCustomCard() {
+    const selectedReason = document.querySelector('input[name="reason"]:checked').value
+    let reason
+    console.log(selectedReason)
+    if (selectedReason === "other") {
+        reason = document.getElementById("otherText").value
+    } else if (selectedReason === "repeated") {
+        reason = "Repeated " + document.getElementById("repeatedSelect").value
+    } else {
+        reason = CARDS[color][selectedReason]
+    }
     fetch("/api/games/update/card", {
         method: "POST", body: JSON.stringify({
             id: id,
-            tournament: tournament.replace("/", ""),
-            firstTeam: lxor(firstTeamSelected, teamsSwapped),
-            firstPlayer: firstPlayerSelected,
-            color: "yellow",
-            time: +(document.getElementById("duration").value) % 10
+            firstTeam: lxor(first, teamsSwapped),
+            leftPlayer: document.getElementById('playerOne').checked,
+            color: color,
+            duration: +(document.getElementById("duration").value) % 10,
+            reason: reason
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -184,7 +223,6 @@ function startServeClock() {
         method: "POST", body: JSON.stringify({
             id: id,
             start: true,
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -196,11 +234,10 @@ function forfeit(firstTeam) {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then( () => document.location.reload());
+    }).then(() => document.location.reload());
 }
 
 function stopServeClock() {
@@ -211,7 +248,6 @@ function stopServeClock() {
         method: "POST", body: JSON.stringify({
             id: id,
             start: false,
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -343,4 +379,15 @@ window.onclick = function (event) {
             }
         }
     }
+    if (event.target.matches('.modal')) {
+        document.getElementById("myModal").style.display = "none";
+    }
+}
+window.onload = () => {
+    document.getElementsByClassName("close")[0].onclick = function () {
+        document.getElementById("myModal").style.display = "none";
+    };
+    document.getElementById("duration").addEventListener("input", (event) => {
+        document.getElementById("durationText").textContent = `Duration (${event.target.value})`;
+    });
 }

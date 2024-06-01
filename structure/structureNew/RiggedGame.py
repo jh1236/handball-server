@@ -24,6 +24,7 @@ def load_from_string(self, game_string: str, s):
     for j in chunks_sized(game_string, 2):
         penalty_count = 0
         penalty_team = None
+        penalty_player = None
         oldServingTeam = \
         s.execute("SELECT id FROM teams WHERE searchableName = ?", (self.team_serving.nice_name(),)).fetchone()[0]
         oldServingPlayer = \
@@ -40,6 +41,7 @@ def load_from_string(self, game_string: str, s):
             first = self.server.nice_name() == team.players[0].nice_name()
             penalty_team = self.team_serving
             penalty_count = 1
+            penalty_player = penalty_team.players[first]
         elif c == "g":
             team.green_card(first)
         elif c == "y":
@@ -63,6 +65,7 @@ def load_from_string(self, game_string: str, s):
             team.sub_player(first)
         elif c == "e":
             team.forfeit()
+            first = None
         elif c == "!":
             c2 = j[1].lower()
             if c2 == "h":
@@ -118,10 +121,12 @@ def load_from_string(self, game_string: str, s):
              oldServingTeam, side_served_from, serving_side, notes))
         if penalty_count > 0:
             team = s.execute("SELECT id FROM teams WHERE searchableName = ?", (penalty_team.nice_name(),)).fetchone()[0]
+            if penalty_player:
+                penalty_player = s.execute("SELECT id FROM people WHERE searchableName = ?", (penalty_player.nice_name(),)).fetchone()[0]
             for i in range(penalty_count):
                 s.execute(
-                    """INSERT INTO gameEvents (gameId, teamId, tournamentId, eventType, time, nextPlayerToServe, nextTeamToServe, playerWhoServed, teamWhoServed, sideServed, nextServeSide, notes) VALUES (?,?,?,'Score', -1,?, ?, ?, ?, ?, ?, 'Penalty')""",
-                    (game_id, team, tournament, servingPlayer, servingTeam, oldServingPlayer,
+                    """INSERT INTO gameEvents (gameId, teamId, playerId, tournamentId, eventType, time, nextPlayerToServe, nextTeamToServe, playerWhoServed, teamWhoServed, sideServed, nextServeSide, notes) VALUES (?,?,?,?,'Score', -1,?, ?, ?, ?, ?, ?, 'Penalty')""",
+                    (game_id, team, penalty_player, tournament, servingPlayer, servingTeam, oldServingPlayer,
                      oldServingTeam, side_served_from, serving_side))
     details = s.execute(
         """SELECT id FROM people WHERE searchableName = ?""",
