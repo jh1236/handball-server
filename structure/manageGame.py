@@ -331,4 +331,7 @@ def create_game(tournamentId, team_one, team_two, official):
 
 
 def protest(game_id, team_one_protest, team_two_protest):
-    return None
+    if team_one_protest:
+        _add_to_game(game_id, c, "End Game", None, None, notes=notes, details=best)
+    if team_two_protest:
+        _add_to_game(game_id, c, "End Game", None, None, notes=notes, details=best)
