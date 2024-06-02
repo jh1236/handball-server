@@ -1495,11 +1495,12 @@ SELECT games.tournamentId,
        ps.name,
        ps.searchableName,
        started,
-       finished,
+       someoneHasWon,
        tournaments.imageURL,
        gameEvents.eventType = 'Fault',
        server.name,
-       lastGe.nextServeSide
+       lastGe.nextServeSide,
+       ended
 FROM games
          INNER JOIN tournaments ON games.tournamentId = tournaments.id
          INNER JOIN officials o ON games.official = o.id
@@ -1550,7 +1551,17 @@ FROM games
                     GROUP BY teams.id
 ORDER BY teams.id <> games.teamOne
 """, (game_id,)).fetchall()
-            players_query = c.execute("""SELECT playerGameStats.teamId, people.name, people.searchableName, playerGameStats.cardTimeRemaining <> 0
+            players_query = c.execute("""SELECT 
+            playerGameStats.teamId, people.name, people.searchableName, playerGameStats.cardTimeRemaining <> 0,
+            playerGameStats.points,
+            playerGameStats.aces,
+            playerGameStats.faults,      
+            playerGameStats.doubleFaults,
+            playerGameStats.roundsPlayed,
+            playerGameStats.roundsBenched,
+            playerGameStats.greenCards,
+            playerGameStats.yellowCards, 
+            playerGameStats.redCards
 FROM games
          INNER JOIN playerGameStats on games.id = playerGameStats.gameId
          INNER JOIN people on people.id = playerGameStats.playerId
@@ -1565,12 +1576,14 @@ FROM games
             officials_query = c.execute("""SELECT searchableName, name 
 FROM officials INNER JOIN people on officials.personId = people.id
 """).fetchall()
+            print(players_query)
 
         @dataclass
         class Player:
             name: str
             searchable_name: str
             is_carded: bool
+            stats: dict[str, object]
 
         @dataclass
         class Card:
@@ -1604,11 +1617,12 @@ FROM officials INNER JOIN people on officials.personId = people.id
             scorer: str
             scorer_searchable_name: str
             started: bool
-            finished: bool
+            someone_has_won: bool
             image: str
             faulted: bool
             server: str
             serve_side: str
+            ended: bool
             has_scorer: bool
             deletable: bool
 
@@ -1616,11 +1630,22 @@ FROM officials INNER JOIN people on officials.personId = people.id
         cards = [Card(*i) for i in cards_query]
         game = Game(game_id, *game_query[1:], True, False)
         players = []
+        player_headers = [
+            "Points Scored",
+            "Aces",
+            "Faults",
+            "Double Faults",
+            "Rounds Played",
+            "Rounds Benched",
+            "Green Cards",
+            "Yellow Cards",
+            "Red Cards",
+        ]
         for i in teams_query:
             teams[i[0]] = (Team(*i[1:], [], []))
             teams[i[0]].cards = [j for j in cards if j.team == i[0]]
         for i in players_query:
-            player = Player(*i[1:])
+            player = Player(*i[1:4], {k: v for k, v in zip(player_headers, i[4:])})
             teams[i[0]].players.append(player)
             players.append(player)
         all_officials = officials_query
@@ -1661,7 +1686,7 @@ FROM officials INNER JOIN people on officials.personId = people.id
                 ),
                 200,
             )
-        elif not game.finished:
+        elif not game.someone_has_won:
             # for i in teams:
             #     i.end_timeout()
             return (
@@ -1680,26 +1705,25 @@ FROM officials INNER JOIN people on officials.personId = people.id
                     timeout_first=0,
                     tournament=link(tournament),
                     match_points=0 if max([i.score for i in teams]) < 10 else abs(teams[0].score - teams[1].score),
-                    VERBAL_WARNINGS = VERBAL_WARNINGS
+                    VERBAL_WARNINGS=VERBAL_WARNINGS
                 ),
                 200,
             )
-        elif game.protested is None:
-            team_dicts = [i.get_stats() for i in teams]
+        elif game.someone_has_won and not game.ended:
             return (
                 render_template(
                     "tournament_specific/game_editor/team_signatures.html",
-                    players=[i.tidy_name() for i in players],
+                    players=[i.name for i in players],
                     swap=visual_str,
                     teams=teams,
                     game=game,
-                    headers=[i for i in players[0].get_stats().keys()],
-                    stats=[(i, *[j[i] for j in team_dicts]) for i in team_dicts[0]],
+                    headers=player_headers,
+                    stats=None,
                     tournament=link(tournament),
                 ),
                 200,
             )
-        elif not game.best_player or key in [
+        elif not game.ended or key in [
             i.key for i in get_all_officials() if i.admin
         ]:
             return (

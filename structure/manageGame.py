@@ -328,3 +328,7 @@ def create_game(tournamentId, team_one, team_two, official):
                     """INSERT INTO playerGameStatsTable(gameId, playerId, teamId, opponentId, tournamentId, roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt) VALUES (?, ?, ?, ?, ?, 0, 0, 0, '')""",
                     (game_id, j[0], i, opp, tournamentId))
         return game_id
+
+
+def protest(game_id, team_one_protest, team_two_protest):
+    return None

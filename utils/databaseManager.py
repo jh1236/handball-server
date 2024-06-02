@@ -77,8 +77,6 @@ create_games_table = """CREATE TABLE IF NOT EXISTS gamesTable (
     startTime INTEGER,
     length INTEGER,
     court INTEGER,
-    protested INTEGER,
-    resolved INTEGER,
     isFinal INTEGER,
     round INTEGER,
     notes TEXT,
@@ -110,11 +108,14 @@ SELECT
             SUM(gE.teamId = gamesTable.teamTwo and (gE.eventType = 'Score'))) >= 2 AND
         max(SUM(gE.teamId = gamesTable.teamOne and (gE.eventType = 'Score')),
             SUM(gE.teamId = gamesTable.teamTwo and (gE.eventType = 'Score'))) >= 11) or
-       SUM(gE.eventType = 'Forfeit') > 0 as finished,
+       SUM(gE.eventType = 'Forfeit') > 0 as someoneHasWon,
        IIf(SUM(gE.eventType = 'Forfeit') > 0, gamesTable.teamOne + teamTwo - SUM((gE.eventType = 'Forfeit') * gE.teamId),
            iif(SUM(gE.teamId = gamesTable.teamOne and (gE.eventType = 'Score')) >
                SUM(gE.teamId = gamesTable.teamTwo and (gE.eventType = 'Score')), teamOne, teamTwo)) as winningTeam,
-    SUM(IIF(gE.eventType = 'Start', 1, 0)) > 0 as started
+    SUM(IIF(gE.eventType = 'Start', 1, 0)) > 0 as started,
+    SUM(IIF(gE.eventType = 'End Game', 1, 0)) > 0 as ended, --THIS NEEDS RENAMING (LACH)
+    SUM(IIF(gE.eventType = 'Protest', gE.details, 0)) > 0 as protested,
+    SUM(IIF(gE.eventType = 'Resolve', gE.details, 0)) > 0 as resolved
     
 from gamesTable
          LEFT JOIN gameEvents gE on gamesTable.id = gE.gameId

@@ -19,7 +19,8 @@ def process_game_string(game, servingTeam, receivingTeam):
 def process_game(tournamentId, game, round, isRanked):
     servingTeam = s.execute("SELECT id FROM teams WHERE name = ?", (game.teams[0].name,)).fetchone()[0]
     receivingTeam = s.execute("SELECT id FROM teams WHERE name = ?", (game.teams[1].name,)).fetchone()[0]
-
+    if servingTeam == receivingTeam:
+        return
     if not game.first_team_serves:
         servingTeam, receivingTeam = receivingTeam, servingTeam
 
@@ -62,10 +63,10 @@ def process_game(tournamentId, game, round, isRanked):
 
     s.execute(
         """INSERT INTO gamesTable (
-            tournamentId, teamOne, teamTwo, bestPlayer, official, scorer, gameStringVersion,  gameString, startTime, length, court, protested, resolved, isFinal, round, notes, isBye, status, adminStatus
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, gameString, started, startTime,
-         length, court, protested, resolved,
+            tournamentId, teamOne, teamTwo, bestPlayer, official, scorer, gameStringVersion,  gameString, startTime, length, court, isFinal, round, notes, isBye, status, adminStatus
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, 1, gameString, startTime,
+         length, court,
          isFinal, round, notes, isBye, status, adminStatus)
     )
 

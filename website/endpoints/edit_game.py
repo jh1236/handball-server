@@ -114,13 +114,9 @@ def add_game_endpoints(app, comps):
 
     @app.post("/api/games/update/protest")
     def protest():
-        tournament = request.json["tournament"]
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
-        comps[tournament].get_game(game_id).protest(
-            request.json["teamOne"], request.json["teamTwo"]
-        )
-        comps[tournament].save()
+        manageGame.protest()
         return "", 204
 
     @app.post("/api/games/update/timeout")
