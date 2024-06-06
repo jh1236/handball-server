@@ -133,7 +133,8 @@ def add_tourney_endpoints(app, comps):
     @app.post("/api/games/update/create")
     def create():
         print(request.json)
-        gid = manageGame.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"], request.json["official"])
+        gid = manageGame.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"],
+                                     request.json["official"], request.json.get("playersOne", None), request.json.get("playersTwo", None))
         return jsonify({"id": gid})
 
     @app.post("/api/games/update/resolve")

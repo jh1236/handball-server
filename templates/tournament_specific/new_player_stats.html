@@ -8,9 +8,9 @@
 {% block bodyBlock %}
 <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <a href="/{{ tournament }}teams/{{ player.team.nice_name() }}">
+    <a href="/{{tournamentLink}}teams/{{ player.team.nice_name() }}">
         <img src="/api/teams/image?name={{ player.team.nice_name() }}" class="team_logo"></a>
-    <h1><a href="/{{ tournament }}players/{{ player.nice_name() }}" class="hide">Statistics for {{ player.name }}</a>
+    <h1><a href="/{{tournamentLink}}players/{{ player.nice_name() }}" class="hide">Statistics for {{ player.name }}</a>
     </h1>
     <table class="jaredTable">
         <tbody>
@@ -40,7 +40,7 @@
 <div style="top:70px;left:66% ; position: absolute;width: 33%">
     <h2>Insights</h2>
     <label for="x-axis">X Axis</label>
-    <select name="x-axis" id="x-axis" onchange="reloadGraph('{{ tournament }}')">
+    <select name="x-axis" id="x-axis" onchange="reloadGraph('{{tournamentLink}}')">
         {% for i in insights %}
             <option value="{{ i }}">{{ i }}</option>
         {% endfor %}
@@ -48,7 +48,7 @@
     </select>
     <br>
     <label for="y-axis">Y Axis</label>
-    <select name="y-axis" id="y-axis" onchange="reloadGraph('{{ tournament }}')">
+    <select name="y-axis" id="y-axis" onchange="reloadGraph('{{tournamentLink}}')">
         {% for i in insights %}
             {% if i != 'Timeline' %}
                 <option value="{{ i }}">{{ i }}</option>
@@ -63,17 +63,17 @@
             src="/graphs/game_player?x=Points Scored&y=Aces&player={{ player.nice_name() }}&tournament={{ tournament.replace('/','') }}"
             width="400" height="300" title="Embedded Page"></iframe>
     <div style="min-height: 400px">
-        <h2><a class="hide" href="/{{ tournament }}fixtures/detailed?player={{ player.nice_name() }}">Recent Matches</a>
+        <h2><a class="hide" href="/{{tournamentLink}}fixtures/detailed?player={{ player.nice_name() }}">Recent Matches</a>
         </h2>
         {% for line in recent_games %}
-            <p style="color: black;"><a class="hide" href="/{{ line[2] }}/games/{{ line[1] }}">{{ line[0] }}</a></p>
+            <p style="color: black;"><a class="hide" href="/games/{{ line[1] }}">{{ line[0] }}</a></p>
         {% endfor %}
     </div>
     <div>
-        <h2><a class="hide" href="/{{ tournament }}fixtures/detailed?player={{ player.nice_name() }}">Upcoming
+        <h2><a class="hide" href="/{{tournamentLink}}fixtures/detailed?player={{ player.nice_name() }}">Upcoming
             Matches</a></h2>
         {% for line in upcoming_games %}
-            <p style="color: black;"><a class="hide" href="/{{ line[2] }}/games/{{ line[1] }}">{{ line[0] }}</a></p>
+            <p style="color: black;"><a class="hide" href="/games/{{ line[1] }}">{{ line[0] }}</a></p>
         {% endfor %}
     </div>
 </div>

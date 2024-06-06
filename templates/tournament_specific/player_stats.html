@@ -7,9 +7,9 @@
 
 {% block bodyBlock %}
 <div style="top:0;left:0;bottom: 100%;width: 66%">
-    <a href="/{{tournament}}teams/{{team}}">
+    <a href="/{{tournamentLink}}teams/{{team}}">
         <img src="/api/teams/image?name={{team}}" class="team_logo"></a>
-    <h1><a href="/{{tournament}}players/{{player}}" class="hide">Statistics for {{name}}</a></h1>
+    <h1><a href="/{{tournamentLink}}players/{{player}}" class="hide">Statistics for {{name}}</a></h1>
     <table class="jaredTable">
         <tbody>
         {% for k, v in stats.items() %}
@@ -35,15 +35,15 @@
 </div>
 <div style="top:70px;left:66% ; position: absolute;width: 33%">
     <div style="min-height: 400px">
-        <h2><a class = "hide" href="/{{tournament}}fixtures/detailed?player={{ player }}">Recent Matches</a></h2>
+        <h2><a class = "hide" href="/{{tournamentLink}}fixtures/detailed?player={{ player }}">Recent Matches</a></h2>
         {% for line in recent_games %}
-            <p style="color: black;"><a class = "hide" href="/{{line[2]}}/games/{{line[1]}}">{{line[0]}}</a></p>
+            <p style="color: black;"><a class = "hide" href="/games/{{line[1]}}">{{line[0]}}</a></p>
         {% endfor %}
     </div>
     <div>
-        <h2><a class = "hide" href="/{{tournament}}fixtures/detailed?player={{ player }}">Upcoming Matches</a></h2>
+        <h2><a class = "hide" href="/{{tournamentLink}}fixtures/detailed?player={{ player }}">Upcoming Matches</a></h2>
         {% for line in upcoming_games %}
-            <p style="color: black;"><a class = "hide" href="/{{line[2]}}/games/{{line[1]}}">{{line[0]}}</a></p>
+            <p style="color: black;"><a class = "hide" href="/games/{{line[1]}}">{{line[0]}}</a></p>
         {% endfor %}
     </div>
 </div>

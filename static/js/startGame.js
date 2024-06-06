@@ -21,11 +21,7 @@ function swap() {
     }
 }
 
-let best = ""
-setBest = (i, s) => {
-    best = i
-    document.getElementById("rename").textContent = "Fairest And Best: " + s
-}
+
 
 let firstServes = true
 let firstIga = true
@@ -209,55 +205,9 @@ function start() {
     }).then(() => location.reload());
 }
 
-function finish(cards_len) {
-    let cards = []
-    for (let i = 1; i <= cards_len; i++) {
-        cards.push(document.getElementById(`card${i}`).value)
-    }
-    fetch("/api/games/update/end", {
-        method: "POST",
-        body: JSON.stringify({
-            id: id,
-            tournament: tournament.replace("/", ""),
-            bestPlayer: best,
-            notes: document.getElementById("notes").value,
-            cards: cards
-        }),
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    }).then(
-        (res) => {
-            if (res.status === 204) {
-                document.location.href = `/${tournament}games/` + id
-            } else {
-                alert("Error!")
-            }
-        }
-    );
-}
-
-
-function protest() {
-    fetch("/api/games/update/protest", {
-        method: "POST",
-        body: JSON.stringify({
-            id: id,
-            tournament: tournament.replace("/", ""),
-            teamOne: document.getElementById("protest0").checked,
-            teamTwo: document.getElementById("protest1").checked,
-        }),
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    }).then(() => location.reload());
-}
-
-
 function undo() {
     fetch("/api/games/update/undo", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -268,7 +218,6 @@ function undo() {
 function del() {
     fetch("/api/games/update/undo", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"

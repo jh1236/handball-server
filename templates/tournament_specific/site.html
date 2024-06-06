@@ -7,7 +7,7 @@
 
 {% block bodyBlock %}
 <h1><a href="/{{ tournament }}fixtures" class="hide">Fixtures</a></h1>
-<p><i><a href="/{{ tournament }}fixtures/detailed" class="hide">Show More</a></i></p>
+<p><i><a href="/{{ tournamentLink }}fixtures/detailed" class="hide">Show More</a></i></p>
 
 <table class="jaredTable">
     <thead>
@@ -29,10 +29,10 @@
         {% for game in round %}
 
             <tr>
-                <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a></td>
-                <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide"> vs</a></td>
-                <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.teams[1] }}</a></td>
-                <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
+                <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a></td>
+                <td><a href="/games/{{ game.id }}" class="hide"> vs</a></td>
+                <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[1] }}</a></td>
+                <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
             </tr>
         {% endfor %}
     {% endfor %}
@@ -50,12 +50,12 @@
             </tr>
             {% for game in round %}
                 <tr>
-                    <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a>
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a>
                     </td>
-                    <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide"> vs</a></td>
-                    <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.teams[1] }}</a>
+                    <td><a href="/games/{{ game.id }}" class="hide"> vs</a></td>
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[1] }}</a>
                     </td>
-                    <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
                 </tr>
 
             {% endfor %}

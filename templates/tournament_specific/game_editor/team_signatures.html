@@ -7,13 +7,9 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-<nav id="navBar"></nav>
-<script>load("{{tournament}}")</script>
-
-<script src="{{ url_for('static', filename='js/startGame.js') }}"></script>
+<script src="{{ url_for('static', filename='js/endGame.js') }}"></script>
 <script>
     setup({{game.id}}, {{ swap }})
-    setTournament("{{tournament}}")
 </script>
 <h1>{{ teams[0].name }} vs {{ teams[1].name }} </h1>
 <h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
@@ -27,35 +23,27 @@
 <table class="jaredTable">
     <tr>
         <td></td>
-        <th colspan="{{ teams[0].players.__len__() }}"><b><a href="/{{ tournament }}teams/{{ teams[0].searchableName }}"
-                              class="hide">{{ teams[0].name }}</a></b></th>
-        <th colspan="{{ teams[1].players.__len__() }}"><b>{% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].searchableName }}"
-                                                   class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
-            </a>{% endif %}</b></th>
+        <th colspan="{{ teams[0].players.__len__() }}"><b>{{ teams[0].name }}</b></th>
+        <th colspan="{{ teams[1].players.__len__() }}"><b>
+            {{ teams[1].name }}</b></th>
         <th class="invisible">Spacerrrrrrr</th>
     </tr>
-{#    {% for stat in stats %}#}
-{#        <tr>#}
-{#            <th>{{ stat[0] }}:</th>#}
-{#            <td colspan="{{ teams[0].all_players.__len__() }}">{{ stat[1] }}</td>#}
-{#            <td colspan="{{ teams[1].all_players.__len__() }}">{{ stat[2] }}</td>#}
-{#        </tr>#}
-{##}
-{##}
-{#    {% endfor %}#}
+    {#    {% for stat in stats %}#}
+    {#        <tr>#}
+    {#            <th>{{ stat[0] }}:</th>#}
+    {#            <td colspan="{{ teams[0].all_players.__len__() }}">{{ stat[1] }}</td>#}
+    {#            <td colspan="{{ teams[1].all_players.__len__() }}">{{ stat[2] }}</td>#}
+    {#        </tr>#}
+    {##}
+    {##}
+    {#    {% endfor %}#}
 
     <tr>
         <td></td>
-        {% for i in game.all_players %}
-            <th><a class="hide" href="/{{ tournament }}players/{{ i.nice_name() }}">{{ i }}</a></th>
+        {% for i in teams[0].players + teams[1].players %}
+            <th>{{ i.name }}</th>
         {% endfor %}
     </tr>
-        <tr>
-        <td></td>
-            {% for i in teams[0].players + teams[1].players %}
-                <th>{{ i.name }}</th>
-            {% endfor %}
-        </tr>
     {% for stat in headers %}
         <tr>
             <th>{{ stat }}:</th>
@@ -68,11 +56,27 @@
 <br>
 <br>
 <h2>Do {{ teams[0].name }} wish to protest? <input type="checkbox" id="protest0"></h2>
+<input style="display:none;width: 330px;font-size: 20px" type="text" id="protestNotes0" maxlength="30">
 <h2>Do {{ teams[1].name }} wish to protest? <input type="checkbox" id="protest1"></h2>
+<input style="display:none;width: 330px;font-size: 20px" type="text" id="protestNotes1" maxlength="30">
+<h1>Notes</h1>
+<textarea style="width: 330px; height: 100px" id="notes"></textarea>
+<br>
+<br>
+<div class="dropdown">
+
+    <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And Best</button>
+    <div class="dropdown-content">
+        {% for i in teams[0].players + teams[1].players %}
+            <p onclick="setBest('{{ i.searchable_name }}', '{{ i.name }}')">{{ i.name }}</p>
+        {% endfor %}
+    </div>
+</div>
+<br>
 <br>
 <button style="background-color: #2a5d88;" class="button" onclick="undo()">Undo</button>
 
-<button onclick="protest()" class="button">Continue</button>
+<button onclick="finish()" class="button">Finish</button>
 
 <br>
 </body>

@@ -10,9 +10,11 @@ import json
 
 from utils.util import n_chunks, chunks_sized
 
+practice = None
+practice_round = 1
 
-def process_game_string(game, servingTeam, receivingTeam):
-    game.load_from_string = lambda a: RiggedGame.load_from_string(game, a, s)
+def process_game_string(game, tournament):
+    game.load_from_string = lambda a: RiggedGame.load_from_string(game, a, s, tournament)
     game.reload()
 
 
@@ -61,13 +63,16 @@ def process_game(tournamentId, game, round, isRanked):
     adminStatus = game.noteable_string(True)
     winning_team = s.execute("SELECT id FROM teams WHERE name = ?", (game.winner.name,)).fetchone()[0]
 
+    ranked = game.ranked
+
+
     s.execute(
-        """INSERT INTO gamesTable (
-            tournamentId, teamOne, teamTwo, bestPlayer, official, scorer, gameStringVersion,  gameString, startTime, length, court, isFinal, round, notes, isBye, status, adminStatus
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        """INSERT INTO games (
+            tournamentId, teamOne, teamTwo, bestPlayer, official, scorer, gameStringVersion,  gameString, startTime, length, court, isFinal, round, notes, isBye, status, adminStatus, isRanked
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (tournamentId, servingTeam, receivingTeam, bestPlayer, official, scorer, 1, gameString, startTime,
          length, court,
-         isFinal, round, notes, isBye, status, adminStatus)
+         isFinal, round, notes, isBye, status, adminStatus, ranked)
     )
 
     if not (game.bye or game.is_final):
@@ -86,7 +91,7 @@ def process_game(tournamentId, game, round, isRanked):
             "UPDATE tournamentTeams SET timeoutsCalled = timeoutsCalled + ? WHERE teamId = (SELECT id FROM teams WHERE name = ?) AND tournamentId = ?",
             (timeoutsCalled, team.name, tournamentId))
 
-    game_id = s.execute("SELECT id FROM gamesTable ORDER BY id DESC LIMIT 1").fetchone()[0]
+    game_id = s.execute("SELECT id FROM games ORDER BY id DESC LIMIT 1").fetchone()[0]
 
     for player in game.playing_players:
         if player.name not in ("Good bye", "Forfeit"):
@@ -112,10 +117,11 @@ def process_game(tournamentId, game, round, isRanked):
             # isFinal INTEGER, +
             sideOfCourt = ["Left", "Right", "Substitute"][player.team.players.index(player)]
             s.execute(
-                """INSERT INTO playerGameStatsTable (
+                """INSERT INTO playerGameStats (
                     gameId,   playerId, teamId, opponentId, tournamentId,roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal
                     ) VALUES (?,?,?,?,?,?,?,?,?,?)""",
-                (game_id, playerId, teamId, opponentId, tournamentId, roundPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal)
+                (game_id, playerId, teamId, opponentId, tournamentId, roundPlayed, roundsBenched, isBestPlayer,
+                 sideOfCourt, isFinal)
             )
 
             if isRanked and (not isFinal) and player.elo_delta:
@@ -129,8 +135,42 @@ def process_game(tournamentId, game, round, isRanked):
                     (game_id, playerId, eloChange, tournamentId)
                 )
 
-    process_game_string(game, servingTeam, receivingTeam)
+    process_game_string(game, tournamentId)
 
+    s.execute("""UPDATE games
+SET teamOneScore    = lg.teamOneScore,
+    teamTwoScore    = lg.teamTwoScore,
+    teamOneTimeouts = lg.teamOneTimeouts,
+    teamTwoTimeouts = lg.teamTwoTimeouts,
+    winningTeam     = lg.winningTeam,
+    started         = lg.started,
+    ended           = lg.ended,
+    protested       = lg.protested,
+    resolved        = lg.resolved
+FROM liveGames lg
+WHERE lg.id = games.id AND games.id = ?""", (game_id,))
+
+    s.execute("""UPDATE playerGameStats
+SET points = lg.points,
+    aces = lg.aces,
+    faults = lg.faults,
+    servedPoints = lg.servedPoints,
+    servedPointsWon = lg.servedPointsWon,
+    servesReceived = lg.servesReceived,
+    servesReturned = lg.servesReturned,
+    doubleFaults = lg.doubleFaults,
+    greenCards = lg.greenCards,
+    warnings = lg.warnings,
+    yellowCards = lg.yellowCards,
+    redCards = lg.redCards,
+    cardTimeRemaining = lg.cardTimeRemaining,
+    cardTime = lg.cardTime
+FROM livePlayerGameStats lg
+WHERE playerGameStats.id = lg.id
+        AND playerGameStats.gameId = ?""", (game_id,))
+
+    if (game_id % 10 == 0):
+        print(f"completed Game {game_id}")
 
 if __name__ == "__main__":
     database_file = './resources/database.db'
@@ -220,13 +260,22 @@ if __name__ == "__main__":
             notes = tournament.notes
 
             twoCourts = tournament.two_courts
-
-            s.execute(
-                "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled,
-                 f"/api/tournaments/image?name={searchableName}")
-            )
-            tournamentId = s.execute("SELECT id FROM tournaments ORDER BY id DESC LIMIT 1").fetchone()[0]
+            if "practice" in tournament.nice_name():
+                if practice is None:
+                    s.execute(
+                        "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled,
+                         f"/api/tournaments/image?name={searchableName}")
+                    )
+                    practice = s.execute("SELECT id FROM tournaments ORDER BY id DESC LIMIT 1").fetchone()[0]
+                tournamentId = practice
+            else:
+                s.execute(
+                    "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled,
+                     f"/api/tournaments/image?name={searchableName}")
+                )
+                tournamentId = s.execute("SELECT id FROM tournaments ORDER BY id DESC LIMIT 1").fetchone()[0]
             # id INTEGER PRIMARY KEY AUTOINCREMENT,
             # tournamentId INTEGER,
             # servingTeam INTEGER,
@@ -268,11 +317,18 @@ if __name__ == "__main__":
                     "INSERT INTO tournamentOfficials (tournamentId, officialId, isUmpire, isScorer) VALUES (?, ?, ?, ?)",
                     (tournamentId, official_id, 1, 1))
 
-            for round, roundgames in enumerate(tournament.fixtures):
-                round += 1
+            if "practice" in tournament.nice_name():
+                round = practice_round
+            else:
+                round = 1
+
+            for roundgames in tournament.fixtures:
                 for game in roundgames:
                     process_game(tournamentId, game, round, ranked)
-            for round, roundgames in enumerate(tournament.finals):
                 round += 1
+            for roundgames in tournament.finals:
                 for game in roundgames:
                     process_game(tournamentId, game, round, ranked)
+                round += 1
+            if "practice" in tournament.nice_name():
+                practice_round = round

@@ -27,39 +27,44 @@
     <nav id="sidebar" style="top:0">
         <div style="top:0; position:sticky;">
             <div class="sidebar-header">
-                <a class="sidebar-link" href="/"><img src="/api/image?name=SUSS" class="logo"></a>
+                {% if tournamentLink %}
+                    <a class="sidebar-link" href="/{{ tournamentLink }}"><img
+                            src="/api/tournaments/image?name={{ tournamentLink[:-1] }}" class="logo"></a>
+                {% else %}
+                    <a class="sidebar-link" href="/"><img src="/api/image?name=SUSS" class="logo"></a>
+                {% endif %}
             </div>
 
             <ul class="list-unstyled components">
-                <p class="tournament-name"><a href="{{ current_tournament.link }}"
-                                              class="hide">{{ current_tournament }}</a></p>
+                <p class="tournament-name"><a href="/{{ tournamentLink }}"
+                                              class="hide">{{ tournament }}</a></p>
                 <li class="active">
                     <a class="sidebar-link dropdown-toggle" href="#homeSubmenu" data-toggle="collapse"
                        aria-expanded="false">Tournament</a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         {% for i in tournaments %}
-                            <li><a class="sidebar-link" href="/{{ i.nice_name() }}"><i>{{ i }}</i></a></li>
+                            <li><a class="sidebar-link" href="/{{ i[0] }}"><i>{{ i[1] }}</i></a></li>
                         {% endfor %}
                     </ul>
                 </li>
                 <li>
-                    {% if current_tournament.link != "/" %}
-                        <a class="sidebar-link" href="{{ current_tournament.link }}fixtures">Fixtures</a>
+                    {% if tournamentLink %}
+                        <a class="sidebar-link" href="/{{ tournamentLink }}fixtures">Fixtures</a>
                     {% else %}
                         <a class="sidebar-link" href="/signup">Sign-Up</a>
                     {% endif %}
                 </li>
                 <li>
-                    <a class="sidebar-link" href="{{ current_tournament.link }}teams">Teams</a>
+                    <a class="sidebar-link" href="/{{ tournamentLink }}teams">Teams</a>
                 </li>
                 <li>
-                    <a class="sidebar-link" href="{{ current_tournament.link }}ladder">Ladder</a>
+                    <a class="sidebar-link" href="/{{ tournamentLink }}ladder">Ladder</a>
                 </li>
                 <li>
-                    <a class="sidebar-link" href="{{ current_tournament.link }}players">Players</a>
+                    <a class="sidebar-link" href="/{{ tournamentLink }}players">Players</a>
                 </li>
                 <li>
-                    <a class="sidebar-link" href="{{ current_tournament.link }}officials">Officials</a>
+                    <a class="sidebar-link" href="/{{ tournamentLink }}officials">Officials</a>
                 </li>
                 <li>
                     <a class="sidebar-link" href="/documents">Documents</a>
@@ -75,6 +80,9 @@
                     <li>
                         <a class="sidebar-link" href="/user">Log in</a>
                     </li>
+                {% endif %}
+                {% if tournamentLink %}
+                    <li><i><a class="sidebar-link" href="/" style="color: #728f78">Back to all Tournaments</a></i></li>
                 {% endif %}
             </ul>
         </div>
@@ -115,7 +123,6 @@
             $('#sidebar').toggleClass('active');
         });
     });
-    console.warn("{{ tournaments }}")
 </script>
 </body>
 </html>

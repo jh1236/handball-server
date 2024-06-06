@@ -104,28 +104,17 @@ def add_game_endpoints(app, comps):
                 id: <int> = id of the current game
                 bestPlayer: <str> = the name of the best on ground
                 notes: <str> (OPTIONAL) = any notes the umpire wishes to leave
+                protestTeamOne: str = null if no protest, the reason if a protest is present
+                protestTeamTwo: str = null if no protest, the reason if a protest is present
             }
         """
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
         best = request.json.get("bestPlayer", None)
-        manageGame.end_game(game_id,  best, request.json.get("notes", None))
+        manageGame.end_game(game_id,  best, request.json.get("notes", None), request.json["protestTeamOne"], request.json["protestTeamTwo"])
         return "", 204
 
-    @app.post("/api/games/update/protest")
-    def protest():
-        """
-        SCHEMA:
-            {
-                id: <int> = id of the current game
-                teamOne: <bool> = if the team listed first protested
-                teamTwo: <bool> = if the team listed second protested
-            }
-        """
-        logger.info(f"Request for end: {request.json}")
-        game_id = request.json["id"]
-        manageGame.protest(game_id, request.json["teamOne"], request.json["teamTwo"])
-        return "", 204
+
 
     @app.post("/api/games/update/timeout")
     def timeout():

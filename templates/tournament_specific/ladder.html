@@ -7,7 +7,7 @@
 
 {% block bodyBlock %}
 <script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
-<h1><a href="/{{tournament}}ladder/" class="hide">Ladder</a></h1>
+<h1><a href="/{{tournamentLink}}ladder/" class="hide">Ladder</a></h1>
 {% for pool_name, pool_number, teams in ladder %}
 <table class="jaredTable" id="sort{{ pool_number }}">
     <h2>{{ pool_name }}</h2>
@@ -23,11 +23,11 @@
 
     {% for position, team in teams %}
     <tr>
-        <th><a href="/{{tournament}}teams/{{team.searchableName}}" class="hide"
+        <th><a href="/{{tournamentLink}}teams/{{team.searchableName}}" class="hide"
                style="left: 30%;"><img
                 src="{{team.image}}" class="team_logo"
                 style="display: inline;left:70%;width: 50px;height: 50px;vertical-align:middle;"></a></th>
-        <th style="text-align: left;"><a href="/{{tournament}}teams/{{team.searchableName}}"
+        <th style="text-align: left;"><a href="/{{tournamentLink}}teams/{{team.searchableName}}"
                                          class="hide">{{team.name}}</a>
         </th>
         {% for _, k, _ in headers %}

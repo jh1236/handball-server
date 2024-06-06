@@ -153,7 +153,7 @@ def init_api(app, comps: dict[str, Tournament]):
     from website.clips import add_video_player
 
     # add_video_player(app)
-    add_tournament_specific(app, comps)
+    add_tournament_specific(app)
     add_old_tournament_specific(app, comps)
     add_universal_tournament(app, comps)
     add_admin_pages(app, comps)

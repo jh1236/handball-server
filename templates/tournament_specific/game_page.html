@@ -9,35 +9,35 @@
     <div class="row">
 
         <div class="col-sm-9">
-            <h1><a href="/{{ tournament }}games/{{ game.id }}" class="hide">{{ teams[0].name }}
+            <h1><a href="/games/{{ game.id }}" class="hide">{{ teams[0].name }}
                 vs {{ teams[1].name }}</a></h1>
             <h1 class="big"><a class="hide"
-                               href="/{{ tournament }}games/{{ game.id }}/display">{{ game.score_string }}</a>
+                               href="/games/{{ game.id }}/display">{{ game.score_string }}</a>
             </h1>
             <p><b>Round:</b> <a class="hide"
-                                href="/{{ tournament }}fixtures/detailed?round={{ game.round }}"><i>{{ game.round }}</i></a>
+                                href="/{{ tournamentLink }}fixtures/detailed?round={{ game.round }}"><i>{{ game.round }}</i></a>
             </p>
             <p><b>Court:</b> <a class="hide"
-                                href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.courtName }}</i></a>
+                                href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"><i>{{ game.courtName }}</i></a>
             </p>
             <p><b>Match Official:</b>{% if not game.bye %}
-                <a class="hide" href="/{{ tournament }}officials/{{ game.umpireSearchableName }}">{% endif %}
+                <a class="hide" href="/{{ tournamentLink }}officials/{{ game.umpireSearchableName }}">{% endif %}
                 <i>{{ game.umpire }}</i>
                 {% if not game.bye %}</a> {% endif %}</p>
             {% if game.scorerSearchableName != 'no_one' %}
                 <p><b>Match Scorer:</b>
-                    <a class="hide" href="/{{ tournament }}officials/{{ game.scorerSearchableName }}">
+                    <a class="hide" href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}">
                         <i>{{ game.scorer }}</i>
                     </a></p>
             {% endif %}
-            <p>{% if not game.bye %}<a href="/{{ tournament }}games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
+            <p>{% if not game.bye %}<a href="/games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
                 {% if not game.bye %}</a>{% endif %} <i>{{ game.status }}</i></p>
             {% if game.startTime > 0 %}
                 <p><b>Match Time:</b> <i>{{ game.startTimeStr }}</i></p>
             {% endif %}
             {% if game.best_player %}
                 <p><b>Best on Court:</b> <a class="hide"
-                                            href="/{{ tournament }}players/{{ game.bestSearchableName }}"><i>{{ best }}</i></a>
+                                            href="/{{ tournamentLink }}players/{{ game.bestSearchableName }}"><i>{{ best }}</i></a>
                 </p>
             {% endif %}
             <br>
@@ -45,13 +45,13 @@
                 <tr>
                     <th></th>
                     <th colspan="{{ teams[0].players.__len__() }}"><a
-                            href="/{{ tournament }}teams/{{ teams[0].searchableName }}"
+                            href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"
                             class="hide"><img
                             src="{{ teams[0].image }}"
                             class="team_logo"
                             style="display: inline;left:70%;vertical-align:middle;"></a></th>
                     <th colspan="{{ teams[1].players.__len__() }}">
-                        {% if not game.bye %}<a href="/{{ tournament }}teams/{{ teams[1].searchableName }}"
+                        {% if not game.bye %}<a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"
                                                 class="hide">{% endif %}<img
                             src="{{ teams[1].image }}"
                             class="team_logo"
@@ -62,10 +62,10 @@
                 <tr>
                     <td></td>
                     <th style="min-width: 150px" colspan="{{ teams[0].players.__len__() }}"><b><a
-                            href="/{{ tournament }}teams/{{ teams[0].searchableName }}"
+                            href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"
                             class="hide">{{ teams[0].name }}</a></b></th>
                     <th style="min-width: 150px" colspan="{{ teams[1].players.__len__() }}"><b>{% if not game.bye %}
-                        <a href="/{{ tournament }}teams/{{ teams[1].searchableName }}"
+                        <a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"
                            class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
                         </a>{% endif %}</b></th>
                     <th class="invisible">Spacerrrrrrr</th>
@@ -98,11 +98,11 @@
         <div class="col-sm-3">
             <div style="min-height: 200px">
                 <h2><a class="hide"
-                       href="/{{ tournament }}fixtures/detailed?team={{ game.teams[0].searchableName }}&team={{ teams[1].searchableName }}">Other
+                       href="/{{ tournamentLink }}fixtures/detailed?team={{ game.teams[0].searchableName }}&team={{ teams[1].searchableName }}">Other
                     Matches</a></h2>
                 {% for line in prev_matches %}
                     <p style="color: black;">{% if line[1] > -1 %}
-                        <a class="hide" href="/{{ line[2] }}/games/{{ line[1] }}">
+                        <a class="hide" href="/games/{{ line[1] }}">
                     {% endif %}
                         {{ line[0] }}
                         {% if line[1] > -1 %}
@@ -111,7 +111,7 @@
                     </p>
                 {% endfor %}
             </div>
-            <h2><a class="hide" href="/{{ tournament }}games/{{ game.id }}/admin">Commentary</a></h2>
+            <h2><a class="hide" href="/games/{{ game.id }}/admin">Commentary</a></h2>
             {% for line in commentary %}
                 <p style="color: black;">{{ line }}</p>
             {% endfor %}

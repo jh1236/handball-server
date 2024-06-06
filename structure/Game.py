@@ -407,10 +407,6 @@ class Game:
         self.ranked = (
             all(len(i.all_players) > 1 for i in self.teams)
             and not self.is_final
-            and (
-                not any(i.nice_name().startswith("null") for i in self.current_players)
-                or RANK_SOLO_GAMES
-            )
             and self.tournament.details.get("ranked", True)
         )
         if self.best_player is not None:

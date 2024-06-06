@@ -2,12 +2,10 @@ from structure.manageGame import game_string_lookup
 from utils.util import chunks_sized
 
 
-def load_from_string(self, game_string: str, s):
+def load_from_string(self, game_string: str, s, tournament):
     if self.bye:
         return
-    game_id = s.execute("SELECT id FROM gamesTable ORDER BY id DESC LIMIT 1").fetchone()[0]
-    tournament = s.execute("""SELECT id FROM tournaments WHERE searchableName = ?""",
-                           (self.tournament.nice_name(),)).fetchone()[0]
+    game_id = s.execute("SELECT id FROM games ORDER BY id DESC LIMIT 1").fetchone()[0]
     card_count = 0
 
     j: str

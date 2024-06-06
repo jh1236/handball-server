@@ -9,13 +9,11 @@
 <body>
 <nav id="navBar"></nav>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}")</script>
-
 <script src="{{ url_for('static', filename='js/startGame.js') }}" teamOne='{{ ','.join(teamOneNames) }}'
         teamTwo='{{ ','.join(teamTwoNames) }}'></script>
 <script>
     setup({{game.id}}, {{ swap }})
-    setTournament("{{tournament}}")
+    setTournament("{{ tournamentLink }}")
 </script>
 <h1 class="big">{{ teams[0].name }} vs {{ teams[1].name }} </h1>
 <p><b>Match Official: </b><i>{{ game.official }}</i></p>

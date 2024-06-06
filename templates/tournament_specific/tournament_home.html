@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block headBlock %}
-    <title>{{ current_tournament.name }}</title>
+    <title>{{ tournament }}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 {% endblock %}
 {% block bodyBlock %}
-    <a href="/{{ current_tournament.link }}">
+    <a href="/{{ tournamentLink }}">
         <img src="/api/tournaments/image?name={{ tourney.searchableName }}" class="title_logo"></a>
-    <h1><a href="/{{ current_tournament.link }}" class="hide">{{ tourney.name }}</a></h1>
+    <h1><a href="/{{ tournamentLink }}" class="hide">{{ tourney.name }}</a></h1>
     <div class="row">
         <div class="col">
             <div style="min-height: 200px">
@@ -17,7 +17,7 @@
                         <h2>Create Games</h2>
                         <br>
                         <br>
-                        <button class="button" onclick="document.location.href = '{{ current_tournament.link }}create'">
+                        <button class="button" onclick="document.location.href = '/{{ tournamentLink }}create'">
                             New Game
                         </button>
                     {% else %}
@@ -37,12 +37,12 @@
                         <th>Score</th>
                         {% for i in ongoing %}
                             <tr>
-                                <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                <td><a href="/games/{{ i.id }}"
                                        class="hide">{{ i.teams[0] }}</a></td>
-                                <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">vs</a></td>
-                                <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                <td><a href="/games/{{ i.id }}" class="hide">vs</a></td>
+                                <td><a href="/games/{{ i.id }}"
                                        class="hide">{{ i.teams[1] }}</a></td>
-                                <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                                <td><a href="/games/{{ i.id }}"
                                        class="hide">{{ i.score_string }}</a></td>
                             </tr>
                         {% endfor %}
@@ -52,7 +52,7 @@
                 </table>
             </div>
             <div style="min-height: 200px">
-                <h2><a class="hide" href="{{ current_tournament.link }}fixtures/">Current Round</a></h2>
+                <h2><a class="hide" href="/{{ tournamentLink }}fixtures/">Current Round</a></h2>
                 <table class="jaredTable">
                     <tbody>
                     <tr>
@@ -63,12 +63,12 @@
                     </tr>
                     {% for i in current_round %}
                         <tr>
-                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                            <td><a href="/games/{{ i.id }}"
                                    class="hide">{{ i.teams[0] }}</a></td>
-                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}" class="hide">vs</a></td>
-                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                            <td><a href="/games/{{ i.id }}" class="hide">vs</a></td>
+                            <td><a href="/games/{{ i.id }}"
                                    class="hide">{{ i.teams[1] }}</a></td>
-                            <td><a href="{{ current_tournament.link }}games/{{ i.id }}"
+                            <td><a href="/games/{{ i.id }}"
                                    class="hide">{{ i.score_string }}</a></td>
                         </tr>
                     {% endfor %}
@@ -76,13 +76,13 @@
                 </table>
             </div>
             <div style="min-height: 200px">
-                <a href="{{ current_tournament.link }}admin" class="hide"><h2>Notices</h2></a>
+                <a href="/{{ tournamentLink }}admin" class="hide"><h2>Notices</h2></a>
                 <p><i>{{ notes }}</i></p>
             </div>
         </div>
         <div class="col">
             <div>
-                <h2><a class="hide" href="{{ tournament }}ladder/">Ladder</a></h2>
+                <h2><a class="hide" href="/{{ tournamentLink }}ladder/">Ladder</a></h2>
 
                 <table class="jaredTable">
 
@@ -130,19 +130,19 @@
                     {% for p in players %}
                         <tr>
                             <td><a class="hide"
-                                   href="{{ current_tournament.link }}players/{{ p.searchableName }}">{{ p.name }}</a>
+                                   href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.name }}</a>
                             </td>
                             <td style="text-align: center"><a class="hide"
-                                                              href="{{ current_tournament.link }}players/{{ p.searchableName }}">{{ p.best }}</a>
+                                                              href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.best }}</a>
                             </td>
                             <td style="text-align: center"><a class="hide"
-                                                              href="{{ current_tournament.link }}players/{{ p.searchableName }}">{{ p.points }}</a>
+                                                              href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.points }}</a>
                             </td>
                             <td><a class="hide"
-                                   href="{{ current_tournament.link }}players/{{ p.searchableName }}">{{ p.aces }}</a>
+                                   href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.aces }}</a>
                             </td>
                             <td><a class="hide"
-                                   href="{{ current_tournament.link }}players/{{ p.searchableName }}">{{ p.cards }}</a>
+                                   href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.cards }}</a>
                             </td>
                         </tr>
                     {% endfor %}

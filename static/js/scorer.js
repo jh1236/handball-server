@@ -144,7 +144,17 @@ function openCardModal(colorIn, firstTeam, teamName) {
 }
 
 function sendCustomCard() {
-    const selectedReason = document.querySelector('input[name="reason"]:checked').value
+    let selectedReason = document.querySelector('input[name="reason"]:checked')
+    const selectedPlayer = document.getElementById('playerOne').checked
+    if (!selectedReason) {
+        alert("Please Select A Reason!")
+        return
+    }
+    selectedReason = selectedReason.checked
+    if (!selectedPlayer && !document.getElementById('playerTwo').checked) {
+        alert("Please Select A Player!")
+        return
+    }
     let reason
     console.log(selectedReason)
     if (selectedReason === "other") {
@@ -154,11 +164,16 @@ function sendCustomCard() {
     } else {
         reason = CARDS[color][selectedReason]
     }
+    if (!reason) {
+        alert("Please Select A Reason!")
+        return
+    }
+
     fetch("/api/games/update/card", {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(first, teamsSwapped),
-            leftPlayer: document.getElementById('playerOne').checked,
+            leftPlayer: selectedPlayer,
             color: color,
             duration: +(document.getElementById("duration").value) % 10,
             reason: reason

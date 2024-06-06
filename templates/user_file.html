@@ -28,12 +28,12 @@
                     <th>Court</th>
                     {% for i in to_play %}
                         <tr>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}"
+                            <td><a href="/games/{{ i.id }}"
                                    class="hide">{{ i.teams[0] }}</a></td>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">vs</a></td>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}"
+                            <td><a href="/games/{{ i.id }}" class="hide">vs</a></td>
+                            <td><a href="/games/{{ i.id }}"
                                    class="hide">{{ i.teams[1] }}</a></td>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}"
+                            <td><a href="/games/{{ i.id }}"
                                    class="hide">{{ i.court_display }}</a></td>
                         </tr>
                     {% endfor %}

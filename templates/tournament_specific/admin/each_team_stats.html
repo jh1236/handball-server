@@ -42,13 +42,13 @@
     <div style="min-height: 400px">
         <h2><a class = "hide" href="/{{tournament}}fixtures/admin?team={{ team.nice_name() }}">Recent Matches</a></h2>
     {% for line in recent_games %}
-    <p style="color: black;"><a class = "hide" href="/{{line[2]}}/games/{{line[1]}}/admin">{{line[0]}}</a></p>
+    <p style="color: black;"><a class = "hide" href="/games/{{line[1]}}/admin">{{line[0]}}</a></p>
     {% endfor %}
     </div>
     <div>
         <h2><a class = "hide" href="/{{tournament}}fixtures/admin?team={{ team.nice_name() }}">Noteable Matches</a></h2>
         {% for line in key_games %}
-        <p style="color: black;"><a class = "hide" href="/{{line[3]}}/games/{{line[2]}}/admin"><b>[{{ line[0] }}]: </b>{{line[1]}}</a></p>
+        <p style="color: black;"><a class = "hide" href="/games/{{line[2]}}/admin"><b>[{{ line[0] }}]: </b>{{line[1]}}</a></p>
         {% endfor %}
     </div>
 </div>

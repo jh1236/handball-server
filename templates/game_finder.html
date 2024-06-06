@@ -37,15 +37,15 @@
     {% for game, players in games %}
         <tr style="outline: 1px black solid">
             <td style="width: 600px;text-align: center;vertical-align: top" rowspan="{{ players.__len__() }}">
-                <a class="hide" href="/{{ game.tournament.nice_name() }}/games/{{ game.id }}">{{ game }}</a>
+                <a class="hide" href="/games/{{ game.id }}">{{ game }}</a>
             </td>
             {% for player in game.all_players if player.nice_name() in players %}
                 <td style="text-align: center;width: 150px"><a class="hide"
-                                                               href="/{{ game.tournament.nice_name() }}/games/{{ game.id }}">{{ player.name }}</a>
+                                                               href=/games/{{ game.id }}">{{ player.name }}</a>
                 </td>
                 {% for d in details %}
                     <td style="text-align: center;min-width: 50px;width: auto"><a class="hide"
-                                                                                  href="/{{ game.tournament.nice_name() }}/games/{{ game.id }}">{{ dict(player.get_game_details(), **player.get_stats_detailed())[d] }}</a>
+                                                                                  href="/games/{{ game.id }}">{{ dict(player.get_game_details(), **player.get_stats_detailed())[d] }}</a>
                     </td>
                 {% endfor %}
                 </tr>
