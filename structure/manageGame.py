@@ -3,45 +3,14 @@ import time
 
 from structure import get_information
 from utils.databaseManager import DatabaseManager
+from utils.statistics import calc_elo
 
 SIDES = ["Left", "Right", "Substitute"]
 
 
-def sync_tables(game_id, c):
-    c.execute("""UPDATE games
-SET teamOneScore    = lg.teamOneScore,
-    teamTwoScore    = lg.teamTwoScore,
-    teamOneTimeouts = lg.teamOneTimeouts,
-    teamTwoTimeouts = lg.teamTwoTimeouts,
-    winningTeam     = lg.winningTeam,
-    started         = lg.started,
-    ended           = lg.ended,
-    protested       = lg.protested,
-    resolved        = lg.resolved,
-    playerToServe = lg.playerToServe,
-    teamToServe = lg.teamToServe,
-    sideToServe = lg.sideToServe
-FROM liveGames lg
-WHERE lg.id = games.id AND games.id = ?""", (game_id,))
-
-    c.execute("""UPDATE playerGameStats
-SET points = lg.points,
-    aces = lg.aces,
-    faults = lg.faults,
-    servedPoints = lg.servedPoints,
-    servedPointsWon = lg.servedPointsWon,
-    servesReceived = lg.servesReceived,
-    servesReturned = lg.servesReturned,
-    doubleFaults = lg.doubleFaults,
-    greenCards = lg.greenCards,
-    warnings = lg.warnings,
-    yellowCards = lg.yellowCards,
-    redCards = lg.redCards,
-    cardTimeRemaining = lg.cardTimeRemaining,
-    cardTime = lg.cardTime
-FROM livePlayerGameStats lg
-WHERE playerGameStats.id = lg.id
-        AND playerGameStats.gameId = ?""", (game_id,))
+def searchable_of(name: str):
+    s = name.lower().replace(" ", "_").replace(",", "").replace("the_", "")
+    return re.sub("[^a-zA-Z0-9_]", "", s)
 
 
 def game_string_lookup(char: str):
@@ -102,6 +71,25 @@ def _swap_server(game_id, team_to_serve, c):
     return player_to_serve[0][0], new_side
 
 
+def game_is_over(game_id, c):
+    return c.execute("""SELECT someoneHasWon FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
+
+
+def game_is_ended(game_id, c):
+    return c.execute("""SELECT ended FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
+
+
+def game_has_started(game_id, c):
+    return c.execute("""SELECT started FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
+
+
+def _score_point(game_id, c, first_team, left_player, penalty=False):
+    if game_is_over(game_id, c):
+        raise ValueError("Game is Already Over!")
+    _add_to_game(game_id, c, "Score", first_team, left_player, team_to_serve=first_team,
+                 notes="Penalty" if penalty else None)
+
+
 def _get_serve_details(game_id, c):
     a = c.execute(
         """SELECT nextTeamToServe,nextPlayerToServe,nextServeSide from gameEvents WHERE gameEvents.gameId = ? order by id DESC LIMIT 1""",
@@ -133,6 +121,8 @@ def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=N
 
 def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official=None, scorer=None):
     with DatabaseManager() as c:
+        if game_has_started(game_id, c):
+            raise ValueError("Game is Already Over!")
         tournament = _tournament_from_game(game_id, c)
         team_one_id, team_two_id = c.execute("""SELECT teamOne, teamTwo FROM games WHERE games.id = ?""",
                                              (game_id,)).fetchone()
@@ -178,17 +168,6 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
         sync_tables(game_id, c)
 
 
-def game_is_over(game_id, c):
-    return c.execute("""SELECT someoneHasWon FROM liveGames WHERE liveGames.id = ?""", (game_id,)).fetchone()[0]
-
-
-def _score_point(game_id, c, first_team, left_player, penalty=False):
-    if game_is_over(game_id, c):
-        raise ValueError("Game is Already Over!")
-    _add_to_game(game_id, c, "Score", first_team, left_player, team_to_serve=first_team,
-                 notes="Penalty" if penalty else None)
-
-
 def score_point(game_id, first_team, left_player):
     with DatabaseManager() as c:
         if game_is_over(game_id, c):
@@ -201,7 +180,7 @@ def ace(game_id):
         if game_is_over(game_id, c):
             raise ValueError("Game is Already Over!")
         first_team = bool(
-            c.execute("""SELECT teamOne == teamToServe FROM liveGames WHERE liveGames.id = ?""", (game_id,)).fetchone()[
+            c.execute("""SELECT teamOne == teamToServe FROM games WHERE games.id = ?""", (game_id,)).fetchone()[
                 0])
         left_player = bool(c.execute(
             """SELECT sideToServe = 'Left' FROM liveGames WHERE liveGames.id = ?""",
@@ -251,6 +230,8 @@ def card(game_id, first_team, left_player, color, duration, reason):
 
 def undo(game_id):
     with DatabaseManager() as c:
+        if game_is_ended(game_id, c):
+            raise ValueError("Game has been set to official!")
         c.execute("""DELETE FROM gameEvents 
                  WHERE 
                    gameId = ? AND
@@ -317,11 +298,36 @@ def end_game(game_id, bestPlayer, notes, protest_team_one, protest_team_two):
         if best:
             best = best[0]
         _add_to_game(game_id, c, "End Game", None, None, notes=notes, details=best)
+        teams = c.execute("""
+SELECT games.isRanked as ranked,
+       games.winningTeam = teamId as myTeamWon,
+       games.teamOne <> playerGameStats.teamId as isSecond,
+       ROUND(1500.0 + (SELECT SUM(eloChange)
+                       from eloChange
+                       where eloChange.playerId = playerGameStats.playerid), 2) as elo,
+       playerId as player,
+       games.tournamentId as tournament
+FROM playerGameStats
+         INNER JOIN games ON playerGameStats.gameId = games.id
+WHERE games.id = ? ORDER BY isSecond""").fetchall()
 
-
-def searchable_of(name: str):
-    s = name.lower().replace(" ", "_").replace(",", "").replace("the_", "")
-    return re.sub("[^a-zA-Z0-9_]", "", s)
+        if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
+            return
+        elos = [0, 0]
+        team_sizes = [0, 0]
+        for i in teams:
+            elos[i[2]] += i[3]
+            team_sizes[i[2]] += 1
+        for i, v in enumerate(team_sizes):
+            elos[i] /= v
+        for i in teams:
+            win = i[1]
+            my_team = i[2]
+            player_id = i[4]
+            tournament_id = i[5]
+            elo_delta = calc_elo(elos[my_team], elos[not my_team], win)
+            c.execute("""INSERT INTO eloChange(gameId, playerId, tournamentId, eloChange) VALUES (?, ?, ?, ?)""",
+                      (game_id, player_id, tournament_id, elo_delta))
 
 
 def create_game(tournamentId, team_one, team_two, official, players_one=None, players_two=None):
@@ -340,7 +346,8 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
   AND IIF(? is null, 1, (captain = ? or nonCaptain = ? or substitute = ?))
   AND IIF(? is null, 1, (captain = ? or nonCaptain = ? or substitute = ?))
 """,
-                                   (players[0], players[0], players[0], players[1],players[1], players[1], players[1], players[2],
+                                   (players[0], players[0], players[0], players[1], players[1], players[1], players[1],
+                                    players[2],
                                     players[2], players[2], players[2])).fetchone()
             print(first_team)
             if first_team:
@@ -363,7 +370,8 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
   AND IIF(? is null, 1, (captain = ? or nonCaptain = ? or substitute = ?))
   AND IIF(? is null, 1, (captain = ? or nonCaptain = ? or substitute = ?))
 """,
-                                    (players[0], players[0], players[0], players[1], players[1], players[1], players[1], players[2],
+                                    (players[0], players[0], players[0], players[1], players[1], players[1], players[1],
+                                     players[2],
                                      players[2], players[2], players[2])).fetchone()
             if second_team:
                 second_team = second_team[0]

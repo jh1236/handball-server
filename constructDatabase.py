@@ -139,41 +139,6 @@ def process_game(tournamentId, game, round, isRanked):
 
     process_game_string(game, tournamentId)
 
-    s.execute("""UPDATE games
-SET teamOneScore    = lg.teamOneScore,
-    teamTwoScore    = lg.teamTwoScore,
-    teamOneTimeouts = lg.teamOneTimeouts,
-    teamTwoTimeouts = lg.teamTwoTimeouts,
-    winningTeam     = lg.winningTeam,
-    started         = lg.started,
-    ended           = lg.ended,
-    protested       = lg.protested,
-    resolved        = lg.resolved,
-    playerToServe = lg.playerToServe,
-    teamToServe = lg.teamToServe,
-    sideToServe = lg.sideToServe
-FROM liveGames lg
-WHERE lg.id = games.id AND games.id = ?""", (game_id,))
-
-    s.execute("""UPDATE playerGameStats
-SET points = lg.points,
-    aces = lg.aces,
-    faults = lg.faults,
-    servedPoints = lg.servedPoints,
-    servedPointsWon = lg.servedPointsWon,
-    servesReceived = lg.servesReceived,
-    servesReturned = lg.servesReturned,
-    doubleFaults = lg.doubleFaults,
-    greenCards = lg.greenCards,
-    warnings = lg.warnings,
-    yellowCards = lg.yellowCards,
-    redCards = lg.redCards,
-    cardTimeRemaining = lg.cardTimeRemaining,
-    cardTime = lg.cardTime
-FROM livePlayerGameStats lg
-WHERE playerGameStats.id = lg.id
-        AND playerGameStats.gameId = ?""", (game_id,))
-
     if (game_id % 10 == 0):
         print(f"completed Game {game_id}")
 
