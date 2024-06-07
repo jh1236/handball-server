@@ -31,9 +31,11 @@ def get_tournament_id(searchable_name, c=None) -> int:
             out = c.execute("SELECT id FROM tournaments WHERE searchableName=?", (searchable_name,)).fetchone()
         if out:
             out = out[0]
+        tournament_id[searchable_name] = out
         return out
     else:
         out = c.execute("SELECT id FROM tournaments WHERE searchableName=?", (searchable_name,)).fetchone()
         if out:
             out = out[0]
+        tournament_id[searchable_name] = out
         return out

@@ -216,7 +216,7 @@ function undo() {
 }
 
 function del() {
-    fetch("/api/games/update/undo", {
+    fetch("/api/games/update/delete", {
         method: "POST", body: JSON.stringify({
             id: id
         }), headers: {

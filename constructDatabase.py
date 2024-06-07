@@ -12,6 +12,8 @@ from utils.util import n_chunks, chunks_sized
 
 practice = None
 practice_round = 1
+practice_teams = []
+practice_officials = []
 
 def process_game_string(game, tournament):
     game.load_from_string = lambda a: RiggedGame.load_from_string(game, a, s, tournament)
@@ -232,7 +234,7 @@ if __name__ == "__main__":
                 substitute = s.execute("SELECT id FROM people WHERE name = ?", (team.players[2].name,)).fetchone()[0]
                 s.execute("UPDATE teams SET substitute = ? WHERE id = ?", (substitute, team_id))
 
-        for tournament in comp.values():
+        for tournament in sorted(comp.values(), key=lambda a: "practice" not in a.nice_name()):
             # create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
             #     id INTEGER PRIMARY KEY AUTOINCREMENT,
             #     finalsGenerator TEXT,
@@ -301,6 +303,11 @@ if __name__ == "__main__":
             if isinstance(tournament.fixtures_class, Pooled):
                 pools = [*n_chunks(sorted(tournament.teams, key=lambda it: it.nice_name()), 2)]
             for t in tournament.teams:
+                if "practice" in tournament.nice_name():
+                    if t.nice_name() in practice_teams:
+                        continue
+                    else:
+                        practice_teams.append(t.nice_name())
                 s.execute("SELECT id FROM teams WHERE name = ?", (t.name,))
                 team = s.fetchone()[0]
                 pool = None if pools is None else (int(t.name in [i.name for i in pools[1]]) + 1)
@@ -310,6 +317,11 @@ if __name__ == "__main__":
                     (tournamentId, team, 0, 0, 0, 0, pool))
 
             for official in tournament.officials:
+                if "practice" in tournament.nice_name():
+                    if official.nice_name() in practice_teams:
+                        continue
+                    else:
+                        practice_officials.append(t.nice_name())
                 official_id = \
                     s.execute("SELECT id FROM officials WHERE personId = (SELECT id FROM people WHERE name = ?)",
                               (official.name,)).fetchone()[0]

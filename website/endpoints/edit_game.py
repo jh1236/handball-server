@@ -198,6 +198,19 @@ def add_game_endpoints(app, comps):
         manageGame.undo(game_id)
         return "", 204
 
+    @app.post("/api/games/update/delete")
+    def delete():
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+            }
+        """
+        logger.info(f"Request for delete: {request.json}")
+        game_id = request.json["id"]
+        manageGame.delete(game_id)
+        return "", 204
+
     @app.post("/api/games/update/swapServe")
     def swap_serve():
         tournament = request.json["tournament"]

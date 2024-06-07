@@ -76,7 +76,7 @@ function createPlayers() {
             if (res.ok) {
                 res.json().then(
                     o => {
-                        document.location.href = `/${tournament}games/` + o.id + "/edit"
+                        document.location.href = `/games/` + o.id + "/edit"
                     }
                 )
             } else {
@@ -103,7 +103,7 @@ function createTeams() {
             if (res.ok) {
                 res.json().then(
                     o => {
-                        document.location.href = `/${tournament}games/` + o.id + "/edit"
+                        document.location.href = `/games/` + o.id + "/edit"
                     }
                 )
             } else {

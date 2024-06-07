@@ -386,7 +386,7 @@ def add_tournament_specific(app):
                                 INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId 
                                 WHERE IIF(? is NULL, 1, tournamentId = ?) AND
                                 tournamentTeams.gamesPlayed > 0;""",
-                (tournamentId,tournamentId),
+                (tournamentId, tournamentId),
             ).fetchall()
             teams = [Team(*team) for team in teams]
 
@@ -398,10 +398,11 @@ def add_tournament_specific(app):
             200,
         )
 
-    #TODO: unfathomably slow
+    # TODO: unfathomably slow
     @app.get("/<tournament>/teams/<team_name>/")
     def team_site(tournament, team_name):
         tournament_id = get_tournament_id(tournament)
+
         @dataclass
         class TeamStats:
             name: str
@@ -510,7 +511,7 @@ FROM teams
 
 where teams.searchableName = ? AND IIF(? is NULL, 1, tournaments.id = ?) AND NOT games.isFinal AND NOT games.isBye AND games.isRanked
 ;""",
-                (team_name,tournament_id,tournament_id),
+                (team_name, tournament_id, tournament_id),
             ).fetchone()
 
             if not team:
@@ -618,7 +619,7 @@ FROM teams
             200,
         )
 
-    #TODO: implement
+    # TODO: implement
     @app.get("/<tournament>/games/<game_id>/display")
     def scoreboard(tournament, game_id):
         if int(game_id) >= len(comps[tournament].games_to_list()):
@@ -1384,7 +1385,7 @@ GROUP BY games.court""",
                                              INNER JOIN tournaments ON tournaments.id = games.tournamentId
                                     WHERE people.searchableName = ? and IIF(? is NULL, 1, tournaments.id = ?)
             """,
-                (nice_name, tournament_id,tournament_id,),
+                (nice_name, tournament_id, tournament_id,),
             ).fetchone()
             games = c.execute(
                 """SELECT DISTINCT games.id,
@@ -1445,7 +1446,7 @@ GROUP BY games.court""",
                 """
             SELECT name, searchableName from officials INNER JOIN people on people.id = officials.personId
              WHERE EXISTS(SELECT games.id FROM games  WHERE official = officials.id AND IIF(? is NULL, 1, games.tournamentId = ?))
-            """, (tournament_id,tournament_id)
+            """, (tournament_id, tournament_id)
             ).fetchall()
         return (
             render_template_sidebar(
@@ -1603,7 +1604,7 @@ FROM officials INNER JOIN people on officials.personId = people.id
 
         teams = {}
         cards = [Card(*i) for i in cards_query]
-        game = Game(game_id, *game_query[1:], True, False)
+        game = Game(game_id, *game_query[1:], True, True)
         players = []
         player_headers = [
             "Points Scored",
@@ -1695,27 +1696,32 @@ FROM officials INNER JOIN people on officials.personId = people.id
                 200,
             )
         else:
-            return redirect(f"/{tournament}/games/{game_id}")
+            return redirect(f"/games/{game_id}")
 
-    #TODO: UPDATE
+    # TODO: UPDATE
     @app.get("/<tournament>/create")
     @officials_only
     def create_game(tournament):
-        # if not comps[tournament].fixtures_class.manual_allowed():
-        #     return (
-        #         render_template(
-        #             "tournament_specific/game_editor/game_done.html",
-        #             error="This competition cannot be edited manually!",
-        #         ),
-        #         400,
-        #     )
         tournament_id = get_tournament_id(tournament)
         with DatabaseManager() as c:
-            teams = c.execute("""SELECT searchableName, name FROM teams INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId where tournamentid = ? order by searchableName""", (tournament_id,)).fetchall()
-            next_id = c.execute("""SELECT id FROM games ORDER BY id DESC LIMIT 1""").fetchone()[0]
-            officials = c.execute("""SELECT searchableName, name, password FROM officials INNER JOIN main.people on officials.personId = people.id""").fetchall()
+            editable = c.execute(
+                "SELECT fixturesGenerator from tournaments where id = ?",
+                (tournament_id,),
+            ).fetchone()
+            teams = c.execute(
+                """SELECT searchableName, name FROM teams INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId and tournamentTeams.tournamentid = ? order by searchableName""",
+                (tournament_id,)).fetchall()
+            officials = c.execute(
+                """SELECT searchableName, name, password FROM officials INNER JOIN main.people on officials.personId = people.id""").fetchall()
+        if not get_type_from_name(editable[0]).manual_allowed():
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="This competition cannot be edited manually!",
+                ),
+                400,
+            )
         key = fetch_user()
-
         # if key not in [i[2] for i in officials if i.admin]:
         #     officials = [i for i in officials if i.key == key]
         # else:
@@ -1728,43 +1734,24 @@ FROM officials INNER JOIN people on officials.personId = people.id
                 tournamentLink=link(tournament),
                 officials=officials,
                 teams=teams,
-                id=next_id,
             ),
             200,
         )
 
-    #TODO: UPDATE
-    @app.get("/<tournament>/round")
-    @admin_only
-    def new_round_site(tournament):
-        if not comps[tournament].fixtures_class.manual_allowed():
-            return (
-                render_template(
-                    "tournament_specific/game_editor/game_done.html",
-                    error="This competition cannot be edited manually!",
-                ),
-                400,
-            )
-        elif any(
-                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
-        ):
-            return (
-                render_template(
-                    "tournament_specific/game_editor/game_done.html",
-                    error="There is already a game in progress!",
-                ),
-                400,
-            )
-
-        comps[tournament].update_games(True)
-        comps[tournament].update_games()
-        comps[tournament].save()
-        return redirect(f"/{comps[tournament].nice_name()}/", code=302)
-
-    #TODO: UPDATE
+    # TODO: UPDATE
     @app.get("/<tournament>/createPlayers")
     def create_game_players(tournament):
-        if not comps[tournament].fixtures_class.manual_allowed():
+        tournament_id = get_tournament_id(tournament)
+        with DatabaseManager() as c:
+            editable = c.execute(
+                "SELECT fixturesGenerator from tournaments where id = ?",
+                (tournament_id,),
+            ).fetchone()
+            players = c.execute(
+                """SELECT searchableName, name FROM people order by searchableName""").fetchall()
+            officials = c.execute(
+                """SELECT searchableName, name, password FROM officials INNER JOIN main.people on officials.personId = people.id""").fetchall()
+        if not get_type_from_name(editable[0]).manual_allowed():
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -1772,32 +1759,16 @@ FROM officials INNER JOIN people on officials.personId = people.id
                 ),
                 400,
             )
-        elif any(
-                [not (i.best_player or i.bye) for i in comps[tournament].games_to_list()]
-        ):
-            return (
-                render_template(
-                    "tournament_specific/game_editor/game_done.html",
-                    error="There is already a game in progress!",
-                ),
-                400,
-            )
-        players = sorted(comps[tournament].players, key=lambda a: a.nice_name())
-        next_id = (
-            comps[tournament].fixtures[-1][-1].id if comps[tournament].fixtures else 0
-        )
-        officials = comps[tournament].officials
 
         key = fetch_user()
-        if key not in [i.key for i in get_all_officials() if i.admin]:
-            officials = [i for i in officials if i.key == key]
-        else:
-            official = [i for i in officials if i.key == key]
-            officials = official + [i for i in officials if i.key != key]
+        # if key not in [i.key for i in get_all_officials() if i.admin]:
+        #     officials = [i for i in officials if i.key == key]
+        official = [i for i in officials if i[2] == key]
+        officials = official + [i for i in officials if i[2] != key]
         return (
             render_template(
                 "tournament_specific/game_editor/create_game_players.html",
-                tournament=link(tournament),
+                tournamentLink=link(tournament),
                 officials=officials,
                 players=players,
             ),

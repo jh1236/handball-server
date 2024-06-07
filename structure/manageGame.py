@@ -141,7 +141,6 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
             """UPDATE games SET status = adminStatus = 'In Progress', startTime = ?, IGASide = ? where id = ?""",
             (time.time(), iga, game_id,))
         if official:
-            print(official)
             c.execute("""
                 UPDATE games SET official = 
                 (SELECT officials.id
@@ -225,7 +224,6 @@ def card(game_id, first_team, left_player, color, duration, reason):
         both_carded = c.execute(
             """SELECT MIN(iif(cardTimeRemaining < 0, 12, cardTimeRemaining)) FROM playerGameStats WHERE playerGameStats.gameId = ? AND playerGameStats.teamId = ?""",
             (game_id, team)).fetchone()[0]
-        print(both_carded)
         if both_carded != 0:
             my_score, their_score = c.execute("""SELECT teamOneScore, teamTwoScore FROM games WHERE games.id = ?""",
                                               (game_id,)).fetchone()
@@ -313,13 +311,17 @@ def create_game(tournamentId, team_one, team_two, official, players_one=None, pl
         if players_one is not None:
             players = [None, None, None]
             for i, v in enumerate(players_one):
-                players[i] = c.execute("""SELECT id FROM people WHERE people.searchableName = ?""", (i,)).fetchone()[0]
-
-            first_team = c.execute("""SELECT id FROM teams WHERE (captain = ? or nonCaptain = ? or substitute = ?)
-             and (captain = ? or nonCaptain = ? or substitute = ?)
-             and (captain = ? or nonCaptain = ? or substitute = ?)""",
-                                   (players[0], players[0], players[0], players[1], players[1], players[1], players[2],
-                                    players[2], players[2])).fetchone()
+                players[i] = c.execute("""SELECT id FROM people WHERE people.searchableName = ?""", (v,)).fetchone()[0]
+            print(players)
+            first_team = c.execute("""SELECT id
+FROM teams
+WHERE (captain = ? or nonCaptain = ? or substitute = ?)
+  AND IIF(? is null, 1, (captain = ? or nonCaptain = ? or substitute = ?))
+  AND IIF(? is null, 1, (captain = ? or nonCaptain = ? or substitute = ?))
+""",
+                                   (players[0], players[0], players[0], players[1],players[1], players[1], players[1], players[2],
+                                    players[2], players[2], players[2])).fetchone()
+            print(first_team)
             if first_team:
                 first_team = first_team[0]
             else:
@@ -332,19 +334,22 @@ def create_game(tournamentId, team_one, team_two, official, players_one=None, pl
         if players_two is not None:
             players = [None, None, None]
             for i, v in enumerate(players_two):
-                players[i] = c.execute("""SELECT id FROM people WHERE people.searchableName = ?""", (i,)).fetchone()[0]
+                players[i] = c.execute("""SELECT id FROM people WHERE people.searchableName = ?""", (v,)).fetchone()[0]
 
-            second_team = c.execute("""SELECT id FROM teams WHERE (captain = ? or nonCaptain = ? or substitute = ?)
-             and (captain = ? or nonCaptain = ? or substitute = ?)
-             and (captain = ? or nonCaptain = ? or substitute = ?)""",
-                                    (players[0], players[0], players[0], players[1], players[1], players[1], players[2],
-                                     players[2], players[2])).fetchone()[0]
+            second_team = c.execute("""SELECT id
+FROM teams
+WHERE (captain = ? or nonCaptain = ? or substitute = ?)
+  AND IIF(? is null, 1, (captain = ? or nonCaptain = ? or substitute = ?))
+  AND IIF(? is null, 1, (captain = ? or nonCaptain = ? or substitute = ?))
+""",
+                                    (players[0], players[0], players[0], players[1], players[1], players[1], players[1], players[2],
+                                     players[2], players[2], players[2])).fetchone()
             if second_team:
                 second_team = second_team[0]
             else:
                 c.execute(
                     """INSERT INTO teams(name, searchableName, captain, nonCaptain, substitute) VALUES (?, ?, ?, ?, ?)""",
-                    (team_one, searchable_of(team_one), players[0], players[1], players[2]))
+                    (team_two, searchable_of(team_two), players[0], players[1], players[2]))
                 second_team = c.execute("""SELECT id FROM teams ORDER BY id DESC LIMIT 1""").fetchone()[0]
         else:
             second_team = c.execute("""SELECT id FROM teams WHERE searchableName = ?""", (team_two,)).fetchone()[0]
@@ -352,8 +357,10 @@ def create_game(tournamentId, team_one, team_two, official, players_one=None, pl
         ranked = True
 
         for i in [first_team, second_team]:
+            print(c.execute("""SELECT id FROM tournamentTeams WHERE teamId = ? AND tournamentId = ?""",
+                            (i, tournamentId)).fetchone())
             if c.execute("""SELECT id FROM tournamentTeams WHERE teamId = ? AND tournamentId = ?""",
-                         (first_team, tournamentId)) is None:
+                         (i, tournamentId)).fetchone() is None:
                 c.execute(
                     """INSERT INTO tournamentTeams(tournamentId, teamId, gamesWon, gamesPlayed, gamesLost, timeoutsCalled) VALUES (?, ?, 0, 0, 0, 0)""",
                     (
@@ -395,3 +402,10 @@ def create_game(tournamentId, team_one, team_two, official, players_one=None, pl
                     """INSERT INTO playerGameStats(gameId, playerId, teamId, opponentId, tournamentId, roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt) VALUES (?, ?, ?, ?, ?, 0, 0, 0, '')""",
                     (game_id, j[0], i, opp, tournamentId))
         return game_id
+
+
+def delete(game_id):
+    with DatabaseManager() as c:
+        c.execute("""DELETE FROM playerGameStats WHERE playerGameStats.gameId = ?""", (game_id,))
+        c.execute("""DELETE FROM gameEvents WHERE gameEvents.gameId = ?""", (game_id,))
+        c.execute("""DELETE FROM games WHERE games.id = ?""", (game_id,))

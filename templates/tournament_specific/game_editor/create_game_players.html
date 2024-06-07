@@ -12,8 +12,7 @@
 
 <script src="{{ url_for('static', filename='js/createGame.js') }}"></script>
 <script>
-    setTournament("{{ tournament }}")
-    setup(-1, false)
+    setTournament("{{ tournamentLink }}")
 </script>
 <h1>Create Game </h1>
 <p onclick="document.location.href = document.location.href.replace('createPlayers','create')"><i>Choose Teams Instead</i></p>
@@ -30,7 +29,7 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne0">Player One</button>
                 <div class="dropdown-content">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p.nice_name()}}', '{{p}}', 0)">{{p}}</p>
+                    <p onclick="setTeamListOne('{{p[0]}}', '{{p[1]}}', 0)">{{p[1]}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -41,7 +40,7 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo0">Player One</button>
                 <div class="dropdown-content">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p.nice_name()}}', '{{p}}', 0)">{{p}}</p>
+                    <p onclick="setTeamListTwo('{{p[0]}}', '{{p[1]}}', 0)">{{p[1]}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -53,7 +52,7 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne1">Player Two</button>
                 <div class="dropdown-content">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p.nice_name()}}', '{{p}}', 1)">{{p}}</p>
+                    <p onclick="setTeamListOne('{{p[0]}}', '{{p[1]}}', 1)">{{p[1]}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -64,7 +63,7 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo1">Player Two</button>
                 <div class="dropdown-content">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p.nice_name()}}', '{{p}}', 1)">{{p}}</p>
+                    <p onclick="setTeamListTwo('{{p[0]}}', '{{p[1]}}', 1)">{{p[1]}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -79,7 +78,7 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne2">Add Substitute</button>
                 <div class="dropdown-content">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p.nice_name()}}', '{{p}}', 2)">{{p}}</p>
+                    <p onclick="setTeamListOne('{{p[0]}}', '{{p[1]}}', 2)">{{p[1]}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -90,7 +89,7 @@
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo2">Add Substitute</button>
                 <div class="dropdown-content">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p.nice_name()}}', '{{p}}', 2)">{{p}}</p>
+                    <p onclick="setTeamListTwo('{{p[0]}}', '{{p[1]}}', 2)">{{p[1]}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -106,12 +105,12 @@
         <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
         <div class="dropdown-content">
             {% for i in officials %}
-                <p onclick="setOfficial('{{i.nice_name()}}', '{{i.tidy_name()}}')">{{i.tidy_name()}}</p>
+                <p onclick="setOfficial('{{i[0]}}', '{{i[1]}}')">{{i[1]}}</p>
             {% endfor %}
         </div>
     </div>
 {% endif %}
-<script>setOfficial('{{officials[0].nice_name()}}', '{{officials[0].tidy_name()}}')</script>
+<script>setOfficial('{{officials[0][0]}}', '{{officials[0][1]}}')</script>
 <br>
 <br>
 <button onclick="createPlayers()" class="button">Start</button>
