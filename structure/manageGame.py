@@ -17,7 +17,10 @@ SET teamOneScore    = lg.teamOneScore,
     started         = lg.started,
     ended           = lg.ended,
     protested       = lg.protested,
-    resolved        = lg.resolved
+    resolved        = lg.resolved,
+    playerToServe = lg.playerToServe,
+    teamToServe = lg.teamToServe,
+    sideToServe = lg.sideToServe
 FROM liveGames lg
 WHERE lg.id = games.id AND games.id = ?""", (game_id,))
 
@@ -175,18 +178,28 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
         sync_tables(game_id, c)
 
 
+def game_is_over(game_id, c):
+    return c.execute("""SELECT someoneHasWon FROM liveGames WHERE liveGames.id = ?""", (game_id,)).fetchone()[0]
+
+
 def _score_point(game_id, c, first_team, left_player, penalty=False):
+    if game_is_over(game_id, c):
+        raise ValueError("Game is Already Over!")
     _add_to_game(game_id, c, "Score", first_team, left_player, team_to_serve=first_team,
                  notes="Penalty" if penalty else None)
 
 
 def score_point(game_id, first_team, left_player):
     with DatabaseManager() as c:
+        if game_is_over(game_id, c):
+            raise ValueError("Game is Already Over!")
         _score_point(game_id, c, first_team, left_player)
 
 
 def ace(game_id):
     with DatabaseManager() as c:
+        if game_is_over(game_id, c):
+            raise ValueError("Game is Already Over!")
         first_team = bool(
             c.execute("""SELECT teamOne == teamToServe FROM liveGames WHERE liveGames.id = ?""", (game_id,)).fetchone()[
                 0])
@@ -199,6 +212,8 @@ def ace(game_id):
 
 def fault(game_id):
     with DatabaseManager() as c:
+        if game_is_over(game_id, c):
+            raise ValueError("Game is Already Over!")
         first_team = bool(
             c.execute("""SELECT teamOne = teamToServe FROM liveGames WHERE liveGames.id = ?""", (game_id,)).fetchone()[
                 0])
@@ -259,21 +274,27 @@ def change_code(game_id):
                           WHERE gameId = ? 
                           ORDER BY 
                              id DESC
-                          LIMIT 1""", (game_id,)).fetchone() or (0))[0]
+                          LIMIT 1""", (game_id,)).fetchone() or [0])[0]
 
 
 def time_out(game_id, first_team):
     with DatabaseManager() as c:
+        if game_is_over(game_id, c):
+            raise ValueError("Game is Already Over!")
         _add_to_game(game_id, c, "Timeout", first_team, None)
 
 
 def forfeit(game_id, first_team):
     with DatabaseManager() as c:
+        if game_is_over(game_id, c):
+            raise ValueError("Game is Already Over!")
         _add_to_game(game_id, c, "Forfeit", first_team, None)
 
 
 def end_timeout(game_id):
     with DatabaseManager() as c:
+        if game_is_over(game_id, c):
+            raise ValueError("Game is Already Over!")
         _add_to_game(game_id, c, "End Timeout", None, None)
 
 
@@ -402,6 +423,37 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
                     """INSERT INTO playerGameStats(gameId, playerId, teamId, opponentId, tournamentId, roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt) VALUES (?, ?, ?, ?, ?, 0, 0, 0, '')""",
                     (game_id, j[0], i, opp, tournamentId))
         return game_id
+
+
+def get_timeout_time(game_id):
+    """Returns the time which the timeout expires"""
+    with DatabaseManager() as c:
+        time_out_time = (c.execute("""SELECT time
+                    FROM gameEvents
+                    WHERE gameId = ?
+                      AND eventType = 'Timeout'
+                      AND not EXISTS(SELECT id
+                                     FROM gameEvents i
+                                     WHERE i.id > gameEvents.id
+                                     AND i.gameId = gameEvents.gameId
+                                       AND i.eventType = 'End Timeout')""", (game_id,)).fetchone() or [-1])[0]
+        return time_out_time + 30 if (time_out_time > 0) else 0
+
+
+def get_timeout_caller(game_id):
+    """Returns if the first team listed called the timeout"""
+    with DatabaseManager() as c:
+        time_out_time = (c.execute("""SELECT teamId == games.teamOne
+                    FROM gameEvents INNER join games on gameEvents.gameId = games.id
+                    WHERE games.Id = ?
+                      AND eventType = 'Timeout'
+                      AND not EXISTS(SELECT i.id
+                                     FROM gameEvents i
+                                     WHERE i.id > gameEvents.id
+                                     AND i.gameId = gameEvents.gameId
+                                       AND i.eventType = 'End Timeout') ORDER BY gameEvents.id desc LIMIT 1""",
+                                   (game_id,)).fetchone() or [0])[0]
+        return time_out_time
 
 
 def delete(game_id):

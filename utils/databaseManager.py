@@ -84,6 +84,9 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     IGASide INTEGER,
     gameStringVersion INTEGER,
     gameString TEXT,
+    playerToServe INTEGER,
+    teamToServe INTEGER,
+    sideToServe TEXT,
     startTime INTEGER,
     length INTEGER,
     court INTEGER,
@@ -99,6 +102,8 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     FOREIGN KEY (teamOne) REFERENCES teams (id),
     FOREIGN KEY (teamTwo) REFERENCES teams (id),
     FOREIGN KEY (bestPlayer) REFERENCES people (id),
+    FOREIGN KEY (playerToServe) REFERENCES people (id),
+    FOREIGN KEY (teamToServe) REFERENCES teams (id),
     FOREIGN KEY (official) REFERENCES officials (id),
     FOREIGN KEY (scorer) REFERENCES officials (id),
     FOREIGN KEY (IGASide) REFERENCES teams (id)

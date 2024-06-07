@@ -148,7 +148,10 @@ SET teamOneScore    = lg.teamOneScore,
     started         = lg.started,
     ended           = lg.ended,
     protested       = lg.protested,
-    resolved        = lg.resolved
+    resolved        = lg.resolved,
+    playerToServe = lg.playerToServe,
+    teamToServe = lg.teamToServe,
+    sideToServe = lg.sideToServe
 FROM liveGames lg
 WHERE lg.id = games.id AND games.id = ?""", (game_id,))
 

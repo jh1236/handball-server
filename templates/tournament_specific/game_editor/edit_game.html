@@ -7,8 +7,6 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-<nav id="navBar"></nav>
-{#<script src="{{ url_for('static', filename='js/index.js') }}"></script>#}
 <script src="{{ url_for('static', filename='js/scorer.js') }}" teamOne='{{ ','.join(teamOneNames) }}'
         teamTwo='{{ ','.join(teamTwoNames) }}'></script>
 <script>
@@ -205,15 +203,15 @@
         </tr>
         <tr>
             {% if VERBAL_WARNINGS %}
-            <td>
-                <button onclick="openCardModal('Warning', true, '{{ teams[0].name }}')" class="gray_button">
-                    Warning {{ teams[0].name }}</button>
-            </td>
-            <td></td>
-            <td>
-                <button onclick="openCardModal('Warning', false, '{{ teams[1].name }}')" class="gray_button">
-                    Warning {{ teams[1].name }}</button>
-            </td>
+                <td>
+                    <button onclick="openCardModal('Warning', true, '{{ teams[0].name }}')" class="gray_button">
+                        Warning {{ teams[0].name }}</button>
+                </td>
+                <td></td>
+                <td>
+                    <button onclick="openCardModal('Warning', false, '{{ teams[1].name }}')" class="gray_button">
+                        Warning {{ teams[1].name }}</button>
+                </td>
             {% else %}
                 <td>
                     <button onclick="openCardModal('Green', true, '{{ teams[0].name }}')" class="green_button">
@@ -287,6 +285,9 @@
     </div>
     <br><br>
     <button class="button" onclick="undo()" style="background-color: #2a5d88;">Undo</button>
+    {% if game.someone_has_won %}
+        <button class="button" onclick="next()" style="background-color: #2a5d88;">Next</button>
+    {% endif %}
     {% if game.in_timeout %}
         <script>timeoutOverlay({{ timeout_time }}, {{ timeout_first }})</script>
     {% endif %}
@@ -353,7 +354,11 @@
     </div>
 
 </div>
-
+{% if timeout_time > 0 %}
+    <script>
+        timeoutOverlay({{ timeout_time }}, {{ timeout_first }})
+    </script>
+{% endif %}
 
 </body>
 </html>

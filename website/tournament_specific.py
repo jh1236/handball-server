@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from flask import render_template, request, redirect, Response
 
 from FixtureMakers.FixtureMaker import get_type_from_name
+from structure import manageGame
 from structure.AllTournament import (
     get_all_officials,
 )
@@ -31,7 +32,7 @@ def priority_to_classname(p):
 
 
 def add_tournament_specific(app):
-    @app.get("/<tournament>/")  # TODO: Implement pooled, Also, this is appallingly slow
+    @app.get("/<tournament>/")  # TODO: Implement pooled
     def home_page(tournament: str):
         tournamentId: int = get_tournament_id(tournament)
         if tournamentId is None:
@@ -398,7 +399,6 @@ def add_tournament_specific(app):
             200,
         )
 
-    # TODO: unfathomably slow
     @app.get("/<tournament>/teams/<team_name>/")
     def team_site(tournament, team_name):
         tournament_id = get_tournament_id(tournament)
@@ -620,47 +620,144 @@ FROM teams
         )
 
     # TODO: implement
-    @app.get("/<tournament>/games/<game_id>/display")
-    def scoreboard(tournament, game_id):
-        if int(game_id) >= len(comps[tournament].games_to_list()):
+    @app.get("/games/<game_id>/display")
+    def scoreboard(game_id):
+        with DatabaseManager() as c:
+            players = c.execute(
+                """SELECT people.name,
+       people.searchableName,
+       playerGameStats.cardTime,
+       playerGameStats.cardTimeRemaining,
+       playerGameStats.playerId = games.playerToServe,
+       coalesce(punishments.hex, '#000000'),
+       teams.name, -- 6
+       teams.searchableName,
+       case
+           when teams.imageURL is null
+               then '/api/teams/image?name=blank'
+           else
+               teams.imageURL
+           end,
+       IIF(teams.id = games.teamOne, games.teamOneScore, games.teamTwoScore),
+       1 - coalesce(IIF(teams.id = games.teamOne, games.teamOneTimeouts, games.teamTwoTimeouts), 0),
+       games.id, --11
+       po.name,          
+       po.searchableName,
+       ps.name,
+       ps.searchableName,
+       games.court,    --16
+       games.round,
+       gameEvents.eventType = 'Fault',
+       lastGE.nextServeSide
+FROM games
+         INNER JOIN playerGameStats on playerGameStats.gameId = games.id
+         INNER JOIN tournaments on tournaments.id = games.tournamentId
+         LEFT JOIN officials o on o.id = games.official
+         LEFT JOIN people po on po.id = o.personId
+         LEFT JOIN officials s on s.id = games.scorer
+         LEFT JOIN people ps on ps.id = s.personId
+         INNER JOIN people on people.id = playerGameStats.playerId
+         LEFT JOIN people best on best.id = games.bestPlayer
+         INNER JOIN teams on teams.id = playerGameStats.teamId
+         INNER JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
+         LEFT JOIN gameEvents ON games.id = gameEvents.gameId AND gameEvents.id =
+                                                                  (SELECT MAX(id)
+                                                                   FROM gameEvents
+                                                                   WHERE games.id = gameEvents.gameId
+                                                                     AND (gameEvents.eventType = 'Fault' or gameEvents.eventType = 'Score'))
+         LEFT JOIN gameEvents lastGE ON games.id = lastGE.gameId AND lastGE.id =
+                                                                     (SELECT MAX(id)
+                                                                      FROM gameEvents
+                                                                      WHERE games.id = gameEvents.gameId)
+         LEFT JOIN punishments ON punishments.gameId =
+                                       (SELECT MAX(id)
+                                       FROM gameEvents
+                                       WHERE games.id = punishments.gameId AND punishments.playerId = playerGameStats.playerId)
+WHERE games.id = ?
+GROUP BY people.name
+order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
+                (game_id,),
+            ).fetchall()
+        if not players:
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
                     error="Game Does not exist",
                 ),
-                400,
+                404,
             )
 
-        game = comps[tournament].get_game(int(game_id))
+        @dataclass
+        class Player:
+            name: str
+            searchableName: str
+            cardTime: int
+            cardTimeRemaining: int
+            serving: bool
+            hex: str
+
+        @dataclass
+        class Team:
+            players: list[Player]
+            name: str
+            searchableName: str
+            imageUrl: str
+            score: int
+            timeouts: int
+            cardTime: int = 0
+            cardTimeRemaining: int = 0
+
+        @dataclass
+        class Game:
+            players: list[Player]
+            teams: list[Team]
+            courtName: str
+            score_string: str
+            id: int
+            umpire: str
+            umpireSearchableName: str
+            scorer: str
+            scorerSearchableName: str
+            court: int
+            round: int
+            faulted: bool
+            serverSide: str
+
+        teams = {}
+        player_stats = []
+
+        for i in players:
+            pl = Player(*i[:6])
+            player_stats.append(pl)
+            if i[6] not in teams:
+                teams[i[6]] = Team([], *i[6:11])
+            teams[i[6]].players.append(pl)
+            if teams[i[6]].cardTime != -1:
+                if pl.cardTime and pl.cardTime < 0: teams[i[6]].cardTime = -1
+                teams[i[6]].cardTime = max(pl.cardTime or 0, teams[i[6]].cardTime)
+                if pl.cardTime and pl.cardTimeRemaining < 0: teams[i[6]].cardTimeRemaining = -1
+                teams[i[6]].cardTimeRemaining = max(pl.cardTimeRemaining or 0, teams[i[6]].cardTimeRemaining)
         visual_swap = request.args.get("swap", "false") == "true"
-        teams = game.teams
+        teams = list(teams.values())
+        print(players[0][10:])
+        game = Game(player_stats,
+                    teams, f"Court {players[0][16]}",
+                    f"{teams[0].score} - {teams[1].score}", *players[0][11:])
         if visual_swap:
             teams = list(reversed(teams))
-        players = game.current_players
-        round_number = game.round_number + 1
-        if not game.started:
-            status = "Waiting for toss"
-        elif game.in_timeout:
-            status = "In Timeout"
-        elif not game.game_ended:
-            status = "Game in Progress"
-        elif not game.best_player:
-            status = "Finished"
-        else:
-            status = "Official"
+
+        print(f"{manageGame.get_timeout_time(game_id) - time.time() = }")
+
         return (
             render_template_sidebar(
                 "tournament_specific/scoreboard.html",
                 game=game,
-                status=status,
-                players=players,
+                status="Status", #TODO: fix
+                players=player_stats,
                 teams=teams,
-                official=game.primary_official,
-                roundNumber=round_number,
-                update_count=game.update_count,
-                tournament=link(tournament),
-                timeout_time=max([i.time_out_time + 30 for i in game.teams]) * 1000,
-                serve_time=(game.serve_clock + 8) * 1000,
+                update_count=manageGame.change_code(game_id),
+                timeout_time=manageGame.get_timeout_time(game_id) * 1000, # TODO: fix
+                serve_time=0, #Todo: Fix
             ),
             200,
         )
@@ -737,7 +834,7 @@ FROM teams
                                          INNER JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
                                 WHERE games.id = ?
                                 GROUP BY people.name
-                                order by teams.id = games.teamOne, playerGameStats.sideOfCourt;""",
+                                order by teams.id <> games.teamOne, playerGameStats.sideOfCourt;""",
                 (game_id,),
             ).fetchall()
             other_matches = c.execute(
@@ -1465,6 +1562,7 @@ GROUP BY games.court""",
         with DatabaseManager() as c:
             game_query = c.execute("""
 SELECT games.tournamentId,
+      tournaments.fixturesGenerator,
        isBye,
        po.name,
        po.searchableName,
@@ -1546,7 +1644,7 @@ FROM games
             cards_query = c.execute("""SELECT people.name, playerGameStats.teamId, type, reason, hex 
             FROM punishments 
             INNER JOIN people on people.id = punishments.playerId
-            INNER JOIN playerGameStats on playerGameStats.playerId = punishments.playerId and playerGameStats.gameId = ?
+            INNER JOIN playerGameStats on playerGameStats.playerId = punishments.playerId and playerGameStats.teamId = punishments.teamId and playerGameStats.gameId = ?
          WHERE playerGameStats.tournamentId = punishments.tournamentId
 """, (game_id,)).fetchall()
             officials_query = c.execute("""SELECT searchableName, name 
@@ -1604,7 +1702,8 @@ FROM officials INNER JOIN people on officials.personId = people.id
 
         teams = {}
         cards = [Card(*i) for i in cards_query]
-        game = Game(game_id, *game_query[1:], True, True)
+        game = Game(game_id, *game_query[2:], True, get_type_from_name(game_query[1]).manual_allowed()
+                    )
         players = []
         player_headers = [
             "Points Scored",
@@ -1647,6 +1746,7 @@ FROM officials INNER JOIN people on officials.personId = people.id
                 400,
             )
         elif not game.started:
+
             return (
                 render_template(
                     "tournament_specific/game_editor/game_start.html",
@@ -1661,7 +1761,7 @@ FROM officials INNER JOIN people on officials.personId = people.id
                 ),
                 200,
             )
-        elif not game.someone_has_won:
+        else:
             return (
                 render_template(
                     f"tournament_specific/game_editor/edit_game.html",
@@ -1674,14 +1774,156 @@ FROM officials INNER JOIN people on officials.personId = people.id
                     teams=teams,
                     enum_teams=enumerate(teams),
                     game=game,
-                    timeout_time=0,
-                    timeout_first=0,
+                    timeout_time=manageGame.get_timeout_time(game_id) * 1000,
+                    timeout_first=manageGame.get_timeout_caller(game_id),
                     match_points=0 if max([i.score for i in teams]) < 10 else abs(teams[0].score - teams[1].score),
                     VERBAL_WARNINGS=VERBAL_WARNINGS
                 ),
                 200,
             )
-        elif game.someone_has_won or key in [
+
+    @officials_only
+    @app.get("/games/<game_id>/finalise")
+    def finalise_game(game_id):
+        visual_swap = request.args.get("swap", "false") == "true"
+        visual_str = "true" if visual_swap else "false"
+
+        with DatabaseManager() as c:
+            game_query = c.execute("""
+SELECT games.tournamentId,
+       isBye,
+       po.name,
+       po.searchableName,
+       ps.name,
+       ps.searchableName,
+       tournaments.imageURL,
+       games.someoneHasWon
+FROM liveGames as games
+         INNER JOIN tournaments ON games.tournamentId = tournaments.id
+         INNER JOIN officials o ON games.official = o.id
+         INNER JOIN people po ON o.personId = po.id
+         LEFT JOIN officials s ON games.scorer = o.id
+         LEFT JOIN people ps ON s.personId = ps.id
+         LEFT JOIN gameEvents ON games.id = gameEvents.gameId AND gameEvents.id =
+                                                                  (SELECT MAX(id)
+                                                                   FROM gameEvents
+                                                                   WHERE games.id = gameEvents.gameId
+                                                                     AND (gameEvents.eventType = 'Fault' or gameEvents.eventType = 'Score'))
+         LEFT JOIN gameEvents lastGE ON games.id = lastGE.gameId AND lastGE.id =
+                                                                     (SELECT MAX(id)
+                                                                      FROM gameEvents
+                                                                      WHERE games.id = gameEvents.gameId)
+         LEFT JOIN people server on lastGE.nextPlayerToServe = server.id
+WHERE games.id = ?
+            """, (game_id,)).fetchone()
+
+            teams_query = c.execute("""SELECT teams.id, teams.name,
+       teams.searchableName,
+       teams.id <> games.teamOne,
+       Case
+           WHEN games.teamTwo = teams.id THEN
+               games.teamTwoScore
+           ELSE
+               games.teamOneScore END,
+       case
+           when teams.imageURL is null
+               then '/api/teams/image?name=blank'
+           else
+               teams.imageURL
+           end,
+        teams.id = games.teamToServe,
+        IIF(sum(playerGameStats.redCards) > 0, -1, max(playerGameStats.cardTimeRemaining)),
+        max(IIF(playerGameStats.cardTime is null, 0, playerGameStats.cardTime)),
+        max(playerGameStats.greenCards) > 0,
+        Case
+           WHEN games.teamTwo = teams.id THEN
+               games.teamTwoTimeouts
+           ELSE
+               games.teamOneTimeouts END
+FROM liveGames as games
+         INNER JOIN tournaments on games.tournamentId = tournaments.id
+         INNER JOIN teams on (games.teamTwo = teams.id or games.teamOne = teams.id)
+         INNER JOIN playerGameStats on playerGameStats.teamId = teams.id AND playerGameStats.gameId = games.id 
+                    WHERE games.id = ?
+                    GROUP BY teams.id
+ORDER BY teams.id <> games.teamOne
+""", (game_id,)).fetchall()
+            players_query = c.execute("""SELECT 
+            playerGameStats.teamId, people.name, people.searchableName,
+            playerGameStats.points,
+            playerGameStats.aces,
+            playerGameStats.faults,      
+            playerGameStats.doubleFaults,
+            playerGameStats.roundsPlayed,
+            playerGameStats.roundsBenched,
+            playerGameStats.greenCards,
+            playerGameStats.yellowCards, 
+            playerGameStats.redCards
+FROM games
+         INNER JOIN playerGameStats on games.id = playerGameStats.gameId
+         INNER JOIN people on people.id = playerGameStats.playerId
+         WHERE gameId = ?
+""", (game_id,)).fetchall()
+
+        @dataclass
+        class Player:
+            name: str
+            searchable_name: str
+            stats: dict[str, object]
+
+        @dataclass
+        class Team:
+            name: str
+            searchable_name: str
+            sort: int
+            score: int
+            image_url: str
+            serving: bool
+            card_time_remaining: int
+            card_time: int
+            green_carded: bool
+            timeouts: int
+            players: list[Player]
+
+        @dataclass
+        class Game:
+            id: int
+            bye: bool
+            official: str
+            official_searchable_name: str
+            scorer: str
+            scorer_searchable_name: str
+            image: str
+            someone_has_won: bool
+            has_scorer: bool
+
+        teams = {}
+        game = Game(game_id, *game_query[1:], True)
+        players = []
+        player_headers = [
+            "Points Scored",
+            "Aces",
+            "Faults",
+            "Double Faults",
+            "Rounds Played",
+            "Rounds Benched",
+            "Green Cards",
+            "Yellow Cards",
+            "Red Cards",
+        ]
+        for i in teams_query:
+            teams[i[0]] = (Team(*i[1:], []))
+        for i in players_query:
+            player = Player(*i[1:3], {k: v for k, v in zip(player_headers, i[4:])})
+            teams[i[0]].players.append(player)
+            players.append(player)
+        teams = list(teams.values())
+        if visual_swap:
+            teams = list(reversed(teams))
+        key = fetch_user()
+        is_admin = key in [i.key for i in get_all_officials() if i.admin]
+
+        if game.someone_has_won or key in [
             i.key for i in get_all_officials() if i.admin
         ]:
             return (
@@ -1695,8 +1937,6 @@ FROM officials INNER JOIN people on officials.personId = people.id
                 ),
                 200,
             )
-        else:
-            return redirect(f"/games/{game_id}")
 
     # TODO: UPDATE
     @app.get("/<tournament>/create")

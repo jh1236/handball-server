@@ -10,47 +10,47 @@
 <script src="{{ url_for('static', filename='js/scoreboard.js') }}"></script>
 <script>
     setup({{game.id}}, {{ update_count }})
-    setTournament("{{tournament}}")
+    setTournament("{{tournamentLink}}")
 </script>
-<script>main("{{tournament}}")</script>
-{% if game.in_timeout %}
+<script>main("{{tournamentLink}}")</script>
+{% if timeout_time > 0 %}
     <div class="overlay"><h1 class="big" style="top: 50%" id="timeout">30</h1></div>
     <script>timeout({{ timeout_time }})</script>
 {% endif %}
 <table class="jaredTable">
 
     <tr>
-        <td><a class="hide" href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"><h1
+        <td><a class="hide" href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"><h1
                 style="font-size: 50px">{{ teams[0].name }}</h1></a></td>
-        <td><a href="/{{ tournament }}games/{{ game.id }}" class="hide"><h1 style="font-size: 50px"> vs </h1></a></td>
-        <td><a class="hide" href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"><h1
+        <td><a href="/games/{{ game.id }}" class="hide"><h1 style="font-size: 50px"> vs </h1></a></td>
+        <td><a class="hide" href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"><h1
                 style="font-size: 50px">{{ teams[1].name }} </h1></a></td>
     </tr>
     <tr>
-        <th><a href="/{{ tournament }}teams/{{ teams[0].nice_name() }}"
+        <th><a href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"
                class="hide"><img
-                src="{{ teams[0].image() }}"
+                src="{{ teams[0].imageUrl }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></a></th>
-        <th><p><b>Round:</b> <i>{{ roundNumber }}</i></p>
+        <th><p><b>Round:</b> <i>{{ game.round }}</i></p>
             <p><b>Court:</b> <a class="hide"
-                                href="/{{ tournament }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court + 1 }}</i></a>
+                                href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court + 1 }}</i></a>
             </p>
             <p><b>Official:</b>
-                <a class="hide" href="/{{ tournament }}officials/{{ official.nice_name() }}">
-                <i>{{ official }}</i>
+                <a class="hide" href="/{{ tournamentLink }}officials/{{ game.umpireSearchableName }}">
+                <i>{{ game.umpire }}</i>
                </a></p>
             {% if game.scorerSearchableName != 'none_one' %}
                 <p><b>Scorer:</b>
-                    <a class="hide" href="/{{ tournament }}officials/{{ game.scorerSearchableName }}"> <i>{{ game.scorer }}</i>
+                    <a class="hide" href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}"> <i>{{ game.scorer }}</i>
                     </a></p>
             {% endif %}
             <h1 id="serveClock" style="font-size: 50px; color:#000000">0.0</h1>
             <script>serveClock({{ serve_time }})</script>
         </th>
-        <th><a href="/{{ tournament }}teams/{{ teams[1].nice_name() }}"
+        <th><a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"
                                     class="hide"><img
-                src="{{ teams[1].image() }}"
+                src="{{ teams[1].imageUrl }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></a></th>
     </tr>
@@ -70,84 +70,81 @@
     </tr>
     <tr>
         <td>
-            {% if teams[0].card_time() > 0 %}
+            {% if teams[0].cardTimeRemaining > 0 %}
                 <div class="rectangle"
-                     style="background-color: #FCCE6E;width:{{ 100*(teams[0].card_time()) / teams[0].card_duration() }}%"></div>
+                     style="background-color: #FCCE6E;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardDuration }}%"></div>
             {% endif %}
-            {% if teams[0].card_time() < 0 %}
+            {% if teams[0].cardTimeRemaining < 0 %}
                 <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
             {% endif %}
         </td>
         <td></td>
         <td>
-            {% if teams[1].card_time() > 0 %}
+
+            {% if teams[1].cardTimeRemaining > 0 %}
                 <div class="rectangle"
-                     style="background-color: #FCCE6E;width:{{ 100*(teams[1].card_time()) / teams[1].card_duration() }}%"></div>
+                     style="background-color: #FCCE6E;width:{{ 100*(teams[1].cardTimeRemaining) / teams[1].cardTime }}%"></div>
             {% endif %}
-            {% if teams[1].card_time() < 0 %}
+            {% if teams[1].cardTimeRemaining < 0 %}
                 <div class="rectangle" style="background-color: #EC4A4A"></div>
             {% endif %}
         </td>
     </tr>
     {% for i in range(2) %}
         <tr>
-            <td style="color: {{ teams[0].players[i].biggest_card_hex() }}; font-size: 40px">
-                <a class="hide" href="/{{ tournament }}players/{{ teams[0].players[i].nice_name() }}">
-                    {% if teams[0].players[i].is_carded() %}
+            <td style="color: {{ teams[0].players[i].card_hex }}; font-size: 40px">
+                <a class="hide" href="/{{ tournamentLink }}players/{{ teams[0].players[i].searchableName }}">
+                    {% if teams[0].players[i].cardTimeRemaining != 0 %}
                         <s>
                     {% endif %}
-                    {% if not teams[0].players[i].serving() %}
+                    {% if not teams[0].players[i].serving %}
                         <i>
                     {% else %}
-                        {% if teams[0].faulted %}
+                        {% if game.faulted %}
                             <u>
                         {% endif %}
                         <b> >
                     {% endif %}
-                    {{ teams[0].players[i] }}
-                    {% if teams[0].players[i].serving() %}
-                        {% if game.team_serving.carded %}
-                            ({{ game.server_side[0] }})
-                        {% endif %}
+                    {{ teams[0].players[i].name }}
+                    {% if teams[0].players[i].serving %}
+                        ({{ game.serverSide[0] }})
                         </b>
-                        {% if teams[0].faulted %}
+                        {% if game.faulted %}
                             </u>
                         {% endif %}
                     {% else %}
                         </i>
                     {% endif %}
-                    {% if teams[0].players[i].is_carded() %}
+                    {% if teams[0].players[i].cardTimeRemaining != 0 %}
                         </s>
                     {% endif %}
                 </a>
             </td>
             <td></td>
-            <td style="color: {{ teams[1].players[i].biggest_card_hex() }}; font-size: 40px">
-                <a class="hide" href="/{{ tournament }}players/{{ teams[1].players[i].nice_name() }}">
-                    {% if teams[1].players[i].is_carded() %}
+            <td style="color: {{ teams[1].players[i].card_hex }}; font-size: 40px">
+                <a class="hide" href="/{{ tournamentLink }}players/{{ teams[1].players[i].searchableName }}">
+                    {% if teams[1].players[i].cardTimeRemaining != 0 %}
                         <s>
                     {% endif %}
-                    {% if not teams[1].players[i].serving() %}
+                    {% if not teams[1].players[i].serving %}
                         <i>
                     {% else %}
-                        {% if teams[1].faulted %}
+                        {% if game.faulted %}
                             <u>
                         {% endif %}
                         <b> >
                     {% endif %}
-                    {{ teams[1].players[i] }}
-                    {% if teams[1].players[i].serving() %}
-                        {% if game.team_serving.carded %}
-                            ({{ game.server_side[0] }})
-                        {% endif %}
+                    {{ teams[1].players[i].name }}
+                    {% if teams[1].players[i].serving %}
+                        ({{ game.serverSide[0] }})
                         </b>
-                        {% if teams[1].faulted %}
+                        {% if game.faulted %}
                             </u>
                         {% endif %}
                     {% else %}
                         </i>
                     {% endif %}
-                    {% if teams[1].players[i].is_carded() %}
+                    {% if teams[1].players[i].cardTimeRemaining != 0 %}
                         </s>
                     {% endif %}
                 </a>
@@ -177,11 +174,11 @@
 <input type="number" id="jump" style="width: 40px">
 <a href="#" onclick="jump()" class="hide">Jump</a>
 <p>
-    <a href="/{{ tournament }}games/{{ game.id - 1 }}/display" class="hide">Previous Game</a>
+    <a href="/games/{{ game.id - 1 }}/display" class="hide">Previous Game</a>
     |
     <a href="#" onclick="swap()" class="hide">Swap Sides</a>
     |
-    <a href="/{{ tournament }}games/{{ game.id + 1 }}/display" class="hide">Next Game</a>
+    <a href="/games/{{ game.id + 1 }}/display" class="hide">Next Game</a>
 </p>
 </body>
 </html>

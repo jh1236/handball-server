@@ -12,6 +12,10 @@ setBest = (i, s) => {
 }
 
 
+function back() {
+    document.location = `/games/${id}/edit`
+}
+
 function finish() {
     const protestOne = document.getElementById("protest0").checked ? document.getElementById("protestNotes0").value : null
     const protestTwo = document.getElementById("protest1").checked ? document.getElementById("protestNotes1").value : null

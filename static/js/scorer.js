@@ -69,7 +69,15 @@ function score(firstTeam, leftPlayer) {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function sub(firstTeam, firstPlayer) {
@@ -82,7 +90,15 @@ function sub(firstTeam, firstPlayer) {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function ace() {
@@ -92,7 +108,15 @@ function ace() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 
@@ -150,7 +174,7 @@ function sendCustomCard() {
         alert("Please Select A Reason!")
         return
     }
-    selectedReason = selectedReason.checked
+    selectedReason = selectedReason.value
     if (!selectedPlayer && !document.getElementById('playerTwo').checked) {
         alert("Please Select A Player!")
         return
@@ -180,8 +204,21 @@ function sendCustomCard() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
+
+function next() {
+    document.location = `/games/${id}/finalise`
+}
+
 
 function timeoutOverlayOld(timeIn = Date.now() + 30000) {
     document.getElementById("myNav").style.width = "100%";

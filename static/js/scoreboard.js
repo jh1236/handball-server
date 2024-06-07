@@ -45,6 +45,7 @@ function jump() {
 
 
 function timeout(timeIn = 0) {
+    console.log(timeIn)
     if (timeIn > 0) {
         startTime = timeIn
     }
