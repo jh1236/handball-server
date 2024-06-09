@@ -229,7 +229,7 @@ class GamePlayer:
             self._tidy_name = self.name
             return self.name
         first, second = self.name.split(" ", 1)
-        others = self.game.tournament.players
+        others = self.game.tournament_id.players
         for i in others:
             if i.name == self.name:
                 continue
@@ -262,13 +262,13 @@ class GamePlayer:
 
         games_total = 0
         for i in comps.values():
-            if i.details["sort"] < self.game.tournament.details["sort"]:
+            if i.details["sort"] < self.game.tournament_id.details["sort"]:
                 for j in i.games_to_list():
                     if j.ranked and self.nice_name() in [
                         k.nice_name() for k in j.playing_players
                     ]:
                         games_total += 1
-        for i in self.game.tournament.games_to_list():
+        for i in self.game.tournament_id.games_to_list():
             if i.id >= self.game.id:
                 break
             if i.ranked and self.nice_name() in [
@@ -325,13 +325,13 @@ class GamePlayer:
 
         games_total = 0
         for i in comps.values():
-            if i.details["sort"] < self.game.tournament.details["sort"]:
+            if i.details["sort"] < self.game.tournament_id.details["sort"]:
                 for j in i.games_to_list():
                     if j.ranked and self.nice_name() in [
                         k.nice_name() for k in j.playing_players
                     ]:
                         games_total += 1
-        for i in self.game.tournament.games_to_list():
+        for i in self.game.tournament_id.games_to_list():
             if i.id >= self.game.id:
                 break
             if i.ranked and self.nice_name() in [
@@ -363,7 +363,7 @@ class GamePlayer:
             if self.team.players[0].nice_name() == self.nice_name()
             else "Right",
             "Format": "Championship"
-            if "championship" in self.game.tournament.nice_name()
+            if "championship" in self.game.tournament_id.nice_name()
             else "Practice",
             "Team Size": len(self.team.playing_players),
             "Round": self.game.round_number,
@@ -375,7 +375,7 @@ class GamePlayer:
             "Made Finals": any(
                 [
                     self.team.nice_name() in [k.nice_name() for k in i.teams]
-                    for i in self.game.tournament.finals_to_list()
+                    for i in self.game.tournament_id.finals_to_list()
                 ]
             ),
             "Ranked": self.game.ranked,
@@ -383,7 +383,7 @@ class GamePlayer:
             "Scorer": self.game.scorer.name,
             "Served First": self.game.teams[not self.game.first_team_serves].nice_name()
             == self.team.nice_name(),
-            "Tournament": self.game.tournament.name,
+            "Tournament": self.game.tournament_id.name,
             "Team": self.team.name,
             "Player": self.name,
         }

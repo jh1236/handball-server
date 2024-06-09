@@ -104,7 +104,7 @@
                         Player: {{ teams[1].players[1].name }}</button>
                     <div class="dropdown-content">
                         {% for i in teams[1].players %}
-                            <p onclick="setTeamTwoRightPlayer('{{ i.name }}', '{{ i.name }}')">{{ i.name }}</p>
+                            <p onclick="setTeamTwoRightPlayer('{{ i.searchable_name }}', '{{ i.name }}')">{{ i.name }}</p>
                         {% endfor %}
                     </div>
                 </div>

@@ -217,8 +217,9 @@ def card(game_id, first_team, left_player, color, duration, reason):
             """SELECT MIN(iif(cardTimeRemaining < 0, 12, cardTimeRemaining)) FROM playerGameStats WHERE playerGameStats.gameId = ? AND playerGameStats.teamId = ?""",
             (game_id, team)).fetchone()[0]
         if both_carded != 0:
-            my_score, their_score, someone_has_won = c.execute("""SELECT teamOneScore, teamTwoScore, someoneHasWon FROM games WHERE games.id = ?""",
-                                              (game_id,)).fetchone()
+            my_score, their_score, someone_has_won = c.execute(
+                """SELECT teamOneScore, teamTwoScore, someoneHasWon FROM games WHERE games.id = ?""",
+                (game_id,)).fetchone()
             if someone_has_won:
                 return
             if not first_team:
@@ -308,7 +309,7 @@ SELECT games.isRanked as ranked,
        games.tournamentId as tournament
 FROM playerGameStats
          INNER JOIN games ON playerGameStats.gameId = games.id
-WHERE games.id = ? ORDER BY isSecond""", (game_id, )).fetchall()
+WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
 
         if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
             return
@@ -329,7 +330,9 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id, )).fetchall()
                       (game_id, player_id, tournament_id, elo_delta))
 
 
-def create_game(tournamentId, team_one, team_two, official, players_one=None, players_two=None):
+def create_game(tournamentId, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,
+                court=0, is_final=False):
+    """Pass team_one & team_two in as either int (team id) or str (searchableName)."""
     with DatabaseManager() as c:
         tournamentId = \
             c.execute("""SELECT id FROM tournaments WHERE tournaments.searchableName = ?""",
@@ -357,7 +360,10 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
                     (team_one, searchable_of(team_one), players[0], players[1], players[2]))
                 first_team = c.execute("""SELECT id FROM teams ORDER BY id DESC LIMIT 1""").fetchone()[0]
         else:
-            first_team = c.execute("""SELECT id FROM teams WHERE searchableName = ?""", (team_one,)).fetchone()[0]
+            if isinstance(team_one, int):
+                first_team = team_one
+            else:
+                first_team = c.execute("""SELECT id FROM teams WHERE searchableName = ?""", (team_one,)).fetchone()[0]
         if players_two is not None:
             players = [None, None, None]
             for i, v in enumerate(players_two):
@@ -380,13 +386,14 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
                     (team_two, searchable_of(team_two), players[0], players[1], players[2]))
                 second_team = c.execute("""SELECT id FROM teams ORDER BY id DESC LIMIT 1""").fetchone()[0]
         else:
-            second_team = c.execute("""SELECT id FROM teams WHERE searchableName = ?""", (team_two,)).fetchone()[0]
+            if isinstance(team_two, int):
+                second_team = team_two
+            else:
+                second_team = c.execute("""SELECT id FROM teams WHERE searchableName = ?""", (team_two,)).fetchone()[0]
 
         ranked = True
 
         for i in [first_team, second_team]:
-            print(c.execute("""SELECT id FROM tournamentTeams WHERE teamId = ? AND tournamentId = ?""",
-                            (i, tournamentId)).fetchone())
             if c.execute("""SELECT id FROM tournamentTeams WHERE teamId = ? AND tournamentId = ?""",
                          (i, tournamentId)).fetchone() is None:
                 c.execute(
@@ -402,24 +409,27 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
             """SELECT officials.id FROM officials INNER JOIN people ON personId = people.id WHERE searchableName = ?""",
             (official,)).fetchone()[0]
 
-        last_start = c.execute("""SELECT startTime, round FROM games WHERE tournamentId = ? ORDER BY id DESC LIMIT 1""",
-                               (tournamentId,)).fetchone()
-        if not last_start:
-            last_start, round_number = (-1, 0)
-        else:
-            last_start, round_number = last_start
-        last_start = last_start or 1
-        if (
-                time.time()
-                - last_start
-                > 32400
-        ):
-            round_number = round_number + 1
+        if round_number < 0:
+            last_start = c.execute(
+                """SELECT startTime, round FROM games WHERE tournamentId = ? ORDER BY id DESC LIMIT 1""",
+                (tournamentId,)).fetchone()
+            if not last_start:
+                last_start, round_number = (-1, 0)
+            else:
+                last_start, round_number = last_start
+            last_start = last_start or 1
+            if (
+                    time.time()
+                    - last_start
+                    > 32400 and
+                    round_number < 0
+            ):
+                round_number = round_number + 1
 
         c.execute("""
             INSERT INTO games(tournamentId, teamOne, teamTwo, official, IGASide, gameStringVersion, gameString, court, isFinal, round, isBye, status, isRanked) 
-            VALUES (?, ?, ?, ?, ?, 1, '', 0, 0, ?, 0, 'Waiting For Start', ?)
-        """, (tournamentId, first_team, second_team, official, first_team, round_number, ranked))
+            VALUES (?, ?, ?, ?, ?, 1, '', ?, ?, ?, 0, 'Waiting For Start', ?)
+        """, (tournamentId, first_team, second_team, official, first_team, court, is_final, round_number, ranked))
         game_id = c.execute("""SELECT id from games order by id desc limit 1""").fetchone()[0]
         for i, opp in [(first_team, second_team), (second_team, first_team)]:
             players = c.execute(

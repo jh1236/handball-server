@@ -603,7 +603,7 @@ def add_old_tournament_specific(app, comps_in: dict[str, Tournament]):
                 render_template_sidebar(
                     "old_tournament_specific/player_stats.html",
                     stats=[
-                        (k, v) for k, v in get_player_stats(player.tournament, player, detail=2).items()
+                        (k, v) for k, v in get_player_stats(player.tournament_id, player, detail=2).items()
                     ],
                     name=player.name,
                     player=player,
@@ -618,7 +618,7 @@ def add_old_tournament_specific(app, comps_in: dict[str, Tournament]):
                 render_template_sidebar(
                     "old_tournament_specific/new_player_stats.html",
                     stats=[
-                        (k, v) for k, v in get_player_stats(player.tournament, player, detail=2).items()
+                        (k, v) for k, v in get_player_stats(player.tournament_id, player, detail=2).items()
                     ],
                     name=player.name,
                     player=player,
@@ -912,7 +912,7 @@ def add_old_tournament_specific(app, comps_in: dict[str, Tournament]):
         players = comps[tournament].players
         headers = []
         for k, v in get_player_stats(
-                players[0].tournament, players[0], detail=3
+                players[0].tournament_id, players[0], detail=3
         ).items():
             if isinstance(v, dict):
                 headers += [f"{k} {i}" for i in v]
@@ -921,7 +921,7 @@ def add_old_tournament_specific(app, comps_in: dict[str, Tournament]):
         string = "Name," + ",".join(headers)
         for i in players:
             to_add = []
-            for j in get_player_stats(i.tournament, i, detail=3).values():
+            for j in get_player_stats(i.tournament_id, i, detail=3).values():
                 if isinstance(j, dict):
                     to_add += j.values()
                 else:

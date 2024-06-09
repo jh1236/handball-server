@@ -113,9 +113,9 @@ class Tournament:
         if "bye" in team.nice_name():
             return
         self.teams.append(team)
-        team.tournament = self
+        team.tournament_id = self
         for i in team.players:
-            i.tournament = self
+            i.tournament_id = self
         self.teams.sort(key=lambda a: a.nice_name())
 
     def no_games_to_play(self):

@@ -109,15 +109,13 @@ def add_tournament_specific(app):
             # there has to be a reason this is the required syntax but i can't work it out1
 
             games = c.execute(
-                """
-                            SELECT 
+                """         SELECT 
                                 serving.name, receiving.name, teamOneScore, teamTwoScore, games.id 
                                 FROM games 
                                 INNER JOIN teams AS serving ON games.teamOne = serving.id 
                                 INNER JOIN teams as receiving ON games.teamTwo = receiving.id 
                                 WHERE 
-                                    tournamentId = ? AND 
-                                    games.bestPlayer = NULL;
+                                    tournamentId = ? AND games.bestPlayer is NULL;
                             """,
                 (tournamentId,),
             ).fetchall()
