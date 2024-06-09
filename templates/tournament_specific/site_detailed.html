@@ -17,6 +17,7 @@
 <table class="jaredTable">
     <thead>
     <tr>
+    <td></td>
         <th style="width: 220px;"><b>First Team</b></th>
         <th></th>
         <th style="width: 220px;"><b>Second Team</b></th>
@@ -30,12 +31,11 @@
     </tr>
     </thead>
     <tbody>
+    <tr><td colspan="999"><hr></td></tr>
+
     {% for i, round in fixtures %}
         <tr>
-            <td><br></td>
-        </tr>
-        <tr>
-            <th colspan="7" style="font-size: 18px"><a href="/{{ tournamentLink }}fixtures/detailed?round={{ i }}" class ="hide">Round {{ i }}</a></th>
+            <th rowspan="{{ round.__len__() + 1 }}" style="font-size: 18px">Round {{ i }}</th>
         </tr>
         {% for game in round %}
 
@@ -53,19 +53,21 @@
                            class="hide">{{ game.court_name }}</a></td> {% endif %}
                 <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
             </tr>
+
         {% endfor %}
+        <tr><td colspan="999"><hr></td></tr>
     {% endfor %}
     {% if finals %}
         <tr>
             <td><br></td>
         </tr>
         <tr>
-            <th colspan="7"><b>Finals:</b></th>
+            <th colspan="7" style="font-size: 30px"><b>Finals:</b></th>
         </tr>
-
+        <tr><td colspan="999"><hr></td></tr>
         {% for i, round in finals %}
             <tr>
-                <th colspan="7" style="font-size: 18px"><a href="/{{ tournamentLink }}fixtures/detailed?round={{ i }}" class ="hide">Round {{ i }}</a></th>
+                <th rowspan="{{ round.__len__() + 1 }}" style="font-size: 18px">Round {{ i }}</th>
             </tr>
             {% for game in round %}
                 <tr>
@@ -84,9 +86,7 @@
                 </tr>
 
             {% endfor %}
-            <tr>
-                <td><br></td>
-            </tr>
+            <tr><td colspan="999"><hr></td></tr>
         {% endfor %}
     {% endif %}
     </tbody>

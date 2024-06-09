@@ -199,7 +199,7 @@ function sendCustomCard() {
             firstTeam: lxor(first, teamsSwapped),
             leftPlayer: selectedPlayer,
             color: color,
-            duration: +(document.getElementById("duration").value) % 10,
+            duration: +(document.getElementById("duration").value),
             reason: reason
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"

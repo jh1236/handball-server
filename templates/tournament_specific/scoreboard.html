@@ -38,18 +38,19 @@
             </p>
             <p><b>Official:</b>
                 <a class="hide" href="/{{ tournamentLink }}officials/{{ game.umpireSearchableName }}">
-                <i>{{ game.umpire }}</i>
-               </a></p>
+                    <i>{{ game.umpire }}</i>
+                </a></p>
             {% if game.scorerSearchableName != 'none_one' %}
                 <p><b>Scorer:</b>
-                    <a class="hide" href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}"> <i>{{ game.scorer }}</i>
+                    <a class="hide" href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}">
+                        <i>{{ game.scorer }}</i>
                     </a></p>
             {% endif %}
             <h1 id="serveClock" style="font-size: 50px; color:#000000">0.0</h1>
             <script>serveClock({{ serve_time }})</script>
         </th>
         <th><a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"
-                                    class="hide"><img
+               class="hide"><img
                 src="{{ teams[1].imageUrl }}"
                 class="team_logo"
                 style="display: inline;left:70%;vertical-align:middle;"></a></th>
@@ -90,7 +91,8 @@
             {% endif %}
         </td>
     </tr>
-    {% for i in range(2) %}
+    {# TODO: this will break if team one has a different amount of players to team two #}
+    {% for i in range(teams[0].players.__len__()) %}
         <tr>
             <td style="color: {{ teams[0].players[i].card_hex }}; font-size: 40px">
                 <a class="hide" href="/{{ tournamentLink }}players/{{ teams[0].players[i].searchableName }}">

@@ -1,19 +1,20 @@
 # raise Exception("THIS WILL DELETE THE DATABASE! DO NOT RUN THIS UNLESS YOU WANT TO DELETE THE DATABASE\nif for whatever reason you want to reconstruct the database from json files, run this script in the root directory of the project and rem out this exception, also good luck!")
+
+import json
+import os
+
 from FixtureMakers.Pooled import Pooled
-from structure.manageGame import game_string_lookup
-from structure.structureNew import RiggedGame
-from utils.databaseManager import DatabaseManager
 from structure.Tournament import load_all_tournaments
 from structure.UniversalTournament import get_all_players, get_all_officials, get_all_teams
-import os
-import json
-
-from utils.util import n_chunks, chunks_sized
+from structure.structureNew import RiggedGame
+from utils.databaseManager import DatabaseManager
+from utils.util import n_chunks
 
 practice = None
 practice_round = 1
 practice_teams = []
 practice_officials = []
+
 
 def process_game_string(game, tournament):
     game.load_from_string = lambda a: RiggedGame.load_from_string(game, a, s, tournament)
@@ -66,7 +67,6 @@ def process_game(tournamentId, game, round, isRanked):
     winning_team = s.execute("SELECT id FROM teams WHERE name = ?", (game.winner.name,)).fetchone()[0]
 
     ranked = game.ranked
-
 
     s.execute(
         """INSERT INTO games (
@@ -139,15 +139,53 @@ def process_game(tournamentId, game, round, isRanked):
 
     process_game_string(game, tournamentId)
 
+    s.execute("""UPDATE games
+SET teamOneScore    = lg.teamOneScore,
+    teamTwoScore    = lg.teamTwoScore,
+    teamOneTimeouts = lg.teamOneTimeouts,
+    teamTwoTimeouts = lg.teamTwoTimeouts,
+    winningTeam     = lg.winningTeam,
+    started         = lg.started,
+    ended           = lg.ended,
+    protested       = lg.protested,
+    someoneHasWon   = lg.someoneHasWon,
+    resolved        = lg.resolved,
+    playerToServe = lg.playerToServe,
+    teamToServe = lg.teamToServe,
+    sideToServe = lg.sideToServe
+FROM liveGames lg
+WHERE lg.id = games.id AND games.id = ?""", (game_id,))
+
+    s.execute("""UPDATE playerGameStats
+SET points = lg.points,
+    aces = lg.aces,
+    faults = lg.faults,
+    servedPoints = lg.servedPoints,
+    servedPointsWon = lg.servedPointsWon,
+    servesReceived = lg.servesReceived,
+    servesReturned = lg.servesReturned,
+    doubleFaults = lg.doubleFaults,
+    greenCards = lg.greenCards,
+    warnings = lg.warnings,
+    yellowCards = lg.yellowCards,
+    redCards = lg.redCards,
+    cardTimeRemaining = lg.cardTimeRemaining,
+    cardTime = lg.cardTime
+FROM livePlayerGameStats lg
+WHERE playerGameStats.id = lg.id
+        AND playerGameStats.gameId = ?""", (game_id,))
+
     if (game_id % 10 == 0):
         print(f"completed Game {game_id}")
+
 
 if __name__ == "__main__":
     database_file = './resources/database.db'
     if os.path.exists(database_file):
         os.remove(database_file)
 
-    with DatabaseManager() as s:
+    with DatabaseManager(force_create_tables=True) as s:
+        s.execute("""drop trigger updateGames;""")
         comp = load_all_tournaments()
 
         with open("./resources/taunts.json", "r") as f:
@@ -312,3 +350,5 @@ if __name__ == "__main__":
                 round += 1
             if "practice" in tournament.nice_name():
                 practice_round = round
+
+    DatabaseManager(force_create_tables=True)

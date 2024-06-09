@@ -5,7 +5,6 @@ import time
 from typing import TYPE_CHECKING
 
 from structure.Player import Player, GamePlayer
-from utils.logging_handler import logger
 from utils.statistics import calc_elo, team_stats
 from utils.util import google_image
 

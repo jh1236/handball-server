@@ -1,4 +1,5 @@
 import time
+import types
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -57,6 +58,7 @@ def add_tournament_specific(app):
             searchableName: str
             games_won: int
             games_played: int
+            pool: int
 
         @dataclass
         class Game:
@@ -77,22 +79,34 @@ def add_tournament_specific(app):
             teams = c.execute(
                 """
                             SELECT 
-                                name, teams.searchableName, gamesWon, gamesPlayed 
+                                name, teams.searchableName, gamesWon, gamesPlayed, pool 
                                 FROM tournamentTeams 
                                 INNER JOIN teams ON tournamentTeams.teamId = teams.id 
                                 WHERE tournamentId = ? 
                                 ORDER BY 
-                                    gamesWon DESC, 
-                                    gamesPlayed ASC 
+                                    CAST(gamesWon AS REAL) / tournamentTeams.gamesPlayed DESC 
                                 LIMIT 10;""",
                 (tournamentId,),
             ).fetchall()
-            ladder = [
-                [
-                    None,
-                    [(n, LadderTeam(*team)) for n, team in enumerate(teams, start=1)],
+            tourney = c.execute(
+                "SELECT name, searchableName, fixturesGenerator, isPooled from tournaments where id = ?",
+                (tournamentId,),
+            ).fetchone()
+
+            ladder = [LadderTeam(*team) for team in teams]
+
+            if tourney[3]:  # this tournament is pooled
+                ladder = [
+                    (
+                        f"Pool {numbers[i]}",
+                        list(enumerate((j for j in ladder if j.pool == i), start=1)),
+                    )
+                    for i in range(1, 3)
                 ]
-            ]  # there has to be a reason this is the required syntax but i can't work it out
+            else:
+                ladder = [("", list(enumerate(ladder, start=1)))]
+
+            # there has to be a reason this is the required syntax but i can't work it out1
 
             games = c.execute(
                 """
@@ -157,10 +171,6 @@ def add_tournament_specific(app):
                     ).fetchone()[0]
                     or "Notices will appear here when posted"
             )
-            tourney = c.execute(
-                "SELECT name, searchableName, fixturesGenerator from tournaments where id = ?",
-                (tournamentId,),
-            ).fetchone()
             in_progress = c.execute(
                 "SELECT not(isFinished) FROM tournaments WHERE id=?", (tournamentId,)
             ).fetchone()[0]
@@ -386,7 +396,7 @@ def add_tournament_specific(app):
                                 FROM teams 
                                 INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId 
                                 WHERE IIF(? is NULL, 1, tournamentId = ?) AND
-                                tournamentTeams.gamesPlayed > 0;""",
+                                tournamentTeams.gamesPlayed > 0 GROUP BY teams.id ORDER BY searchableName""",
                 (tournamentId, tournamentId),
             ).fetchall()
             teams = [Team(*team) for team in teams]
@@ -509,7 +519,7 @@ FROM teams
          INNER JOIN games ON playerGameStats.gameId = games.id
          INNER JOIN tournaments on tournaments.id = games.tournamentId
 
-where teams.searchableName = ? AND IIF(? is NULL, 1, tournaments.id = ?) AND NOT games.isFinal AND NOT games.isBye AND games.isRanked
+where teams.searchableName = ? AND IIF(? is NULL, 1, tournaments.id = ?) AND NOT games.isFinal AND NOT games.isBye AND (games.isRanked OR teams.nonCaptain is null)
 ;""",
                 (team_name, tournament_id, tournament_id),
             ).fetchone()
@@ -578,7 +588,7 @@ FROM teams
          INNER JOIN playerGameStats on teams.id = playerGameStats.teamId
          INNER JOIN people on playerGameStats.playerId = people.id
          INNER JOIN games on playerGameStats.gameId = games.id
-         WHERE teams.searchableName = ? and games.isBye = 0 and games.isFinal = 0 and IIF(? is NULL, 1, games.tournamentId = ?) and games.isRanked 
+         WHERE teams.searchableName = ? and games.isBye = 0 and games.isFinal = 0 and IIF(? is NULL, 1, games.tournamentId = ?) and (games.isRanked or teams.nonCaptain is null) 
           GROUP BY people.id ORDER BY people.id <> teams.captain, people.id <> teams.nonCaptain""",
                 (team_name, tournament_id, tournament_id),
             ).fetchall()
@@ -619,7 +629,6 @@ FROM teams
             200,
         )
 
-    # TODO: implement
     @app.get("/games/<game_id>/display")
     def scoreboard(game_id):
         with DatabaseManager() as c:
@@ -752,15 +761,24 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
             render_template_sidebar(
                 "tournament_specific/scoreboard.html",
                 game=game,
-                status="Status", #TODO: fix
+                status="Status",  # TODO: fix
                 players=player_stats,
                 teams=teams,
                 update_count=manageGame.change_code(game_id),
-                timeout_time=manageGame.get_timeout_time(game_id) * 1000, # TODO: fix
-                serve_time=0, #Todo: Fix
+                timeout_time=manageGame.get_timeout_time(game_id) * 1000,  # TODO: fix
+                serve_time=0,  # Todo: Fix
             ),
             200,
         )
+
+    @app.get("/games/display")
+    def court_scoreboard():
+        court = int(request.args.get("court"))
+        with DatabaseManager() as c:
+            tournament = get_tournament_id(request.args.get("tournament"), c)
+            game_id = c.execute("""SELECT id FROM games WHERE court = ? AND tournamentId = ? ORDER BY id desc""",
+                                (court, tournament)).fetchone()
+        return scoreboard(game_id[0])
 
     @app.get("/games/<game_id>/")
     def game_site(game_id):
@@ -1040,6 +1058,7 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
             stats: dict[str, object]
 
         with DatabaseManager() as c:
+            tournament_id = get_tournament_id(tournament, c)
             teams = c.execute(
                 """SELECT tournaments.isPooled,
                        teams.searchableName,
@@ -1051,16 +1070,16 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
                                teams.imageURL
                            end,
                        tournamentTeams.pool,
-                       tournamentTeams.gamesPlayed                                                                           as played,
-                       tournamentTeams.gamesWon                                                                              as wins,
-                       ROUND(100.0 * Cast(tournamentTeams.gamesWon AS REAL) / tournamentTeams.gamesPlayed,
+                       COUNT(DISTINCT games.id)                                                                           as played,
+                       SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0))                                                                                 as wins,
+                       ROUND(100.0 * Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) / COUNT(DISTINCT games.id),
                              2)|| '%'                                                                                              as percentage,
-                       tournamentTeams.gamesLost                                                                             as losses,
+                       COUNT(DISTINCT games.id)   - SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0))                                                                          as losses,
                        SUM(playerGameStats.greenCards)                                                                       as greenCards,
                        SUM(playerGameStats.yellowCards)                                                                      as yellowCards,
                        SUM(playerGameStats.redCards)                                                                         as redCards,
                        SUM(playerGameStats.faults)                                                                           as faults,
-                       tournamentTeams.timeoutsCalled                                                                        as timeouts,
+                       SUM(IIF(playerGameStats.playerId = teams.captain, IIF(games.teamOne = teams.id, teamOneTimeouts, teamTwoTimeouts), 0)),
                        SUM(playerGameStats.points)                                                                           as pointsScored,
                        (SELECT SUM(playerGameStats.points)
                             FROM playerGameStats
@@ -1083,11 +1102,14 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
                 FROM tournamentTeams
                          INNER JOIN tournaments ON tournaments.id = tournamentTeams.tournamentId
                          INNER JOIN teams ON teams.id = tournamentTeams.teamId
+                         INNER JOIN games ON 
+                             (games.teamOne = teams.id or games.teamTwo = teams.id) AND games.tournamentId = tournaments.id 
+                             AND IIF(? is NULL, games.isRanked, 1) AND games.isBye = 0 AND games.isFinal = 0
                          INNER JOIN playerGameStats
-                                    ON teams.id = playerGameStats.teamId AND playerGameStats.tournamentId = tournaments.id
-                WHERE tournaments.searchableName = ?
+                                ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
+                WHERE IIF(? is NULL, 1, tournaments.id = ?)
                 GROUP BY teams.name
-                ORDER BY percentage DESC,
+                ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) / COUNT(DISTINCT games.id) DESC,
                          difference DESC,
                          pointsScored DESC,
                          greenCards + yellowCards + redCards ASC,
@@ -1095,7 +1117,7 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
                          yellowCards ASC,
                          faults ASC,
                          SUM(timeoutsCalled) ASC""",
-                (tournament,),
+                (tournament_id,tournament_id, tournament_id),
             ).fetchall()
         ladder = [
             Team(i[2], i[1], i[4], i[3], {k: v for k, v in zip(priority, i[5:])})
@@ -1125,7 +1147,7 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
             200,
         )
 
-    # TODO: UPDATE
+
     @app.get("/<tournament>/players/")
     def players_site(tournament):
         priority = {
@@ -1145,63 +1167,68 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
             "Games Played": 5,
             "Games Won": 4,
         }
-        players = [
-            (
-                i.name,
-                i.team.nice_name(),
-                i.nice_name(),
-                [
-                    (v, priority_to_classname(priority[k]))
-                    for k, v in i.get_stats().items()
-                ],
-            )
-            for i in comps[tournament].players
-            if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
-               and not i.nice_name().startswith("null")
-        ]
-        headers = ["Name"] + [
-            i for i in comps[tournament].teams[0].players[0].get_stats()
-        ]
+        player_headers = ["Name",
+                          "B&F Votes",
+                          "Elo",
+                          "Games Won",
+                          "Games Played",
+                          "Points Scored",
+                          "Aces Scored",
+                          "Faults",
+                          "Double Faults",
+                          "Green Cards",
+                          "Yellow Cards",
+                          "Red Cards",
+                          "Rounds Played",
+                          "Points Served",
+                          ]
+        tournament_id = get_tournament_id(tournament)
+        # TODO (LACHIE): please help me make this less queries...
+        with DatabaseManager() as c:
+            players_query = c.execute(
+                """SELECT teams.imageURL,  people.searchableName, people.name,
+       SUM(playerGameStats.isBestPlayer),
+       ROUND(1500.0 + (SELECT SUM(eloChange)
+                       from eloChange
+                       where eloChange.playerId = people.id), 2) as elo,
+       SUM(games.winningTeam = playerGameStats.teamId),
+       COUNT(DISTINCT games.id),
+       SUM(playerGameStats.points),
+       SUM(playerGameStats.aces),
+       SUM(playerGameStats.faults),
+       SUM(playerGameStats.doubleFaults),
+       SUM(playerGameStats.greenCards),
+       SUM(playerGameStats.yellowCards),
+       SUM(playerGameStats.redCards),
+       SUM(playerGameStats.roundsPlayed),
+       SUM(playerGameStats.servedPoints)
+
+FROM people
+         INNER JOIN playerGameStats on people.id = playerGameStats.playerId
+         INNER JOIN teams on playerGameStats.teamId = teams.id
+         INNER JOIN tournaments on tournaments.id = playerGameStats.tournamentId
+         INNER JOIN games on playerGameStats.gameId = games.id
+WHERE games.isBye = 0 and games.isFinal = 0 and IIF(? is NULL, 1, tournaments.id = ?) and games.isRanked
+GROUP BY people.id""",
+                (tournament_id, tournament_id), ).fetchall()
+
+        players = []
+        # Im so fucking lazy so im not gonna use a dataclass.  Fucking fight me idec
+        for i in players_query:
+            players.append((i[2], i[0], i[1], [(v, (priority_to_classname(priority[k]))) for k, v in zip(player_headers, i[3:])]))
+
         return (
             render_template_sidebar(
                 "tournament_specific/players.html",
                 headers=[
                     (i - 1, k, priority_to_classname(priority[k]))
-                    for i, k in enumerate(headers)
+                    for i, k in enumerate(player_headers)
                 ],
-                players=sorted(players),
-                tournament=link(tournament),
+                players=sorted(players, key=lambda a: a[3][1][0]),
             ),
             200,
         )
 
-    # TODO: UPDATE
-    @app.get("/<tournament>/players/detailed")
-    def detailed_players_site(tournament):
-        players = [
-            (
-                i.name,
-                i.team.nice_name(),
-                i.nice_name(),
-                i.get_stats_detailed().values(),
-            )
-            for i in comps[tournament].players
-            if (i.get_stats()["Games Played"] or len(comps[tournament].fixtures) < 2)
-               and not i.nice_name().startswith("null")
-        ]
-        headers = ["Name"] + [
-            i for i in comps[tournament].teams[0].players[0].get_stats_detailed()
-        ]
-        return (
-            render_template_sidebar(
-                "tournament_specific/players_detailed.html",
-                headers=[(i - 1, k) for i, k in enumerate(headers)],
-                players=sorted(players),
-                total=get_player_stats(comps[tournament], None, detail=2),
-                tournament=link(tournament),
-            ),
-            200,
-        )
 
     @app.get("/<tournament>/players/<player_name>/")
     def player_stats(tournament, player_name):
@@ -1575,7 +1602,7 @@ SELECT games.tournamentId,
        server.name,
        lastGe.nextServeSide,
        ended
-FROM liveGames as games
+FROM games
          INNER JOIN tournaments ON games.tournamentId = tournaments.id
          INNER JOIN officials o ON games.official = o.id
          INNER JOIN people po ON o.personId = po.id
@@ -1617,7 +1644,7 @@ WHERE games.id = ?
                games.teamTwoTimeouts
            ELSE
                games.teamOneTimeouts END
-FROM liveGames as games
+FROM games
          INNER JOIN tournaments on games.tournamentId = tournaments.id
          INNER JOIN teams on (games.teamTwo = teams.id or games.teamOne = teams.id)
          INNER JOIN playerGameStats on playerGameStats.teamId = teams.id AND playerGameStats.gameId = games.id 
@@ -1798,7 +1825,7 @@ SELECT games.tournamentId,
        ps.searchableName,
        tournaments.imageURL,
        games.someoneHasWon
-FROM liveGames as games
+FROM games
          INNER JOIN tournaments ON games.tournamentId = tournaments.id
          INNER JOIN officials o ON games.official = o.id
          INNER JOIN people po ON o.personId = po.id
@@ -1840,7 +1867,7 @@ WHERE games.id = ?
                games.teamTwoTimeouts
            ELSE
                games.teamOneTimeouts END
-FROM liveGames as games
+FROM games
          INNER JOIN tournaments on games.tournamentId = tournaments.id
          INNER JOIN teams on (games.teamTwo = teams.id or games.teamOne = teams.id)
          INNER JOIN playerGameStats on playerGameStats.teamId = teams.id AND playerGameStats.gameId = games.id 
@@ -1914,7 +1941,7 @@ FROM games
         for i in teams_query:
             teams[i[0]] = (Team(*i[1:], []))
         for i in players_query:
-            player = Player(*i[1:3], {k: v for k, v in zip(player_headers, i[4:])})
+            player = Player(*i[1:3], {k: v for k, v in zip(player_headers, i[3:])})
             teams[i[0]].players.append(player)
             players.append(player)
         teams = list(teams.values())
@@ -1932,8 +1959,7 @@ FROM games
                     swap=visual_str,
                     teams=teams,
                     game=game,
-                    headers=player_headers,
-                    stats=None,
+                    headers=player_headers
                 ),
                 200,
             )
@@ -2015,33 +2041,6 @@ FROM games
             200,
         )
 
-    @app.get("/<tournament>/raw/")
-    def raw_tournament(tournament):
-        players = comps[tournament].players
-        headers = []
-        for k, v in get_player_stats(
-                players[0].tournament, players[0], detail=3
-        ).items():
-            if isinstance(v, dict):
-                headers += [f"{k} {i}" for i in v]
-            else:
-                headers.append(k)
-        string = "Name," + ",".join(headers)
-        for i in players:
-            to_add = []
-            for j in get_player_stats(i.tournament, i, detail=3).values():
-                if isinstance(j, dict):
-                    to_add += j.values()
-                else:
-                    to_add.append(j)
-            string += "\n"
-            string += ",".join([i.name] + [str(j) for j in to_add])
-        response = Response(string, content_type="text/csv")
-        response.headers[
-            "Content-Disposition"
-        ] = f"attachment; filename={comps[tournament].nice_name()}.csv"
-        return response
-
     @app.get("/teams/")
     def universal_stats_directory_site():
         return team_directory_site(None)
@@ -2058,10 +2057,6 @@ FROM games
     def universal_players_site():
         return players_site(None)
 
-    @app.get("/players/detailed")
-    def unviersal_detailed_players_site():
-        return detailed_players_site(None)
-
     @app.get("/players/<player_name>/")
     def universal_player_stats(player_name):
         return player_stats(None, player_name)
@@ -2073,7 +2068,3 @@ FROM games
     @app.get("/officials/")
     def universal_official_directory_site():
         return official_directory_site(None)
-
-    @app.get("/raw/")
-    def raw():
-        return raw_tournament(None)

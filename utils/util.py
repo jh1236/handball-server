@@ -45,7 +45,6 @@ def fixture_sorter(fixtures: list[list[Any]]) -> list[list[Any]]:
 
 
 def google_image(word):
-    return # Disabled so my log isn't spammed 
     url = "https://www.google.com/search?tbm=isch&q=" + re.sub("[^a-zA-Z0-9]","",word.replace(" ", "_"))
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
     req = Request(url, headers=headers)

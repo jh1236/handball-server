@@ -116,7 +116,6 @@ def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=N
         team_who_served, player_who_served, serve_side,
         next_team_to_serve, next_player_to_serve, next_serve_side))
 
-    sync_tables(game_id, c)
 
 
 def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official=None, scorer=None):
@@ -165,7 +164,6 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
                           INNER JOIN playerGameStats ON playerGameStats.gameId = games.id
                      AND sideOfCourt = 'Left' AND (playerGameStats.teamId <> games.teamOne) = ?
                  WHERE games.id = ?""", (tournament, time.time(), swap_service, game_id))
-        sync_tables(game_id, c)
 
 
 def score_point(game_id, first_team, left_player):
@@ -183,7 +181,7 @@ def ace(game_id):
             c.execute("""SELECT teamOne == teamToServe FROM games WHERE games.id = ?""", (game_id,)).fetchone()[
                 0])
         left_player = bool(c.execute(
-            """SELECT sideToServe = 'Left' FROM liveGames WHERE liveGames.id = ?""",
+            """SELECT sideToServe = 'Left' FROM games WHERE games.id = ?""",
             (game_id,)).fetchone()[0])
         _add_to_game(game_id, c, "Ace", first_team, left_player)
         _score_point(game_id, c, first_team, left_player, penalty=True)
@@ -194,10 +192,10 @@ def fault(game_id):
         if game_is_over(game_id, c):
             raise ValueError("Game is Already Over!")
         first_team = bool(
-            c.execute("""SELECT teamOne = teamToServe FROM liveGames WHERE liveGames.id = ?""", (game_id,)).fetchone()[
+            c.execute("""SELECT teamOne = teamToServe FROM games WHERE games.id = ?""", (game_id,)).fetchone()[
                 0])
         left_player = bool(c.execute(
-            """SELECT sideToServe = 'Left' FROM liveGames WHERE liveGames.id = ?""",
+            """SELECT sideToServe = 'Left' FROM games WHERE games.id = ?""",
             (game_id,)).fetchone()[0])
         prev_event = c.execute(
             """SELECT eventType FROM gameEvents WHERE gameId = ? AND (eventType = 'Score' or eventType = 'Fault') ORDER BY id DESC LIMIT 1""",
@@ -219,8 +217,10 @@ def card(game_id, first_team, left_player, color, duration, reason):
             """SELECT MIN(iif(cardTimeRemaining < 0, 12, cardTimeRemaining)) FROM playerGameStats WHERE playerGameStats.gameId = ? AND playerGameStats.teamId = ?""",
             (game_id, team)).fetchone()[0]
         if both_carded != 0:
-            my_score, their_score = c.execute("""SELECT teamOneScore, teamTwoScore FROM games WHERE games.id = ?""",
+            my_score, their_score, someone_has_won = c.execute("""SELECT teamOneScore, teamTwoScore, someoneHasWon FROM games WHERE games.id = ?""",
                                               (game_id,)).fetchone()
+            if someone_has_won:
+                return
             if not first_team:
                 my_score, their_score = their_score, my_score
             both_carded = min(both_carded, max(11 - their_score, my_score + 2 - their_score))
@@ -244,7 +244,6 @@ def undo(game_id):
                             t.id DESC
                         LIMIT 1
                     )""", (game_id,))
-        sync_tables(game_id, c)
 
 
 def change_code(game_id):
@@ -309,7 +308,7 @@ SELECT games.isRanked as ranked,
        games.tournamentId as tournament
 FROM playerGameStats
          INNER JOIN games ON playerGameStats.gameId = games.id
-WHERE games.id = ? ORDER BY isSecond""").fetchall()
+WHERE games.id = ? ORDER BY isSecond""", (game_id, )).fetchall()
 
         if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
             return

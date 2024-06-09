@@ -12,6 +12,7 @@
 <table class="jaredTable">
     <thead>
     <tr>
+        <td></td>
         <th style="width: 220px"><b>First Team</b></th>
         <th></th>
         <th style="width: 220px"><b>Second Team</b></th>
@@ -19,15 +20,12 @@
     </tr>
     </thead>
     <tbody>
+    <tr><td colspan="999"><hr></td></tr>
     {% for i, round in fixtures %}
         <tr>
-            <td><br></td>
-        </tr>
-        <tr>
-            <th colspan="3" style="font-size: 18px">Round {{ i }}</th>
+            <th rowspan="{{ round.__len__() + 1 }}" style="font-size: 18px">Round {{ i }}</th>
         </tr>
         {% for game in round %}
-
             <tr>
                 <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a></td>
                 <td><a href="/games/{{ game.id }}" class="hide"> vs</a></td>
@@ -35,33 +33,27 @@
                 <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
             </tr>
         {% endfor %}
+        <tr><td colspan="999"><hr></td></tr>
     {% endfor %}
     {% if finals %}
         <tr>
-            <td><br></td>
+        <td></td>
+            <th colspan="3" style="font-size: 30px"><b>Finals:</b></th>
         </tr>
-        <tr>
-            <th colspan="3"><b>Finals:</b></th>
-        </tr>
-
+        <tr><td colspan="999"><hr></td></tr>
         {% for i, round in finals %}
             <tr>
-                <th colspan="3" style="font-size: 18px">Round {{ i }}</th>
+                <th rowspan="{{ round.__len__() + 1 }}" style="font-size: 18px">Round {{ i }}</th>
             </tr>
             {% for game in round %}
                 <tr>
-                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a>
-                    </td>
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a></td>
                     <td><a href="/games/{{ game.id }}" class="hide"> vs</a></td>
-                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[1] }}</a>
-                    </td>
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[1] }}</a></td>
                     <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
                 </tr>
-
             {% endfor %}
-            <tr>
-                <td><br></td>
-            </tr>
+            <tr><td colspan="999"><hr></td></tr>
         {% endfor %}
     {% endif %}
     </tbody>

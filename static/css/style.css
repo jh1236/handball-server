@@ -38,7 +38,7 @@ a.hide {
 
 .jaredTable tr td:nth-child(2) {
     width: 30px;
-    text-align: left;
+    /*text-align: left;*/
 }
 
 .jaredTable tr td:nth-child(3) {
