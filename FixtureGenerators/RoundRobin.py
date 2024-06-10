@@ -31,19 +31,17 @@ ORDER BY (SELECT SUM(eloChange)
                       COUNT(DISTINCT playerGameStats.playerId)""",
                 (tournament,),
             ).fetchall()
-            rounds = c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament,)).fetchone()[0] or 0
+            rounds = (c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament,)).fetchone()[0] or 0) + 1
 
         teams = [i[0] for i in teams]
-
         if len(teams) % 2 != 0:
             teams += [1]
-
         if len(teams) <= rounds:
             with DatabaseManager() as c:
                 c.execute("""UPDATE tournaments SET inFinals = 1 WHERE tournaments.id = ?""", (tournament,))
             return
 
-        for _ in range(rounds):
+        for _ in range(rounds - 1):
             # Rotate the teams except the first one
             teams[1:] = [teams[-1]] + teams[1:-1]
 
@@ -51,4 +49,4 @@ ORDER BY (SELECT SUM(eloChange)
         for j in range(mid):
             team_one = teams[j]
             team_two = teams[len(teams) - 1 - j]
-            manageGame.create_game(tournament, team_one, team_two)
+            manageGame.create_game(tournament, team_one, team_two, round_number=rounds)

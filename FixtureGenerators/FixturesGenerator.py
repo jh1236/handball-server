@@ -155,5 +155,6 @@ def get_type_from_name(name: str, tournament: int) -> FixturesGenerator:
         "BasicFinals": BasicFinals(tournament),
         "Pooled": Pooled(tournament),
         "RoundRobin": RoundRobin(tournament),
-        "OneRoundEditable": OneRound(tournament)
+        "OneRoundEditable": OneRound(tournament),
+        "Swiss": RoundRobin(tournament)
     }[name]

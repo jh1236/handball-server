@@ -13,6 +13,7 @@ class BasicFinals(FixturesGenerator):
             finals_games = c.execute("""SELECT winningTeam, teamOne + teamTwo - winningTeam FROM games WHERE 
             tournamentId = ? AND isFinal = 1""",
                                      (tournament_id,)).fetchall()
+            finals_rounds = c.execute("""SELECT COUNT(*) FROM games WHERE isFinal = 1 AND tournamentId = ? GROUP BY round""", (tournament_id,)).fetchall()
             ladder = c.execute(
                 """
 SELECT teams.id                                                                                   
@@ -42,9 +43,15 @@ ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games
                IIF(games.teamOne = teams.id, teamOneTimeouts, teamTwoTimeouts), 0)) ASC""",
                 (tournament_id,),
             ).fetchall()
+            rounds = c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament_id,)).fetchone()[
+                         0] + 1
+        if len(finals_rounds) > 1:
+            with DatabaseManager() as c:
+                c.execute("""UPDATE tournaments SET isFinished = 1 WHERE tournaments.id = ?""", (tournament_id,))
+                return
         if finals_games:
-            manageGame.create_game(tournament_id, finals_games[0][1], finals_games[1][1], is_final=True)
-            manageGame.create_game(tournament_id, finals_games[0][0], finals_games[1][0], is_final=True)
+            manageGame.create_game(tournament_id, finals_games[0][1], finals_games[1][1], is_final=True, round_number=rounds)
+            manageGame.create_game(tournament_id, finals_games[0][0], finals_games[1][0], is_final=True, round_number=rounds)
         else:
-            manageGame.create_game(tournament_id, ladder[0][0], ladder[3][0], is_final=True)
-            manageGame.create_game(tournament_id, ladder[1][0], ladder[2][0], is_final=True)
+            manageGame.create_game(tournament_id, ladder[0][0], ladder[3][0], is_final=True,round_number=rounds)
+            manageGame.create_game(tournament_id, ladder[1][0], ladder[2][0], is_final=True,round_number=rounds)

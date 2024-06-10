@@ -50,7 +50,7 @@ GROUP BY tournamentTeams.teamId""",
                 (tournament_id,),
             ).fetchall()
             rounds = c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament_id,)).fetchone()[
-                0]
+                0] or 0
 
         pools = [[j for j in teams if j[1] == i] for i in range(2)]
 
@@ -58,7 +58,7 @@ GROUP BY tournamentTeams.teamId""",
             if len(pool) % 2 != 0:
                 pool += [1]
 
-        if max(len(i) for i in pools) >= rounds:
+        if max(len(i) for i in pools) <= rounds + 1:
             with DatabaseManager() as c:
                 c.execute("""UPDATE tournaments SET inFinals = 1 WHERE tournaments.id = ?""", (tournament_id,))
             return
@@ -71,4 +71,4 @@ GROUP BY tournamentTeams.teamId""",
             for j in range(mid):
                 team_one = pool[j]
                 team_two = pool[len(pool) - 1 - j]
-                manageGame.create_game(tournament_id, team_one, team_two)
+                manageGame.create_game(tournament_id, team_one, team_two, round_number=rounds + 1)

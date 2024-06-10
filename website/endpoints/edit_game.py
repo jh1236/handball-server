@@ -35,8 +35,8 @@ def add_game_endpoints(app, comps):
         logger.info(f"Request for score: {request.json}")
         game_id = int(request.json["id"])
         swap_serve = request.json["swapService"]
-        team_one = request.json["teamOne"]
-        team_two = request.json["teamTwo"]
+        team_one = request.json.get("teamOne", None)
+        team_two = request.json.get("teamTwo", None)
         first_is_iga = request.json["teamOneIGA"]
         umpire = request.json.get("official", None)
         scorer = request.json.get("scorer", None)
