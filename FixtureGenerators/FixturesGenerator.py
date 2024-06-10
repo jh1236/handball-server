@@ -20,12 +20,20 @@ class FixturesGenerator:
         self._end_of_round(self.tournament_id)
         if self.fill_officials:
             self.add_umpires()
+        if self.fill_courts and False:
+            self.add_courts()
+
+    def add_courts(self):
+        with DatabaseManager() as c:
+            c.execute("""SELECT id FROM""")
 
     def add_umpires(self):
         with DatabaseManager() as c:
-            games_query = c.execute("""SELECT games.id, round, court, official, scorer FROM games WHERE games.tournamentId = ? ORDER BY id""",
-                              (self.tournament_id,))
-            players = c.execute("""SELECT id, gameId FROM playerGameStats WHERE tournamentId = ?""", (self.tournament_id, ))
+            games_query = c.execute(
+                """SELECT games.id, round, court, official, scorer FROM games WHERE games.tournamentId = ? ORDER BY id""",
+                (self.tournament_id,))
+            players = c.execute("""SELECT id, gameId FROM playerGameStats WHERE tournamentId = ?""",
+                                (self.tournament_id,))
             officials = c.execute(
                 """SELECT
                                    officials.personId,
@@ -120,9 +128,17 @@ class FixturesGenerator:
                         o.games_scored += 1
                         break
                     if not g[4]:
-                        c.execute("""UPDATE games SET scorer = official WHERE id = ?""", (g[0], ))
+                        c.execute("""UPDATE games SET scorer = official WHERE id = ?""", (g[0],))
 
 
-
-
-
+def get_type_from_name(name: str, tournament: int) -> FixturesGenerator:
+    from FixtureGenerators.BasicFinals import BasicFinals
+    from FixtureGenerators.OneRound import OneRound
+    from FixtureGenerators.Pooled import Pooled
+    from FixtureGenerators.RoundRobin import RoundRobin
+    return {
+        "BasicFinals": BasicFinals(tournament),
+        "Pooled": Pooled(tournament),
+        "RoundRobin": RoundRobin(tournament),
+        "OneRound": OneRound(tournament)
+    }[name]

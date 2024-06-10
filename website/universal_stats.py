@@ -12,7 +12,7 @@ def add_universal_tournament(app, comps: dict[str, Tournament]):
 
     @app.get("/signup/")
     def sign_up_page():
-        tournament = "Fifth S.U.S.S Championship"
+        tournament = "Sixth S.U.S.S Championship"
         return (
             render_template_sidebar(
                 "sign_up/new.html",

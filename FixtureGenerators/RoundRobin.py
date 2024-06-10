@@ -1,11 +1,13 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
 from structure import manageGame
-from structure.Game import Game
-from FixtureMakers.FixtureMaker import FixtureMaker
 from utils.databaseManager import DatabaseManager
 
 
 class RoundRobin(FixturesGenerator):
+    def __init__(self, tournament):
+
+        super().__init__(tournament, fill_officials=True, editable=False, fill_courts=True)
+
     def _end_of_round(self, tournament):
         with DatabaseManager() as c:
             teams = c.execute(

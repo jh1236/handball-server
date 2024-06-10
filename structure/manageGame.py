@@ -1,6 +1,7 @@
 import re
 import time
 
+from FixtureGenerators.FixturesGenerator import get_type_from_name
 from structure import get_information
 from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
@@ -115,7 +116,6 @@ def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=N
         details, notes,
         team_who_served, player_who_served, serve_side,
         next_team_to_serve, next_player_to_serve, next_serve_side))
-
 
 
 def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official=None, scorer=None):
@@ -312,25 +312,37 @@ FROM playerGameStats
 WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
 
         if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
-            return
-        elos = [0, 0]
-        team_sizes = [0, 0]
-        for i in teams:
-            elos[i[2]] += i[3]
-            team_sizes[i[2]] += 1
-        for i, v in enumerate(team_sizes):
-            elos[i] /= v
-        for i in teams:
-            win = i[1]
-            my_team = i[2]
-            player_id = i[4]
-            tournament_id = i[5]
-            elo_delta = calc_elo(elos[my_team], elos[not my_team], win)
-            c.execute("""INSERT INTO eloChange(gameId, playerId, tournamentId, eloChange) VALUES (?, ?, ?, ?)""",
-                      (game_id, player_id, tournament_id, elo_delta))
+            elos = [0, 0]
+            team_sizes = [0, 0]
+            for i in teams:
+                elos[i[2]] += i[3]
+                team_sizes[i[2]] += 1
+            for i, v in enumerate(team_sizes):
+                elos[i] /= v
+            for i in teams:
+                win = i[1]
+                my_team = i[2]
+                player_id = i[4]
+                tournament_id = i[5]
+                elo_delta = calc_elo(elos[my_team], elos[not my_team], win)
+                c.execute("""INSERT INTO eloChange(gameId, playerId, tournamentId, eloChange) VALUES (?, ?, ?, ?)""",
+                          (game_id, player_id, tournament_id, elo_delta))
 
-        end_of_round = c.execute("""SELECT id FROM games WHERE not games.isBye AND games.tournamentId = ? AND not games.ended""").fetchone()
+        end_of_round = c.execute(
+            """SELECT id FROM games WHERE not games.isBye AND games.tournamentId = ? AND not games.ended""").fetchone()
+        fixture_gen, finals_gen, in_finals, finished = c.execute(
+            """SELECT fixturesGenerator, finalsGenerator, inFinals, isFinished FROM tournaments WHERE tournaments.id = ?""").fetchone()
 
+        if end_of_round:
+            if not in_finals:
+                fixtures = get_type_from_name(fixture_gen, tournament_id)
+                fixtures.end_of_round()
+                with DatabaseManager() as c:
+                    in_finals, = c.execute("""SELECT inFinals FROM tournaments WHERE tournaments.id = ?""",
+                                           (tournament_id,))
+            if in_finals and not finished:
+                finals = get_type_from_name(finals_gen, tournament_id)
+                finals.end_of_round()
 
 
 def create_game(tournamentId, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,
@@ -436,7 +448,8 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
         c.execute("""
             INSERT INTO games(tournamentId, teamOne, teamTwo, official, IGASide, gameStringVersion, gameString, court, isFinal, round, isBye, status, isRanked) 
             VALUES (?, ?, ?, ?, ?, 1, '', ?, ?, ?, ?, 'Waiting For Start', ?)
-        """, (tournamentId, first_team, second_team, official, first_team, court, is_final, round_number, is_bye, ranked))
+        """, (
+        tournamentId, first_team, second_team, official, first_team, court, is_final, round_number, is_bye, ranked))
         game_id = c.execute("""SELECT id from games order by id desc limit 1""").fetchone()[0]
         for i, opp in [(first_team, second_team), (second_team, first_team)]:
             players = c.execute(
