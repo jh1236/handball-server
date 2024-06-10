@@ -124,7 +124,7 @@
             {% endif %}
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="umpire">
-                    Official: {{ game.officials }}</button>
+                    Official: {{ game.official }}</button>
                 <div class="dropdown-content">
                     {% for i in all_officials %}
                         <p onclick="setOfficial('{{ i[0] }}', '{{ i[1] }}')">{{ i[1] }}</p>

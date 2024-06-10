@@ -1,4 +1,4 @@
-# raise Exception("THIS WILL DELETE THE DATABASE! DO NOT RUN THIS UNLESS YOU WANT TO DELETE THE DATABASE\nif for whatever reason you want to reconstruct the database from json files, run this script in the root directory of the project and rem out this exception, also good luck!")
+raise Exception("THIS WILL DELETE THE DATABASE! DO NOT RUN THIS UNLESS YOU WANT TO DELETE THE DATABASE\nif for whatever reason you want to reconstruct the database from json files, run this script in the root directory of the project and rem out this exception, also good luck!")
 
 import json
 import os
@@ -264,6 +264,7 @@ if __name__ == "__main__":
             searchableName = tournament.nice_name()
             ranked = tournament.details.get("ranked", True)
             isPooled = isinstance(tournament.fixtures_class, Pooled)
+            hasScorer = tournament.details.get("scorer", False)
 
             notes = tournament.notes
 
@@ -271,7 +272,7 @@ if __name__ == "__main__":
             if "practice" in tournament.nice_name():
                 if practice is None:
                     s.execute(
-                        "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL, hasScorer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)",
                         (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled,
                          f"/api/tournaments/image?name={searchableName}")
                     )
@@ -279,9 +280,9 @@ if __name__ == "__main__":
                 tournamentId = practice
             else:
                 s.execute(
-                    "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL, hasScorer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled,
-                     f"/api/tournaments/image?name={searchableName}")
+                     f"/api/tournaments/image?name={searchableName}", hasScorer)
                 )
                 tournamentId = s.execute("SELECT id FROM tournaments ORDER BY id DESC LIMIT 1").fetchone()[0]
             # id INTEGER PRIMARY KEY AUTOINCREMENT,

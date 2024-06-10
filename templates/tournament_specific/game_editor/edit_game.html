@@ -46,9 +46,9 @@
                     src="{{ teams[0].image_url }}"
                     class="team_logo"
                     style="display: inline;left:70%;vertical-align:middle;"></th>
-            <td style="width: 150px;"><p><b>Round:</b> <i>{{ game.rounds }}</i></p>
+            <td style="width: 150px;"><p><b>Round:</b> <i>{{ game.round }}</i></p>
                 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
-                <p><b>Official:</b> <i>{{ game.primary_official }}</i></p>
+                <p><b>Official:</b> <i>{{ game.official }}</i></p>
                 {% if game.scorer %}
                     <p><b>Scorer:</b> <i>{{ game.scorer }}</i></p>
                 {% endif %}
@@ -87,7 +87,7 @@
         </tr>
         <tr>
             <td>
-                {% if teams[0].has_sub and game.rounds <= 9 %}
+                {% if teams[0].has_sub and game.round <= 9 %}
                     <div class="dropdown">
                         <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
                             Substitute {{ teams[0].name }}</button>

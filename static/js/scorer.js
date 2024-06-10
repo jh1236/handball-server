@@ -10,7 +10,7 @@ const CARDS = {
         "dissent": "Disrespect Towards Officials",
         "timeWasting": "Delay of Game",
         "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
-        "allowedNonCaptain": "Allowed Non Captain to Speak To Umpire",
+        "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
     },
     Yellow: {
         "directedSwearing": "Swearing Towards Players or Officials",

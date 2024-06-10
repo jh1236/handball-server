@@ -329,6 +329,9 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
             c.execute("""INSERT INTO eloChange(gameId, playerId, tournamentId, eloChange) VALUES (?, ?, ?, ?)""",
                       (game_id, player_id, tournament_id, elo_delta))
 
+        end_of_round = c.execute("""SELECT id FROM games WHERE not games.isBye AND games.tournamentId = ? AND not games.ended""").fetchone()
+
+
 
 def create_game(tournamentId, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,
                 court=0, is_final=False):
@@ -426,10 +429,14 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
             ):
                 round_number = round_number + 1
 
+        is_bye = 1 in [first_team, second_team]
+        if is_bye and first_team == 1:
+            first_team, second_team = second_team, first_team
+
         c.execute("""
             INSERT INTO games(tournamentId, teamOne, teamTwo, official, IGASide, gameStringVersion, gameString, court, isFinal, round, isBye, status, isRanked) 
-            VALUES (?, ?, ?, ?, ?, 1, '', ?, ?, ?, 0, 'Waiting For Start', ?)
-        """, (tournamentId, first_team, second_team, official, first_team, court, is_final, round_number, ranked))
+            VALUES (?, ?, ?, ?, ?, 1, '', ?, ?, ?, ?, 'Waiting For Start', ?)
+        """, (tournamentId, first_team, second_team, official, first_team, court, is_final, round_number, is_bye, ranked))
         game_id = c.execute("""SELECT id from games order by id desc limit 1""").fetchone()[0]
         for i, opp in [(first_team, second_team), (second_team, first_team)]:
             players = c.execute(

@@ -46,8 +46,9 @@ create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     ranked INTEGER,
     twoCourts INTEGER,
     isFinished INTEGER,
+    hasScorer INTEGER,
     isPooled INTEGER,
-    notes STRING,
+    notes TEXT,
     imageURL TEXT
 );"""
 create_punishments_view = """CREATE VIEW IF NOT EXISTS punishments AS

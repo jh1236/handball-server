@@ -347,7 +347,7 @@ def add_tournament_specific(app):
             t = Tourney(
                 *c.execute(
                     """SELECT
-                                twoCourts, count(scorer)>0
+                                twoCourts, hasScorer
                                 FROM tournaments
                                 INNER JOIN games ON games.tournamentId = tournaments.id
                                 WHERE tournaments.id = ?;""",
@@ -1599,7 +1599,9 @@ SELECT games.tournamentId,
        gameEvents.eventType = 'Fault',
        server.name,
        lastGe.nextServeSide,
-       ended
+       ended,
+       tournaments.hasScorer,
+       teamOneScore + teamTwoScore
 FROM games
          INNER JOIN tournaments ON games.tournamentId = tournaments.id
          INNER JOIN officials o ON games.official = o.id
@@ -1723,11 +1725,12 @@ FROM officials INNER JOIN people on officials.personId = people.id
             serve_side: str
             ended: bool
             has_scorer: bool
+            round: int
             deletable: bool
 
         teams = {}
         cards = [Card(*i) for i in cards_query]
-        game = Game(game_id, *game_query[2:], True, get_type_from_name(game_query[1]).manual_allowed()
+        game = Game(game_id, *game_query[2:], get_type_from_name(game_query[1]).manual_allowed()
                     )
         players = []
         player_headers = [
