@@ -3,6 +3,7 @@ import time
 
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from structure import get_information
+from structure.get_information import get_tournament_id
 from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
 
@@ -281,6 +282,7 @@ def end_timeout(game_id):
 
 def end_game(game_id, bestPlayer, notes, protest_team_one, protest_team_two):
     with DatabaseManager() as c:
+        tournament_id = c.execute("""SELECT tournamentId FROM games WHERE id = ?""", (game_id,)).fetchone()[0]
         if protest_team_one:
             _add_to_game(game_id, c, "Protest", True, None, notes=protest_team_one)
         if protest_team_two:
@@ -305,9 +307,8 @@ SELECT games.isRanked as ranked,
        ROUND(1500.0 + (SELECT SUM(eloChange)
                        from eloChange
                        where eloChange.playerId = playerGameStats.playerid), 2) as elo,
-       playerId as player,
-       games.tournamentId as tournament
-FROM playerGameStats
+       playerId as player
+       FROM playerGameStats
          INNER JOIN games ON playerGameStats.gameId = games.id
 WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
 
@@ -323,35 +324,35 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
                 win = i[1]
                 my_team = i[2]
                 player_id = i[4]
-                tournament_id = i[5]
                 elo_delta = calc_elo(elos[my_team], elos[not my_team], win)
                 c.execute("""INSERT INTO eloChange(gameId, playerId, tournamentId, eloChange) VALUES (?, ?, ?, ?)""",
                           (game_id, player_id, tournament_id, elo_delta))
 
         end_of_round = c.execute(
-            """SELECT id FROM games WHERE not games.isBye AND games.tournamentId = ? AND not games.ended""").fetchone()
+            """SELECT id FROM games WHERE not games.isBye AND games.tournamentId = ? AND not games.ended""", (tournament_id,)).fetchone()
         fixture_gen, finals_gen, in_finals, finished = c.execute(
-            """SELECT fixturesGenerator, finalsGenerator, inFinals, isFinished FROM tournaments WHERE tournaments.id = ?""").fetchone()
+            """SELECT fixturesGenerator, finalsGenerator, inFinals, isFinished FROM tournaments WHERE tournaments.id = ?""", (tournament_id,)).fetchone()
 
-        if end_of_round:
-            if not in_finals:
-                fixtures = get_type_from_name(fixture_gen, tournament_id)
-                fixtures.end_of_round()
-                with DatabaseManager() as c:
-                    in_finals, = c.execute("""SELECT inFinals FROM tournaments WHERE tournaments.id = ?""",
-                                           (tournament_id,))
-            if in_finals and not finished:
-                finals = get_type_from_name(finals_gen, tournament_id)
-                finals.end_of_round()
+    if end_of_round:
+        if not in_finals:
+            fixtures = get_type_from_name(fixture_gen, tournament_id)
+            fixtures.end_of_round()
+            with DatabaseManager() as c:
+                in_finals, = c.execute("""SELECT inFinals FROM tournaments WHERE tournaments.id = ?""",
+                                       (tournament_id,))
+        if in_finals and not finished:
+            finals = get_type_from_name(finals_gen, tournament_id)
+            finals.end_of_round()
 
 
 def create_game(tournamentId, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,
                 court=0, is_final=False):
     """Pass team_one & team_two in as either int (team id) or str (searchableName)."""
     with DatabaseManager() as c:
-        tournamentId = \
-            c.execute("""SELECT id FROM tournaments WHERE tournaments.searchableName = ?""",
-                      (tournamentId,)).fetchone()[0]
+        if isinstance(tournamentId, str):
+            tournamentId = \
+                c.execute("""SELECT id FROM tournaments WHERE tournaments.searchableName = ?""",
+                          (tournamentId,)).fetchone()[0]
         if players_one is not None:
             players = [None, None, None]
             for i, v in enumerate(players_one):
@@ -366,7 +367,6 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
                                    (players[0], players[0], players[0], players[1], players[1], players[1], players[1],
                                     players[2],
                                     players[2], players[2], players[2])).fetchone()
-            print(first_team)
             if first_team:
                 first_team = first_team[0]
             else:
@@ -409,6 +409,7 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
         ranked = True
 
         for i in [first_team, second_team]:
+            if i == 1: continue
             if c.execute("""SELECT id FROM tournamentTeams WHERE teamId = ? AND tournamentId = ?""",
                          (i, tournamentId)).fetchone() is None:
                 c.execute(
@@ -419,10 +420,10 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
             ranked &= len(c.execute(
                 """SELECT people.id FROM people INNER JOIN teams ON (people.id = teams.substitute or people.id = teams.nonCaptain or people.id = teams.captain) WHERE teams.id = ?""",
                 (i,)).fetchall()) > 2
-
-        official = c.execute(
-            """SELECT officials.id FROM officials INNER JOIN people ON personId = people.id WHERE searchableName = ?""",
-            (official,)).fetchone()[0]
+        if official is not None:
+            official = c.execute(
+                """SELECT officials.id FROM officials INNER JOIN people ON personId = people.id WHERE searchableName = ?""",
+                (official,)).fetchone()[0]
 
         if round_number < 0:
             last_start = c.execute(
@@ -446,10 +447,10 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
             first_team, second_team = second_team, first_team
 
         c.execute("""
-            INSERT INTO games(tournamentId, teamOne, teamTwo, official, IGASide, gameStringVersion, gameString, court, isFinal, round, isBye, status, isRanked) 
-            VALUES (?, ?, ?, ?, ?, 1, '', ?, ?, ?, ?, 'Waiting For Start', ?)
+            INSERT INTO games(tournamentId, teamOne, teamTwo, official, IGASide, gameStringVersion, gameString, court, isFinal, round, isBye, status, isRanked, teamOneScore, teamTwoScore, teamOneTimeouts, teamTwoTimeouts) 
+            VALUES (?, ?, ?, ?, ?, 1, '', ?, ?, ?, ?, 'Waiting For Start', ?, 0, 0, 0, 0)
         """, (
-        tournamentId, first_team, second_team, official, first_team, court, is_final, round_number, is_bye, ranked))
+            tournamentId, first_team, second_team, official, first_team, court, is_final, round_number, is_bye, ranked))
         game_id = c.execute("""SELECT id from games order by id desc limit 1""").fetchone()[0]
         for i, opp in [(first_team, second_team), (second_team, first_team)]:
             players = c.execute(
@@ -460,6 +461,29 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
                     """INSERT INTO playerGameStats(gameId, playerId, teamId, opponentId, tournamentId, roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt) VALUES (?, ?, ?, ?, ?, 0, 0, 0, '')""",
                     (game_id, j[0], i, opp, tournamentId))
         return game_id
+
+
+def create_tournament(name, fixtures_gen, finals_gen, ranked, two_courts, scorer, teams: list[int] = None,
+                      officials: list[int] = None):
+    officials = officials or []
+    teams = teams or []
+    with DatabaseManager() as c:
+        searchable_name = searchable_of(name)
+        c.execute("""INSERT INTO tournaments(name, searchableName, fixturesGenerator, finalsGenerator, ranked, twoCourts,  hasScorer, imageURL, isFinished, isPooled, notes, inFinals) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, '', 0)""", (
+            name, searchable_name, fixtures_gen, finals_gen, ranked, two_courts, scorer,
+            '/api/tournaments/image?name=' + searchable_name))
+        tournament = c.execute("""SELECT id FROM tournaments ORDER BY id desc LIMIT 1""").fetchone()[0]
+        for i in teams:
+            c.execute(
+                """INSERT INTO tournamentTeams(tournamentId, teamId, gamesWon, gamesPlayed, gamesLost, timeoutsCalled, pool) VALUES (?, ?, 0, 0, 0, 0, 0)""",
+                (tournament, i))
+        for i in officials:
+            c.execute(
+                """INSERT INTO tournamentOfficials(tournamentId, officialId, isUmpire, isScorer) VALUES (?, ?, 1, 1)""",
+                (tournament, i))
+    fixtures = get_type_from_name(fixtures_gen, tournament)
+    fixtures.begin_tournament()
 
 
 def get_timeout_time(game_id):

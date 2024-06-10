@@ -1,7 +1,6 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
 from structure import manageGame
 from utils.databaseManager import DatabaseManager
-from utils.util import n_chunks
 
 
 class Pooled(FixturesGenerator):
@@ -9,14 +8,11 @@ class Pooled(FixturesGenerator):
     def __init__(self, tournament_id):
         super().__init__(tournament_id, fill_officials=True, editable=False, fill_courts=True)
 
-    def begin_tournament(self, tournament_id):
-        pass
-
-    def _end_of_round(self, tournament_id):
+    def _begin_tournament(self, tournament_id):
         with DatabaseManager() as c:
             teams = c.execute(
                 """
-SELECT tournamentTeams.teamId                                                                                  
+SELECT tournamentTeams.teamId, pool                                                                                  
 
 FROM tournamentTeams
 INNER JOIN playerGameStats ON playerGameStats.teamId = tournamentTeams.teamId
@@ -35,12 +31,28 @@ ORDER BY (SELECT SUM(eloChange)
                       COUNT(DISTINCT playerGameStats.playerId)""",
                 (tournament_id,),
             ).fetchall()
+            pool = 0
+            for i in teams:
+                c.execute("""UPDATE tournamentTeams SET pool = ? WHERE teamId = ? AND tournamentId = ?""", (pool, i, tournament_id))
+                pool = 1 - pool
+            c.execute("""UPDATE tournaments SET tournaments.isPooled = 1 WHERE id = ?""", (tournament_id,))
+
+    def _end_of_round(self, tournament_id):
+        with DatabaseManager() as c:
+            teams = c.execute(
+                """
+SELECT tournamentTeams.teamId, pool                                                                                  
+
+FROM tournamentTeams
+
+WHERE  tournamentTeams.tournamentId = ?
+GROUP BY tournamentTeams.teamId""",
+                (tournament_id,),
+            ).fetchall()
             rounds = c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament_id,)).fetchone()[
                 0]
 
-        pools = list(
-            n_chunks([i[0] for i in teams], 2)
-        )
+        pools = [[j for j in teams if j[1] == i] for i in range(2)]
 
         for pool in pools:
             if len(pool) % 2 != 0:

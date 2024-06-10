@@ -31,12 +31,14 @@ ORDER BY (SELECT SUM(eloChange)
                       COUNT(DISTINCT playerGameStats.playerId)""",
                 (tournament,),
             ).fetchall()
-            rounds = c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament,)).fetchone()[0]
+            rounds = c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament,)).fetchone()[0] or 0
+
+        teams = [i[0] for i in teams]
 
         if len(teams) % 2 != 0:
             teams += [1]
 
-        if len(teams) >= rounds:
+        if len(teams) <= rounds:
             with DatabaseManager() as c:
                 c.execute("""UPDATE tournaments SET inFinals = 1 WHERE tournaments.id = ?""", (tournament,))
             return

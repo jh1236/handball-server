@@ -1,11 +1,10 @@
 import time
-import types
 from collections import defaultdict
 from dataclasses import dataclass
 
-from flask import render_template, request, redirect, Response
+from flask import render_template, request
 
-from FixtureMakers.FixtureMaker import get_type_from_name
+from FixtureGenerators.FixturesGenerator import get_type_from_name
 from structure import manageGame
 from structure.AllTournament import (
     get_all_officials,
@@ -13,13 +12,11 @@ from structure.AllTournament import (
 from structure.get_information import get_tournament_id
 from utils.databaseManager import DatabaseManager
 from utils.permissions import (
-    admin_only,
     fetch_user,
     officials_only,
     user_on_mobile,
 )  # Temporary till i make a function that can handle dynamic/game permissions
 from utils.sidebar_wrapper import render_template_sidebar, link
-from utils.statistics import get_player_stats
 from website.website import numbers
 
 VERBAL_WARNINGS = True
@@ -172,7 +169,7 @@ def add_tournament_specific(app):
             in_progress = c.execute(
                 "SELECT not(isFinished) FROM tournaments WHERE id=?", (tournamentId,)
             ).fetchone()[0]
-            iseditable = get_type_from_name(tourney[2]).manual_allowed()
+            iseditable = get_type_from_name(tourney[2], tournamentId).manual_allowed()
             tourney = Tourney(tourney[0], tourney[1], iseditable)
 
             return (
@@ -393,8 +390,7 @@ def add_tournament_specific(app):
                                     end  
                                 FROM teams 
                                 INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId 
-                                WHERE IIF(? is NULL, 1, tournamentId = ?) AND
-                                tournamentTeams.gamesPlayed > 0 GROUP BY teams.id ORDER BY searchableName""",
+                                WHERE IIF(? is NULL, 1, tournamentId = ?) GROUP BY teams.id ORDER BY searchableName""",
                 (tournamentId, tournamentId),
             ).fetchall()
             teams = [Team(*team) for team in teams]
@@ -479,8 +475,7 @@ def add_tournament_specific(app):
 
         with DatabaseManager() as c:
             team = c.execute(
-                """
-SELECT teams.name,
+                """SELECT teams.name,
        teams.searchableName,
        case
            when teams.imageURL is null
@@ -488,38 +483,56 @@ SELECT teams.name,
            else
                teams.imageURL
            end,
-       ROUND(1500.0 + (SELECT SUM(eloChange)
-                       from eloChange
-                                INNER JOIN teams inside ON inside.id = teams.id
-                                INNER JOIN people captain ON captain.id = inside.captain
-                                LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
-                                LEFT JOIN people sub ON sub.id = inside.substitute
-                       where eloChange.playerId = sub.id
-                          or eloChange.playerId = captain.id
-                          or eloChange.playerId = nonCaptain.id)
+       ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
+                                from eloChange
+                                         INNER JOIN teams inside ON inside.id = teams.id
+                                         INNER JOIN people captain ON captain.id = inside.captain
+                                         LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
+                                         LEFT JOIN people sub ON sub.id = inside.substitute
+                                where eloChange.playerId = sub.id
+                                   or eloChange.playerId = captain.id
+                                   or eloChange.playerId = nonCaptain.id), 0)
            /
-                      COUNT(DISTINCT playerGameStats.playerId), 2) as elo,
+                      COUNT(teams.captain is not null + teams.noncaptain is not null + teams.substitute is not null),
+             2) as elo,
        COUNT(DISTINCT games.id),
        COUNT(DISTINCT IIF(games.winningTeam = teams.id, games.id, NULL)),
        COUNT(DISTINCT playerGameStats.gameId) - COUNT(DISTINCT IIF(games.winningTeam = teams.id, games.id, NULL)),
-       ROUND(100.0 * Cast(COUNT(DISTINCT IIF(games.winningTeam = teams.id, games.id, NULL)) AS REAL) / COUNT(DISTINCT playerGameStats.gameId),
+       ROUND(100.0 * Cast(COUNT(DISTINCT IIF(games.winningTeam = teams.id, games.id, NULL)) AS REAL) /
+             COUNT(DISTINCT playerGameStats.gameId),
              2) || '%',
-       SUM(playerGameStats.greenCards),
-       SUM(playerGameStats.yellowCards),
-       SUM(playerGameStats.redCards),
-       SUM(playerGameStats.faults),
-       SUM((SELECT IIF(games.teamOne = teams.id, games.teamOneTimeouts, games.teamTwoTimeouts) FROM games WHERE games.id = gameId AND playerId = teams.captain)),
-       SUM((SELECT IIF(games.teamOne = teams.id, games.teamOneScore, games.teamTwoScore) FROM games WHERE games.id = gameId AND playerId = teams.captain)),
-       SUM((SELECT IIF(games.teamOne = teams.id, games.teamTwoScore, games.teamOneScore) FROM games WHERE games.id = gameId AND playerId = teams.captain)),
-       SUM(playerGameStats.points) - SUM((SELECT IIF(games.teamOne = teams.id, games.teamTwoScore, games.teamOneScore) FROM games WHERE games.id = gameId AND playerId = teams.captain))
+       coalesce(SUM(playerGameStats.greenCards), 0),
+       coalesce(SUM(playerGameStats.yellowCards), 0),
+       coalesce(SUM(playerGameStats.redCards), 0),
+       coalesce(SUM(playerGameStats.faults), 0),
+       coalesce(SUM((SELECT IIF(games.teamOne = teams.id, games.teamOneTimeouts, games.teamTwoTimeouts)
+                     FROM games
+                     WHERE games.id = gameId
+                       AND playerId = teams.captain)), 0),
+       coalesce(SUM((SELECT IIF(games.teamOne = teams.id, games.teamOneScore, games.teamTwoScore)
+                     FROM games
+                     WHERE games.id = gameId
+                       AND playerId = teams.captain)), 0),
+       coalesce(SUM((SELECT IIF(games.teamOne = teams.id, games.teamTwoScore, games.teamOneScore)
+                     FROM games
+                     WHERE games.id = gameId
+                       AND playerId = teams.captain)), 0),
+       coalesce(SUM(playerGameStats.points) -
+                SUM((SELECT IIF(games.teamOne = teams.id, games.teamTwoScore, games.teamOneScore)
+                     FROM games
+                     WHERE games.id = gameId
+                       AND playerId = teams.captain)), 0)
 FROM teams
-         INNER JOIN playerGameStats ON teams.id = playerGameStats.teamId
-         INNER JOIN games ON playerGameStats.gameId = games.id
-         INNER JOIN tournaments on tournaments.id = games.tournamentId
+         INNER JOIN tournamentTeams on teams.id = tournamentTeams.teamId
+         LEFT JOIN games ON (games.teamOne = teams.id OR games.teamTwo = teams.id) AND games.isFinal = 0 AND
+                            games.isBye = 0 AND (games.isRanked OR teams.nonCaptain is null) AND games.tournamentId = tournamentTeams.tournamentId
+         LEFT JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
+         LEFT JOIN tournaments on tournaments.id = tournamentTeams.tournamentId
 
-where teams.searchableName = ? AND IIF(? is NULL, 1, tournaments.id = ?) AND NOT games.isFinal AND NOT games.isBye AND (games.isRanked OR teams.nonCaptain is null)
+where IIF(? is NULL, 1, tournaments.id = ?)
+  AND teams.searchableName = ?
 ;""",
-                (team_name, tournament_id, tournament_id),
+                (tournament_id, tournament_id, team_name),
             ).fetchone()
 
             if not team:
@@ -537,57 +550,88 @@ where teams.searchableName = ? AND IIF(? is NULL, 1, tournaments.id = ?) AND NOT
                 {k: v for k, v in zip(team_headers, team[3:])},
             )
             players = c.execute(
-                """
-                        SELECT people.name,
+                """SELECT people.name,
        people.searchableName,
-       SUM(playerGameStats.isBestPlayer),
+       coalesce(SUM(playerGameStats.isBestPlayer), 0),
        ROUND(1500.0 + (SELECT SUM(eloChange)
                        from eloChange
                        where eloChange.playerId = people.id), 2) as elo,
-       SUM(playerGameStats.points),
-       SUM(playerGameStats.aces),
-       SUM(playerGameStats.faults),
-       SUM(playerGameStats.doubleFaults),
-       SUM(playerGameStats.greenCards),
-       SUM(playerGameStats.yellowCards),
-       SUM(playerGameStats.redCards),
-       SUM(playerGameStats.roundsPlayed),
-       SUM(playerGameStats.roundsBenched),
-       ROUND((SELECT SUM(eloChange)
+       coalesce(SUM(playerGameStats.points), 0),
+       coalesce(SUM(playerGameStats.aces), 0),
+       coalesce(SUM(playerGameStats.faults), 0),
+       coalesce(SUM(playerGameStats.doubleFaults), 0),
+       coalesce(SUM(playerGameStats.greenCards), 0),
+       coalesce(SUM(playerGameStats.yellowCards), 0),
+       coalesce(SUM(playerGameStats.redCards), 0),
+       coalesce(SUM(playerGameStats.roundsPlayed), 0),
+       coalesce(SUM(playerGameStats.roundsBenched), 0),
+       coalesce(ROUND((SELECT SUM(eloChange)
                        from eloChange
-                       INNER JOIN games on eloChange.gameId = games.id
-                       where eloChange.playerId = people.id AND games.tournamentId = games.tournamentId), 2),
-       ROUND((SELECT SUM(eloChange)                       from eloChange
-                       INNER JOIN games on eloChange.gameId = games.id
-                       where eloChange.playerId = people.id AND games.tournamentId = games.tournamentId) / COUNT(DISTINCT playerGameStats.gameId), 2) as elo,
-       SUM(playerGameStats.servedPoints),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (COUNT(DISTINCT playerGameStats.gameId) - COUNT(DISTINCT IIF(games.winningTeam = teams.id, games.id, NULL))), 2),
-       ROUND(CAST(SUM(playerGameStats.aces) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.faults) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 2),
-       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 2),
-       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points) from playerGameStats i where i.teamId = teams.id and i.tournamentId = games.tournamentId ), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints), 2)|| '%',
-       SUM(playerGameStats.servesReceived),
-       SUM(playerGameStats.servesReturned),
-       ROUND(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived), 2) || '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT( DISTINCT playerGameStats.gameId), 2)
-       
-       
+                                INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id
+                         AND games.tournamentId = tournamentTeams.tournamentId), 2), 0),
+       ROUND(coalesce((SELECT SUM(eloChange)
+                       from eloChange
+                                INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id
+                         AND games.tournamentId = tournamentTeams.tournamentId), 0) / COUNT(DISTINCT playerGameStats.gameId),
+                2)                                               as elo,
+       coalesce(SUM(playerGameStats.servedPoints), 0),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) / (COUNT(DISTINCT playerGameStats.gameId) -
+                                                                   COUNT(DISTINCT IIF(games.winningTeam = teams.id, games.id, NULL))),
+                      0),
+             2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.aces) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.faults) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.greenCards + playerGameStats.yellowCards +
+                               playerGameStats.redCards) AS REAL) /
+                      COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       coalesce(SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards), 0),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) /
+                      (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 0),
+             2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 0), 2),
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 0), 2) ||
+       '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 0), 2) ||
+       '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) /
+                      (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points)
+                                                                           from playerGameStats i
+                                                                           where i.teamId = teams.id
+                                                                             and i.tournamentId = tournamentTeams.tournamentId),
+                      0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) /
+                      COUNT(DISTINCT playerGameStats.gameId), 0),
+             2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints),
+                      0), 2) || '%',
+       coalesce(SUM(playerGameStats.servesReceived), 0),
+       coalesce(SUM(playerGameStats.servesReturned), 0),
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived),
+                      0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT(DISTINCT playerGameStats.gameId),
+                      0), 2)
+
+
 FROM teams
-         INNER JOIN playerGameStats on teams.id = playerGameStats.teamId
-         INNER JOIN people on playerGameStats.playerId = people.id
-         INNER JOIN games on playerGameStats.gameId = games.id
-         WHERE teams.searchableName = ? and games.isBye = 0 and games.isFinal = 0 and IIF(? is NULL, 1, games.tournamentId = ?) and (games.isRanked or teams.nonCaptain is null) 
-          GROUP BY people.id ORDER BY people.id <> teams.captain, people.id <> teams.nonCaptain""",
+         INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId
+         INNER JOIN people
+                    on (teams.captain = people.id OR teams.noncaptain = people.id OR teams.substitute = people.id)
+         LEFT JOIN games on (teams.id = games.teamOne OR   teams.id = teamTwo)
+          AND games.tournamentId = tournamentTeams.tournamentId and games.isBye = 0
+                                and games.isFinal = 0
+                                and (games.isRanked or teams.nonCaptain is null)
+         LEFT JOIN playerGameStats on people.id = playerGameStats.playerId AND games.id = playerGameStats.gameId
+WHERE teams.searchableName = ?
+
+  and IIF(? is NULL, 1, tournamentTeams.tournamentId = ?)
+
+GROUP BY people.id
+ORDER BY people.id <> teams.captain, people.id <> teams.nonCaptain""",
                 (team_name, tournament_id, tournament_id),
             ).fetchall()
             recent = c.execute(
@@ -783,28 +827,28 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
         with DatabaseManager() as c:
             players = c.execute(
                 """SELECT people.name,
-                                       round(SUM(eloChange.eloChange) + 1500, 2) as elo,
+                                       round(coalesce(SUM(eloChange.eloChange) + 1500,0), 2) as elo,
                                        case 
-                                        when round((SELECT eloChange
+                                        when round(coalesce((SELECT eloChange
                                         from eloChange
                                         where eloChange.playerId = playerGameStats.playerId
-                                          and eloChange.gameId = games.id), 2) is null 
+                                          and eloChange.gameId = games.id), 0), 2) is null 
                                             then 0 
                                         else 
-                                            round((SELECT eloChange
+                                            round(coalesce((SELECT eloChange
                                         from eloChange
                                         where eloChange.playerId = playerGameStats.playerId
-                                          and eloChange.gameId = games.id), 2)
+                                          and eloChange.gameId = games.id), 0), 2)
                                         end as eloDelta,
-                                       playerGameStats.points,
-                                       playerGameStats.aces,
-                                       playerGameStats.faults, --5
-                                       playerGameStats.doubleFaults,
-                                       playerGameStats.roundsPlayed,
-                                       playerGameStats.roundsBenched,
-                                       playerGameStats.greenCards,
-                                       playerGameStats.yellowCards, --10
-                                       playerGameStats.redCards,
+                                       coalesce(playerGameStats.points, 0),
+                                       coalesce(playerGameStats.aces, 0),
+                                       coalesce(playerGameStats.faults, 0), --5
+                                       coalesce(playerGameStats.doubleFaults, 0),
+                                       coalesce(playerGameStats.roundsPlayed, 0),
+                                       coalesce(playerGameStats.roundsBenched, 0),
+                                       coalesce(playerGameStats.greenCards, 0),
+                                       coalesce(playerGameStats.yellowCards, 0), --10
+                                       coalesce(playerGameStats.redCards, 0),
                                        games.isBye,   --i[12]
                                        tournaments.name,
                                        tournaments.searchableName,
@@ -821,7 +865,7 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
                                        games.round,--25
                                        best.name,
                                        best.searchableName,
-                                       games.startTime,
+                                       coalesce(games.startTime, -1),
                                        tournaments.searchableName,
                                        teams.name, --30
                                        teams.searchableName,
@@ -838,21 +882,22 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
                                        games.teamTwoTimeouts
                 
                                 FROM games
-                                         INNER JOIN playerGameStats on playerGameStats.gameId = games.id
+                                         LEFT JOIN playerGameStats on playerGameStats.gameId = games.id
                                          INNER JOIN tournaments on tournaments.id = games.tournamentId
                                          LEFT JOIN officials o on o.id = games.official
                                          LEFT JOIN people po on po.id = o.personId
                                          LEFT JOIN officials s on s.id = games.scorer
                                          LEFT JOIN people ps on ps.id = s.personId
-                                         INNER JOIN people on people.id = playerGameStats.playerId
+                                         LEFT JOIN people on people.id = playerGameStats.playerId
                                          LEFT JOIN people best on best.id = games.bestPlayer
-                                         INNER JOIN teams on teams.id = playerGameStats.teamId
-                                         INNER JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
+                                         LEFT JOIN teams on teams.id = playerGameStats.teamId
+                                         LEFT JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
                                 WHERE games.id = ?
                                 GROUP BY people.name
                                 order by teams.id <> games.teamOne, playerGameStats.sideOfCourt;""",
                 (game_id,),
             ).fetchall()
+
             other_matches = c.execute(
                 """ SELECT s.name, r.name, g2.teamOneScore, g2.teamTwoScore, g2.id, tournaments.searchableName
                     FROM games g1
@@ -953,6 +998,7 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
         player_stats = []
         teams = {}
         for i in players:
+            print(i)
             pl = make_player(i)
             player_stats.append(pl)
             if i[30] not in teams:
@@ -979,6 +1025,7 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
             i.stats[
                 "Elo"
             ] = f"{i.elo} [{i.elo_delta if i.elo_delta < 0 else '+' + str(i.elo_delta)}]"
+
         teams = list(teams.values())
         time_float = float(players[0][28])
 
@@ -1059,62 +1106,73 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
             tournament_id = get_tournament_id(tournament, c)
             teams = c.execute(
                 """SELECT tournaments.isPooled,
-                       teams.searchableName,
-                       teams.name,
-                       case
-                           when teams.imageURL is null
-                               then '/api/teams/image?name=blank'
-                           else
-                               teams.imageURL
-                           end,
-                       tournamentTeams.pool,
-                       COUNT(DISTINCT games.id)                                                                           as played,
-                       SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0))                                                                                 as wins,
-                       ROUND(100.0 * Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) / COUNT(DISTINCT games.id),
-                             2)|| '%'                                                                                              as percentage,
-                       COUNT(DISTINCT games.id)   - SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0))                                                                          as losses,
-                       SUM(playerGameStats.greenCards)                                                                       as greenCards,
-                       SUM(playerGameStats.yellowCards)                                                                      as yellowCards,
-                       SUM(playerGameStats.redCards)                                                                         as redCards,
-                       SUM(playerGameStats.faults)                                                                           as faults,
-                       SUM(IIF(playerGameStats.playerId = teams.captain, IIF(games.teamOne = teams.id, teamOneTimeouts, teamTwoTimeouts), 0)),
-                       SUM(playerGameStats.points)                                                                           as pointsScored,
-                       (SELECT SUM(playerGameStats.points)
-                            FROM playerGameStats
-                            where playerGameStats.opponentId = teams.id and playerGameStats.tournamentId = tournaments.id)                                                    as pointsConceded,
-                       SUM(playerGameStats.points) - (SELECT SUM(playerGameStats.points)
-                            FROM playerGameStats
-                            where playerGameStats.opponentId = teams.id and playerGameStats.tournamentId = tournaments.id)                       as difference,
-                       ROUND(1500.0 + (SELECT SUM(eloChange)
-                                       from eloChange
-                                                INNER JOIN teams inside ON inside.id = teams.id
-                                                INNER JOIN people captain ON captain.id = inside.captain
-                                                LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
-                                                LEFT JOIN people sub ON sub.id = inside.substitute
-                                       where eloChange.playerId = sub.id
-                                          or eloChange.playerId = captain.id
-                                          or eloChange.playerId = nonCaptain.id)
-                           /
-                                      COUNT(DISTINCT playerGameStats.playerId), 2)                                           as elo
-                
-                FROM tournamentTeams
-                         INNER JOIN tournaments ON tournaments.id = tournamentTeams.tournamentId
-                         INNER JOIN teams ON teams.id = tournamentTeams.teamId
-                         INNER JOIN games ON 
-                             (games.teamOne = teams.id or games.teamTwo = teams.id) AND games.tournamentId = tournaments.id 
-                             AND IIF(? is NULL, games.isRanked, 1) AND games.isBye = 0 AND games.isFinal = 0
-                         INNER JOIN playerGameStats
-                                ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
-                WHERE IIF(? is NULL, 1, tournaments.id = ?)
-                GROUP BY teams.name
-                ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) / COUNT(DISTINCT games.id) DESC,
-                         difference DESC,
-                         pointsScored DESC,
-                         greenCards + yellowCards + redCards ASC,
-                         redCards ASC,
-                         yellowCards ASC,
-                         faults ASC,
-                         SUM(timeoutsCalled) ASC""",
+       teams.searchableName,
+       teams.name,
+       case
+           when teams.imageURL is null
+               then '/api/teams/image?name=blank'
+           else
+               teams.imageURL
+           end,
+       tournamentTeams.pool,
+       COUNT(DISTINCT games.id)                                                                                       as played,
+       SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam,
+               0))                                                                                                    as wins,
+       ROUND(100.0 * coalesce(Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) /
+             COUNT(DISTINCT games.id), 0),
+             2) ||
+       '%'                                                                                                            as percentage,
+       COUNT(DISTINCT games.id) - SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam,
+                                          0))                                                                         as losses,
+       coalesce(SUM(playerGameStats.greenCards), 0)                                                                   as greenCards,
+       coalesce(SUM(playerGameStats.yellowCards), 0)                                                                  as yellowCards,
+       coalesce(SUM(playerGameStats.redCards), 0)                                                                     as redCards,
+       coalesce(SUM(playerGameStats.faults), 0)                                                                       as faults,
+       SUM(IIF(playerGameStats.playerId = teams.captain,
+               IIF(games.teamOne = teams.id, teamOneTimeouts, teamTwoTimeouts), 0)),
+       coalesce(SUM(playerGameStats.points), 0)                                                                       as pointsScored,
+       coalesce((SELECT SUM(playerGameStats.points)
+                 FROM playerGameStats
+                 where playerGameStats.opponentId = teams.id
+                   and playerGameStats.tournamentId = tournaments.id),
+                0)                                                                                                    as pointsConceded,
+       coalesce(SUM(playerGameStats.points) - (SELECT SUM(playerGameStats.points)
+                                               FROM playerGameStats
+                                               where playerGameStats.opponentId = teams.id
+                                                 and playerGameStats.tournamentId = tournaments.id),
+                0)                                                                                                    as difference,
+       ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
+                                from eloChange
+                                         INNER JOIN teams inside ON inside.id = teams.id
+                                         INNER JOIN people captain ON captain.id = inside.captain
+                                         LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
+                                         LEFT JOIN people sub ON sub.id = inside.substitute
+                                where eloChange.playerId = sub.id
+                                   or eloChange.playerId = captain.id
+                                   or eloChange.playerId = nonCaptain.id), 0)
+           /
+                      COUNT(teams.captain is not null + teams.noncaptain is not null + teams.substitute is not null),
+             2)                                                                                                       as elo
+
+FROM tournamentTeams
+         INNER JOIN tournaments ON tournaments.id = tournamentTeams.tournamentId
+         INNER JOIN teams ON teams.id = tournamentTeams.teamId
+         LEFT JOIN games ON
+    (games.teamOne = teams.id or games.teamTwo = teams.id) AND games.tournamentId = tournaments.id
+        AND IIF(? is NULL, games.isRanked, 1) AND games.isBye = 0 AND games.isFinal = 0
+         LEFT JOIN playerGameStats
+                   ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
+WHERE IIF(? is NULL, 1, tournaments.id = ?)
+GROUP BY teams.name
+ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) /
+         COUNT(DISTINCT games.id) DESC,
+         difference DESC,
+         pointsScored DESC,
+         greenCards + yellowCards + redCards ASC,
+         redCards ASC,
+         yellowCards ASC,
+         faults ASC,
+         SUM(timeoutsCalled) ASC""",
                 (tournament_id,tournament_id, tournament_id),
             ).fetchall()
         ladder = [
@@ -1184,29 +1242,36 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
         # TODO (LACHIE): please help me make this less queries...
         with DatabaseManager() as c:
             players_query = c.execute(
-                """SELECT teams.imageURL,  people.searchableName, people.name,
-       SUM(playerGameStats.isBestPlayer),
-       ROUND(1500.0 + (SELECT SUM(eloChange)
+                """SELECT teams.imageURL,
+       people.searchableName,
+       people.name,
+       coalesce(SUM(playerGameStats.isBestPlayer), 0),
+       ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
                        from eloChange
-                       where eloChange.playerId = people.id), 2) as elo,
-       SUM(games.winningTeam = playerGameStats.teamId),
+                       where eloChange.playerId = people.id), 0), 2) as elo,
+       coalesce(SUM(games.winningTeam = playerGameStats.teamId), 0),
        COUNT(DISTINCT games.id),
-       SUM(playerGameStats.points),
-       SUM(playerGameStats.aces),
-       SUM(playerGameStats.faults),
-       SUM(playerGameStats.doubleFaults),
-       SUM(playerGameStats.greenCards),
-       SUM(playerGameStats.yellowCards),
-       SUM(playerGameStats.redCards),
-       SUM(playerGameStats.roundsPlayed),
-       SUM(playerGameStats.servedPoints)
+       coalesce(SUM(playerGameStats.points), 0),
+       coalesce(SUM(playerGameStats.aces), 0),
+       coalesce(SUM(playerGameStats.faults), 0),
+       coalesce(SUM(playerGameStats.doubleFaults), 0),
+       coalesce(SUM(playerGameStats.greenCards), 0),
+       coalesce(SUM(playerGameStats.yellowCards), 0),
+       coalesce(SUM(playerGameStats.redCards), 0),
+       coalesce(SUM(playerGameStats.roundsPlayed), 0),
+       coalesce(SUM(playerGameStats.servedPoints), 0)
 
-FROM people
-         INNER JOIN playerGameStats on people.id = playerGameStats.playerId
-         INNER JOIN teams on playerGameStats.teamId = teams.id
-         INNER JOIN tournaments on tournaments.id = playerGameStats.tournamentId
-         INNER JOIN games on playerGameStats.gameId = games.id
-WHERE games.isBye = 0 and games.isFinal = 0 and IIF(? is NULL, 1, tournaments.id = ?) and games.isRanked
+FROM tournamentTeams
+         INNER JOIN teams ON teams.id = tournamentTeams.teamId
+         INNER JOIN people
+                    ON (people.id = teams.captain OR people.id = teams.nonCaptain OR teams.substitute = people.id)
+         INNER JOIN tournaments on tournaments.id = tournamentTeams.tournamentId
+         LEFT JOIN games
+                   on (teams.id = games.teamOne OR teams.id = teamTwo)  AND games.isBye = 0 and games.isFinal = 0 and games.isRanked and
+                      tournaments.id = games.tournamentId
+         LEFT JOIN playerGameStats on games.id = playerGameStats.gameId AND playerId = people.id
+         
+WHERE IIF(? is NULL, 1, tournaments.id = ?)
 GROUP BY people.id""",
                 (tournament_id, tournament_id), ).fetchall()
 
@@ -1232,11 +1297,11 @@ GROUP BY people.id""",
     def player_stats(tournament, player_name):
         tournament_id = get_tournament_id(tournament)
         player_headers = ["B&F Votes",
+                          "Elo",
                           "Games Won",
                           "Games Lost",
                           "Games Played",
                           "Percentage",
-                          "Elo",
                           "Points scored",
                           "Aces scored",
                           "Faults",
@@ -1275,117 +1340,174 @@ GROUP BY people.id""",
         with DatabaseManager() as c:
             players = c.execute(
                 """SELECT people.name,
-                        teams.searchableName,
-       SUM(playerGameStats.isBestPlayer),
-       SUM(games.winningTeam = playerGameStats.teamId),
-       SUM(games.winningTeam <> playerGameStats.teamId),
-       COUNT(DISTINCT games.id),
-       ROUND(100.0 * SUM(CAST(games.winningTeam = playerGameStats.teamId AS REAL)) / COUNT(DISTINCT games.id), 2)|| '%',
+       teams.searchableName,
+       coalesce(SUM(playerGameStats.isBestPlayer), 0),
        ROUND(1500.0 + (SELECT SUM(eloChange)
                        from eloChange
                        where eloChange.playerId = people.id), 2) as elo,
-       SUM(playerGameStats.points),
-       SUM(playerGameStats.aces),
-       SUM(playerGameStats.faults),
-       SUM(playerGameStats.doubleFaults),
-       SUM(playerGameStats.greenCards),
-       SUM(playerGameStats.yellowCards),
-       SUM(playerGameStats.redCards),
-       SUM(playerGameStats.roundsPlayed),
-       SUM(playerGameStats.roundsBenched),
-       ROUND((SELECT SUM(eloChange)
-              from eloChange
-                       INNER JOIN games on eloChange.gameId = games.id
-              where eloChange.playerId = people.id AND games.tournamentId = tournaments.id), 2),
-       ROUND((SELECT SUM(eloChange)                       from eloChange
-                                                                   INNER JOIN games on eloChange.gameId = games.id
-              where eloChange.playerId = people.id AND games.tournamentId = tournaments.id) / COUNT(DISTINCT playerGameStats.gameId), 2) as elo,
-       SUM(playerGameStats.servedPoints),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / tournamentTeams.gamesLost, 2),
-       ROUND(CAST(SUM(playerGameStats.aces) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.faults) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 2),
-       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 2),
-       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points) from playerGameStats i where i.teamId = teams.id and i.tournamentId = tournaments.id ), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints), 2)|| '%',
-       SUM(playerGameStats.servesReturned),
-       SUM(playerGameStats.servesReceived),
-       ROUND(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived), 2) || '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT( DISTINCT playerGameStats.gameId), 2)
+       coalesce(SUM(winningTeam = teams.id), 0),
+       coalesce(SUM(winningTeam <> teams.id), 0),
+       COUNT(DISTINCT games.id),
+       ROUND(coalesce(100.0 * CAST(SUM(winningTeam = teams.id)  AS REAL) / COUNT(DISTINCT games.id), 0), 2) || '%',
+       coalesce(SUM(playerGameStats.points), 0),
+       coalesce(SUM(playerGameStats.aces), 0),
+       coalesce(SUM(playerGameStats.faults), 0),
+       coalesce(SUM(playerGameStats.doubleFaults), 0),
+       coalesce(SUM(playerGameStats.greenCards), 0),
+       coalesce(SUM(playerGameStats.yellowCards), 0),
+       coalesce(SUM(playerGameStats.redCards), 0),
+       coalesce(SUM(playerGameStats.roundsPlayed), 0),
+       coalesce(SUM(playerGameStats.roundsBenched), 0),
+       coalesce(ROUND((SELECT SUM(eloChange)
+                       from eloChange
+                                INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id
+                         AND games.tournamentId = tournamentTeams.tournamentId), 2), 0),
+       ROUND(coalesce((SELECT SUM(eloChange)
+                       from eloChange
+                                INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id
+                         AND games.tournamentId = tournamentTeams.tournamentId), 0) / COUNT(DISTINCT playerGameStats.gameId),
+                2)                                               as elo,
+       coalesce(SUM(playerGameStats.servedPoints), 0),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) / (COUNT(DISTINCT playerGameStats.gameId) -
+                                                                   COUNT(DISTINCT IIF(games.winningTeam = teams.id, games.id, NULL))),
+                      0),
+             2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.aces) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.faults) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.greenCards + playerGameStats.yellowCards +
+                               playerGameStats.redCards) AS REAL) /
+                      COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       coalesce(SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards), 0),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) /
+                      (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 0),
+             2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 0), 2),
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 0), 2) ||
+       '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 0), 2) ||
+       '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) /
+                      (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points)
+                                                                           from playerGameStats i
+                                                                           where i.teamId = teams.id
+                                                                             and i.tournamentId = tournamentTeams.tournamentId),
+                      0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) /
+                      COUNT(DISTINCT playerGameStats.gameId), 0),
+             2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints),
+                      0), 2) || '%',
+       coalesce(SUM(playerGameStats.servesReceived), 0),
+       coalesce(SUM(playerGameStats.servesReturned), 0),
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived),
+                      0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT(DISTINCT playerGameStats.gameId),
+                      0), 2)
 
-FROM people
-         INNER JOIN playerGameStats on people.id = playerGameStats.playerId
-         INNER JOIN teams on playerGameStats.teamId = teams.id
-         INNER JOIN tournaments on tournaments.id = playerGameStats.tournamentId
-         INNER JOIN tournamentTeams on tournaments.id = tournamentTeams.tournamentId and teams.id = tournamentTeams.teamId
-         INNER JOIN games on playerGameStats.gameId = games.id
-WHERE people.searchableName = ? and games.isBye = 0 and games.isFinal = 0 and IIF(? is NULL, 1, tournaments.id = ?) and games.isRanked""",
+
+FROM teams
+         INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId
+         INNER JOIN people
+                    on (teams.captain = people.id OR teams.noncaptain = people.id OR teams.substitute = people.id)
+         LEFT JOIN games on (teams.id = games.teamOne OR teams.id = teamTwo)
+          AND games.tournamentId = tournamentTeams.tournamentId and games.isBye = 0
+                                and games.isFinal = 0
+                                and (games.isRanked or teams.nonCaptain is null)
+         LEFT JOIN playerGameStats on people.id = playerGameStats.playerId AND games.id = playerGameStats.gameId
+WHERE people.searchableName = ?
+
+  and IIF(? is NULL, 1, tournamentTeams.tournamentId = ?)""",
                 (player_name, tournament_id, tournament_id), ).fetchone()
 
             courts = c.execute(
                 """SELECT people.name,
-                        teams.searchableName,
-       SUM(playerGameStats.isBestPlayer),
-       SUM(games.winningTeam = playerGameStats.teamId),
-       SUM(games.winningTeam <> playerGameStats.teamId),
-       COUNT(DISTINCT games.id),
-       ROUND(100.0 * SUM(CAST(games.winningTeam = playerGameStats.teamId AS REAL)) / COUNT(DISTINCT games.id), 2)|| '%',
+       people.searchableName,
+       coalesce(SUM(playerGameStats.isBestPlayer), 0),
        ROUND(1500.0 + (SELECT SUM(eloChange)
                        from eloChange
                        where eloChange.playerId = people.id), 2) as elo,
-       SUM(playerGameStats.points),
-       SUM(playerGameStats.aces),
-       SUM(playerGameStats.faults),
-       SUM(playerGameStats.doubleFaults),
-       SUM(playerGameStats.greenCards),
-       SUM(playerGameStats.yellowCards),
-       SUM(playerGameStats.redCards),
-       SUM(playerGameStats.roundsPlayed),
-       SUM(playerGameStats.roundsBenched),
-       ROUND((SELECT SUM(eloChange)
-              from eloChange
-                       INNER JOIN games on eloChange.gameId = games.id
-              where eloChange.playerId = people.id AND games.tournamentId = tournaments.id), 2),
-       ROUND((SELECT SUM(eloChange)                       from eloChange
-                                                                   INNER JOIN games on eloChange.gameId = games.id
-              where eloChange.playerId = people.id AND games.tournamentId = tournaments.id) / COUNT(DISTINCT playerGameStats.gameId), 2) as elo,
-       SUM(playerGameStats.servedPoints),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / tournamentTeams.gamesLost, 2),
-       ROUND(CAST(SUM(playerGameStats.aces) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.faults) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       ROUND(CAST(SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2),
-       SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards),
-       ROUND(CAST(SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 2),
-       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 2),
-       ROUND(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 2),
-       ROUND(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points) from playerGameStats i where i.teamId = teams.id and i.tournamentId = tournaments.id ), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 2)|| '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints), 2)|| '%',
-       SUM(playerGameStats.servesReturned),
-       SUM(playerGameStats.servesReceived),
-       ROUND(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived), 2) || '%',
-       ROUND(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT( DISTINCT playerGameStats.gameId), 2)
+       coalesce(SUM(winningTeam = teams.id), 0),
+       coalesce(SUM(winningTeam <> teams.id), 0),
+       COUNT(DISTINCT games.id),
+       ROUND(coalesce(100.0 * CAST(SUM(winningTeam = teams.id)  AS REAL) / COUNT(DISTINCT games.id), 0), 2) || '%',
+       coalesce(SUM(playerGameStats.points), 0),
+       coalesce(SUM(playerGameStats.aces), 0),
+       coalesce(SUM(playerGameStats.faults), 0),
+       coalesce(SUM(playerGameStats.doubleFaults), 0),
+       coalesce(SUM(playerGameStats.greenCards), 0),
+       coalesce(SUM(playerGameStats.yellowCards), 0),
+       coalesce(SUM(playerGameStats.redCards), 0),
+       coalesce(SUM(playerGameStats.roundsPlayed), 0),
+       coalesce(SUM(playerGameStats.roundsBenched), 0),
+       coalesce(ROUND((SELECT SUM(eloChange)
+                       from eloChange
+                                INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id
+                         AND games.tournamentId = tournamentTeams.tournamentId), 2), 0),
+       ROUND(coalesce((SELECT SUM(eloChange)
+                       from eloChange
+                                INNER JOIN games on eloChange.gameId = games.id
+                       where eloChange.playerId = people.id
+                         AND games.tournamentId = tournamentTeams.tournamentId), 0) / COUNT(DISTINCT playerGameStats.gameId),
+                2)                                               as elo,
+       coalesce(SUM(playerGameStats.servedPoints), 0),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) / (COUNT(DISTINCT playerGameStats.gameId) -
+                                                                   COUNT(DISTINCT IIF(games.winningTeam = teams.id, games.id, NULL))),
+                      0),
+             2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.aces) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.faults) AS REAL) / COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.greenCards + playerGameStats.yellowCards +
+                               playerGameStats.redCards) AS REAL) /
+                      COUNT(DISTINCT playerGameStats.gameId), 0), 2),
+       coalesce(SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards), 0),
+       ROUND(coalesce(CAST(SUM(playerGameStats.points) AS REAL) /
+                      (SUM(playerGameStats.greenCards + playerGameStats.yellowCards + playerGameStats.redCards)), 0),
+             2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.aces)), 0), 2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.servedPoints) AS REAL) / (SUM(playerGameStats.faults)), 0), 2),
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.aces) AS REAL) / (SUM(playerGameStats.servedPoints)), 0), 2) ||
+       '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.faults) AS REAL) / (SUM(playerGameStats.servedPoints)), 0), 2) ||
+       '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) /
+                      (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points)
+                                                                           from playerGameStats i
+                                                                           where i.teamId = teams.id
+                                                                             and i.tournamentId = tournamentTeams.tournamentId),
+                      0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) /
+                      COUNT(DISTINCT playerGameStats.gameId), 0),
+             2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints),
+                      0), 2) || '%',
+       coalesce(SUM(playerGameStats.servesReceived), 0),
+       coalesce(SUM(playerGameStats.servesReturned), 0),
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servesReturned) AS REAL) / SUM(playerGameStats.servesReceived),
+                      0), 2) || '%',
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.isBestPlayer) AS REAL) / COUNT(DISTINCT playerGameStats.gameId),
+                      0), 2)
 
-FROM people
-         INNER JOIN playerGameStats on people.id = playerGameStats.playerId
-         INNER JOIN teams on playerGameStats.teamId = teams.id
-         INNER JOIN tournaments on tournaments.id = playerGameStats.tournamentId
-         INNER JOIN tournamentTeams on tournaments.id = tournamentTeams.tournamentId and teams.id = tournamentTeams.teamId
-         INNER JOIN games on playerGameStats.gameId = games.id
-WHERE people.searchableName = ? and games.isBye = 0 and games.isFinal = 0 and IIF(? is NULL, 1, tournaments.id = ?) and games.isRanked
-GROUP BY games.court""",
+
+FROM teams
+         INNER JOIN tournamentTeams ON teams.id = tournamentTeams.teamId
+         INNER JOIN people
+                    on (teams.captain = people.id OR teams.noncaptain = people.id OR teams.substitute = people.id)
+         LEFT JOIN games on (teams.id = games.teamOne OR teams.id = teamTwo)
+          AND games.tournamentId = tournamentTeams.tournamentId and games.isBye = 0
+                                and games.isFinal = 0
+                                and (games.isRanked or teams.nonCaptain is null)
+         LEFT JOIN playerGameStats on people.id = playerGameStats.playerId AND games.id = playerGameStats.gameId
+WHERE people.searchableName = ?
+  and IIF(? is NULL, 1, tournamentTeams.tournamentId = ?)
+  group by games.court""",
                 (player_name, tournament_id, tournament_id)).fetchall()
 
             recent = c.execute(
@@ -1566,11 +1688,11 @@ GROUP BY games.court""",
         with DatabaseManager() as c:
             official = c.execute(
                 """
-            SELECT name, searchableName from officials INNER JOIN people on people.id = officials.personId
-             WHERE EXISTS(SELECT games.id FROM games  WHERE official = officials.id AND IIF(? is NULL, 1, games.tournamentId = ?))
-            """, (tournament_id, tournament_id)
+            SELECT name, searchableName from officials INNER JOIN people on people.id = officials.personId INNER JOIN tournamentOfficials ON officials.id = tournamentOfficials.officialId 
+            WHERE IIF(? is NULL, 1, tournamentOfficials.tournamentId = ?)""", (tournament_id, tournament_id)
             ).fetchall()
         return (
+
             render_template_sidebar(
                 "tournament_specific/all_officials.html",
                 officials=official,
@@ -1604,8 +1726,8 @@ SELECT games.tournamentId,
        teamOneScore + teamTwoScore
 FROM games
          INNER JOIN tournaments ON games.tournamentId = tournaments.id
-         INNER JOIN officials o ON games.official = o.id
-         INNER JOIN people po ON o.personId = po.id
+         LEFT JOIN officials o ON games.official = o.id
+         LEFT JOIN people po ON o.personId = po.id
          LEFT JOIN officials s ON games.scorer = o.id
          LEFT JOIN people ps ON s.personId = ps.id
          LEFT JOIN gameEvents ON games.id = gameEvents.gameId AND gameEvents.id =
@@ -1730,7 +1852,7 @@ FROM officials INNER JOIN people on officials.personId = people.id
 
         teams = {}
         cards = [Card(*i) for i in cards_query]
-        game = Game(game_id, *game_query[2:], get_type_from_name(game_query[1]).manual_allowed()
+        game = Game(game_id, *game_query[2:], get_type_from_name(game_query[1], game_query[0]).manual_allowed()
                     )
         players = []
         player_headers = [
@@ -1828,8 +1950,8 @@ SELECT games.tournamentId,
        games.someoneHasWon
 FROM games
          INNER JOIN tournaments ON games.tournamentId = tournaments.id
-         INNER JOIN officials o ON games.official = o.id
-         INNER JOIN people po ON o.personId = po.id
+         LEFT JOIN officials o ON games.official = o.id
+         LEFT JOIN people po ON o.personId = po.id
          LEFT JOIN officials s ON games.scorer = o.id
          LEFT JOIN people ps ON s.personId = ps.id
          LEFT JOIN gameEvents ON games.id = gameEvents.gameId AND gameEvents.id =
@@ -1980,7 +2102,7 @@ FROM games
                 (tournament_id,)).fetchall()
             officials = c.execute(
                 """SELECT searchableName, name, password FROM officials INNER JOIN main.people on officials.personId = people.id""").fetchall()
-        if not get_type_from_name(editable[0]).manual_allowed():
+        if not get_type_from_name(editable[0], tournament_id).manual_allowed():
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -2018,7 +2140,7 @@ FROM games
                 """SELECT searchableName, name FROM people order by searchableName""").fetchall()
             officials = c.execute(
                 """SELECT searchableName, name, password FROM officials INNER JOIN main.people on officials.personId = people.id""").fetchall()
-        if not get_type_from_name(editable[0]).manual_allowed():
+        if not get_type_from_name(editable[0], tournament_id).manual_allowed():
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
