@@ -9,6 +9,7 @@ from structure import manageGame
 from structure.AllTournament import (
     get_all_officials,
 )
+from structure.GameUtils import game_string_to_commentary
 from structure.get_information import get_tournament_id
 from utils.databaseManager import DatabaseManager
 from utils.permissions import (
@@ -790,14 +791,12 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
                 teams[i[6]].cardTimeRemaining = max(pl.cardTimeRemaining or 0, teams[i[6]].cardTimeRemaining)
         visual_swap = request.args.get("swap", "false") == "true"
         teams = list(teams.values())
-        print(players[0][10:])
         game = Game(player_stats,
                     teams, f"Court {players[0][16]}",
                     f"{teams[0].score} - {teams[1].score}", *players[0][11:])
         if visual_swap:
             teams = list(reversed(teams))
 
-        print(f"{manageGame.get_timeout_time(game_id) - time.time() = }")
 
         return (
             render_template_sidebar(
@@ -998,7 +997,6 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
         player_stats = []
         teams = {}
         for i in players:
-            print(i)
             pl = make_player(i)
             player_stats.append(pl)
             if i[30] not in teams:
@@ -1058,7 +1056,6 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
             (f"{i[0]} vs {i[1]} [{i[2]} - {i[3]}]", i[4], i[5]) for i in other_matches
         ]
         prev_matches = prev_matches or [("No other matches", -1, players[0][29])]
-        print(players)
         return (
             render_template_sidebar(
                 "tournament_specific/game_page.html",
@@ -1067,6 +1064,7 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
                 best=best,
                 team_headings=team_headers,
                 player_headings=player_headers,
+                commentary=game_string_to_commentary(game.id),
                 roundNumber=round_number,
                 prev_matches=prev_matches,
                 tournament=players[0][13],
@@ -1506,7 +1504,7 @@ FROM teams
                                 and (games.isRanked or teams.nonCaptain is null)
          LEFT JOIN playerGameStats on people.id = playerGameStats.playerId AND games.id = playerGameStats.gameId
 WHERE people.searchableName = ?
-  and IIF(? is NULL, 1, tournamentTeams.tournamentId = ?)
+  and IIF(? is NULL, 1, tournamentTeams.tournamentId = ?) AND court >= 0
   group by games.court""",
                 (player_name, tournament_id, tournament_id)).fetchall()
 
@@ -1799,7 +1797,6 @@ FROM games
             officials_query = c.execute("""SELECT searchableName, name 
 FROM officials INNER JOIN people on officials.personId = people.id
 """).fetchall()
-            print(players_query)
 
         @dataclass
         class Player:

@@ -3,7 +3,6 @@ import time
 
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from structure import get_information
-from structure.get_information import get_tournament_id
 from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
 
@@ -142,7 +141,7 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
 
         iga = team_one_id if team_one_iga else team_two_id
         c.execute(
-            """UPDATE games SET status = adminStatus = 'In Progress', startTime = ?, IGASide = ? where id = ?""",
+            """UPDATE games SET status = 'In Progress', adminStatus = 'In Progress', startTime = ?, IGASide = ? where id = ?""",
             (time.time(), iga, game_id,))
         if official:
             c.execute("""
@@ -322,6 +321,28 @@ SELECT games.isRanked as ranked,
        FROM playerGameStats
          INNER JOIN games ON playerGameStats.gameId = games.id
 WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
+
+        resolved, protested, red_cards, yellow_cards, notes  = c.execute("""SELECT resolved,
+       protested,
+       SUM(playerGameStats.redCards) > 0,
+       SUM(playerGameStats.yellowCards) > 0,
+       notes
+FROM games
+         INNER JOIN main.playerGameStats on playerGameStats.gameId = gameId""").fetchone()
+
+        if resolved:
+            c.execute("""UPDATE games SET adminStatus = 'Resolved' WHERE id = ?""", (game_id,))
+        elif red_cards:
+            c.execute("""UPDATE games SET adminStatus = 'Red Card Awarded' WHERE id = ?""", (game_id,))
+        elif protested:
+            c.execute("""UPDATE games SET adminStatus = 'Protested' WHERE id = ?""", (game_id,))
+        elif notes.strip():
+            c.execute("""UPDATE games SET adminStatus = 'Notes To Review' WHERE id = ?""", (game_id,))
+        elif yellow_cards:
+            c.execute("""UPDATE games SET adminStatus = 'Yellow Card Awarded' WHERE id = ?""", (game_id,))
+
+        c.execute("""UPDATE games SET status = 'Official' WHERE id = ?""", (game_id,))
+
 
         if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
             elos = [0, 0]
@@ -539,3 +560,8 @@ def delete(game_id):
         c.execute("""DELETE FROM playerGameStats WHERE playerGameStats.gameId = ?""", (game_id,))
         c.execute("""DELETE FROM gameEvents WHERE gameEvents.gameId = ?""", (game_id,))
         c.execute("""DELETE FROM games WHERE games.id = ?""", (game_id,))
+
+
+def resolve_game(game_id):
+    with DatabaseManager() as c:
+        _add_to_game(game_id, c, "Resolve", None, None)

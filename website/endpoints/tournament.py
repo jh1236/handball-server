@@ -132,18 +132,35 @@ def add_tourney_endpoints(app, comps):
 
     @app.post("/api/games/update/create")
     def create():
+        """
+        SCHEMA:
+            {
+                tournament: str = the searchable name of the tournament
+                teamOne: str = the searchable name of the first team, or the name of the team to be created if players is populated
+                teamTwo: str = the searchable name of the second team, or the name of the team to be created if players is populated
+                official: str (OPTIONAL) = the searchable name of the official (used to change officials)
+                scorer: str (OPTIONAL) = the searchable name of the scorer (used to change scorer)
+                playersOne: list[str] (OPTIONAL) = the list of players on team one if the game is created by players
+                playersTwo: list[str] (OPTIONAL) = the list of players on team two if the game is created by players
+            }
+        """
         print(request.json)
         gid = manageGame.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"],
-                                     request.json["official"], request.json.get("playersOne", None), request.json.get("playersTwo", None))
+                                     request.json["official"], request.json.get("playersOne", None),
+                                     request.json.get("playersTwo", None))
         return jsonify({"id": gid})
 
     @app.post("/api/games/update/resolve")
     def resolve():
-        tournament = request.json["tournament"]
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the game to resolve
+            }
+        """
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
-        comps[tournament].get_game(game_id).resolve()
-        comps[tournament].save()
+        manageGame.resolve_game(game_id)
         return "", 204
 
     @app.post("/api/signup")

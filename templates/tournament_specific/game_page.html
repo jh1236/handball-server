@@ -82,7 +82,7 @@
                 <tr>
                 <td></td>
                     {% for i in game.players %}
-                        <th><b><a class = "hide" href="/players/{{ i.searchableName }}">{{ i.name }}</a></b></th>
+                        <th><b><a class = "hide" href="/{{ tournamentLink }}/players/{{ i.searchableName }}">{{ i.name }}</a></b></th>
                     {% endfor %}
                 </tr>
                 {% for i in player_headings %}
