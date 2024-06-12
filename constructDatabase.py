@@ -240,7 +240,7 @@ if __name__ == "__main__":
                 substitute = s.execute("SELECT id FROM people WHERE name = ?", (team.players[2].name,)).fetchone()[0]
                 s.execute("UPDATE teams SET substitute = ? WHERE id = ?", (substitute, team_id))
 
-        for tournament in sorted(comp.values(), key=lambda a: "practice" not in a.nice_name()):
+        for tournament in sorted(comp.values(), key=lambda a: "practice_season_one" not in a.nice_name()):
             # create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
             #     id INTEGER PRIMARY KEY AUTOINCREMENT,
             #     finalsGenerator TEXT,
@@ -352,4 +352,5 @@ if __name__ == "__main__":
             if "practice" in tournament.nice_name():
                 practice_round = round
 
-    DatabaseManager(force_create_tables=True)
+    with DatabaseManager(force_create_tables=True) as c:
+        c.execute("""UPDATE tournaments SET name = 'SUSS Practice', searchableName = 'suss_practice', imageURL = '/api/tournaments/image?name=suss_practice', fixturesGenerator = 'OneRoundEditable' WHERE tournaments.id = 1""")

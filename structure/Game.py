@@ -440,7 +440,7 @@ class Game:
                     break
             if self.is_forfeited and self.best_player is None:
                 self.best_player = forfeit_player(self)
-            elif all(len(i.all_players) == 1 for i in self.teams):
+            elif any(len(i.all_players) == 1 for i in self.teams):
                 self.best_player = [
                     i
                     for i in self.teams[0].players + self.teams[1].players

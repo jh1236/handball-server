@@ -61,6 +61,7 @@ GROUP BY gameEvents.id""", (game,)).fetchall()
     if not game:
         return ["Hang Tight, the game will start soon!"]
     for taunt, player, team, team_mate, other_player, other_team, umpire in game_events:
+        team_mate = team_mate or player
         string = taunt.replace("%p", player).replace("%r", other_player)
         string = (
             string.replace("%t", team)

@@ -262,7 +262,7 @@ class GameTeam:
 
     def change_elo(self, delta: float, a: "Game") -> None:
         for i in self.players:
-            if i.time_on_court:
+            if i.time_on_court or a.is_forfeited:
                 i.change_elo(delta, a)
 
     def next_point(self) -> None:
