@@ -4,6 +4,8 @@ let teamsSwapped = false
 let teamName = ""
 let startTime = -1
 
+let waiting = false
+
 const CARDS = {
     Warning: {
         "swearing": "Audible Swearing",
@@ -61,6 +63,8 @@ let lxor = (a, b) => a ? !b : b
 let timeoutTime = -1
 
 function score(firstTeam, leftPlayer) {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/score", {
         method: "POST", body: JSON.stringify({
             id: id,
@@ -71,6 +75,7 @@ function score(firstTeam, leftPlayer) {
         }
     }).then(
         (res) => {
+            waiting = false
             if (res.ok) {
                 location.reload()
             } else {
@@ -81,17 +86,19 @@ function score(firstTeam, leftPlayer) {
 }
 
 function sub(firstTeam, firstPlayer) {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/substitute", {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            tournament: tournament.replace("/", ""),
-            firstPlayer: firstPlayer,
+            leftPlayer: firstPlayer,
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
     }).then(
         (res) => {
+            waiting = false
             if (res.ok) {
                 location.reload()
             } else {
@@ -102,6 +109,8 @@ function sub(firstTeam, firstPlayer) {
 }
 
 function ace() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/ace", {
         method: "POST", body: JSON.stringify({
             id: id,
@@ -110,6 +119,7 @@ function ace() {
         }
     }).then(
         (res) => {
+            waiting = false
             if (res.ok) {
                 location.reload()
             } else {
@@ -168,6 +178,8 @@ function openCardModal(colorIn, firstTeam, teamName) {
 }
 
 function sendCustomCard() {
+    if (waiting) return
+    waiting = true
     let selectedReason = document.querySelector('input[name="reason"]:checked')
     const selectedPlayer = document.getElementById('playerOne').checked
     if (!selectedReason) {
@@ -206,6 +218,7 @@ function sendCustomCard() {
         }
     }).then(
         (res) => {
+            waiting = false
             if (res.ok) {
                 location.reload()
             } else {
@@ -266,6 +279,8 @@ function timeoutOverlay(timeIn = 0, firstTeam) {
 
 
 function startServeClock() {
+    if (waiting) return
+    waiting = true
     if (startTime > 0) {
         stopServeClock()
         return
@@ -278,10 +293,21 @@ function startServeClock() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    });
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function forfeit(firstTeam) {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/forfeit", {
         method: "POST", body: JSON.stringify({
             id: id,
@@ -289,10 +315,21 @@ function forfeit(firstTeam) {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );;
 }
 
 function stopServeClock() {
+    if (waiting) return
+    waiting = true
     startTime = -1
     document.getElementById("serveBtn").style = ""
     document.getElementById("serveBtn").textContent = "Start Serve Timer"
@@ -303,7 +340,16 @@ function stopServeClock() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    });
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function serveClock(timeIn = 0) {
@@ -323,6 +369,8 @@ function serveClock(timeIn = 0) {
 }
 
 function timeout(firstTeam) {
+    if (waiting) return
+    waiting = true
     if (timeoutTime > 0) {
         endTimeout(firstTeam)
         return
@@ -336,7 +384,14 @@ function timeout(firstTeam) {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    });
+    }).then(
+        (res) => {
+            waiting = false
+            if (!res.ok) {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function endTimeout(firstTeam) {
@@ -355,22 +410,44 @@ function endTimeout(firstTeam) {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 
 function fault() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/fault", {
         method: "POST", body: JSON.stringify({
             id: id,
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 
 function undo() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/undo", {
         method: "POST", body: JSON.stringify({
             tournament: tournament.replace("/", ""),
@@ -378,10 +455,21 @@ function undo() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function swapServe() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/swapServe", {
         method: "POST", body: JSON.stringify({
             tournament: tournament.replace("/", ""),
@@ -389,10 +477,21 @@ function swapServe() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function swapServeTeam() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/swapServeTeam", {
         method: "POST", body: JSON.stringify({
             tournament: tournament.replace("/", ""),
@@ -400,10 +499,21 @@ function swapServeTeam() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function swapPlayerSides(first) {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/swapPlayerSides", {
         method: "POST", body: JSON.stringify({
             tournament: tournament.replace("/", ""),
@@ -412,7 +522,16 @@ function swapPlayerSides(first) {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function myFunction(button) {

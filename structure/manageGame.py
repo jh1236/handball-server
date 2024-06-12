@@ -13,6 +13,44 @@ def searchable_of(name: str):
     s = name.lower().replace(" ", "_").replace(",", "").replace("the_", "")
     return re.sub("[^a-zA-Z0-9_]", "", s)
 
+def sync(c, game_id):
+    c.execute("""UPDATE games
+SET teamOneScore    = lg.teamOneScore,
+    teamTwoScore    = lg.teamTwoScore,
+    teamOneTimeouts = lg.teamOneTimeouts,
+    teamTwoTimeouts = lg.teamTwoTimeouts,
+    winningTeam     = lg.winningTeam,
+    started         = lg.started,
+    ended           = lg.ended,
+    protested       = lg.protested,
+    resolved        = lg.resolved,
+    playerToServe = lg.playerToServe,
+    teamToServe = lg.teamToServe,
+    sideToServe = lg.sideToServe,
+    someoneHasWon = lg.someoneHasWon
+FROM liveGames lg
+WHERE lg.id = games.id AND games.id = ?;""", (game_id,))
+    c.execute("""
+    UPDATE playerGameStats
+SET points = lg.points,
+    aces = lg.aces,
+    faults = lg.faults,
+    servedPoints = lg.servedPoints,
+    servedPointsWon = lg.servedPointsWon,
+    servesReceived = lg.servesReceived,
+    servesReturned = lg.servesReturned,
+    doubleFaults = lg.doubleFaults,
+    greenCards = lg.greenCards,
+    warnings = lg.warnings,
+    yellowCards = lg.yellowCards,
+    redCards = lg.redCards,
+    cardTimeRemaining = lg.cardTimeRemaining,
+    cardTime = lg.cardTime
+FROM livePlayerGameStats lg
+WHERE playerGameStats.id = lg.id
+        AND playerGameStats.gameId = ?;
+""", (game_id,))
+
 
 def game_string_lookup(char: str):
     d = {
@@ -36,18 +74,19 @@ def game_string_lookup(char: str):
 def _team_and_position_to_id(game_id, first_team, left_player, c) -> int:
     if first_team:
         player = c.execute("""
-            SELECT playerGameStats.playerId
-            FROM games
-                     INNER JOIN gameEvents ON games.id = gameEvents.gameId AND NOT EXISTS (SELECT * FROM gameEvents i WHERE i.gameId = games.id AND i.id > gameEvents.gameId)
-                     INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND IIF(? = 1, teamOneLeft = playerGameStats.playerId, teamOneRight = playerGameStats.playerId)
-             WHERE games.id = ?""", (left_player, game_id)).fetchone()
+SELECT playerGameStats.playerId
+FROM games
+         INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
+         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND IIF(? = 1, teamOneLeft = playerGameStats.playerId, teamOneRight = playerGameStats.playerId)
+WHERE games.id = ?""", (left_player, game_id)).fetchone()
         player = player[0]
     else:
         player = c.execute("""SELECT playerGameStats.playerId
-            FROM games
-                     INNER JOIN gameEvents ON games.id = gameEvents.gameId AND NOT EXISTS (SELECT * FROM gameEvents i WHERE i.gameId = games.id AND i.id > gameEvents.gameId)
-                     INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND IIF(? = 1, teamTwoLeft = playerGameStats.playerId, teamTwoRight = playerGameStats.playerId)
-             WHERE games.id = ?""", (left_player, game_id)).fetchone()[0]
+FROM games
+         INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
+         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND IIF(? = 1, teamTwoLeft = playerGameStats.playerId, teamTwoRight = playerGameStats.playerId)
+WHERE games.id = ?
+        """, (left_player, game_id)).fetchone()[0]
     return player
 
 
@@ -55,29 +94,35 @@ def _tournament_from_game(game_id, c):
     return c.execute("""SELECT tournamentId FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
 
 
-def _swap_server(game_id, team_to_serve, c):  # FIXME: this doesn't work with subs...
+def _swap_server(game_id, team_to_serve, c, swap=True):
     query = c.execute(
-        """SELECT sideServed, playerWhoServed FROM gameEvents WHERE gameId = ? AND teamWhoServed = ? ORDER BY id DESC LIMIT 1""",
+        """SELECT sideServed FROM gameEvents WHERE gameId = ? AND teamWhoServed = ? ORDER BY id DESC LIMIT 1""",
         (game_id, team_to_serve)).fetchone()
     if query is None:  # this team is yet to serve
-        old_side = "Right"
-        player_who_served = c.execute("""
-SELECT IIF(teamOne = ?, teamOneRight, teamOneLeft)
-FROM games
-         INNER JOIN gameEvents ON games.id = gameEvents.gameId
-WHERE games.id = ?
-ORDER BY gameEvents.id DESC
-LIMIT 1""", (team_to_serve, game_id))
+        old_side = "Right" if swap else "Left"
     else:
         old_side = query[0]
-        player_who_served = query[1]
-    if old_side == "Left":
-        new_side = "Right"
+    if swap:
+        if old_side == "Left":
+            new_side = "Right"
+        else:
+            new_side = "Left"
     else:
-        new_side = "Left"
+        new_side = old_side
     player_to_serve = c.execute(
-        """SELECT playerId, playerId = ? as o  FROM playerGameStats WHERE gameId = ? AND teamId = ? AND cardTimeRemaining = 0 ORDER BY o desc""",
-        (player_who_served, new_side, game_id, team_to_serve)).fetchall()
+        """SELECT playerGameStats.playerId,
+       (teamOneLeft = playerGameStats.playerId OR teamTwoLeft = playerGameStats.playerId) = (? = 'Left') as o
+FROM games
+         INNER JOIN gameEvents ON gameEvents.id = (SELECT MAX(id) FROM gameEvents WHERE gameEvents.gameId = games.id)
+         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND (teamOneLeft = playerGameStats.playerId OR
+                                                                              teamOneRight = playerGameStats.playerId OR
+                                                                              teamTwoLeft = playerGameStats.playerId OR
+                                                                              teamTwoRight = playerGameStats.playerId)
+WHERE games.id = ?
+  AND playerGameStats.teamId = ?
+  AND cardTimeRemaining = 0
+ORDER BY o desc""",
+        (new_side, game_id, team_to_serve)).fetchall()
     return player_to_serve[0][0], new_side
 
 
@@ -93,11 +138,14 @@ def game_has_started(game_id, c):
     return c.execute("""SELECT started FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
 
 
-def _score_point(game_id, c, first_team, left_player, penalty=False):
+def _score_point(game_id, c, first_team, left_player, penalty=False, points = 1):
     if game_is_over(game_id, c):
         raise ValueError("Game is Already Over!")
-    _add_to_game(game_id, c, "Score", first_team, left_player, team_to_serve=first_team,
-                 notes="Penalty" if penalty else None)
+    for _ in range(points):
+        _add_to_game(game_id, c, "Score", first_team, left_player, team_to_serve=first_team,
+                     notes="Penalty" if penalty else None)
+    if penalty:
+        sync(c, game_id)
 
 
 def _get_serve_details(game_id, c):
@@ -115,17 +163,20 @@ def _get_player_details(game_id, c):
 
 
 def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=None, details=None, notes=None):
+    """IMPORTANT: if the item added to game is a penalty, THE CALLER IS RESPONSIBLE FOR SYNCING"""
     player = _team_and_position_to_id(game_id, first_team, left_player, c) if left_player is not None else None
     team = get_information.get_team_id_from_game_and_side(game_id, first_team, c) if first_team is not None else None
-    next_team_to_serve = get_information.get_team_id_from_game_and_side(game_id, team_to_serve, c)
+    next_team_to_serve = None if team_to_serve is None else get_information.get_team_id_from_game_and_side(game_id, team_to_serve, c)
     players = _get_player_details(game_id, c)
     tournament = _tournament_from_game(game_id, c)
     team_who_served, player_who_served, serve_side = _get_serve_details(game_id, c)
-    if team_to_serve is None or team_who_served == next_team_to_serve:
-        next_team_to_serve, next_player_to_serve, next_serve_side = team_who_served, player_who_served, serve_side
+    next_team_to_serve = next_team_to_serve or team_who_served
+    swap = team_who_served != next_team_to_serve
+    if swap:
+        next_player_to_serve, next_serve_side = _swap_server(game_id, next_team_to_serve, c,
+                                                             swap=swap)
     else:
-        next_player_to_serve, next_serve_side = _swap_server(game_id, next_team_to_serve, c)
-
+        next_player_to_serve, next_serve_side = player_who_served, serve_side
     c.execute("""INSERT INTO gameEvents(gameId, teamId, playerId, tournamentId, eventType, time, details, notes, teamWhoServed,playerWhoServed,  sideServed, nextTeamToServe, nextPlayerToServe, nextServeSide, teamOneLeft, teamOneRight, teamTwoLeft, teamTwoRight)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)""", (
         game_id, team if team is not None else None, player if player is not None else None, tournament,
@@ -133,6 +184,45 @@ def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=N
         details, notes,
         team_who_served, player_who_served, serve_side,
         next_team_to_serve, next_player_to_serve, next_serve_side, players[0], players[1], players[2], players[3]))
+    if char == "Substitute":
+        player_on = c.execute("""SELECT playerGameStats.playerid
+FROM playerGameStats
+         INNER JOIN gameEvents
+                    ON gameEvents.id = (SELECT MAX(id) FROM gameEvents WHERE gameEvents.gameId = playerGameStats.gameId)
+WHERE playerGameStats.gameId = ?
+  AND playerGameStats.teamId = ?
+  AND gameEvents.teamOneLeft <> playerGameStats.playerId
+  AND gameEvents.teamOneRight <> playerGameStats.playerId
+  AND gameEvents.teamTwoLeft <> playerGameStats.playerId
+  AND gameEvents.teamTwoRight <> playerGameStats.playerId""", (game_id, team)).fetchone()[0]
+        if first_team:
+            if left_player:
+                c.execute(
+                    """UPDATE gameEvents SET teamOneLeft = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
+                    (player_on, game_id,))
+            else:
+                c.execute(
+                    """UPDATE gameEvents SET teamOneRight = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
+                    (player_on, game_id,))
+        else:
+            if left_player:
+                c.execute(
+                    """UPDATE gameEvents SET teamTwoLeft = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
+                    (player_on, game_id,))
+            else:
+                c.execute(
+                    """UPDATE gameEvents SET teamTwoRight = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
+                    (player_on, game_id,))
+
+    if notes != "Penalty":
+        sync(c, game_id)
+        if "Card" in char or char == "Substitute":
+            next_player_to_serve, next_serve_side = _swap_server(game_id, next_team_to_serve, c,
+                                                                 swap=team_who_served != next_team_to_serve)
+            c.execute(
+                """UPDATE gameEvents SET nextTeamToServe = ? ,nextPlayerToServe = ?, nextServeSide = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
+                (next_team_to_serve, next_player_to_serve, next_serve_side, game_id,))
+            sync(c, game_id)
 
 
 def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official=None, scorer=None):
@@ -153,19 +243,18 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
                 """SELECT people.searchableName FROM games INNER JOIN teams ON teams.id = games.teamTwo INNER JOIN people ON 
                 (captain = people.id OR noncaptain = people.id OR substitute = people.id) WHERE games.id = ?""",
                 (game_id,)).fetchall() if i]
-        print(f"{team_one = }, {team_two = }")
         get_information.game_and_side[game_id] = (team_one_id, team_two_id)
         team_one_players = []
         for name in team_one:
             team_one_players.append(c.execute("""
                 SELECT id FROM people WHERE searchableName = ?""",
-                                              (name,)))
+                                              (name,)).fetchone()[0])
         team_two_players = []
         for name in team_two:
             team_two_players.append(c.execute("""
                 SELECT id FROM people WHERE searchableName = ?""",
-                                              (name,)))
-
+                                              (name,)).fetchone()[0])
+        print(f"{team_one_players = }, {team_two_players = }")
         iga = team_one_id if team_one_iga else team_two_id
         c.execute(
             """UPDATE games SET status = 'In Progress', adminStatus = 'In Progress', startTime = ?, IGASide = ? where id = ?""",
@@ -188,7 +277,7 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
                 where 
                     playerGameStats.playerId = (SELECT people.id from people where people.searchableName = ?) and
                     playerGameStats.gameId = ?""",
-                  (side, name, game_id))
+                      (side, name, game_id))
         for name, side in zip(team_two, SIDES):
             c.execute("""
                     UPDATE playerGameStats SET startSide = ? 
@@ -196,13 +285,14 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
                         playerGameStats.playerId = (SELECT people.id from people where people.searchableName = ?) and
                         playerGameStats.gameId = ?""",
                       (side, name, game_id))
-
+        team = get_information.get_team_id_from_game_and_side(game_id, not swap_service, c=c)
         c.execute("""INSERT
-    INTO gameEvents(gameId, tournamentId, eventType, time, nextPlayerToServe, nextServeSide, teamOneLeft, teamOneRight,
+    INTO gameEvents(gameId, tournamentId, eventType, time,nextPlayerToServe, nextTeamToServe, nextServeSide, teamOneLeft, teamOneRight,
                     teamTwoLeft, teamTwoRight)
-    VALUES (?, tournamentId, 'Start', ?, ?, ?, ?, ?, ?, ?)""",
-                      (game_id, tournament, time.time(), team_two_players[0] if swap_service else team_one_players[0],
-                       game_id, team_one_players[0], team_one_players[1], team_two_players[0], team_two_players[0]))
+    VALUES (?, ?, 'Start', ?, ?, ?, 'Left', ?, ?, ?, ?)""",
+                  (game_id, tournament, time.time(), team_two_players[0] if swap_service else team_one_players[0], team,
+                   team_one_players[0], team_one_players[1], team_two_players[0], team_two_players[1]))
+        sync(c, game_id)
 
 
 def score_point(game_id, first_team, left_player):
@@ -253,7 +343,15 @@ def card(game_id, first_team, left_player, color, duration, reason):
         _add_to_game(game_id, c, color, first_team, left_player, notes=reason, details=duration)
         team = get_information.get_team_id_from_game_and_side(game_id, first_team, c)
         both_carded = c.execute(
-            """SELECT MIN(iif(cardTimeRemaining < 0, 12, cardTimeRemaining)) FROM playerGameStats WHERE playerGameStats.gameId = ? AND playerGameStats.teamId = ?""",
+            """SELECT MIN(iif(cardTimeRemaining < 0, 12, cardTimeRemaining))
+FROM games
+         INNER JOIN main.gameEvents gE on gE.id = (SELECT MAX(id) FROM gameEvents WHERE games.id = gE.gameId)
+         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND (teamOneLeft = playerGameStats.playerId OR
+                                                                              teamOneRight = playerGameStats.playerId OR
+                                                                              teamTwoLeft = playerGameStats.playerId OR
+                                                                              teamTwoRight = playerGameStats.playerId)
+WHERE playerGameStats.gameId = ?
+  AND playerGameStats.teamId = ?""",
             (game_id, team)).fetchone()[0]
         if both_carded != 0:
             my_score, their_score, someone_has_won = c.execute(
@@ -264,8 +362,7 @@ def card(game_id, first_team, left_player, color, duration, reason):
             if not first_team:
                 my_score, their_score = their_score, my_score
             both_carded = min(both_carded, max(11 - their_score, my_score + 2 - their_score))
-            for _ in range(both_carded):
-                _score_point(game_id, c, not first_team, None, penalty=True)
+            _score_point(game_id, c, not first_team, None, penalty=True, points=both_carded)
 
 
 def undo(game_id):
@@ -284,6 +381,7 @@ def undo(game_id):
                             t.id DESC
                         LIMIT 1
                     )""", (game_id,))
+        sync(c, game_id)
 
 
 def change_code(game_id):
@@ -386,13 +484,15 @@ FROM games
                 elo_delta = calc_elo(elos[my_team], elos[not my_team], win)
                 c.execute("""INSERT INTO eloChange(gameId, playerId, tournamentId, eloChange) VALUES (?, ?, ?, ?)""",
                           (game_id, player_id, tournament_id, elo_delta))
-
         end_of_round = c.execute(
             """SELECT id FROM games WHERE not games.isBye AND games.tournamentId = ? AND not games.ended""",
             (tournament_id,)).fetchone()
         fixture_gen, finals_gen, in_finals, finished = c.execute(
             """SELECT fixturesGenerator, finalsGenerator, inFinals, isFinished FROM tournaments WHERE tournaments.id = ?""",
             (tournament_id,)).fetchone()
+
+        sync(c, game_id)
+
     print(f"{end_of_round = }")
     if not end_of_round:
         if not in_finals:
@@ -409,40 +509,11 @@ FROM games
             finals.end_of_round()
 
 
+
 def substitute(game_id, first_team, left_player):
     with DatabaseManager() as c:
         _add_to_game(game_id, c, "Substitute", first_team, left_player)
-        team = get_information.get_team_id_from_game_and_side(game_id, first_team, c)
-        player_on = c.execute("""SELECT playerGameStats.playerid
-FROM playerGameStats
-         INNER JOIN gameEvents ON playerGameStats.gameId = gameEvents.gameId AND NOT EXISTS (SELECT *
-                                                                                             FROM gameEvents i
-                                                                                             WHERE i.gameId = playerGameStats.gameId
-                                                                                               AND i.id > gameEvents.gameId)
-WHERE playerGameStats.gameId = ?
-  AND playerGameStats.teamId = ?
-  AND gameEvents.teamOneLeft <> playerGameStats.playerId
-  AND gameEvents.teamOneRight <> playerGameStats.playerId
-  AND gameEvents.teamTwoLeft <> playerGameStats.playerId
-  AND gameEvents.teamTwoRight <> playerGameStats.playerId""", (game_id, team))
-        if first_team:
-            if left_player:
-                c.execute(
-                    """UPDATE gameEvents SET teamOneLeft = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
-                    (player_on, game_id,))
-            else:
-                c.execute(
-                    """UPDATE gameEvents SET teamOneRight = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
-                    (player_on, game_id,))
-        else:
-            if left_player:
-                c.execute(
-                    """UPDATE gameEvents SET teamTwoLeft = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
-                    (player_on, game_id,))
-            else:
-                c.execute(
-                    """UPDATE gameEvents SET teamTwoRight = ? WHERE id = (SELECT MAX(id) FROM gameEvents WHERE gameId = ?)""",
-                    (player_on, game_id,))
+
 
 
 def create_game(tournamentId, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,

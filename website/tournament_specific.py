@@ -695,7 +695,7 @@ ORDER BY people.id <> teams.captain, people.id <> teams.nonCaptain""",
        IIF(teams.id = games.teamOne, games.teamOneScore, games.teamTwoScore),
        1 - coalesce(IIF(teams.id = games.teamOne, games.teamOneTimeouts, games.teamTwoTimeouts), 0),
        games.id, --11
-       po.name,          
+       po.name,
        po.searchableName,
        ps.name,
        ps.searchableName,
@@ -704,7 +704,13 @@ ORDER BY people.id <> teams.captain, people.id <> teams.nonCaptain""",
        gameEvents.eventType = 'Fault',
        lastGE.nextServeSide
 FROM games
-         INNER JOIN playerGameStats on playerGameStats.gameId = games.id
+         LEFT JOIN gameEvents lastGE ON games.id = lastGE.gameId AND lastGE.id =
+                                                                     (SELECT MAX(id)
+                                                                      FROM gameEvents
+                                                                      WHERE games.id = gameEvents.gameId)
+         INNER JOIN playerGameStats on
+    (lastGE.teamOneLeft = playerGameStats.playerId OR lastGE.teamOneRight = playerGameStats.playerId OR
+     lastGE.teamTwoLeft = playerGameStats.playerId OR lastGE.teamTwoRight = playerGameStats.playerId) AND games.id = playerGameStats.gameId
          INNER JOIN tournaments on tournaments.id = games.tournamentId
          LEFT JOIN officials o on o.id = games.official
          LEFT JOIN people po on po.id = o.personId
@@ -719,17 +725,14 @@ FROM games
                                                                    FROM gameEvents
                                                                    WHERE games.id = gameEvents.gameId
                                                                      AND (gameEvents.eventType = 'Fault' or gameEvents.eventType = 'Score'))
-         LEFT JOIN gameEvents lastGE ON games.id = lastGE.gameId AND lastGE.id =
-                                                                     (SELECT MAX(id)
-                                                                      FROM gameEvents
-                                                                      WHERE games.id = gameEvents.gameId)
+
          LEFT JOIN punishments ON punishments.gameId =
-                                       (SELECT MAX(id)
-                                       FROM gameEvents
-                                       WHERE games.id = punishments.gameId AND punishments.playerId = playerGameStats.playerId)
+                                  (SELECT MAX(id)
+                                   FROM gameEvents
+                                   WHERE games.id = punishments.gameId AND punishments.playerId = playerGameStats.playerId)
 WHERE games.id = ?
 GROUP BY people.name
-order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneLeft) AND (playerGameStats.playerId <> lastGE.teamOneLeft)""",
+order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneLeft) AND (playerGameStats.playerId <> lastGE.teamTwoLeft);""",
                 (game_id,),
             ).fetchall()
         print(players)
@@ -819,7 +822,7 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
         court = int(request.args.get("court"))
         with DatabaseManager() as c:
             tournament = get_tournament_id(request.args.get("tournament"), c)
-            game_id = c.execute("""SELECT id FROM games WHERE court = ? AND tournamentId = ? ORDER BY id desc""",
+            game_id = c.execute("""SELECT id FROM games WHERE court = ? AND tournamentId = ? AND started = 1 ORDER BY id desc""",
                                 (court, tournament)).fetchone()
         return scoreboard(game_id[0])
 
@@ -1772,16 +1775,16 @@ WHERE games.id = ?
            WHEN games.teamTwo = teams.id THEN
                games.teamTwoTimeouts
            ELSE
-               games.teamOneTimeouts END
+               games.teamOneTimeouts END,
+       (coalesce((SELECT SUM(eventType = 'Substitute') FROM gameEvents WHERE gameEvents.gameId = games.id AND gameEvents.teamId = teams.id), 0) = 0) AND teams.substitute is not null AND teamOneScore + games.teamTwoScore <= 9
 FROM games
          INNER JOIN tournaments on games.tournamentId = tournaments.id
          INNER JOIN teams on (games.teamTwo = teams.id or games.teamOne = teams.id)
          INNER JOIN playerGameStats on playerGameStats.teamId = teams.id AND playerGameStats.gameId = games.id 
                     WHERE games.id = ?
                     GROUP BY teams.id
-ORDER BY teams.id <> games.teamOne
-""", (game_id,)).fetchall()
-            players_query = c.execute("""SELECT 
+ORDER BY teams.id <> games.teamOne""", (game_id,)).fetchall()
+            players_query = c.execute("""SELECT
             playerGameStats.teamId, people.name, people.searchableName, playerGameStats.cardTimeRemaining <> 0,
             playerGameStats.points,
             playerGameStats.aces,
@@ -1793,19 +1796,18 @@ ORDER BY teams.id <> games.teamOne
             playerGameStats.yellowCards, 
             playerGameStats.redCards
 FROM games
-         INNER JOIN playerGameStats on games.id = playerGameStats.gameId
+         LEFT JOIN gameEvents on gameEvents.id = (SELECT Max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
+         INNER JOIN playerGameStats on games.id = playerGameStats.gameId AND (eventType is null or (playerGameStats.playerId = gameEvents.teamOneLeft OR playerGameStats.playerId = gameEvents.teamOneRight
+            OR playerGameStats.playerId = gameEvents.teamTwoLeft OR playerGameStats.playerId = gameEvents.teamTwoRight))
          INNER JOIN people on people.id = playerGameStats.playerId
-         WHERE gameId = ?
-""", (game_id,)).fetchall()
+         WHERE games.id = ? ORDER BY playerGameStats.teamId, (gameEvents.teamOneLeft = playerGameStats.playerId OR gameEvents.teamTwoLeft = playerGameStats.playerId) DESC""", (game_id,)).fetchall()
             cards_query = c.execute("""SELECT people.name, playerGameStats.teamId, type, reason, hex 
             FROM punishments 
             INNER JOIN people on people.id = punishments.playerId
             INNER JOIN playerGameStats on playerGameStats.playerId = punishments.playerId and playerGameStats.teamId = punishments.teamId and playerGameStats.gameId = ?
-         WHERE playerGameStats.tournamentId = punishments.tournamentId
-""", (game_id,)).fetchall()
+         WHERE playerGameStats.tournamentId = punishments.tournamentId""", (game_id,)).fetchall()
             officials_query = c.execute("""SELECT searchableName, name 
-FROM officials INNER JOIN people on officials.personId = people.id
-""").fetchall()
+FROM officials INNER JOIN people on officials.personId = people.id""").fetchall()
 
         @dataclass
         class Player:
@@ -1834,6 +1836,7 @@ FROM officials INNER JOIN people on officials.personId = people.id
             card_time: int
             green_carded: bool
             timeouts: int
+            has_sub: bool
             players: list[Player]
             cards: list[Card]
 

@@ -242,7 +242,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                                          LEFT JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
                                 WHERE games.id = ?
                                 GROUP BY people.name
-                                order by teams.id <> games.teamOne, playerGameStats.sideOfCourt;""",
+                                order by teams.id <> games.teamOne, playerGameStats.startSide;""",
                 (game_id,),
             ).fetchall()
             cards_query = c.execute("""SELECT people.name, playerGameStats.teamId, type, reason, hex 

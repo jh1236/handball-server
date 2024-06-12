@@ -73,7 +73,7 @@
         <td>
             {% if teams[0].cardTimeRemaining > 0 %}
                 <div class="rectangle"
-                     style="background-color: #FCCE6E;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardDuration }}%"></div>
+                     style="background-color: #FCCE6E;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardTime }}%"></div>
             {% endif %}
             {% if teams[0].cardTimeRemaining < 0 %}
                 <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>

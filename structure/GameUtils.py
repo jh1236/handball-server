@@ -28,25 +28,25 @@ def game_string_to_commentary(game: int) -> list[str]:
     out = []
     with DatabaseManager() as c:
         game_events = c.execute("""SELECT
-       (SELECT taunt FROM taunts WHERE eventType = taunts.event ORDER BY random()) as taunt,
-       people.name                                                                 as person,
-       t1.name                                                                     as team,
-       (SELECT people.name
-        FROM teams
-                 INNER JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
-                 INNER JOIN people ON playerGameStats.playerId = people.id
-        WHERE (teamOneLeft = people.id OR teamOneRight = people.id OR teamTwoLeft = people.id OR teamTwoRight = people.id) 
-          AND people.id <> gameEvents.playerId
-          AND teams.id = t1.id)                                                    as team_mate,
-       (SELECT people.name
-        FROM teams
-                 INNER JOIN playerGameStats ON playerGameStats.teamId = teams.id
-                 INNER JOIN people ON playerGameStats.playerId = people.id
-            AND (eventType <> 'Ace' OR (gameEvents.sideServed = 'Left') = (people.id = gameEvents.teamOneLeft OR people.id = gameEvents.teamTwoLeft))
-        WHERE teams.id = t2.id
-        ORDER BY random())                                                         as other_player,
-       t2.name                                                                     as other_team,
-       off.name                                                                    as umpire
+    (SELECT taunt FROM taunts WHERE eventType = taunts.event ORDER BY random()) as newTaunt,
+    people.name                                                                 as person,
+    t1.name                                                                     as team,
+    (SELECT people.name
+     FROM teams
+              INNER JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
+              INNER JOIN people ON playerGameStats.playerId = people.id
+     WHERE (teamOneLeft = people.id OR teamOneRight = people.id OR teamTwoLeft = people.id OR teamTwoRight = people.id)
+       AND people.id <> gameEvents.playerId
+       AND teams.id = t1.id)                                                    as team_mate,
+    (SELECT people.name
+     FROM teams
+              INNER JOIN playerGameStats ON playerGameStats.teamId = teams.id
+              INNER JOIN people ON playerGameStats.playerId = people.id
+         AND (eventType <> 'Ace' OR (gameEvents.sideServed = 'Left') = (people.id = gameEvents.teamOneLeft OR people.id = gameEvents.teamTwoLeft))
+     WHERE teams.id = t2.id
+     ORDER BY random())                                                         as other_player,
+    t2.name                                                                     as other_team,
+    off.name                                                                    as umpire
 
 FROM gameEvents
          INNER JOIN people on people.id = gameEvents.playerId
@@ -56,7 +56,7 @@ FROM gameEvents
          INNER JOIN people off on off.id = officials.personId
          INNER JOIN teams t2 on (games.teamTwo + games.teamOne - t1.id) = t2.id
 
-WHERE games.id = ?
+WHERE games.id = ? AND newTaunt is not null
 GROUP BY gameEvents.id""", (game,)).fetchall()
     if not game:
         return ["Hang Tight, the game will start soon!"]
@@ -98,16 +98,17 @@ def game_string_to_events(game: int) -> list[str]:
        off.name                                                                    as umpire
 
 FROM gameEvents
-         LEFT JOIN people on people.id = gameEvents.playerId
-         LEFT JOIN teams t1 on gameEvents.teamId = t1.id
+         INNER JOIN people on people.id = gameEvents.playerId
+         INNER JOIN teams t1 on gameEvents.teamId = t1.id
          INNER JOIN games on gameEvents.gameId = games.id
-         LEFT JOIN officials on officials.id = games.official
-         LEFT JOIN people off on off.id = officials.personId
-         LEFT JOIN teams t2 on (games.teamTwo + games.teamOne - t1.id) = t2.id
+         INNER JOIN officials on officials.id = games.official
+         INNER JOIN people off on off.id = officials.personId
+         INNER JOIN teams t2 on (games.teamTwo + games.teamOne - t1.id) = t2.id
 
-WHERE games.id = ? AND (gameEvents.notes is null OR gameEvents.notes != 'Penalty')
+WHERE games.id = ?
 GROUP BY gameEvents.id""", (game,)).fetchall()
     for taunt, player, team, team_mate, other_player, other_team, umpire in game_events:
+        team_mate = team_mate or player
         string = f"{taunt} by {player} from ({team})."
         out.append(string)
     return out

@@ -196,6 +196,8 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
 create_player_game_stats_view = """CREATE VIEW IF NOT EXISTS livePlayerGameStats AS
 SELECT playerGameStats.id,
        playerGameStats.playerId,
+       playerGameStats.teamId,
+       playerGameStats.gameid,
        coalesce(SUM(ge.eventType = 'Score' and ge.playerId = playerGameStats.playerId), 0) as points,
        coalesce(SUM(ge.eventType = 'Ace' and ge.playerId = playerGameStats.playerId), 0)   as aces,
        coalesce(SUM(ge.eventType = 'Fault' and ge.playerId = playerGameStats.playerId),
@@ -356,6 +358,48 @@ WHERE playerGameStats.id = lg.id
 
 END;
 """
+create_update_game_event_trigger = """CREATE TRIGGER IF NOT EXISTS updateGamesOnUpdate
+    AFTER UPDATE
+    ON gameEvents
+BEGIN
+    UPDATE games
+SET teamOneScore    = lg.teamOneScore,
+    teamTwoScore    = lg.teamTwoScore,
+    teamOneTimeouts = lg.teamOneTimeouts,
+    teamTwoTimeouts = lg.teamTwoTimeouts,
+    winningTeam     = lg.winningTeam,
+    started         = lg.started,
+    ended           = lg.ended,
+    protested       = lg.protested,
+    resolved        = lg.resolved,
+    playerToServe = lg.playerToServe,
+    teamToServe = lg.teamToServe,
+    sideToServe = lg.sideToServe,
+    someoneHasWon = lg.someoneHasWon
+FROM liveGames lg
+WHERE lg.id = games.id AND games.id = NEW.gameId;
+
+    UPDATE playerGameStats
+SET points = lg.points,
+    aces = lg.aces,
+    faults = lg.faults,
+    servedPoints = lg.servedPoints,
+    servedPointsWon = lg.servedPointsWon,
+    servesReceived = lg.servesReceived,
+    servesReturned = lg.servesReturned,
+    doubleFaults = lg.doubleFaults,
+    greenCards = lg.greenCards,
+    warnings = lg.warnings,
+    yellowCards = lg.yellowCards,
+    redCards = lg.redCards,
+    cardTimeRemaining = lg.cardTimeRemaining,
+    cardTime = lg.cardTime
+FROM livePlayerGameStats lg
+WHERE playerGameStats.id = lg.id
+        AND playerGameStats.gameId = NEW.gameId;
+
+END;
+"""
 
 create_delete_game_event_trigger = """CREATE TRIGGER IF NOT EXISTS updateGamesAgain
     AFTER DELETE
@@ -432,8 +476,10 @@ class DatabaseManager:
         self.read_write_c.execute(create_live_games_view)
         self.read_write_c.execute(create_punishments_view)
         self.read_write_c.execute(create_player_game_stats_view)
-        self.read_write_c.execute(create_insert_game_event_trigger)
-        self.read_write_c.execute(create_delete_game_event_trigger)
+        # TOO SLOW!!
+        # self.read_write_c.execute(create_insert_game_event_trigger)
+        # self.read_write_c.execute(create_delete_game_event_trigger)
+        # self.read_write_c.execute(create_update_game_event_trigger)
         self.conn.commit()
 
     def close_connection(self):
