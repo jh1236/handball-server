@@ -7,7 +7,7 @@
             {
                 "bestPlayer": "Tristan Nel",
                 "cards": [
-                    "Disrespect"
+                    "Disrespect Towards Other Team"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -105,7 +105,7 @@
             {
                 "bestPlayer": "Liam Cooper",
                 "cards": [
-                    "Non-Captain Talking to umpire"
+                    "Allowed Non Captain to Speak to Umpire"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -137,8 +137,8 @@
             {
                 "bestPlayer": "Lachlan Banks",
                 "cards": [
-                    "Swearing",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -171,7 +171,7 @@
                 "bestPlayer": "Jared Healy",
                 "cards": [
                     "Swearing",
-                    "Spoke To Umpire Outside BRA"
+                    "Spoke to Umpire from Outside BRA"
                 ],
                 "court": 1,
                 "firstTeamServed": true,
@@ -266,7 +266,7 @@
             {
                 "bestPlayer": "Tomasz Sakowski",
                 "cards": [
-                    "Swearing"
+                    "Repeated Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": false,
@@ -421,7 +421,7 @@
             {
                 "bestPlayer": "Brigitte Gredziuk",
                 "cards": [
-                    "Swearing"
+                    "Repeated Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": true,
@@ -636,7 +636,7 @@
             {
                 "bestPlayer": "Iggy Kreutz",
                 "cards": [
-                    "Swearing"
+                    "Repeated Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": true,
@@ -731,7 +731,7 @@
             {
                 "bestPlayer": "Tomasz Sakowski",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": false,
@@ -793,7 +793,7 @@
             {
                 "bestPlayer": "Declan Holloway",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": false,
@@ -1102,7 +1102,7 @@
             {
                 "bestPlayer": "Tristan Nel",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": false,
@@ -1134,7 +1134,7 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "Arguing With Umpire"
+                    "Disrespect Towards Officials"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -1166,8 +1166,8 @@
             {
                 "bestPlayer": "Declan Holloway",
                 "cards": [
-                    "Swearing",
-                    "Time wasting"
+                    "Repeated Audible Swearing",
+                    "Delay of Game"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -1321,7 +1321,7 @@
             {
                 "bestPlayer": "Tristan Nel",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": true,

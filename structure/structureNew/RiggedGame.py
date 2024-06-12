@@ -16,9 +16,15 @@ def load_from_string(self, game_string: str, s, tournament):
         s.execute("SELECT id FROM teams WHERE searchableName = ?", (self.team_serving.nice_name(),)).fetchone()[0]
     servingPlayer = s.execute("SELECT id FROM people WHERE searchableName = ?", (self.server.nice_name(),)).fetchone()[
         0]
+    team_one = []
+    for i in self.teams[0].players:
+        team_one.append(s.execute("SELECT id FROM people WHERE searchableName = ?", (i.nice_name(),)).fetchone()[0])
+    team_two = []
+    for i in self.teams[1].players:
+        team_two.append(s.execute("SELECT id FROM people WHERE searchableName = ?", (i.nice_name(),)).fetchone()[0])
     s.execute(
-        """INSERT INTO gameEvents (gameId, playerId, teamId, tournamentId, eventType, time, details, nextPlayerToServe, nextTeamToServe, sideServed, nextServeSide) VALUES (?,?,?,?, 'Start', -1, null, ?, ?, null, 'Left')""",
-        (game_id, None, None, tournament, servingPlayer, servingTeam))
+        """INSERT INTO gameEvents (gameId, playerId, teamId, tournamentId, eventType, time, details, nextPlayerToServe, nextTeamToServe, sideServed, nextServeSide,  teamOneLeft, teamOneRight, teamTwoLeft, teamTwoRight) VALUES (?,?,?,?, 'Start', -1, null, ?, ?, null, 'Left', ?, ?,?,?)""",
+        (game_id, None, None, tournament, servingPlayer, servingTeam, team_one[0], team_one[1], team_two[0], team_two[1]))
     for j in chunks_sized(game_string, 2):
         penalty_count = 0
         penalty_team = None
@@ -95,6 +101,12 @@ def load_from_string(self, game_string: str, s, tournament):
             s.execute("SELECT id FROM teams WHERE searchableName = ?", (self.team_serving.nice_name(),)).fetchone()[0]
         servingPlayer = \
             s.execute("SELECT id FROM people WHERE searchableName = ?", (self.server.nice_name(),)).fetchone()[0]
+        team_one = []
+        for i in self.teams[0].players:
+            team_one.append(s.execute("SELECT id FROM people WHERE searchableName = ?", (i.nice_name(),)).fetchone()[0])
+        team_two = []
+        for i in self.teams[1].players:
+            team_two.append(s.execute("SELECT id FROM people WHERE searchableName = ?", (i.nice_name(),)).fetchone()[0])
         serving_side = "Left" if self.team_serving.first_player_serves else "Right"
         if event_type.endswith(" Card"):
             if "null" in team.players[not first].nice_name(): continue
@@ -106,27 +118,29 @@ def load_from_string(self, game_string: str, s, tournament):
                     details = 3
             card_count += 1
         elif event_type == "Substitute":
-            details = s.execute(
-                """SELECT playerId FROM playerGameStats WHERE gameId = ? and sideOfCourt = 'Substitute' and teamId = ?""",
-                (game_id, team_id)).fetchone()
-            if details: details = details[0]
+            print(f"{team_one =}, {team_two = }")
 
         if self.game_ended:
             servingTeam = servingPlayer = serving_side = None
         s.execute(
-            """INSERT INTO gameEvents (gameId, playerId, teamId, tournamentId, eventType, time, details, nextPlayerToServe, nextTeamToServe, playerWhoServed, teamWhoServed, sideServed, nextServeSide, notes) VALUES (?,?,?,?,?, -1,?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO gameEvents (gameId, playerId, teamId, tournamentId, eventType, time, details, 
+            nextPlayerToServe, nextTeamToServe, playerWhoServed, teamWhoServed, sideServed, nextServeSide, notes, 
+            teamOneLeft, teamOneRight, teamTwoLeft, teamTwoRight) VALUES (?,?,?,?,?, -1,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+            ?, ?)""",
             (game_id, player_id, team_id, tournament, event_type, details, servingPlayer, servingTeam, oldServingPlayer,
-             oldServingTeam, side_served_from, serving_side, notes))
+             oldServingTeam, side_served_from, serving_side, notes, team_one[0], team_one[1], team_two[0], team_two[1]))
         if penalty_count > 0:
             team = s.execute("SELECT id FROM teams WHERE searchableName = ?", (penalty_team.nice_name(),)).fetchone()[0]
             if penalty_player:
                 penalty_player = \
-                s.execute("SELECT id FROM people WHERE searchableName = ?", (penalty_player.nice_name(),)).fetchone()[0]
+                    s.execute("SELECT id FROM people WHERE searchableName = ?",
+                              (penalty_player.nice_name(),)).fetchone()[0]
             for i in range(penalty_count):
                 s.execute(
-                    """INSERT INTO gameEvents (gameId, teamId, playerId, tournamentId, eventType, time, nextPlayerToServe, nextTeamToServe, playerWhoServed, teamWhoServed, sideServed, nextServeSide, notes) VALUES (?,?,?,?,'Score', -1,?, ?, ?, ?, ?, ?, 'Penalty')""",
+                    """INSERT INTO gameEvents (gameId, teamId, playerId, tournamentId, eventType, time, nextPlayerToServe, nextTeamToServe, playerWhoServed, teamWhoServed, sideServed, nextServeSide, notes,  teamOneLeft, teamOneRight, teamTwoLeft, teamTwoRight) VALUES (?,?,?,?,'Score', -1,?, ?, ?, ?, ?, ?, 'Penalty', ?, ?, ?, ?)""",
                     (game_id, team, penalty_player, tournament, servingPlayer, servingTeam, oldServingPlayer,
-                     oldServingTeam, side_served_from, serving_side))
+                     oldServingTeam, side_served_from, serving_side, team_one[0], team_one[1], team_two[0],
+                     team_two[1]))
     details = s.execute(
         """SELECT id FROM people WHERE searchableName = ?""",
         (self.best_player.nice_name(),)).fetchone()
@@ -140,7 +154,8 @@ def load_from_string(self, game_string: str, s, tournament):
                     """INSERT INTO gameEvents (gameId, teamId,  tournamentId, eventType, time, details, notes) VALUES (?, ?, ?, 'Protest', -1, ?, ?)""",
                     (game_id, team, tournament, details, self.notes))
         else:
-            team = s.execute("SELECT id FROM teams WHERE searchableName = ?", (self.teams[self.protested - 1].nice_name(),)).fetchone()[0]
+            team = s.execute("SELECT id FROM teams WHERE searchableName = ?",
+                             (self.teams[self.protested - 1].nice_name(),)).fetchone()[0]
             s.execute(
                 """INSERT INTO gameEvents (gameId, teamId,  tournamentId, eventType, time, details, notes) VALUES (?, ?, ?, 'Protest', -1, ?, ?)""",
                 (game_id, team, tournament, details, self.notes))

@@ -1,4 +1,4 @@
-raise Exception("THIS WILL DELETE THE DATABASE! DO NOT RUN THIS UNLESS YOU WANT TO DELETE THE DATABASE\nif for whatever reason you want to reconstruct the database from json files, run this script in the root directory of the project and rem out this exception, also good luck!")
+# raise Exception("THIS WILL DELETE THE DATABASE! DO NOT RUN THIS UNLESS YOU WANT TO DELETE THE DATABASE\nif for whatever reason you want to reconstruct the database from json files, run this script in the root directory of the project and rem out this exception, also good luck!")
 
 import json
 import os
@@ -120,7 +120,7 @@ def process_game(tournamentId, game, round, isRanked):
             sideOfCourt = ["Left", "Right", "Substitute"][player.team.players.index(player)]
             s.execute(
                 """INSERT INTO playerGameStats (
-                    gameId,   playerId, teamId, opponentId, tournamentId,roundsPlayed, roundsBenched, isBestPlayer, sideOfCourt, isFinal
+                    gameId,   playerId, teamId, opponentId, tournamentId,roundsPlayed, roundsBenched, isBestPlayer, startSide, isFinal
                     ) VALUES (?,?,?,?,?,?,?,?,?,?)""",
                 (game_id, playerId, teamId, opponentId, tournamentId, roundPlayed, roundsBenched, isBestPlayer,
                  sideOfCourt, isFinal)
@@ -272,7 +272,7 @@ if __name__ == "__main__":
             if "practice" in tournament.nice_name():
                 if practice is None:
                     s.execute(
-                        "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL, hasScorer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)",
+                        "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL, hasScorer, isFinished, inFinals) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0)",
                         (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled,
                          f"/api/tournaments/image?name={searchableName}")
                     )
@@ -280,7 +280,7 @@ if __name__ == "__main__":
                 tournamentId = practice
             else:
                 s.execute(
-                    "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL, hasScorer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO tournaments (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled, imageURL, hasScorer, isFinished, inFinals) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1)",
                     (searchableName, finalsGenerator, fixturesGenerator, name, ranked, twoCourts, notes, isPooled,
                      f"/api/tournaments/image?name={searchableName}", hasScorer)
                 )

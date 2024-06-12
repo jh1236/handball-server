@@ -318,7 +318,7 @@
             {
                 "bestPlayer": "Tomasz Sakowski",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -380,7 +380,7 @@
             {
                 "bestPlayer": "Zaiah Deards",
                 "cards": [
-                    "swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -748,7 +748,7 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -780,7 +780,7 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "Talking to Umpire"
+                    "Spoke to Umpire from Outside BRA"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -812,7 +812,7 @@
             {
                 "bestPlayer": "Tristan Nel",
                 "cards": [
-                    "time wasting"
+                    "Delay of Game"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -936,7 +936,7 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -968,8 +968,8 @@
             {
                 "bestPlayer": "Digby Ross",
                 "cards": [
-                    "swearing",
-                    "swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -1031,8 +1031,8 @@
             {
                 "bestPlayer": "Digby Ross",
                 "cards": [
-                    "Swearing ",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -1064,7 +1064,7 @@
             {
                 "bestPlayer": "Digby Ross",
                 "cards": [
-                    "swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -1132,7 +1132,7 @@
                 ],
                 "court": 0,
                 "firstTeamServed": true,
-                "game": "VRvrslflSLSLFRARSLslsrglSLslSLslslSRslflslSLSLSLSL",
+                "game": "slflSLSLFRARSLslsrglSLslSLslslSRslflslSLSLSLSL",
                 "id": 36,
                 "notes": "eva bad scorer",
                 "official": "Jared Healy",
@@ -1224,7 +1224,7 @@
                 ],
                 "court": 0,
                 "firstTeamServed": true,
-                "game": "VRvrslslglflttslslflSLslslslfrfrslslSLSLSLARslSLsl",
+                "game": "slslglflttslslflSLslslslfrfrslslSLSLSLARslSLsl",
                 "id": 39,
                 "notes": " ur bald",
                 "official": "Lachlan Banks",
@@ -1342,11 +1342,11 @@
             {
                 "bestPlayer": "Null",
                 "cards": [
-                    "Not Provided"
+                    "Spoke to Umpire from Outside BRA"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
-                "game": "vrVRslSLslararslSLslslflslSLslslGLSLSLFRSLsl",
+                "game": "slSLslararslSLslslflslSLslslGLSLSLFRSLsl",
                 "id": 43,
                 "notes": " \u201cUmpire baited player into green card offence.\u201d",
                 "official": "Alex Soudure",
@@ -1770,7 +1770,7 @@
             {
                 "bestPlayer": "Alex Soudure",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -1898,8 +1898,8 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "Talking to Umpire Outside BRA",
-                    "Swearing"
+                    "Spoke to Umpire from Outside BRA",
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -1993,10 +1993,10 @@
             {
                 "bestPlayer": "Digby Ross",
                 "cards": [
-                    "swearing",
-                    "swearing",
-                    "swearing",
-                    "swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing",
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -2028,8 +2028,8 @@
             {
                 "bestPlayer": "Eva Hajigabriel",
                 "cards": [
-                    "Swearing",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -2061,9 +2061,9 @@
             {
                 "bestPlayer": "Digby Ross",
                 "cards": [
-                    "Swearing",
-                    "Swearing",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -2127,7 +2127,7 @@
             {
                 "bestPlayer": "Null",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,

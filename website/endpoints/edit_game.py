@@ -77,15 +77,19 @@ def add_game_endpoints(app, comps):
 
     @app.post("/api/games/update/substitute")
     def substitute():
-        tournament = request.json["tournament"]
-        logger.info(f"Request for score: {request.json}")
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+                firstTeam: <bool> = if the team listed first is substituting
+                leftPlayer: <bool> = if the player listed as left is leaving the court
+            }
+        """
+        logger.info(f"Request for substitute: {request.json}")
         game_id = request.json["id"]
         first_team = request.json["firstTeam"]
-        first_player = request.json["firstPlayer"]
-        comps[tournament].get_game(game_id).teams[not first_team].sub_player(
-            first_player
-        )
-        comps[tournament].save()
+        first_player = request.json["leftPlayer"]
+        manageGame.substitute(game_id, first_team, first_player)
         return "", 204
 
     @app.post("/api/games/update/round")

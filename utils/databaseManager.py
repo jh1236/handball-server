@@ -46,6 +46,7 @@ create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     ranked INTEGER,
     twoCourts INTEGER,
     isFinished INTEGER,
+    inFinals INTEGER,
     hasScorer INTEGER,
     isPooled INTEGER,
     notes TEXT,
@@ -114,26 +115,6 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
 create_live_games_view = """CREATE VIEW IF NOT EXISTS liveGames AS
 SELECT
     games.id,
-    games.tournamentId,
-    games.teamOne,
-    games.teamTwo,
-    games.bestPlayer,
-    games.official,
-    games.scorer,
-    games.IGASide,
-    games.gameStringVersion,
-    games.gameString,
-    games.startTime,
-    games.length,
-    games.court,
-    games.isFinal,
-    games.round,
-    games.notes,
-    games.isBye,
-    games.pool,
-    games.status,
-    games.isRanked,
-    games.adminStatus,
     SUM(IIF(gE.teamId = games.teamOne and gE.eventType = 'Score', 1, 0)) as teamOneScore,
     SUM(IIF(gE.teamId = games.teamTwo and gE.eventType = 'Score', 1, 0)) as teamTwoScore,
     SUM(IIF(gE.teamId = games.teamOne and gE.eventType = 'Timeout', 1, 0)) as teamOneTimeouts,
@@ -190,7 +171,6 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
     roundsPlayed INTEGER,
     roundsBenched INTEGER,
     isBestPlayer INTEGER,
-    sideOfCourt TEXT,
     isFinal INTEGER,
     points INTEGER,
     aces INTEGER,
@@ -206,85 +186,86 @@ create_player_game_stats_table = """CREATE TABLE IF NOT EXISTS playerGameStats (
     redCards INTEGER,
     cardTimeRemaining INTEGER,
     cardTime INTEGER,
+    startSide TEXT,
     FOREIGN KEY (gameId) REFERENCES games (id),
     FOREIGN KEY (playerId) REFERENCES people (id),
     FOREIGN KEY (teamId) REFERENCES teams (id),
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (opponentID) REFERENCES teams (id)
 );"""
-create_player_game_stats_view = """
-CREATE VIEW IF NOT EXISTS livePlayerGameStats AS SELECT 
-       playerGameStats.id,
-       playerGameStats.gameId,
+create_player_game_stats_view = """CREATE VIEW IF NOT EXISTS livePlayerGameStats AS
+SELECT playerGameStats.id,
        playerGameStats.playerId,
-       playerGameStats.teamId,
-       playerGameStats.opponentId,
-       playerGameStats.tournamentId,
-       playerGameStats.roundsPlayed,
-       playerGameStats.roundsBenched,
-       playerGameStats.isBestPlayer,
-       playerGameStats.sideOfCourt,
-       playerGameStats.isFinal,
-       coalesce(SUM(ge.eventType = 'Score' and ge.playerId = playerGameStats.playerId),0) as points,
-       coalesce(SUM(ge.eventType = 'Ace' and ge.playerId = playerGameStats.playerId),0)                           as aces,
-       coalesce(SUM(ge.eventType = 'Fault' and ge.playerId = playerGameStats.playerId),0)                         as faults,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId AND gE.nextPlayerToServe = playerGameStats.playerId),0)    as servedPoints,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId
-           AND gE.playerWhoServed = playerGameStats.playerId
+       coalesce(SUM(ge.eventType = 'Score' and ge.playerId = playerGameStats.playerId), 0) as points,
+       coalesce(SUM(ge.eventType = 'Ace' and ge.playerId = playerGameStats.playerId), 0)   as aces,
+       coalesce(SUM(ge.eventType = 'Fault' and ge.playerId = playerGameStats.playerId),
+                0)                                                                         as faults,
+       coalesce(SUM(gE.gameId = playerGameStats.gameId AND gE.nextPlayerToServe = playerGameStats.playerId),
+                0)                                                                         as servedPoints,
+       coalesce(SUM(gE.playerWhoServed = playerGameStats.playerId
            AND playerGameStats.teamId = gE.teamId
-           AND gE.eventType = 'Score'), 0)                                          as servedPointsWon,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId
-           and gE.teamWhoServed <> playerGameStats.teamId
-           AND gE.sideServed = playerGameStats.sideOfCourt
-            and gE.eventType == 'Score'), 0)                                           as servesReceived,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId
-           and gE.teamWhoServed <> playerGameStats.teamId
-           AND gE.sideServed = playerGameStats.sideOfCourt
-           and gE.eventType == 'Score') - 
-       SUM(gE.gameId = playerGameStats.gameId
-           and gE.teamWhoServed <> playerGameStats.teamId
-           AND gE.sideServed = playerGameStats.sideOfCourt
-           and gE.eventType == 'Ace'), 0)                                                                 as servesReturned,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId
-           AND gE.playerWhoServed = playerGameStats.playerId
-           AND gE.eventType = 'Fault' AND gE.nextPlayerToServe <> playerGameStats.playerId), 0)           as doubleFaults,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId
-           AND gE.playerId = playerGameStats.playerId
-           AND gE.eventType = 'Green Card'), 0)                                                           as greenCards,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId
-           AND gE.playerId = playerGameStats.playerId
-           AND gE.eventType = 'Warning'), 0)                                                           as warnings,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId
-           AND gE.playerId = playerGameStats.playerId
-           AND gE.eventType = 'Yellow Card'), 0)                                                          as yellowCards,
-       coalesce(SUM(gE.gameId = playerGameStats.gameId
-           AND gE.playerId = playerGameStats.playerId
-           AND gE.eventType = 'Red Card'), 0)                                                          as redCards,
-           
+           AND gE.eventType = 'Score'),
+                0)                                                                         as servedPointsWon,
+       coalesce(SUM(gE.teamWhoServed <> playerGameStats.teamId
+           AND ((gE.sideServed = 'Left') =
+                (teamOneLeft = playerGameStats.playerId OR teamTwoRight = playerGameStats.playerId
+                    AND (teamOneLeft = playerGameStats.playerId OR teamOneRight = playerGameStats.playerId OR
+                         teamTwoLeft = playerGameStats.playerId OR teamTwoRight = playerGameStats.playerId)))
+           and gE.eventType == 'Score'),
+                0)                                                                         as servesReceived,
+       coalesce(SUM(gE.teamWhoServed <> playerGameStats.teamId
+           AND ((gE.sideServed = 'Left') =
+                (teamOneLeft = playerGameStats.playerId OR teamTwoRight = playerGameStats.playerId
+                    AND (teamOneLeft = playerGameStats.playerId OR teamOneRight = playerGameStats.playerId OR
+                         teamTwoLeft = playerGameStats.playerId OR teamTwoRight = playerGameStats.playerId)))
+           and gE.eventType == 'Score'),
+                0) - coalesce(SUM(gE.teamWhoServed <> playerGameStats.teamId
+           AND ((gE.sideServed = 'Left') =
+                (teamOneLeft = playerGameStats.playerId OR teamTwoRight = playerGameStats.playerId
+                    AND (teamOneLeft = playerGameStats.playerId OR teamOneRight = playerGameStats.playerId OR
+                         teamTwoLeft = playerGameStats.playerId OR teamTwoRight = playerGameStats.playerId)))
+           and gE.eventType == 'Ace'),
+                              0)                                                           as servesReturned,
+       coalesce(SUM(gE.playerWhoServed = playerGameStats.playerId
+           AND gE.eventType = 'Fault' AND gE.nextPlayerToServe <> playerGameStats.playerId),
+                0)                                                                         as doubleFaults, --TODO: probably broken
+       coalesce(SUM(gE.playerId = playerGameStats.playerId
+           AND gE.eventType = 'Green Card'),
+                0)                                                                         as greenCards,
+       coalesce(SUM(gE.playerId = playerGameStats.playerId
+           AND gE.eventType = 'Warning'),
+                0)                                                                         as warnings,
+       coalesce(SUM(gE.playerId = playerGameStats.playerId
+           AND gE.eventType = 'Yellow Card'),
+                0)                                                                         as yellowCards,
+       coalesce(SUM(gE.playerId = playerGameStats.playerId
+           AND gE.eventType = 'Red Card'),
+                0)                                                                         as redCards,
        IIF(
-               MIN(IIF(gE.eventType = 'Red Card' and gE.playerId = playerGameStats.playerId, -1, 0)) = -1, -1,
-               max(
-                       IIF(gE.eventType LIKE '% Card' and gE.playerId = playerGameStats.playerId,
-                           details - (SELECT COUNT(id)
-                                      FROM gameEvents
-                                      WHERE gameEvents.gameId = playerGameStats.gameId
-                                        AND gameEvents.id > gE.id
-                                        AND gameEvents.eventType = 'Score'),
-                           0)
-               )
-       ) as cardTimeRemaining,
+                   MIN(IIF(gE.eventType = 'Red Card' and gE.playerId = playerGameStats.playerId, -1, 0)) = -1, -1,
+                   max(
+                           IIF(gE.eventType LIKE '% Card' and gE.playerId = playerGameStats.playerId,
+                               details - (SELECT COUNT(id)
+                                          FROM gameEvents
+                                          WHERE gameEvents.gameId = playerGameStats.gameId
+                                            AND gameEvents.id > gE.id
+                                            AND gameEvents.eventType = 'Score'),
+                               0)
+                   )
+       )                                                                                   as cardTimeRemaining,
        IIF(
-               MIN(IIF(gE.eventType = 'Red Card' and gE.playerId = playerGameStats.playerId, -1, 0)) = -1, -1,
-               (SELECT details
-                FROM gameEvents
-                WHERE gameEvents.gameId = playerGameStats.gameId
-                  AND gameEvents.playerId = playerGameStats.playerId
-                  AND gameEvents.eventType LIKE '% Card'
-                ORDER BY id desc
-                LIMIT 1)
-       ) as cardTime
+                   MIN(IIF(gE.eventType = 'Red Card' and gE.playerId = playerGameStats.playerId, -1, 0)) = -1, -1,
+                   (SELECT details
+                    FROM gameEvents
+                    WHERE gameEvents.gameId = playerGameStats.gameId
+                      AND gameEvents.playerId = playerGameStats.playerId
+                      AND gameEvents.eventType LIKE '% Card'
+                    ORDER BY id desc
+                    LIMIT 1)
+       )                                                                                   as cardTime
 
 FROM playerGameStats
+         INNER JOIN games ON playerGameStats.gameId = games.id
          LEFT JOIN gameEvents gE
                    on playerGameStats.gameId = gE.gameId
 group by playerGameStats.id;
@@ -315,11 +296,19 @@ create_game_event_table = """CREATE TABLE IF NOT EXISTS gameEvents (
     nextPlayerToServe INTEGER,
     nextTeamToServe INTEGER,
     nextServeSide TEXT,
+    teamOneLeft INTEGER,
+    teamOneRight INTEGER,
+    teamTwoLeft INTEGER,
+    teamTwoRight INTEGER,
     FOREIGN KEY (gameId) REFERENCES games (id),
     FOREIGN KEY (teamId) REFERENCES teams (id),
     FOREIGN KEY (nextPlayerToServe) REFERENCES people (id),
     FOREIGN KEY (nextTeamToServe) REFERENCES teams (id),
     FOREIGN KEY (playerWhoServed) REFERENCES people (id),
+    FOREIGN KEY (teamOneLeft) REFERENCES people (id),
+    FOREIGN KEY (teamOneRight) REFERENCES people (id),
+    FOREIGN KEY (teamTwoLeft) REFERENCES people (id),
+    FOREIGN KEY (teamTwoRight) REFERENCES people (id),
     FOREIGN KEY (teamWhoServed) REFERENCES teams (id),
     FOREIGN KEY (playerId) REFERENCES people (id),
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id)

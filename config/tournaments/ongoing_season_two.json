@@ -43,7 +43,7 @@
             {
                 "bestPlayer": "Eva Hajigabriel",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -198,8 +198,8 @@
             {
                 "bestPlayer": "Dora Wan",
                 "cards": [
-                    "Swearing",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -261,9 +261,9 @@
             {
                 "bestPlayer": "Tomasz Sakowski",
                 "cards": [
-                    "Swearing",
-                    "Swearing",
-                    "Time wasting"
+                    "Audible Swearing",
+                    "Audible Swearing",
+                    "Delay of Game"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -295,7 +295,7 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -575,7 +575,7 @@
             {
                 "bestPlayer": "Alex Soudure",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -638,7 +638,7 @@
                 "bestPlayer": "Dora Wan",
                 "cards": [
                     "Excessive Celebration",
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -700,7 +700,7 @@
             {
                 "bestPlayer": "Lachlan Banks",
                 "cards": [
-                    "Arguing with umpire"
+                    "Disrespect Towards Officials"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -854,7 +854,7 @@
             {
                 "bestPlayer": "Dora Wan",
                 "cards": [
-                    "Allowed Non-captain to communicate"
+                    "Allowed Non Captain to Speak to Umpire"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -916,9 +916,9 @@
             {
                 "bestPlayer": "Tristan Nel",
                 "cards": [
-                    "Swearing",
-                    "Protesting Umpire",
-                    "Accusation of cheating"
+                    "Audible Swearing",
+                    "Disrespect Towards Officials",
+                    "Accusations Of Cheating"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -1100,8 +1100,8 @@
             {
                 "bestPlayer": "Tristan Nel",
                 "cards": [
-                    "Swearing",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -1135,12 +1135,11 @@
             {
                 "bestPlayer": "Alex Soudure",
                 "cards": [
-                    "Not Provided",
                     "Equipment Abuse"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
-                "game": "VRSLSLslSLsrSLslslSLSLslsrSLSLSLsrsrSLslsrarGLar",
+                "game": "SLSLslSLsrSLslslSLSLslsrSLSLSLsrsrSLslsrarGLar",
                 "id": 36,
                 "notes": "",
                 "official": "Lachlan Banks",
@@ -1198,7 +1197,7 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -1230,7 +1229,7 @@
             {
                 "bestPlayer": "Zaiah Deards",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -1386,8 +1385,8 @@
             {
                 "bestPlayer": "Dora Wan",
                 "cards": [
-                    "Swearing",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -1539,7 +1538,7 @@
             {
                 "bestPlayer": "James Sharpham",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -1603,7 +1602,7 @@
             {
                 "bestPlayer": "Eva Hajigabriel",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -1877,13 +1876,11 @@
             {
                 "bestPlayer": "Null",
                 "cards": [
-                    "Not Provided",
-                    "Not Provided",
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
-                "game": "VRvrSLSLFLSLSLSLFLARglSLttSLARFLSLslSL",
+                "game": "SLSLFLSLSLSLFLARglSLttSLARFLSLslSL",
                 "id": 60,
                 "notes": "",
                 "official": "Jared Healy",
@@ -1910,13 +1907,10 @@
             },
             {
                 "bestPlayer": "Null",
-                "cards": [
-                    "Not Provided",
-                    "Not Provided"
-                ],
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
-                "game": "SLVRvrslslflslslslflslslslslslsl",
+                "game": "SLslslflslslslflslslslslslsl",
                 "id": 61,
                 "notes": "",
                 "official": "Jared Healy",
@@ -1974,7 +1968,7 @@
             {
                 "bestPlayer": "Tristan Nel",
                 "cards": [
-                    "Swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -2038,8 +2032,8 @@
             {
                 "bestPlayer": "Lachlan Banks",
                 "cards": [
-                    "Swearing",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -2071,7 +2065,7 @@
             {
                 "bestPlayer": "Alex Soudure",
                 "cards": [
-                    "teammate spoke to umpire "
+                    "Allowed Non Captain to Speak to Umpire"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -2102,13 +2096,10 @@
             },
             {
                 "bestPlayer": "Jared Healy",
-                "cards": [
-                    "Yes",
-                    "Yes"
-                ],
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": false,
-                "game": "VRvrSLSLslSLSLSLSLARFRSLee",
+                "game": "SLSLslSLSLSLSLARFRSLee",
                 "id": 67,
                 "notes": "",
                 "official": "Lachlan Banks",
@@ -2137,13 +2128,10 @@
         [
             {
                 "bestPlayer": "Jared Healy",
-                "cards": [
-                    "Not Provided",
-                    "Not Provided"
-                ],
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
-                "game": "VRvrSLslslslTTSLSLSLslslslslslslfrslar",
+                "game": "SLslslslTTSLSLSLslslslslslslfrslar",
                 "id": 68,
                 "notes": " ",
                 "official": "Edward Smith",
@@ -2171,9 +2159,7 @@
             {
                 "bestPlayer": "Edward Smith",
                 "cards": [
-                    "Not Provided",
-                    "Not Provided",
-                    "Disrespect towards umpire"
+                    "Disrespect Towards Officials"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -2204,13 +2190,10 @@
             },
             {
                 "bestPlayer": "Jared Healy",
-                "cards": [
-                    "Not Provided",
-                    "Not Provided"
-                ],
+                "cards": [],
                 "court": 0,
                 "firstTeamServed": true,
-                "game": "VRvrARslSLslSLSLSLSLSLSLSLSLee",
+                "game": "ARslSLslSLSLSLSLSLSLSLSLee",
                 "id": 70,
                 "notes": " ",
                 "official": "Edward Smith",

@@ -7,7 +7,7 @@
             {
                 "bestPlayer": "Eva Hajigabriel",
                 "cards": [
-                    "Time wasting"
+                    "Delay of Game"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -196,7 +196,7 @@
             {
                 "bestPlayer": "Tristan Nel",
                 "cards": [
-                    "Swearing "
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -228,8 +228,8 @@
             {
                 "bestPlayer": "Vangeli Hajigabriel",
                 "cards": [
-                    "Entering Bra without perm",
-                    "Swearing"
+                    "Disrespect Towards Officials",
+                    "Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": true,
@@ -263,8 +263,8 @@
             {
                 "bestPlayer": "Eva Hajigabriel",
                 "cards": [
-                    "Teammate speaking to umpire ",
-                    "Swearing"
+                    "Allowed Non Captain to Speak to Umpire",
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -327,12 +327,12 @@
             {
                 "bestPlayer": "Vangeli Hajigabriel",
                 "cards": [
-                    "Letting Non captain speak",
-                    "Time wasting",
-                    "Time wasting",
-                    "Skim",
-                    "Time wasting",
-                    "Skim"
+                    "Teammate speaking to umpire ",
+                    "Delay of Game",
+                    "Repeated Delay of Game",
+                    "Dangerous Play (Skim)",
+                    "Delay Of Game",
+                    "Repeated Dangerous Play (Skim)"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -457,8 +457,8 @@
             {
                 "bestPlayer": "Sean Robinson",
                 "cards": [
-                    "Teammate talking to umpire",
-                    "Talking to umpire"
+                    "Allowed Non Captain to Speak to Umpire",
+                    "Spoke to Umpire from Outside BRA"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -490,13 +490,13 @@
             {
                 "bestPlayer": "Vangeli Hajigabriel",
                 "cards": [
-                    "Letting non captain speak ",
-                    "Danger: skims",
-                    "Swearing at official",
-                    "Swearing at official",
-                    "Disrespect towards official",
-                    "Disrespect not shaking hand",
-                    "Letting non captain speak "
+                    "Allowed Non Captain to Speak to Umpire",
+                    "Dangerous Play (Skim)",
+                    "Swearing Towards Players or Officials",
+                    "Repeated Swearing Towards Players or Officials",
+                    "Disrespect Towards Official",
+                    "Continuous or Egregious Disrespect Towards Officials",
+                    "Repeated Allowed Non Captain to Speak to Umpire"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -560,7 +560,7 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "Letting team mate talk to Ump"
+                    "Allowed Non Captain to Speak to Umpire"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -685,11 +685,11 @@
             {
                 "bestPlayer": "Jared Healy",
                 "cards": [
-                    "Hinderance",
-                    "Skim",
-                    "Equipment abuse",
-                    "Swearing ",
-                    "Abusing officials"
+                    "Hindrance",
+                    "Dangerous Play (Skim)",
+                    "Equipment Abuse",
+                    "Repeated Audible Swearing",
+                    "Repeated Continuous or Egregious Disrespect Towards Officials"
                 ],
                 "court": 1,
                 "firstTeamServed": false,
@@ -721,7 +721,7 @@
             {
                 "bestPlayer": "James Sharpham",
                 "cards": [
-                    "Interference "
+                    "Interference"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -876,10 +876,10 @@
             {
                 "bestPlayer": "Zebiah Peaker",
                 "cards": [
-                    "Clothes indecency ",
-                    "Clothes indecency ",
-                    "Equipmemt Abuse",
-                    "Calling Umpire a Cheat"
+                    "Clothes Indecency",
+                    "Clothes Indecency",
+                    "Equipment Abuse",
+                    "Accusations Of Cheating"
                 ],
                 "court": 1,
                 "firstTeamServed": true,

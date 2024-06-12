@@ -1,5 +1,5 @@
 {
-  "score": [
+  "Score": [
     "%p scored.",
     "%o got styled on by %p.",
     "%p just embarrassed %r...",
@@ -18,7 +18,7 @@
     "An absolutely nasty shot by %p! %r didn't stand a chance.",
     "Ooooh, that was ugly. If I were %o, I'd be using my timeout right about now."
   ],
-  "ace": [
+  "Ace": [
     "%p hit an ace.",
     "An un-returnable serve from %p.",
     "I bet %p has been working on that serve for a while...",
@@ -31,7 +31,7 @@
     "%o is clearly behind on their training, %r should not be missing serves like that...",
     "%p has a lovely serve! Straight down the left hand of %r, really just beautiful to watch!"
   ],
-  "green": [
+  "Green Card": [
     "%p was green carded.",
     "%p thought green meant go?",
     "%p, YOU cANT SAy tHAT!",
@@ -39,7 +39,7 @@
     "%p needs to be careful, another outburst like that and they'll have bench time",
     "Time wasting is not a part of the sport that %u will let slide. Green card for %p."
   ],
-  "yellow": [
+  "Yellow Card": [
     "%p was yellow carded.",
     "%p needed a break...",
     "%p was yellow carded.  Good luck %q...",
@@ -47,7 +47,7 @@
     "Yeouch! That looked dangerous, and %u agrees. Yellow for %p.",
     "%t are going to need to play with one player here; %p has let the team down."
   ],
-  "red": [
+  "Red Card": [
     "%p was red carded.",
     "It's fine. %p didn't wanna play anyway.",
     "%p trusts %q so much, they got carded out!",
@@ -56,7 +56,7 @@
     "Frankly disrespectful behaviour by %p. I hope that this is followed up after the match",
     "And fireworks erupt on the court! %p has just been ejected, and you won't believe what for!"
   ],
-  "timeout": [
+  "Timeout": [
     "%t called a timeout.",
     "%t is out picking daisies.",
     "%t is off with the fairies.",
@@ -65,7 +65,7 @@
     "STOP! and wait 30 seconds for %t's timeout.",
     "%t is going to take a time out.  Let's see if this is a good decision"
   ],
-  "fault": [
+  "Fault": [
     "%p faulted.",
     "%p didn't know that you're meant to serve diagonal.",
     "Just reminding you %p, the ball needs to land *in* the court.",
@@ -75,7 +75,7 @@
     "%p have been walking the line, and the umpire finally catches on.  Fault for %t!",
     "Straight out of the court by %p!  Time to serve again."
   ],
-  "sub": [
+  "Substitute": [
     "%p needed a rest.",
     "Enter the X-factor player: %q",
     "Tactical retreat for %p.",

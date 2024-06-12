@@ -35,14 +35,14 @@ def game_string_to_commentary(game: int) -> list[str]:
         FROM teams
                  INNER JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
                  INNER JOIN people ON playerGameStats.playerId = people.id
-        WHERE sideOfCourt <> 'Substitute'
+        WHERE (teamOneLeft = people.id OR teamOneRight = people.id OR teamTwoLeft = people.id OR teamTwoRight = people.id) 
           AND people.id <> gameEvents.playerId
           AND teams.id = t1.id)                                                    as team_mate,
        (SELECT people.name
         FROM teams
                  INNER JOIN playerGameStats ON playerGameStats.teamId = teams.id
                  INNER JOIN people ON playerGameStats.playerId = people.id
-            AND (eventType <> 'Ace' OR playerGameStats.sideOfCourt = gameEvents.sideServed)
+            AND (eventType <> 'Ace' OR (gameEvents.sideServed = 'Left') = (people.id = gameEvents.teamOneLeft OR people.id = gameEvents.teamTwoLeft))
         WHERE teams.id = t2.id
         ORDER BY random())                                                         as other_player,
        t2.name                                                                     as other_team,
@@ -83,14 +83,14 @@ def game_string_to_events(game: int) -> list[str]:
         FROM teams
                  INNER JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
                  INNER JOIN people ON playerGameStats.playerId = people.id
-        WHERE sideOfCourt <> 'Substitute'
+        WHERE (teamOneLeft = people.id OR teamOneRight = people.id OR teamTwoLeft = people.id OR teamTwoRight = people.id) 
           AND people.id <> gameEvents.playerId
           AND teams.id = t1.id)                                                    as team_mate,
        (SELECT people.name
         FROM teams
                  INNER JOIN playerGameStats ON playerGameStats.teamId = teams.id
                  INNER JOIN people ON playerGameStats.playerId = people.id
-            AND (eventType <> 'Ace' OR playerGameStats.sideOfCourt = gameEvents.sideServed)
+            AND (eventType <> 'Ace' OR (gameEvents.sideServed = 'Left') = (people.id = gameEvents.teamOneLeft OR people.id = gameEvents.teamTwoLeft))
         WHERE teams.id = t2.id
         ORDER BY random())                                                         as other_player,
        t2.name                                                                     as other_team,

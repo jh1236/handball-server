@@ -343,8 +343,8 @@
             {
                 "bestPlayer": "Tomasz Sakowski",
                 "cards": [
-                    "Swearing ",
-                    "Non captain talking "
+                    "Audible Swearing",
+                    "Allowed Non Captain to Speak to Umpire"
                 ],
                 "court": 1,
                 "firstTeamServed": false,
@@ -468,7 +468,7 @@
             {
                 "bestPlayer": "Liam Cox",
                 "cards": [
-                    "Talking to Umpire"
+                    "Spoke to Umpire from Outside BRA"
                 ],
                 "court": 1,
                 "firstTeamServed": true,
@@ -652,7 +652,7 @@
             {
                 "bestPlayer": "Lachlan Banks",
                 "cards": [
-                    "swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -714,7 +714,7 @@
             {
                 "bestPlayer": "James Frayne",
                 "cards": [
-                    "Communicating outside of BRA"
+                    "Spoke to Umpire from Outside BRA"
                 ],
                 "court": 0,
                 "firstTeamServed": false,
@@ -778,9 +778,9 @@
             {
                 "bestPlayer": "Liam Cox",
                 "cards": [
-                    "Swearing",
-                    "Talking to Umpire outside BRA",
-                    "Repeated Talking to Umpire"
+                    "Audible Swearing",
+                    "Spoke to Umpire from Outside BRA",
+                    "Repeated Spoke to Umpire from Outside BRA"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -902,8 +902,8 @@
             {
                 "bestPlayer": "Tomasz Sakowski",
                 "cards": [
-                    "Swearing ",
-                    "Swearing"
+                    "Audible Swearing",
+                    "Repeated Audible Swearing"
                 ],
                 "court": 1,
                 "firstTeamServed": true,
@@ -1057,7 +1057,7 @@
             {
                 "bestPlayer": "Charlie Wyatt",
                 "cards": [
-                    "swearing "
+                    "Repeated Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": true,
@@ -1183,7 +1183,7 @@
             {
                 "bestPlayer": "Liam Cox",
                 "cards": [
-                    "swearing"
+                    "Audible Swearing"
                 ],
                 "court": 0,
                 "firstTeamServed": false,

@@ -605,7 +605,7 @@ where IIF(? is NULL, 1, tournaments.id = ?)
                                                                            where i.teamId = teams.id
                                                                              and i.tournamentId = tournamentTeams.tournamentId),
                       0), 2) || '%',
-       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) /
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.startSide = 'Left') AS REAL) /
                       COUNT(DISTINCT playerGameStats.gameId), 0),
              2) || '%',
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints),
@@ -727,9 +727,10 @@ FROM games
                                        WHERE games.id = punishments.gameId AND punishments.playerId = playerGameStats.playerId)
 WHERE games.id = ?
 GROUP BY people.name
-order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
+order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneLeft) AND (playerGameStats.playerId <> lastGE.teamOneLeft)""",
                 (game_id,),
             ).fetchall()
+        print(players)
         if not players:
             return (
                 render_template(
@@ -891,9 +892,10 @@ order by teams.id <> games.teamOne, playerGameStats.sideOfCourt""",
                                          LEFT JOIN people best on best.id = games.bestPlayer
                                          LEFT JOIN teams on teams.id = playerGameStats.teamId
                                          LEFT JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
+                                         LEFT JOIN gameEvents on gameEvents.gameId = (SELECT MAX(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
                                 WHERE games.id = ?
                                 GROUP BY people.name
-                                order by teams.id <> games.teamOne, playerGameStats.sideOfCourt;""",
+                                order by teams.id <> games.teamOne, (playerGameStats.playerId = teamOneLeft OR playerGameStats.playerId = teamTwoLeft) DESC;""",
                 (game_id,),
             ).fetchall()
 
@@ -1395,7 +1397,7 @@ GROUP BY people.id""",
                                                                            where i.teamId = teams.id
                                                                              and i.tournamentId = tournamentTeams.tournamentId),
                       0), 2) || '%',
-       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) /
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.startSide = 'Left') AS REAL) /
                       COUNT(DISTINCT playerGameStats.gameId), 0),
              2) || '%',
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints),
@@ -1481,7 +1483,7 @@ WHERE people.searchableName = ?
                                                                            where i.teamId = teams.id
                                                                              and i.tournamentId = tournamentTeams.tournamentId),
                       0), 2) || '%',
-       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.sideOfCourt = 'Left') AS REAL) /
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.startSide = 'Left') AS REAL) /
                       COUNT(DISTINCT playerGameStats.gameId), 0),
              2) || '%',
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.servedPointsWon) AS REAL) / SUM(playerGameStats.servedPoints),
