@@ -1,4 +1,14 @@
 {
+    "Handchester United ": {
+        "colors": [
+            "Red",
+            "None/Unknown"
+        ],
+        "players": [
+            "Edward Smith ",
+            "Maddie Harvey"
+        ]
+    },
     "Saelmoa": {
         "colors": [
             "Black",
@@ -7,6 +17,16 @@
         "players": [
             "Brigitte",
             "Sophie"
+        ]
+    },
+    "The Baes": {
+        "colors": [
+            "Pink",
+            "None/Unknown"
+        ],
+        "players": [
+            "Eva",
+            "Dora"
         ]
     },
     "WWBD": {

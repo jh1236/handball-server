@@ -249,11 +249,13 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
             team_one_players.append(c.execute("""
                 SELECT id FROM people WHERE searchableName = ?""",
                                               (name,)).fetchone()[0])
+        team_one_players += [None]
         team_two_players = []
         for name in team_two:
             team_two_players.append(c.execute("""
                 SELECT id FROM people WHERE searchableName = ?""",
                                               (name,)).fetchone()[0])
+        team_two_players += [None]
         print(f"{team_one_players = }, {team_two_players = }")
         iga = team_one_id if team_one_iga else team_two_id
         c.execute(
@@ -493,7 +495,6 @@ FROM games
 
         sync(c, game_id)
 
-    print(f"{end_of_round = }")
     if not end_of_round:
         if not in_finals:
             fixtures = get_type_from_name(fixture_gen, tournament_id)

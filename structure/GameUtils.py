@@ -42,7 +42,6 @@ def game_string_to_commentary(game: int) -> list[str]:
      FROM teams
               INNER JOIN playerGameStats ON playerGameStats.teamId = teams.id
               INNER JOIN people ON playerGameStats.playerId = people.id
-         AND (eventType <> 'Ace' OR (gameEvents.sideServed = 'Left') = (people.id = gameEvents.teamOneLeft OR people.id = gameEvents.teamTwoLeft))
      WHERE teams.id = t2.id
      ORDER BY random())                                                         as other_player,
     t2.name                                                                     as other_team,
@@ -56,11 +55,12 @@ FROM gameEvents
          INNER JOIN people off on off.id = officials.personId
          INNER JOIN teams t2 on (games.teamTwo + games.teamOne - t1.id) = t2.id
 
-WHERE games.id = ? AND newTaunt is not null
-GROUP BY gameEvents.id""", (game,)).fetchall()
+WHERE games.id = ? AND newTaunt is not null AND (gameEvents.notes is null OR gameEvents.notes <> 'Penalty')
+GROUP BY gameEvents.id;""", (game,)).fetchall()
     if not game:
         return ["Hang Tight, the game will start soon!"]
     for taunt, player, team, team_mate, other_player, other_team, umpire in game_events:
+        if not player: continue
         team_mate = team_mate or player
         string = taunt.replace("%p", player).replace("%r", other_player)
         string = (
