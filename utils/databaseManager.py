@@ -100,6 +100,7 @@ create_games_table = """CREATE TABLE IF NOT EXISTS games (
     pool INTEGER,
     status TEXT,
     adminStatus TEXT,
+    noteableStatus TEXT,
     
     FOREIGN KEY (tournamentId) REFERENCES tournaments (id),
     FOREIGN KEY (teamOne) REFERENCES teams (id),
