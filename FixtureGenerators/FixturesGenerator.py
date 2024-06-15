@@ -25,21 +25,25 @@ class FixturesGenerator:
 
     def end_of_round(self):
         self._end_of_round(self.tournament_id)
+        if self.fill_courts:
+            self.add_courts()
         if self.fill_officials:
             self.add_umpires()
-        if self.fill_courts and False:
-            self.add_courts()
 
     def add_courts(self):
         with DatabaseManager() as c:
-            games = c.execute("""SELECT games.id, games.round, games.isFinal, coalesce(CAST(SUM(otherGames.winningTeam = teams.id) AS REAL), 0) / max(COUNT(otherGames.id), 1) as o
+            games = c.execute("""
+SELECT games.id,
+       games.round,
+       games.isFinal,
+       coalesce(CAST(SUM(otherGames.winningTeam = teams.id) AS REAL), 0) / max(COUNT(otherGames.id), 1) as o
 FROM games
          INNER JOIN teams ON (teams.id = games.teamOne OR teams.id = games.teamTwo)
          LEFT JOIN games otherGames ON (teams.id = otherGames.teamOne OR teams.id = otherGames.teamTwo) AND
                                        games.tournamentId = otherGames.tournamentId AND otherGames.id < games.id
-WHERE games.tournamentId = ?
+WHERE games.tournamentId = ?  AND games.started = 0 AND games.round = (SELECT MAX(round) FROM games WHERE games.tournamentId = games.tournamentId AND not games.isFinal)
 GROUP by games.id
-ORDER BY games.round, o DESC""").fetchall()
+ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
             rounds = []
             finals = []
             for i in games:
@@ -49,9 +53,10 @@ ORDER BY games.round, o DESC""").fetchall()
                     rounds[-1].append(i)
                 else:
                     rounds.append([i])
-            l = ceil(len(rounds) / 2) + 1
+            l = ceil(len(rounds) / 2)
             for r in rounds:
                 for i, g in enumerate(r):
+                    print(f"Game {i}: court {int(i > l) + 1}")
                     c.execute("""UPDATE games SET court = ? WHERE id = ?""", (i > l, g[0]))
             for i in finals:
                 c.execute("""UPDATE games SET court = 0 WHERE id = ?""", (i[0]))
@@ -71,16 +76,18 @@ ORDER BY games.round, o DESC""").fetchall()
             scorer = c.execute("""SELECT hasScorer FROM tournaments WHERE id = ?""",
                                (self.tournament_id,)).fetchone()[0]
             officials = c.execute(
-                """SELECT officials.personId,
+                """
+SELECT officials.personId,
        officials.id,
        proficiency,
        COUNT(DISTINCT games.id),
        COUNT((SELECT games.id FROM games WHERE scorer = officials.id)),
        COUNT(DISTINCT IIF(games.court = 0, games.id, null))
 FROM officials
-         LEFT JOIN games on games.official = officials.id
          INNER JOIN tournamentOfficials ON officials.id = tournamentOfficials.officialId
-WHERE tournamentOfficials.tournamentId = ?""",
+         LEFT JOIN games on games.official = officials.id AND games.tournamentId = tournamentOfficials.tournamentId
+WHERE tournamentOfficials.tournamentId = ?
+GROUP BY officials.id""",
                 (self.tournament_id,)
             ).fetchall()
 
@@ -125,7 +132,7 @@ WHERE tournamentOfficials.tournamentId = ?""",
                     #  games.id, round, court, official, scorer, [players]
                     if not g:
                         continue
-                    if not g[3]:
+                    if g[3]:
                         continue
                     for o in court_one_officials if g[2] == 0 else court_two_officials:
                         if o.official_id in [k[3] for k in games if k]:

@@ -79,7 +79,7 @@ FROM games
          INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
          INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamOne
          WHERE games.id = ?
-         ORDER BY (teamOneLeft = playerGameStats.playerId OR teamOneRight = playerGameStats.playerId) = ? DESC
+         ORDER BY teamOneLeft = playerGameStats.playerId = ? DESC
 """, (game_id, left_player)).fetchone()
         player = player[0]
     else:
@@ -88,7 +88,7 @@ FROM games
          INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
          INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamTwo
          WHERE games.id = ?
-         ORDER BY (teamOneLeft = playerGameStats.playerId OR teamOneRight = playerGameStats.playerId) = ? DESC
+         ORDER BY (teamTwoLeft = playerGameStats.playerId) = ? DESC
         """, (game_id, left_player)).fetchone()[0]
     return player
 
