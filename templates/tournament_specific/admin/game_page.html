@@ -57,13 +57,13 @@
                 <tr>
                     <th></th>
                     <th colspan="{{ teams[0].players.__len__() }}"><a
-                            href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"
+                            href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}/admin"
                             class="hide"><img
                             src="{{ teams[0].image }}"
                             class="team_logo"
                             style="display: inline;left:70%;vertical-align:middle;"></a></th>
                     <th colspan="{{ teams[1].players.__len__() }}">
-                        {% if not game.bye %}<a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"
+                        {% if not game.bye %}<a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}/admin"
                                                 class="hide">{% endif %}<img
                             src="{{ teams[1].image }}"
                             class="team_logo"
@@ -74,10 +74,10 @@
                 <tr>
                     <td></td>
                     <th style="min-width: 150px" colspan="{{ teams[0].players.__len__() }}"><b><a
-                            href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"
+                            href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}/admin"
                             class="hide">{{ teams[0].name }}</a></b></th>
                     <th style="min-width: 150px" colspan="{{ teams[1].players.__len__() }}"><b>{% if not game.bye %}
-                        <a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"
+                        <a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}/admin"
                            class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
                         </a>{% endif %}</b></th>
                     <th class="invisible">Spacerrrrrrr</th>
@@ -94,7 +94,7 @@
                 <tr>
                     <td></td>
                     {% for i in game.players %}
-                        <th><b><a class = "hide" href="/{{ tournamentLink }}/players/{{ i.searchableName }}">{{ i.name }}</a></b></th>
+                        <th><b><a class = "hide" href="/{{ tournamentLink }}/players/{{ i.searchableName }}/admin">{{ i.name }}</a></b></th>
                     {% endfor %}
                 </tr>
                 {% for i in player_headings %}

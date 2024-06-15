@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "admin.html" %}
+
+{% block headBlock %}
     <title>{{ tournament }} sign up</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<img src="/api/image?name=SUSS" class="title_logo">
-
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("",true)</script>
-
+{% endblock %}
+{% block bodyBlock %}
 <script src="{{ url_for('static', filename='js/startGame.js') }}"></script>
 <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
 <script>
@@ -48,5 +43,4 @@
 {% for i in umpires %}
     <p>{{ i }}</p>
 {% endfor %}
-</body>
-</html>
+{% endblock %}

@@ -418,7 +418,8 @@ def end_timeout(game_id):
         _add_to_game(game_id, c, "End Timeout", None, None)
 
 
-def end_game(game_id, bestPlayer, notes, protest_team_one, protest_team_two):
+def end_game(game_id, bestPlayer,
+             notes, protest_team_one, protest_team_two):
     with DatabaseManager() as c:
         tournament_id = c.execute("""SELECT tournamentId FROM games WHERE id = ?""", (game_id,)).fetchone()[0]
         if protest_team_one:
@@ -450,11 +451,12 @@ SELECT games.isRanked as ranked,
          INNER JOIN games ON playerGameStats.gameId = games.id
 WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
 
-        resolved, protested, red_cards, yellow_cards, notes = c.execute("""SELECT resolved,
+        resolved, protested, red_cards, yellow_cards, notes, start_time = c.execute("""SELECT resolved,
        protested,
        SUM(playerGameStats.redCards) > 0,
        SUM(playerGameStats.yellowCards) > 0,
-       notes
+       notes,
+       startTime
 FROM games
          INNER JOIN main.playerGameStats on playerGameStats.gameId = gameId""").fetchone()
 
@@ -469,7 +471,9 @@ FROM games
         elif yellow_cards:
             c.execute("""UPDATE games SET adminStatus = 'Yellow Card Awarded' WHERE id = ?""", (game_id,))
 
-        c.execute("""UPDATE games SET status = 'Official' WHERE id = ?""", (game_id,))
+        end_time = time.time() - start_time
+
+        c.execute("""UPDATE games SET status = 'Official', length = ? WHERE id = ?""", (end_time, game_id,))
 
         if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
             elos = [0, 0]
@@ -700,3 +704,4 @@ def delete(game_id):
 def resolve_game(game_id):
     with DatabaseManager() as c:
         _add_to_game(game_id, c, "Resolve", None, None)
+        c.execute("""UPDATE games SET adminStatus = 'Resolved' WHERE id = ?""", (game_id,))

@@ -8,45 +8,46 @@
 
 {% block bodyBlock %}
 
-<div style="top:0;left:0;bottom: 100%;width: 66%">
-    <a href="/{{tournament}}teams/{{team.nice_name()}}/admin">
-        <img src="{{team.image()}}" class="team_logo" style="width: 200px;height: 200px"></a>
-    <h1><a href="/{{tournament}}teams/{{team.nice_name()}}/admin" class="hide">Statistics for {{team.name}}</a></h1>
-    <table class="jaredTable">
-        <tbody>
-        {% for stat in stats %}
-        <tr>
-            <th>{{ stat[0] }}:</th>
-            <td></td>
-            <td>{{ stat[1] }}</td>
-        </tr>
+    <div style="top:0;left:0;bottom: 100%;width: 66%">
+        <a href="/{{ tournamentLink }}teams/{{team.searchableName}}/admin">
+            <img src="{{team.image}}" class="team_logo" style="width: 200px;height: 200px"></a>
+        <h1><a href="/{{ tournamentLink }}teams/{{team.searchableName}}/admin" class="hide">Statistics for {{team.name}}</a></h1>
+        <table class="jaredTable">
+            <tbody>
+            {% for stat in stats %}
+                <tr>
+                    <th>{{ stat[0] }}:</th>
+                    <td></td>
+                    <td>{{ stat[1] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% for player in players %}
+            <br>
+            <h3>Statistics for <a class="hide" href="/{{ tournamentLink }}players/{{player.searchableName}}/admin">{{player.name}}</a></h3>
+            <table class="jaredTable">
+                <tbody>
+                {% for header, stat in player.stats.items() %}
+                    <tr>
+                        <th>{{ header }}:</th>
+                        <td></td>
+                        <td>{{ stat }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         {% endfor %}
-        </tbody>
-    </table>
-    {% for player in players %}
-        <h3>Statistics for <a class="hide" href="/{{tournament}}players/{{player[1]}}/admin">{{player[0]}}</a></h3>
-    <table class="jaredTable">
-        <tbody>
-        {% for stat in player[2] %}
-        <tr>
-            <th>{{ stat[0] }}:</th>
-            <td></td>
-            <td>{{ stat[1] }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endfor %}
-</div>
+    </div>
 <div style="top:70px;left:66% ; position: absolute;width: 33%">
     <div style="min-height: 400px">
-        <h2><a class = "hide" href="/{{tournament}}fixtures/admin?team={{ team.nice_name() }}">Recent Matches</a></h2>
+        <h2><a class = "hide" href="/{{tournamentLink}}fixtures/admin?team={{ team.searchableName }}">Recent Matches</a></h2>
     {% for line in recent_games %}
     <p style="color: black;"><a class = "hide" href="/games/{{line[1]}}/admin">{{line[0]}}</a></p>
     {% endfor %}
     </div>
     <div>
-        <h2><a class = "hide" href="/{{tournament}}fixtures/admin?team={{ team.nice_name() }}">Noteable Matches</a></h2>
+        <h2><a class = "hide" href="/{{tournamentLink}}fixtures/admin?team={{ team.searchableName }}">Noteable Matches</a></h2>
         {% for line in key_games %}
         <p style="color: black;"><a class = "hide" href="/games/{{line[2]}}/admin"><b>[{{ line[0] }}]: </b>{{line[1]}}</a></p>
         {% endfor %}
