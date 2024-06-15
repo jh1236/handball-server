@@ -1,6 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import zip_longest
+from math import ceil
 
 from utils.databaseManager import DatabaseManager
 
@@ -31,7 +32,29 @@ class FixturesGenerator:
 
     def add_courts(self):
         with DatabaseManager() as c:
-            c.execute("""SELECT id FROM""")
+            games = c.execute("""SELECT games.id, games.round, games.isFinal, coalesce(CAST(SUM(otherGames.winningTeam = teams.id) AS REAL), 0) / max(COUNT(otherGames.id), 1) as o
+FROM games
+         INNER JOIN teams ON (teams.id = games.teamOne OR teams.id = games.teamTwo)
+         LEFT JOIN games otherGames ON (teams.id = otherGames.teamOne OR teams.id = otherGames.teamTwo) AND
+                                       games.tournamentId = otherGames.tournamentId AND otherGames.id < games.id
+WHERE games.tournamentId = ?
+GROUP by games.id
+ORDER BY games.round, o DESC""").fetchall()
+            rounds = []
+            finals = []
+            for i in games:
+                if i[2]:
+                    finals.append(i)
+                elif i[1] == len(rounds):
+                    rounds[-1].append(i)
+                else:
+                    rounds.append([i])
+            l = ceil(len(rounds) / 2) + 1
+            for r in rounds:
+                for i, g in enumerate(r):
+                    c.execute("""UPDATE games SET court = ? WHERE id = ?""", (i > l, g[0]))
+            for i in finals:
+                c.execute("""UPDATE games SET court = 0 WHERE id = ?""", (i[0]))
 
     def begin_tournament(self):
         self._begin_tournament(self.tournament_id)
@@ -42,8 +65,9 @@ class FixturesGenerator:
             games_query = c.execute(
                 """SELECT games.id, round, court, official, scorer FROM games WHERE games.tournamentId = ? ORDER BY id""",
                 (self.tournament_id,)).fetchall()
-            players = c.execute("""SELECT playerGameStats.playerId, gameId FROM playerGameStats WHERE tournamentId = ?""",
-                                (self.tournament_id,)).fetchall()
+            players = c.execute(
+                """SELECT playerGameStats.playerId, gameId FROM playerGameStats WHERE tournamentId = ?""",
+                (self.tournament_id,)).fetchall()
             scorer = c.execute("""SELECT hasScorer FROM tournaments WHERE id = ?""",
                                (self.tournament_id,)).fetchone()[0]
             officials = c.execute(

@@ -77,16 +77,19 @@ def _team_and_position_to_id(game_id, first_team, left_player, c) -> int:
 SELECT playerGameStats.playerId
 FROM games
          INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
-         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND IIF(? = 1, teamOneLeft = playerGameStats.playerId, teamOneRight = playerGameStats.playerId)
-WHERE games.id = ?""", (left_player, game_id)).fetchone()
+         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamOne
+         WHERE games.id = ?
+         ORDER BY (teamOneLeft = playerGameStats.playerId OR teamOneRight = playerGameStats.playerId) = ? DESC
+""", (game_id, left_player)).fetchone()
         player = player[0]
     else:
         player = c.execute("""SELECT playerGameStats.playerId
 FROM games
          INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
-         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND IIF(? = 1, teamTwoLeft = playerGameStats.playerId, teamTwoRight = playerGameStats.playerId)
-WHERE games.id = ?
-        """, (left_player, game_id)).fetchone()[0]
+         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamTwo
+         WHERE games.id = ?
+         ORDER BY (teamOneLeft = playerGameStats.playerId OR teamOneRight = playerGameStats.playerId) = ? DESC
+        """, (game_id, left_player)).fetchone()[0]
     return player
 
 

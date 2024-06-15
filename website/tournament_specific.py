@@ -113,7 +113,7 @@ def add_tournament_specific(app):
                                 INNER JOIN teams AS serving ON games.teamOne = serving.id 
                                 INNER JOIN teams as receiving ON games.teamTwo = receiving.id 
                                 WHERE 
-                                    tournamentId = ? AND games.bestPlayer is NULL;
+                                    tournamentId = ? AND not games.ended AND NOT games.isBye AND games.round = (SELECT MAX(inn.round) FROM games inn WHERE inn.tournamentId = games.tournamentId);
                             """,
                 (tournamentId,),
             ).fetchall()
