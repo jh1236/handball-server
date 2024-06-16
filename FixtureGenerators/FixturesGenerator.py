@@ -41,9 +41,10 @@ FROM games
          INNER JOIN teams ON (teams.id = games.teamOne OR teams.id = games.teamTwo)
          LEFT JOIN games otherGames ON (teams.id = otherGames.teamOne OR teams.id = otherGames.teamTwo) AND
                                        games.tournamentId = otherGames.tournamentId AND otherGames.id < games.id
-WHERE games.tournamentId = ?  AND games.started = 0 AND games.round = (SELECT MAX(round) FROM games WHERE games.tournamentId = games.tournamentId AND not games.isFinal)
+WHERE games.tournamentId = ?  AND games.started = 0 AND games.isBye = 0 AND games.round = (SELECT MAX(round) FROM games inn WHERE inn.tournamentId = games.tournamentId AND not inn.isFinal)
 GROUP by games.id
 ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
+            print(games)
             rounds = []
             finals = []
             for i in games:
@@ -68,7 +69,7 @@ ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
     def add_umpires(self):
         with DatabaseManager() as c:
             games_query = c.execute(
-                """SELECT games.id, round, court, official, scorer FROM games WHERE games.tournamentId = ? ORDER BY id""",
+                """SELECT games.id, round, court, official, scorer FROM games WHERE games.tournamentId = ? AND games.isBye = 0 ORDER BY id""",
                 (self.tournament_id,)).fetchall()
             players = c.execute(
                 """SELECT playerGameStats.playerId, gameId FROM playerGameStats WHERE tournamentId = ?""",
@@ -91,22 +92,24 @@ GROUP BY officials.id""",
                 (self.tournament_id,)
             ).fetchall()
 
-            @dataclass
-            class Official:
-                person_id: int
-                official_id: int
-                proficiency: int
-                games_umpired: int
-                games_scored: int
-                court_one_games: int
+        @dataclass
+        class Official:
+            person_id: int
+            official_id: int
+            proficiency: int
+            games_umpired: int
+            games_scored: int
+            court_one_games: int
 
-            officials = [Official(*i) for i in officials]
+        officials = [Official(*i) for i in officials]
 
-            rounds = defaultdict(list)
-
-            for i in games_query:
-                rounds[i[1]].append([*i, [j[0] for j in players if j[1] == i[0]]])
-            rounds = list(rounds.values())
+        rounds = defaultdict(list)
+        game_to_players = defaultdict(list)
+        for i in players:
+            game_to_players[i[1]].append(i[0])
+        for i in games_query:
+            rounds[i[1]].append(list(i))
+        rounds = list(rounds.values())
         # id, round, court, official
         for r in rounds:
             court_one_games = [i for i in r if i[2] == 0]
@@ -130,16 +133,21 @@ GROUP BY officials.id""",
                         ),
                     )
                     #  games.id, round, court, official, scorer, [players]
+
                     if not g:
                         continue
                     if g[3]:
                         continue
                     for o in court_one_officials if g[2] == 0 else court_two_officials:
+                        print(o.person_id, end=" ")
                         if o.official_id in [k[3] for k in games if k]:
+                            # the official is already umpiring this round
                             continue
-                        if o.person_id in [i[5] for i in games if i]:
+                        if any([o.person_id in [j for j in game_to_players[i[0]]] for i in games if i]):
+                            # the official is playing this round
                             continue
                         with DatabaseManager() as c:
+                            print(" can umpire. YAY!")
                             c.execute("""UPDATE games SET official = ? WHERE id = ?""", (o.official_id, g[0]))
                         o.games_umpired += 1
                         o.court_one_games += g[2] == 0
@@ -147,11 +155,12 @@ GROUP BY officials.id""",
                         break
             if not scorer:
                 continue
+            print("-" * 100)
             for games in zip_longest(court_one_games, court_two_games):
                 for g in games:
                     if not g:
                         continue
-                    if g[3]:
+                    if g[4]:
                         continue
                     scorer = sorted(
                         officials,
@@ -162,19 +171,26 @@ GROUP BY officials.id""",
                         ),
                     )
                     for o in scorer:
+                        print(o.person_id, end=" ")
+                        if o.official_id in [k[3] for k in games if k]:
+                            # the official is umpiring this round
+                            continue
                         if o.official_id in [k[4] for k in games if k]:
+                            # the official is already scoring this round
                             continue
-                        if o.person_id in [i[5] for i in games if i]:
-                            continue
-                        if o.official_id == g[3]:
+                        if any([o.person_id in [j for j in game_to_players[i[0]]] for i in games if i]):
+                            # the official is playing this round
                             continue
                         with DatabaseManager() as c:
+                            print(" can umpire. YAY!")
                             c.execute("""UPDATE games SET scorer = ? WHERE id = ?""", (o.official_id, g[0]))
                         g[4] = o.official_id
                         o.games_scored += 1
                         break
                     if not g[4]:
-                        c.execute("""UPDATE games SET scorer = official WHERE id = ?""", (g[0],))
+                        # there was no scorer found, set the scorer to be equal to the umpire
+                        with DatabaseManager() as c:
+                            c.execute("""UPDATE games SET scorer = official WHERE id = ?""", (g[0],))
 
 
 def get_type_from_name(name: str, tournament: int) -> FixturesGenerator:

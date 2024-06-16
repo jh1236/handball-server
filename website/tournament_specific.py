@@ -18,6 +18,7 @@ from utils.permissions import (
     user_on_mobile,
 )  # Temporary till i make a function that can handle dynamic/game permissions
 from utils.sidebar_wrapper import render_template_sidebar, link
+from utils.util import fixture_sorter
 from website.website import numbers
 
 VERBAL_WARNINGS = True
@@ -189,52 +190,58 @@ def add_tournament_specific(app):
 
     @app.get("/<tournament>/fixtures/")
     def fixtures(tournament):
-        @dataclass
-        class Game:
-            teams: list[str]
-            score_string: str
-            id: int
-
         tournamentId = get_tournament_id(tournament)
         with DatabaseManager() as c:
             games = c.execute(
                 """
                             SELECT 
-                                serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, round
+                                games.id, court, isBye, serving.name, receiving.name, teamOneScore, teamTwoScore, round
                                 FROM games 
                                 INNER JOIN teams serving ON games.teamOne = serving.id
                                 INNER JOIN teams receiving ON games.teamTwo = receiving.id
                                 -- INNER JOIN people ON games.bestPlayer = people.id 
                                 WHERE 
                                     tournamentId = ? AND
-                                    isFinal = 0;""",
-                (tournamentId,),
+                                    isFinal = 0;""", (tournamentId,)
             ).fetchall()
+        # me when i criticize Jareds code then write this abomination
+
+            @dataclass
+            class Game:
+                teams: list[str]
+                score_string: str
+                id: int
+                court: int
+                bye: bool
             # me when i criticize Jareds code then write this abomination
             fixtures = defaultdict(list)
             for game in games:
-                fixtures[game[5]].append(
-                    Game(game[:2], f"{game[2]} - {game[3]}", game[4])
+                fixtures[game[-1]].append(
+                    Game(game[3:5], f"{game[5]} - {game[6]}", game[0], game[1], game[2])
                 )
+            new_fixtures = {}
+            for k, v in fixtures.items():
+                new_fixtures[k] = [j[3] for j in fixture_sorter([(i.id, i.court, i.bye,i) for i in v])]
+            fixtures = new_fixtures
 
             games = c.execute(
                 """
                             SELECT 
-                                serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, round
+                                games.id, court, isBye, serving.name, receiving.name, teamOneScore, teamTwoScore, round
                                 FROM games 
-                                INNER JOIN teams AS serving ON games.teamOne = serving.id 
-                                INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
+                                INNER JOIN teams serving ON games.teamOne = serving.id
+                                INNER JOIN teams receiving ON games.teamTwo = receiving.id
                                 -- INNER JOIN people ON games.bestPlayer = people.id 
                                 WHERE 
-                                    tournamentId = ? AND
-                                    isFinal = 1;""",
+                                        tournamentId = ? AND
+                                        isFinal = 1;""",
                 (tournamentId,),
             ).fetchall()
             # idk something about glass houses?
             finals = defaultdict(list)
             for game in games:
-                finals[game[5]].append(
-                    Game(game[:2], f"{game[2]} - {game[3]}", game[4])
+                finals[game[-1]].append(
+                    Game(game[3:5], f"{game[5]} - {game[6]}", game[0], game[1], game[2])
                 )
         return (
             render_template_sidebar(
@@ -259,6 +266,7 @@ def add_tournament_specific(app):
             teams: list[str]
             score_string: str
             id: int
+            bye: bool
             umpire: str
             umpireSearchableName: str
             scorer: str
@@ -276,9 +284,9 @@ def add_tournament_specific(app):
 
             games = c.execute(
                 """SELECT 
-                        serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, 
+                        games.id, court, isBye, serving.name, receiving.name, teamOneScore, teamTwoScore, 
                         umpire.name, umpire.searchableName, scorer.name, scorer.searchableName, 
-                        court, round
+                        round
                         FROM games 
                         INNER JOIN teams AS serving ON games.teamOne = serving.id 
                         INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
@@ -296,23 +304,29 @@ def add_tournament_specific(app):
             for game in games:
                 fixtures[game[-1]].append(
                     GameDetailed(
-                        game[:2],
-                        f"{game[2]} - {game[3]}",
-                        game[4],
-                        game[5],
-                        game[6],
+                        game[3:5],
+                        f"{game[5]} - {game[6]}",
+                        game[0],
+                        game[2],
                         game[7],
                         game[8],
                         game[9],
-                        {-1: "-", 0: "Court 1", 1: "Court 2"}.get(game[9]),
+                        game[10],
+                        game[1],
+                        {-1: "-", 0: "Court 1", 1: "Court 2"}.get(game[1]),
                     )
                 )
 
+            new_fixtures = {}
+            for k, v in fixtures.items():
+                new_fixtures[k] = [j[3] for j in fixture_sorter([(i.id, i.court, i.bye, i) for i in v])]
+            fixtures = new_fixtures
+
             games = c.execute(
                 """SELECT 
-                        serving.name, receiving.name, teamOneScore, teamTwoScore, games.id, 
+                        games.id, court, isBye, serving.name, receiving.name, teamOneScore, teamTwoScore, 
                         umpire.name, umpire.searchableName, scorer.name, scorer.searchableName, 
-                        court, round
+                        round
                         FROM games 
                         INNER JOIN teams AS serving ON games.teamOne = serving.id 
                         INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
@@ -322,23 +336,23 @@ def add_tournament_specific(app):
                             LEFT JOIN people AS scorer ON s.personId = scorer.id
                         WHERE
                             tournamentId = ? AND
-                            isFinal = 1;
-                            """,
+                            isFinal = 1;""",
                 (tournamentId,),
             )
             finals = defaultdict(list)
             for game in games:
                 finals[game[-1]].append(
                     GameDetailed(
-                        game[:2],
-                        f"{game[2]} - {game[3]}",
-                        game[4],
-                        game[5],
-                        game[6],
+                        game[3:5],
+                        f"{game[5]} - {game[6]}",
+                        game[0],
+                        game[2],
                         game[7],
                         game[8],
                         game[9],
-                        {-1: "-", 0: "Court 1", 1: "Court 2"}.get(game[9]),
+                        game[10],
+                        game[1],
+                        {-1: "-", 0: "Court 1", 1: "Court 2"}.get(game[1]),
                     )
                 )
 
