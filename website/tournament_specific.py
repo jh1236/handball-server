@@ -1264,7 +1264,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games
                 """SELECT teams.imageURL,
        people.searchableName,
        people.name,
-       coalesce(SUM(playerGameStats.isBestPlayer), 0),
+       coalesce(SUM(games.bestPlayer = playerId), 0),
        ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
                        from eloChange
                        where eloChange.playerId = people.id AND eloChange.id <=

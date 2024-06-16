@@ -425,30 +425,28 @@ def end_game(game_id, bestPlayer,
              notes, protest_team_one, protest_team_two):
     with DatabaseManager() as c:
         tournament_id = c.execute("""SELECT tournamentId FROM games WHERE id = ?""", (game_id,)).fetchone()[0]
+        best = c.execute("""SELECT id FROM people WHERE searchableName = ?""", (bestPlayer,)).fetchone()
+        if best:
+            best = best[0]
+        else:
+            allowed = c.execute("""SELECT SUM(eventType = 'Forfeit') > 0 FROM gameEvents WHERE gameId = ?""",
+                                (game_id,)).fetchone()[0]
+            allowed |= bool(c.execute("""SELECT teams.id FROM games INNER JOIN teams ON 
+            (teams.id = games.teamOne or games.teamTwo = teams.id) WHERE (teams.nonCaptain is null) AND games.id = ?""", (game_id,)).fetchone())
+            if not allowed:
+                raise ValueError("Best Player was not provided")
         if protest_team_one:
             _add_to_game(game_id, c, "Protest", True, None, notes=protest_team_one)
         if protest_team_two:
             _add_to_game(game_id, c, "Protest", False, None, notes=protest_team_two)
-        if bestPlayer is None:
-            allowed = c.execute("""SELECT SUM(eventType = 'Forfeit') > 0 FROM gameEvents WHERE gameId = ?""",
-                                (game_id,)).fetchone()[0]
-            allowed |= \
-                c.execute(
-                    """SELECT COUNT(DISTINCT playerID) < 2 FROM playerGameStats WHERE gameId = ? GROUP BY teamId""",
-                    (game_id,)).fetchone()[0]
-            if not allowed:
-                raise ValueError("Best Player was not provided")
-        best = c.execute("""SELECT id FROM people WHERE searchableName = ?""", (bestPlayer,)).fetchone()
-        if best:
-            best = best[0]
         _add_to_game(game_id, c, "End Game", None, None, notes=notes, details=best)
         teams = c.execute("""
 SELECT games.isRanked as ranked,
        games.winningTeam = teamId as myTeamWon,
        games.teamOne <> playerGameStats.teamId as isSecond,
-       ROUND(1500.0 + (SELECT SUM(eloChange)
+       ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
                        from eloChange
-                       where eloChange.playerId = playerGameStats.playerid), 2) as elo,
+                       where eloChange.playerId = playerGameStats.playerid), 0), 2) as elo,
        playerId as player
        FROM playerGameStats
          INNER JOIN games ON playerGameStats.gameId = games.id
@@ -461,7 +459,7 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
        notes,
        startTime
 FROM games
-         INNER JOIN main.playerGameStats on playerGameStats.gameId = gameId""").fetchone()
+         INNER JOIN main.playerGameStats on playerGameStats.gameId = games.id""").fetchone()
 
         if resolved:
             c.execute("""UPDATE games SET adminStatus = 'Resolved' WHERE id = ?""", (game_id,))
@@ -476,7 +474,7 @@ FROM games
 
         end_time = time.time() - start_time
 
-        c.execute("""UPDATE games SET status = 'Official', length = ? WHERE id = ?""", (end_time, game_id,))
+        c.execute("""UPDATE games SET status = 'Official', length = ?, bestPlayer = ?, notes = ? WHERE id = ?""", (end_time, best, notes.strip(), game_id,))
 
         if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
             elos = [0, 0]
@@ -509,7 +507,6 @@ FROM games
             with DatabaseManager() as c:
                 in_finals = c.execute("""SELECT inFinals FROM tournaments WHERE tournaments.id = ?""",
                                       (tournament_id,)).fetchone()[0]
-            print(in_finals)
         if in_finals and not finished:
             print(in_finals)
             print(finished)
@@ -596,9 +593,9 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
                     (
                         tournamentId, i
                     ))
-            ranked &= len(c.execute(
-                """SELECT people.id FROM people INNER JOIN teams ON (people.id = teams.substitute or people.id = teams.nonCaptain or people.id = teams.captain) WHERE teams.id = ?""",
-                (i,)).fetchall()) > 2
+            ranked &= c.execute(
+                """SELECT teams.nonCaptain FROM teams WHERE teams.id = ?""",
+                (i,)).fetchone()[0] != None
         if official is not None:
             official = c.execute(
                 """SELECT officials.id FROM officials INNER JOIN people ON personId = people.id WHERE searchableName = ?""",

@@ -1,5 +1,13 @@
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+const readline = require('node:readline');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
+
+
 function start(id) {
     return fetch("http://localhost/api/games/update/start", {
         method: "POST",
@@ -54,12 +62,14 @@ function finish(id) {
     })
 }
 
-all_games = [[398, 399, 400], [401, 403, 404], [405, 406, 408], [409, 410, 411], [413, 414, 415], [420, 418, 417], [424, 423, 421], [425, 426], [427, 428]]
+let startCount = 397
+let end = 420
 
 async function a() {
-    for (const j of all_games) {
-        console.log(j)
-        for (const i of j) {
+    let test = ''
+    while (test !== 'x') {
+        for (let i = startCount; i < end; i++) {
+            console.log(i)
             start(i).then(
                 (res) => {
                     if (res.status === 204) {
@@ -89,13 +99,16 @@ async function a() {
                             }
                         );
                     } else {
-                        throw new DOMException("didnt work")
+                        console.log(`${i} didnt work`)
                     }
                 }
             );
 
         }
-        await sleep(8000)
+        rl.question(`What's your name?`, name => {
+            test = name
+            rl.close();
+        });
     }
 }
 

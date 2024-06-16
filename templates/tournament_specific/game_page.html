@@ -35,9 +35,9 @@
             {% if game.startTime > 0 %}
                 <p><b>Match Time:</b> <i>{{ game.startTimeStr }}</i></p>
             {% endif %}
-            {% if game.best_player %}
+            {% if game.bestName %}
                 <p><b>Best on Court:</b> <a class="hide"
-                                            href="/{{ tournamentLink }}players/{{ game.bestSearchableName }}"><i>{{ best }}</i></a>
+                                            href="/{{ tournamentLink }}players/{{ game.bestSearchableName }}"><i>{{ game.bestName }}</i></a>
                 </p>
             {% endif %}
             <br>

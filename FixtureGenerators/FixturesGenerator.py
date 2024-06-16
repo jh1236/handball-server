@@ -44,7 +44,6 @@ FROM games
 WHERE games.tournamentId = ?  AND games.started = 0 AND games.isBye = 0 AND games.round = (SELECT MAX(round) FROM games inn WHERE inn.tournamentId = games.tournamentId AND not inn.isFinal)
 GROUP by games.id
 ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
-            print(games)
             rounds = []
             finals = []
             for i in games:
@@ -57,7 +56,6 @@ ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
             l = ceil(len(rounds) / 2)
             for r in rounds:
                 for i, g in enumerate(r):
-                    print(f"Game {i}: court {int(i > l) + 1}")
                     c.execute("""UPDATE games SET court = ? WHERE id = ?""", (i > l, g[0]))
             for i in finals:
                 c.execute("""UPDATE games SET court = 0 WHERE id = ?""", (i[0]))
@@ -139,7 +137,6 @@ GROUP BY officials.id""",
                     if g[3]:
                         continue
                     for o in court_one_officials if g[2] == 0 else court_two_officials:
-                        print(o.person_id, end=" ")
                         if o.official_id in [k[3] for k in games if k]:
                             # the official is already umpiring this round
                             continue
@@ -147,7 +144,6 @@ GROUP BY officials.id""",
                             # the official is playing this round
                             continue
                         with DatabaseManager() as c:
-                            print(" can umpire. YAY!")
                             c.execute("""UPDATE games SET official = ? WHERE id = ?""", (o.official_id, g[0]))
                         o.games_umpired += 1
                         o.court_one_games += g[2] == 0
@@ -155,7 +151,6 @@ GROUP BY officials.id""",
                         break
             if not scorer:
                 continue
-            print("-" * 100)
             for games in zip_longest(court_one_games, court_two_games):
                 for g in games:
                     if not g:
@@ -171,7 +166,6 @@ GROUP BY officials.id""",
                         ),
                     )
                     for o in scorer:
-                        print(o.person_id, end=" ")
                         if o.official_id in [k[3] for k in games if k]:
                             # the official is umpiring this round
                             continue
@@ -182,7 +176,6 @@ GROUP BY officials.id""",
                             # the official is playing this round
                             continue
                         with DatabaseManager() as c:
-                            print(" can umpire. YAY!")
                             c.execute("""UPDATE games SET scorer = ? WHERE id = ?""", (o.official_id, g[0]))
                         g[4] = o.official_id
                         o.games_scored += 1

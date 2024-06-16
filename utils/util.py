@@ -32,7 +32,8 @@ def fixture_sorter(games: list[list[Any]]) -> list[list[Any]]:
     court_one = [i for i in games if i[1] == 0 and not i[2]]
     court_two = [i for i in games if i[1] == 1 and not i[2]]
     byes = [i for i in games if i[2]]
-
+    if not court_two:
+        return court_one +  byes
     this_round = []
     for g1, g2 in zip(court_one, court_two):
         this_round.append(g1)
