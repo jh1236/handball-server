@@ -32,7 +32,7 @@ class FixturesGenerator:
 
     def add_courts(self):
         with DatabaseManager() as c:
-            games = c.execute("""
+            games_query = c.execute("""
 SELECT games.id,
        games.round,
        games.isFinal,
@@ -44,19 +44,11 @@ FROM games
 WHERE games.tournamentId = ?  AND games.started = 0 AND games.isBye = 0 AND games.round = (SELECT MAX(round) FROM games inn WHERE inn.tournamentId = games.tournamentId AND not inn.isFinal)
 GROUP by games.id
 ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
-            rounds = []
-            finals = []
-            for i in games:
-                if i[2]:
-                    finals.append(i)
-                elif i[1] == len(rounds):
-                    rounds[-1].append(i)
-                else:
-                    rounds.append([i])
-            l = ceil(len(rounds) / 2)
-            for r in rounds:
-                for i, g in enumerate(r):
-                    c.execute("""UPDATE games SET court = ? WHERE id = ?""", (i > l, g[0]))
+            games = [i for i in games_query if not i[2]]
+            finals = [i for i in games_query if i[2]]
+            l = ceil(len(games) / 2) - 1
+            for i, g in enumerate(games):
+                c.execute("""UPDATE games SET court = ? WHERE id = ?""", (i > l, g[0]))
             for i in finals:
                 c.execute("""UPDATE games SET court = 0 WHERE id = ?""", (i[0]))
 

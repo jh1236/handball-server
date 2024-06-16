@@ -617,11 +617,10 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
                     round_number < 0
             ):
                 round_number = round_number + 1
-
         is_bye = 1 in [first_team, second_team]
+        court = -1 if is_bye else court
         if is_bye and first_team == 1:
             first_team, second_team = second_team, first_team
-            court = -1
 
         c.execute("""
             INSERT INTO games(tournamentId, teamOne, teamTwo, official, IGASide, gameStringVersion, gameString, court, isFinal, round, isBye, status, isRanked, teamOneScore, teamTwoScore, teamOneTimeouts, teamTwoTimeouts, started, ended) 
