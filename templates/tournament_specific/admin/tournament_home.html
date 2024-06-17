@@ -9,9 +9,9 @@
 {% block bodyBlock %}
     <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 
-    <a href="/{{ tournament }}/admin">
-        <img src="/api/tournaments/image?name={{ tourney.nice_name() }}" class="title_logo"></a>
-    <h1><a href="/{{ tournament }}/admin" class="hide">{{ tourney.name }}</a></h1>
+    <a href="/{{ tournamentLink }}/admin">
+        <img src="/api/tournaments/image?name={{ tourney.searchableName }}" class="title_logo"></a>
+    <h1><a href="/{{ tournamentLink }}/admin" class="hide">{{ tourney.name }}</a></h1>
     <br>
     <br>
     <div class="row">
@@ -22,30 +22,21 @@
                     <h2>Games Requiring Action</h2>
 
                     {% if not require_action %}
-                        {% if tourney.fixtures_class.manual_allowed() and not in_progress %}
-                            <button class="button" onclick="document.location.href = '/{{ tournament }}/create'">New
-                                Game
-                            </button>
-                            <br>
-                            <br>
-                            <button class="button" onclick="document.location.href = '/{{ tournament }}/round'">New
-                                Round
-                            </button>
-                        {% else %}
-                            <br><br>
-                            <i>No Ongoing Games</i>
-                        {% endif %}
+                        <br>
+                        <br>
+                        <i>No Games Requiring Action</i>
                     {% else %}
                         {% for i in require_action %}
 
-                            <p><a href="/{{ tournament }}games/{{ i.id }}/admin"
-                                  class="hide"><b>[{{ i.requires_action_string }}]: </b>{{ i }}</a></p>
+                            <p><a href="/games/{{ i.id }}/admin"
+                                  class="hide"><b>[{{ i.requires_action_string }}]: </b>{{ i.teams[0] }}
+                                vs {{ i.teams[1] }} ({{ i.score_string }})</a></p>
 
                         {% endfor %}
                     {% endif %}
                 </div>
                 <div style="min-height: 200px">
-                    <h2><a class="hide" href="/{{ tournament }}fixtures/admin">Current Round</a></h2>
+                    <h2><a class="hide" href="/{{ tournamentLink }}fixtures/admin">Current Round</a></h2>
                     <table class="jaredTable">
                         <tbody>
                         <tr>
@@ -56,12 +47,12 @@
                         </tr>
                         {% for i in current_round %}
                             <tr>
-                                <td><a href="/{{ tournament }}games/{{ i.id }}/admin"
+                                <td><a href="/games/{{ i.id }}/admin"
                                        class="hide">{{ i.teams[0] }}</a></td>
-                                <td><a href="/{{ tournament }}games/{{ i.id }}/admin" class="hide">vs</a></td>
-                                <td><a href="/{{ tournament }}games/{{ i.id }}/admin"
+                                <td><a href="/games/{{ i.id }}/admin" class="hide">vs</a></td>
+                                <td><a href="/games/{{ i.id }}/admin"
                                        class="hide">{{ i.teams[1] }}</a></td>
-                                <td><a href="/{{ tournament }}games/{{ i.id }}/admin"
+                                <td><a href="/games/{{ i.id }}/admin"
                                        class="hide">{{ i.score_string }}</a></td>
                             </tr>
                         {% endfor %}
@@ -72,7 +63,7 @@
                     <h2>Notices</h2>
                     <textarea style="width: 400px; height: 150px" id="notes"> {{ notes }} </textarea>
                     <br>
-                    <button onclick="sendNotes('{{ tournament }}')">Submit</button>
+                    <button onclick="sendNotes('{{ tournamentLink }}')">Submit</button>
                     <br>
                     <br>
                 </div>
@@ -80,16 +71,17 @@
         </div>
         <div class="col">
 
-            <h2><a class="hide" href="/{{ tournament }}players/admin">Players Requiring Action</a></h2>
+            <h2><a class="hide" href="/{{ tournamentLink }}players/admin">Players Requiring Action</a></h2>
             <div style="height: 200px">
-                {% for p in players if p.get_stats_detailed()["Penalty Points"] >= 12%}
-                <p style="text-align: center"><a class="hide"
-                                                  href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p }}: {{ p.get_stats_detailed()["Penalty Points"] }} penalty points</a>
-                </p>
-                {% endfor  %}
+                {% for p in players if p.penalty_points >= 10 %}
+                    <p style="text-align: center"><a class="hide"
+                                                     href="/{{ tournamentLink }}players/{{ p.searchableName }}/admin">{{ p.name }}: {{ p.penalty_points }}
+                        penalty points</a>
+                    </p>
+                {% endfor %}
             </div>
 
-            <h2><a class="hide" href="/{{ tournament }}players/admin">Noteable Players</a></h2>
+            <h2><a class="hide" href="/{{ tournamentLink }}players/admin">Noteable Players</a></h2>
 
             <table class="jaredTable">
                 <tr>
@@ -103,22 +95,22 @@
                 {% for p in players %}
                     <tr>
                         <td><a class="hide"
-                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p }}</a>
+                               href="/{{ tournamentLink }}players/{{ p.searchableName }}/admin">{{ p.name }}</a>
                         </td>
                         <td style="text-align: center"><a class="hide"
-                                                          href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats_detailed()["Penalty Points"] }}</a>
+                                                          href="/{{ tournamentLink }}players/{{ p.searchableName }}/admin">{{ p.penalty_points }}</a>
                         </td>
                         <td style="text-align: center"><a class="hide"
-                                                          href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats()["Green Cards"] }}</a>
+                                                          href="/{{ tournamentLink }}players/{{ p.searchableName }}/admin">{{ p.warnings }}</a>
                         </td>
                         <td style="text-align: center"><a class="hide"
-                                                          href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats()["Yellow Cards"] }}</a>
+                                                          href="/{{ tournamentLink }}players/{{ p.searchableName }}/admin">{{ p.yellow_cards }}</a>
                         </td>
                         <td><a class="hide"
-                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats()["Red Cards"] }}</a>
+                               href="/{{ tournamentLink }}players/{{ p.searchableName }}/admin">{{ p.red_cards }}</a>
                         </td>
                         <td><a class="hide"
-                               href="/{{ tournament }}players/{{ p.nice_name() }}/admin">{{ p.get_stats()["Rounds Carded"] }}</a>
+                               href="/{{ tournamentLink }}players/{{ p.searchableName }}/admin">{{ p.rounds_on_bench }}</a>
                         </td>
                     </tr>
                 {% endfor %}

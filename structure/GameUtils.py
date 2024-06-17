@@ -10,13 +10,6 @@ from utils.util import chunks_sized
 from utils.databaseManager import DatabaseManager
 from collections import defaultdict
 
-with DatabaseManager() as db:
-    db.execute("SELECT event,taunt FROM taunts")
-    t = db.fetchall()
-    taunts = defaultdict(list)
-    for key, value in t:
-        taunts[key].append(value)
-
 
 def copy_case(string: str, other: str) -> str:
     if other.isupper():
@@ -105,7 +98,7 @@ FROM gameEvents
          INNER JOIN people off on off.id = officials.personId
          INNER JOIN teams t2 on (games.teamTwo + games.teamOne - t1.id) = t2.id
 
-WHERE games.id = ?
+WHERE games.id = ? AND (gameEvents.notes is null OR gameEvents.notes <> 'Penalty')
 GROUP BY gameEvents.id""", (game,)).fetchall()
     for taunt, player, team, team_mate, other_player, other_team, umpire in game_events:
         team_mate = team_mate or player

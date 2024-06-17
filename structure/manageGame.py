@@ -452,18 +452,15 @@ SELECT games.isRanked as ranked,
          INNER JOIN games ON playerGameStats.gameId = games.id
 WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
 
-        resolved, protested, red_cards, yellow_cards, notes, start_time = c.execute("""SELECT resolved,
-       protested,
+        protested, red_cards, yellow_cards, start_time = c.execute("""SELECT protested,
        SUM(playerGameStats.redCards) > 0,
        SUM(playerGameStats.yellowCards) > 0,
-       notes,
        startTime
 FROM games
-         INNER JOIN main.playerGameStats on playerGameStats.gameId = games.id""").fetchone()
+         INNER JOIN main.playerGameStats on playerGameStats.gameId = games.id
+         WHERE games.id = ?""", (game_id,)).fetchone()
 
-        if resolved:
-            c.execute("""UPDATE games SET adminStatus = 'Resolved' WHERE id = ?""", (game_id,))
-        elif red_cards:
+        if red_cards:
             c.execute("""UPDATE games SET adminStatus = 'Red Card Awarded' WHERE id = ?""", (game_id,))
         elif protested:
             c.execute("""UPDATE games SET adminStatus = 'Protested' WHERE id = ?""", (game_id,))
@@ -471,10 +468,13 @@ FROM games
             c.execute("""UPDATE games SET adminStatus = 'Notes To Review' WHERE id = ?""", (game_id,))
         elif yellow_cards:
             c.execute("""UPDATE games SET adminStatus = 'Yellow Card Awarded' WHERE id = ?""", (game_id,))
-
+        else:
+            c.execute("""UPDATE games SET adminStatus = 'Official' WHERE id = ?""", (game_id,))
         end_time = time.time() - start_time
 
-        c.execute("""UPDATE games SET status = 'Official', length = ?, bestPlayer = ?, notes = ? WHERE id = ?""", (end_time, best, notes.strip(), game_id,))
+        c.execute("""UPDATE games SET status = 'Official', noteableStatus = adminStatus, length = ?, bestPlayer = ?, notes = ? WHERE id = ?""", (end_time, best, notes.strip(), game_id,))
+
+        c.execute("""UPDATE playerGameStats SET isBestPlayer = (SELECT games.bestPlayer = playerGameStats.playerId FROM games WHERE games.id = playerGameStats.gameId) WHERE playerGameStats.gameid = ?""", (game_id,))
 
         if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
             elos = [0, 0]

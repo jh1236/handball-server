@@ -1949,7 +1949,7 @@ FROM officials INNER JOIN people on officials.personId = people.id""").fetchall(
                     game=game,
                     timeout_time=manageGame.get_timeout_time(game_id) * 1000,
                     timeout_first=manageGame.get_timeout_caller(game_id),
-                    match_points=0 if max([i.score for i in teams]) < 10 else abs(teams[0].score - teams[1].score),
+                    match_points=0 if (max([i.score for i in teams]) < 10 or game.someone_has_won) else abs(teams[0].score - teams[1].score),
                     VERBAL_WARNINGS=VERBAL_WARNINGS
                 ),
                 200,
