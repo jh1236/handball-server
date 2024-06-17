@@ -265,7 +265,18 @@ SELECT playerGameStats.id,
                       AND gameEvents.eventType LIKE '% Card'
                     ORDER BY id desc
                     LIMIT 1)
-       )                                                                                   as cardTime
+       )                                                                                   as cardTime,
+       coalesce(SUM(gE.teamOneLeft = playerGameStats.playerId OR
+                    gE.teamOneRight = playerGameStats.playerId OR
+                    gE.teamTwoLeft = playerGameStats.playerId OR 
+                    gE.teamTwoRight = playerGameStats.playerId) AND gE.eventType = 'Score', 0) as roundsPlayed,
+        --absolutely vile hack 
+       coalesce(SUM(IIF(eventType = 'Start', games.teamOneScore + games.teamTwoScore, 0)), 0) -
+           coalesce(SUM(gE.teamOneLeft = playerGameStats.playerId OR
+                    gE.teamOneRight = playerGameStats.playerId OR
+                    gE.teamTwoLeft = playerGameStats.playerId OR 
+                    gE.teamTwoRight = playerGameStats.playerId) AND gE.eventType = 'Score', 0) as roundsBenched
+                    
 
 FROM playerGameStats
          INNER JOIN games ON playerGameStats.gameId = games.id

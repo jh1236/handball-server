@@ -45,7 +45,9 @@ SET points = lg.points,
     yellowCards = lg.yellowCards,
     redCards = lg.redCards,
     cardTimeRemaining = lg.cardTimeRemaining,
-    cardTime = lg.cardTime
+    cardTime = lg.cardTime,
+    roundsBenched = lg.roundsBenched,
+    roundsPlayed = lg.roundsPlayed
 FROM livePlayerGameStats lg
 WHERE playerGameStats.id = lg.id
         AND playerGameStats.gameId = ?;
