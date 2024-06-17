@@ -12,11 +12,39 @@ let setup = (newId, change_id) => {
 }
 setTournament = t => tournament = t
 
+let t = 1
+
+function rotate(obj, angle) {
+    let s = "rotate(" + angle + "deg)";
+    obj.style.MozTransform = s
+    obj.style.WebkitTransform = s;
+    obj.style.OTransform = s;
+    obj.style.MSTransform = s;
+    obj.style.transform = s;
+}
+
 function deleteFireworks() {
+    function a() {
+        let l = Array.from(document.getElementsByClassName("bigger"))
+        for (let i of l) {
+            console.log(i)
+            i.width = Math.pow(1.2, (t / 40) * (t / 40))
+            i.height = Math.pow(1.2, (t / 40) * (t / 40))
+        }
+        l = Array.from(document.getElementsByClassName("rotate"))
+        for (let i of l) {
+            rotate(i, t)
+        }
+        t++
+        if (l) {
+            setTimeout(a, 10)
+        }
+    }
+
+    a()
     setTimeout(() => {
         let l = Array.from(document.getElementsByClassName("fireworks"))
         for (let i of l) {
-            console.log(i)
             i.remove()
         }
     }, 5000)
