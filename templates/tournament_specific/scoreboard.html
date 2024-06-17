@@ -17,8 +17,18 @@
     <div class="overlay"><h1 class="big" style="top: 50%" id="timeout">30</h1></div>
     <script>timeout({{ timeout_time }})</script>
 {% endif %}
+{% if game.aced %}
+    <img class="fireworks" src="https://i.pinimg.com/originals/fd/d0/0e/fdd00eff2cfe977daed3584f56eafbc9.gif" style="left: 0;top:0;width: 100%;height: 110%; position: fixed">
+    <img class="fireworks" src="https://cliply.co/wp-content/uploads/2021/09/CLIPLY_372109170_FREE_FIREWORKS_400.gif" style="left: 0;width: 100%;height: 100%; position: fixed">
+    <img class="fireworks" src="https://i.pinimg.com/originals/29/8f/2c/298f2ce6dead72fe992253c5ba0eba95.gif" style="left: 75%;top:60%;width: 25%;height: 25%; position: fixed">
+    <img class="fireworks" src="https://i.pinimg.com/originals/29/8f/2c/298f2ce6dead72fe992253c5ba0eba95.gif" style="left: 25%;top:25%;width: 25%;height: 25%; position: fixed">
+    <img class="fireworks" src="https://i.pinimg.com/originals/29/8f/2c/298f2ce6dead72fe992253c5ba0eba95.gif" style="left: 10%;top:10%;width: 25%;height: 25%; position: fixed">
+    <img class="fireworks" src="https://i.pinimg.com/originals/29/8f/2c/298f2ce6dead72fe992253c5ba0eba95.gif" style="left: 70%;top:33%;width: 25%;height: 25%; position: fixed">
+    <img class="fireworks" src="https://i.gifer.com/WS2k.gif" style="left: 10%;top:80%;width: 25%;height: 25%; position: fixed">
+    <img class="fireworks" src="https://i.gifer.com/WS2k.gif" style="left: 60%;top:13%;width: 25%;height: 25%; position: fixed">
+    <script>deleteFireworks()</script>
+{% endif %}
 <table class="jaredTable">
-
     <tr>
         <td><a class="hide" href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"><h1
                 style="font-size: 50px">{{ teams[0].name }}</h1></a></td>

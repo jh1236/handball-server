@@ -12,6 +12,16 @@ let setup = (newId, change_id) => {
 }
 setTournament = t => tournament = t
 
+function deleteFireworks() {
+    setTimeout(() => {
+        let l = Array.from(document.getElementsByClassName("fireworks"))
+        for (let i of l) {
+            console.log(i)
+            i.remove()
+        }
+    }, 5000)
+}
+
 function main() {
     fetch(`/api/games/change_code?id=${id}&tournament=${tournament.replace("/", "")}`, {
         method: "GET"
