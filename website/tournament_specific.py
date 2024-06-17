@@ -917,7 +917,7 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
                                          LEFT JOIN people on people.id = playerGameStats.playerId
                                          LEFT JOIN people best on best.id = games.bestPlayer
                                          LEFT JOIN teams on teams.id = playerGameStats.teamId
-                                         LEFT JOIN eloChange on games.id >= eloChange.gameId and eloChange.playerId = playerGameStats.playerId
+                                         LEFT JOIN eloChange on games.id > eloChange.gameId and eloChange.playerId = playerGameStats.playerId
                                          LEFT JOIN gameEvents on gameEvents.id = (SELECT MAX(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
                                 WHERE games.id = ?
                                 GROUP BY people.name

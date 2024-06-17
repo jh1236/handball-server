@@ -486,6 +486,7 @@ FROM games
                 team_sizes[i[2]] += 1
             for i, v in enumerate(team_sizes):
                 elos[i] /= v
+            print(elos)
             for i in teams:
                 win = i[1]
                 my_team = i[2]

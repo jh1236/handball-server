@@ -420,3 +420,6 @@ def team_stats(tournament, team, include_players=False):
             for i in team.players
         ]
     return d
+
+if __name__ == "__main__":
+    print(calc_elo(1561.25 + 34.89, 1568.46 - 34.89, False))
