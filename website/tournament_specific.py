@@ -717,7 +717,7 @@ ORDER BY people.id <> teams.captain, people.id <> teams.nonCaptain""",
        games.round,
        gameEvents.eventType = 'Fault',
        lastGE.nextServeSide,
-       (SELECT 'Ace' = eventType
+       (SELECT eventType
         FROM gameEvents inn
         WHERE inn.id =
               (SELECT MAX(id)
@@ -801,7 +801,7 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
             round: int
             faulted: bool
             serverSide: str
-            aced: bool
+            type: str
 
         teams = {}
         player_stats = []

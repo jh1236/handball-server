@@ -154,3 +154,33 @@ h1.big {
     /* Column | row */
 
 }
+
+.red_card {
+    animation-name: red_animation;
+    animation-duration: 1.2s;
+    text-align: center;
+    display: flex;
+    justify-content: center; /* Align horizontal */
+    align-items: center;
+    font-size: 10px;
+}
+
+@keyframes red_animation {
+    0%   {font-size: 100px; color: #7d0a0a; height: 400px;  transform: translate(0%, -100%)}
+    40%   {font-size: 100px; color: #7d0a0a; height: 400px;transform: translate(0%, -100%)}
+}
+
+.yellow_card {
+    animation-name: yellow_animation;
+    animation-duration: 1.2s;
+    text-align: center;
+    display: flex;
+    justify-content: center; /* Align horizontal */
+    align-items: center;
+    font-size: 10px;
+}
+
+@keyframes yellow_animation {
+    0%   {font-size: 100px; color: #7D4F0A; height: 400px; transform: translate(0, -100%)}
+    40%   {font-size: 100px; color: #7D4F0A; height: 400px; transform: translate(0, -100%)}
+}

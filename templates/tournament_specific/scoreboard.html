@@ -17,7 +17,8 @@
     <div class="overlay"><h1 class="big" style="top: 50%" id="timeout">30</h1></div>
     <script>timeout({{ timeout_time }})</script>
 {% endif %}
-{% if game.aced %}
+{{ game.type }}
+{% if game.type == "Ace" %}
     <img class="fireworks" src="https://i.pinimg.com/originals/fd/d0/0e/fdd00eff2cfe977daed3584f56eafbc9.gif" style="left: 0;top:0;width: 100%;height: 110%; position: fixed">
     <img class="fireworks" src="https://cliply.co/wp-content/uploads/2021/09/CLIPLY_372109170_FREE_FIREWORKS_400.gif" style="left: 0;width: 100%;height: 100%; position: fixed">
     <img class="fireworks" src="https://i.pinimg.com/originals/29/8f/2c/298f2ce6dead72fe992253c5ba0eba95.gif" style="left: 75%;top:60%;width: 25%;height: 25%; position: fixed">
@@ -82,22 +83,19 @@
     <tr>
         <td>
             {% if teams[0].cardTimeRemaining > 0 %}
-                <div class="rectangle"
-                     style="background-color: #FCCE6E;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardTime }}%"></div>
+                <div class="rectangle {% if game.type == "Yellow Card" %}yellow_card{% endif %}" style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardTime }}%">Yellow Card</div>
             {% endif %}
             {% if teams[0].cardTimeRemaining < 0 %}
-                <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
+                <div class="rectangle {% if game.type == "Red Card" %}red_card{% endif %}" style="background-color: #EC4A4A; color:#EC4A4A; width:100%">Red Card</div>
             {% endif %}
         </td>
         <td></td>
         <td>
-
             {% if teams[1].cardTimeRemaining > 0 %}
-                <div class="rectangle"
-                     style="background-color: #FCCE6E;width:{{ 100*(teams[1].cardTimeRemaining) / teams[1].cardTime }}%"></div>
+                <div class="rectangle {% if game.type == "Yellow Card" %}yellow_card{% endif %}" style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(teams[1].cardTimeRemaining) / teams[1].cardTime }}%">Yellow Card</div>
             {% endif %}
             {% if teams[1].cardTimeRemaining < 0 %}
-                <div class="rectangle" style="background-color: #EC4A4A"></div>
+                <div class="rectangle {% if game.type == "Red Card" %}red_card{% endif %}" style="background-color: #EC4A4A; color:#EC4A4A; width:100%">Red Card</div>
             {% endif %}
         </td>
     </tr>
