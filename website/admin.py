@@ -643,10 +643,7 @@ where IIF(? is NULL, 1, tournaments.id = ?)
        '%',
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) /
                       (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 0), 2) || '%',
-       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points)
-                                                                           from playerGameStats i
-                                                                           where i.teamId = teams.id
-                                                                             and i.tournamentId = tournamentTeams.tournamentId),
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(IIF(games.teamOne = playerGameStats.teamId, teamOneScore, teamTwoScore))),
                       0), 2) || '%',
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.startSide = 'Left') AS REAL) /
                       COUNT(DISTINCT playerGameStats.gameId), 0),
@@ -933,10 +930,7 @@ GROUP BY people.id""",
        '%',
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) /
                       (SUM(playerGameStats.roundsPlayed + playerGameStats.roundsBenched)), 0), 2) || '%',
-       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SELECT SUM(i.points)
-                                                                           from playerGameStats i
-                                                                           where i.teamId = teams.id
-                                                                             and i.tournamentId = tournamentTeams.tournamentId),
+       ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.points) AS REAL) / (SUM(IIF(games.teamOne = playerGameStats.teamId, teamOneScore, teamTwoScore))),
                       0), 2) || '%',
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.startSide = 'Left') AS REAL) /
                       COUNT(DISTINCT playerGameStats.gameId), 0),

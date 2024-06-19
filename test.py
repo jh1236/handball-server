@@ -1,3 +1,4 @@
+from structure import manageGame
 from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
 
@@ -44,6 +45,6 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
 
 
 if __name__ == '__main__':
-    regen_elo()
-    # manageGame.create_tournament("Test", "RoundRobin", "BasicFinals",
-    #                              True, True, True, [52, 13, 40, 4, 28, 22, 26, 37, 6], [2, 4, 3, 1])
+    # regen_elo()
+    manageGame.create_tournament("The Sixth SUSS Championship", "RoundRobin", "BasicFinals",
+                                 True, True, True, [13, 93, 92, 40, 52], [2, 4, 3, 1])
