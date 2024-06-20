@@ -40,10 +40,12 @@ ORDER BY (SELECT SUM(eloChange)
             with DatabaseManager() as c:
                 c.execute("""UPDATE tournaments SET inFinals = 1 WHERE tournaments.id = ?""", (tournament,))
             return
+        print(teams)
 
         for _ in range(rounds - 1):
             # Rotate the teams except the first one
             teams[1:] = [teams[-1]] + teams[1:-1]
+        print(teams)
 
         mid = len(teams) // 2
         for j in range(mid):
