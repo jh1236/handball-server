@@ -12,23 +12,12 @@ class RoundRobin(FixturesGenerator):
         with DatabaseManager() as c:
             teams = c.execute(
                 """
-SELECT tournamentTeams.teamId,
-coalesce((SELECT SUM(eloChange)
-                       from eloChange
-                                INNER JOIN teams inside ON inside.id = tournamentTeams.teamId
-                                INNER JOIN people captain ON captain.id = inside.captain
-                                LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
-                                LEFT JOIN people sub ON sub.id = inside.substitute
-                       where eloChange.playerId = sub.id
-                          or eloChange.playerId = captain.id
-                          or eloChange.playerId = nonCaptain.id)
-           /
-                      COUNT(DISTINCT playerGameStats.playerId), 1500.0) as ord
+SELECT tournamentTeams.teamId
 FROM tournamentTeams
 LEFT JOIN playerGameStats ON playerGameStats.teamId = tournamentTeams.teamId
 WHERE  tournamentTeams.tournamentId = ?
 GROUP BY tournamentTeams.teamId
-ORDER BY ord""",
+ORDER BY tournamentTeams.teamId""",
                 (tournament,),
             ).fetchall()
             rounds = (c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament,)).fetchone()[0] or 0) + 1

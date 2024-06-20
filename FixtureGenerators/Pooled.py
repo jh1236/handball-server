@@ -12,13 +12,8 @@ class Pooled(FixturesGenerator):
         with DatabaseManager() as c:
             teams = c.execute(
                 """
-SELECT tournamentTeams.teamId, pool                                                                                  
-
-FROM tournamentTeams
-INNER JOIN playerGameStats ON playerGameStats.teamId = tournamentTeams.teamId
-WHERE  tournamentTeams.tournamentId = ?
-GROUP BY tournamentTeams.teamId
-ORDER BY (SELECT SUM(eloChange)
+SELECT tournamentTeams.teamId, pool,
+coalesce((SELECT SUM(eloChange)
                        from eloChange
                                 INNER JOIN teams inside ON inside.id = tournamentTeams.teamId
                                 INNER JOIN people captain ON captain.id = inside.captain
@@ -28,7 +23,13 @@ ORDER BY (SELECT SUM(eloChange)
                           or eloChange.playerId = captain.id
                           or eloChange.playerId = nonCaptain.id)
            /
-                      COUNT(DISTINCT playerGameStats.playerId)""",
+                      COUNT(DISTINCT playerGameStats.playerId), 1500.0) as o                                                                                  
+
+FROM tournamentTeams
+LEFT JOIN playerGameStats ON playerGameStats.teamId = tournamentTeams.teamId
+WHERE  tournamentTeams.tournamentId = ?
+GROUP BY tournamentTeams.teamId
+ORDER BY o""",
                 (tournament_id,),
             ).fetchall()
             pool = 0
@@ -46,7 +47,8 @@ SELECT tournamentTeams.teamId, pool
 FROM tournamentTeams
 
 WHERE  tournamentTeams.tournamentId = ?
-GROUP BY tournamentTeams.teamId""",
+GROUP BY tournamentTeams.teamId
+ORDER BY teamId""",
                 (tournament_id,),
             ).fetchall()
             rounds = c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament_id,)).fetchone()[
