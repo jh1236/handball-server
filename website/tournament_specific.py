@@ -506,8 +506,8 @@ def add_tournament_specific(app):
                                          LEFT JOIN people sub ON sub.id = inside.substitute
                                 where eloChange.playerId = sub.id
                                    or eloChange.playerId = captain.id
-                                   or eloChange.playerId = nonCaptain.id AND eloChange.id <=
-                                      (SELECT MAX(id) FROM eloChange WHERE eloChange.tournamentId = tournaments.id)), 0)
+                                   or eloChange.playerId = nonCaptain.id AND eloChange.gameId <=
+                                      (SELECT MAX(id) FROM games WHERE games.tournamentId = tournaments.id)), 0)
            /
                       COUNT(teams.captain is not null + teams.noncaptain is not null + teams.substitute is not null),
              2) as elo,
@@ -571,8 +571,8 @@ where IIF(? is NULL, 1, tournaments.id = ?)
        coalesce(SUM(playerGameStats.isBestPlayer), 0),
        ROUND(1500.0 + (SELECT SUM(eloChange)
                        from eloChange
-                       where eloChange.playerId = people.id AND eloChange.id <=
-                                      (SELECT MAX(id) FROM eloChange WHERE eloChange.tournamentId = playerGameStats.tournamentId)), 2) as elo,
+                       where eloChange.playerId = people.id AND eloChange.gameId <=
+                                      (SELECT MAX(id) FROM games WHERE games.tournamentId = playerGameStats.tournamentId)), 2) as elo,
        coalesce(SUM(playerGameStats.points), 0),
        coalesce(SUM(playerGameStats.aces), 0),
        coalesce(SUM(playerGameStats.faults), 0),
@@ -1272,8 +1272,8 @@ ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games
        coalesce(SUM(games.bestPlayer = playerId), 0),
        ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
                        from eloChange
-                       where eloChange.playerId = people.id AND eloChange.id <=
-                                      (SELECT MAX(id) FROM eloChange WHERE eloChange.tournamentId = tournaments.id)), 0), 2) as elo,
+                       where eloChange.playerId = people.id AND eloChange.gameId <=
+                                      (SELECT MAX(id) FROM games WHERE games.tournamentId = tournaments.id)), 0), 2) as elo,
        coalesce(SUM(games.winningTeam = playerGameStats.teamId), 0),
        COUNT(DISTINCT games.id),
        coalesce(SUM(playerGameStats.points), 0),
