@@ -70,7 +70,7 @@ ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
                 """
 SELECT officials.personId,
        officials.id,
-       proficiency,
+       officials.proficiency,
        COUNT(DISTINCT games.id),
        COUNT((SELECT games.id FROM games WHERE scorer = officials.id)),
        COUNT(DISTINCT IIF(games.court = 0, games.id, null))
@@ -91,8 +91,9 @@ GROUP BY officials.id""",
             games_scored: int
             court_one_games: int
 
+        print([(i) for i in officials])
         officials = [Official(*i) for i in officials]
-
+        print([(i.person_id, i.proficiency) for i in officials])
         rounds = defaultdict(list)
         game_to_players = defaultdict(list)
         for i in players:
@@ -122,6 +123,7 @@ GROUP BY officials.id""",
                             -it.court_one_games,
                         ),
                     )
+                    print(f"c1: {[(i.person_id, i.proficiency) for i in court_one_officials]}, c2: {[(i.person_id, i.proficiency) for i in court_two_officials]}")
                     #  games.id, round, court, official, scorer, [players]
 
                     if not g:
@@ -157,6 +159,7 @@ GROUP BY officials.id""",
                             it.games_scored
                         ),
                     )
+                    print(f"{[(i.person_id, i.proficiency) for i in scorer]}")
                     for o in scorer:
                         if o.official_id in [k[3] for k in games if k]:
                             # the official is umpiring this round
