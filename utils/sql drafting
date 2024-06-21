@@ -130,4 +130,135 @@ WHERE
     games.isBye = 0
 GROUP BY teams.name;
 
-    
+-- get wins and losses of teams based on tournament
+
+
+-- get amount of games played for each team
+-- laziest fucking query of my life
+SELECT Team, sum(games), (sum(wins)*100)/(sum(games))
+FROM (
+    SELECT teamOne as Team, count(teamOne) as games, 0 as wins
+        FROM games
+        WHERE 
+            tournamentId = 3
+            AND ended = 1 -- basically to ignore BYE game
+            AND isFinal = 0
+            AND teamOne != 1
+        GROUP BY teamOne
+    UNION ALL
+    SELECT teamTwo as Team, count(teamTwo) as games, 0 as wins
+        FROM games
+        WHERE 
+            tournamentId = 3
+            AND ended = 1
+            AND isFinal = 0
+            AND teamTwo != 1
+        GROUP BY teamTwo
+    UNION ALL
+    SELECT winningTeam as Team, 0 as games, count(winningTeam) as wins
+        FROM games
+        WHERE 
+            tournamentId = 3 
+            AND ended = 1
+            AND isFinal = 0
+            and isRanked = 1
+        GROUP BY winningTeam
+) AS subquery
+GROUP BY Team
+ORDER BY Team;
+
+SELECT (tournamentTeams.teamId)+0 as Team -- fucked as fuck
+FROM tournamentTeams
+LEFT JOIN playerGameStats ON playerGameStats.teamId = tournamentTeams.teamId
+WHERE  tournamentTeams.tournamentId = 3
+GROUP BY tournamentTeams.teamId
+ORDER BY tournamentTeams.teamId;
+
+    SELECT winningTeam as Team, 0 as games, count(winningTeam) as wins
+        FROM games
+        WHERE 
+            tournamentId = 3 
+            AND ended = 1
+            AND isFinal = 0
+            and isRanked = 1
+        GROUP BY winningTeam;
+
+-- get elo for all players
+
+SELECT playerId, SUM(eloChange)+1500 as elo
+    FROM eloChange
+    GROUP BY playerId;
+
+
+
+SELECT 
+    tournamentTeams.teamId, 
+    (e1.elo + IFNULL(e2.elo, 0) + IFNULL(e3.elo, 0))/(1 + (e2.elo IS NOT NULL) + (e3.elo IS NOT NULL)) as elo
+FROM 
+    tournamentTeams
+    LEFT JOIN teams ON teams.id = tournamentTeams.teamId
+    LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e1 ON e1.playerId = teams.captain
+    LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e2 ON e2.playerId = teams.nonCaptain
+    LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e3 ON e3.playerId = teams.substitute
+WHERE 
+    tournamentTeams.tournamentId = 3
+GROUP BY 
+    tournamentTeams.teamId
+ORDER BY 
+    elo DESC;
+
+
+SELECT Team, sum(games), (sum(wins)*100)/(sum(games)) as resultWinPercentage, sum(elo) as resultElo
+FROM (
+    SELECT teamOne as Team, count(teamOne) as games, 0 as wins,0 AS elo
+        FROM games
+        WHERE 
+            tournamentId = 3
+            AND ended = 1 -- basically to ignore BYE game
+            AND isFinal = 0
+            AND teamOne != 1
+        GROUP BY teamOne
+    UNION ALL
+    SELECT teamTwo as Team, count(teamTwo) as games, 0 as wins,0 AS elo
+        FROM games
+        WHERE 
+            tournamentId = 3
+            AND ended = 1
+            AND isFinal = 0
+            AND teamTwo != 1
+        GROUP BY teamTwo
+    UNION ALL
+    SELECT 
+        tournamentTeams.teamId, 0, 0,
+        (e1.elo + IFNULL(e2.elo, 0) + IFNULL(e3.elo, 0))/(1 + (e2.elo IS NOT NULL) + (e3.elo IS NOT NULL)) as elo
+        FROM 
+            tournamentTeams
+            LEFT JOIN teams ON teams.id = tournamentTeams.teamId
+            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e1 ON e1.playerId = teams.captain
+            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e2 ON e2.playerId = teams.nonCaptain
+            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e3 ON e3.playerId = teams.substitute
+        WHERE 
+            tournamentTeams.tournamentId = 3
+        GROUP BY 
+            tournamentTeams.teamId
+    UNION ALL
+    SELECT winningTeam as Team, 0 as games, count(winningTeam) as wins, 0 AS elo
+        FROM games
+        WHERE 
+            tournamentId = 3 
+            AND ended = 1
+            AND isFinal = 0
+            and isRanked = 1
+        GROUP BY winningTeam
+)
+GROUP BY Team
+ORDER BY resultWinPercentage DESC, resultElo DESC;
+
+
+--get all games for a tournament
+SELECT 
+    teamOne, teamTwo
+    FROM games
+    WHERE tournamentId = 3;
+
+SELECT COUNT(*) FROM tournamentTeams WHERE tournamentId = 3;
