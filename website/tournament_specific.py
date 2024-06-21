@@ -145,12 +145,12 @@ def add_tournament_specific(app):
             playerList = c.execute(
                 """
                                 SELECT 
-                                    people.name, searchableName, sum(isBestPlayer), sum(points), sum(aces), sum(redCards+yellowCards) 
-                                    FROM playerGameStats 
-                                    INNER JOIN people ON playerId = people.id 
+                                    people.name, searchableName, coalesce(sum(isBestPlayer), 0), coalesce(sum(points), 0), coalesce(sum(aces), 0), coalesce(sum(redCards+yellowCards), 0) 
+                                    FROM people 
+                                    LEFT JOIN playerGameStats ON playerId = people.id 
                                     WHERE 
                                         tournamentId = ? AND
-                                        isFinal = 0
+                                        (isFinal = 0 OR isFinal is null) AND searchableName <> 'null'
                                     GROUP BY playerId 
                                     ORDER BY 
                                         sum(isBestPlayer) DESC, 
@@ -1142,8 +1142,8 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
        SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam,
                0))                                   as wins,
        ROUND(100.0 * coalesce(
-                   Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) /
-                   COUNT(DISTINCT games.id), 0),
+               Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) /
+               COUNT(DISTINCT games.id), 0),
              2) ||
        '%'                                           as percentage,
        COUNT(DISTINCT games.id) - SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam,
@@ -1171,23 +1171,22 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
                                          INNER JOIN people captain ON captain.id = inside.captain
                                          LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
                                          LEFT JOIN people sub ON sub.id = inside.substitute
-                                where (eloChange.playerId = sub.id or eloChange.playerId = captain.id or
-                                       eloChange.playerId = nonCaptain.id)
-                                  AND eloChange.id <=
-                                      (SELECT MAX(id) FROM eloChange WHERE eloChange.tournamentId = tournaments.id)), 0)
+                                where eloChange.playerId = sub.id
+                                   or eloChange.playerId = captain.id
+                                   or eloChange.playerId = nonCaptain.id AND eloChange.gameId <=
+                                                                             (SELECT MAX(id) FROM games WHERE games.tournamentId = tournaments.id)), 0)
            /
                       COUNT(teams.captain is not null + teams.noncaptain is not null + teams.substitute is not null),
-             2)                                      as elo
+             2)                                     as elo
 
-FROM tournamentTeams
-         INNER JOIN tournaments ON tournaments.id = tournamentTeams.tournamentId
-         INNER JOIN teams ON teams.id = tournamentTeams.teamId
-         LEFT JOIN (SELECT * FROM games WHERE someoneHasWon = 1) as games ON
-        (games.teamOne = teams.id or games.teamTwo = teams.id) AND games.tournamentId = tournaments.id
-        AND IIF(? is NULL, games.isRanked, 1) AND games.isBye = 0 AND games.isFinal = 0
-         LEFT JOIN playerGameStats
-                   ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
-WHERE IIF(? is NULL, 1, tournaments.id = ?)
+FROM teams
+         INNER JOIN tournamentTeams on teams.id = tournamentTeams.teamId
+         LEFT JOIN (SELECT * FROM games WHERE someoneHasWon = 1) as games ON (games.teamOne = teams.id OR games.teamTwo = teams.id) AND games.isFinal = 0 AND
+                            games.isBye = 0 AND (IIF(? is null, games.isRanked, 1) OR teams.nonCaptain is null) AND games.tournamentId = tournamentTeams.tournamentId
+         LEFT JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
+         LEFT JOIN tournaments on tournaments.id = tournamentTeams.tournamentId
+
+where IIF(? is NULL, 1, tournaments.id = ?)
 GROUP BY teams.name
 ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) /
          COUNT(DISTINCT games.id) DESC,
