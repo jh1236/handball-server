@@ -1182,7 +1182,7 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
 FROM tournamentTeams
          INNER JOIN tournaments ON tournaments.id = tournamentTeams.tournamentId
          INNER JOIN teams ON teams.id = tournamentTeams.teamId
-         LEFT JOIN games ON
+         LEFT JOIN (SELECT * FROM games WHERE someoneHasWon = 1) as games ON
         (games.teamOne = teams.id or games.teamTwo = teams.id) AND games.tournamentId = tournaments.id
         AND IIF(? is NULL, games.isRanked, 1) AND games.isBye = 0 AND games.isFinal = 0
          LEFT JOIN playerGameStats
