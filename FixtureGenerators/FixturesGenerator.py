@@ -186,10 +186,11 @@ def get_type_from_name(name: str, tournament: int) -> FixturesGenerator:
     from FixtureGenerators.OneRound import OneRound
     from FixtureGenerators.Pooled import Pooled
     from FixtureGenerators.RoundRobin import RoundRobin
+    from FixtureGenerators.Swiss import Swiss
     return {
         "BasicFinals": BasicFinals(tournament),
         "Pooled": Pooled(tournament),
         "RoundRobin": RoundRobin(tournament),
         "OneRoundEditable": OneRound(tournament),
-        "Swiss": RoundRobin(tournament)
+        "Swiss": Swiss(tournament)
     }[name]

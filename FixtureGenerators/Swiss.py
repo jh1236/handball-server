@@ -64,13 +64,12 @@ class Swiss(FixturesGenerator):
             teamCount = c.execute("SELECT COUNT(*) FROM tournamentTeams WHERE tournamentId = ?;", (tournament,)).fetchone()[0]
             
             maxRound = ceil(log2(teamCount)) + 1 # we will do 1 round above the maximum
-
             if rounds == 1:
                 teams = c.execute(
                     """
                         SELECT 
                             tournamentTeams.teamId, 
-                            (e1.elo + IFNULL(e2.elo, 0) + IFNULL(e3.elo, 0))/(1 + (e2.elo IS NOT NULL) + (e3.elo IS NOT NULL)) as elo
+                            (IFNULL(e1.elo, 1500) + IFNULL(e2.elo, 0) + IFNULL(e3.elo, 0))/(1 + (e2.elo IS NOT NULL) + (e3.elo IS NOT NULL)) as eloFinal
                         FROM 
                             tournamentTeams
                             LEFT JOIN teams ON teams.id = tournamentTeams.teamId
@@ -82,16 +81,15 @@ class Swiss(FixturesGenerator):
                         GROUP BY 
                             tournamentTeams.teamId
                         ORDER BY 
-                            tournamentTeams.teamId;
+                            eloFinal DESC;
                             """,(tournament,),
                 ).fetchall()
-                    # match 'best teams' with 'worst teams' 
                 games = []
                 while len(teams) >= 2:
                     games += [(teams.pop(0)[0], teams.pop(-1)[0])]
                 if len(teams) == 1:
                     games += [(teams[0][0], 1)] # add a bye game
-            if rounds <= maxRound:
+            elif rounds <= maxRound:
                 teams = c.execute("""
                                 SELECT Team, sum(games), (sum(wins)*100)/(sum(games)) as resultWinPercentage, sum(elo) as resultElo
                                 FROM (
