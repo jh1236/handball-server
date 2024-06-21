@@ -2059,6 +2059,8 @@ FROM officials INNER JOIN people on officials.personId = people.id""").fetchall(
         # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
         #     return _no_permissions()
         # el
+        if visual_swap:
+            team_one_players, team_two_players = team_two_players, team_one_players
         if game.bye:
             return (
                 render_template(
