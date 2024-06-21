@@ -179,7 +179,6 @@ function openCardModal(colorIn, firstTeam, teamName) {
 
 function sendCustomCard() {
     if (waiting) return
-    waiting = true
     let selectedReason = document.querySelector('input[name="reason"]:checked')
     const selectedPlayer = document.getElementById('playerOne').checked
     if (!selectedReason) {
@@ -204,6 +203,15 @@ function sendCustomCard() {
         alert("Please Select A Reason!")
         return
     }
+    waiting = true
+    let duration;
+    if (color === 'Red') {
+        duration = -1
+    } else if (color === 'Yellow') {
+        duration = document.getElementById("duration").value
+    } else if (color === 'Green' || color === 'Warning') {
+        duration = 0
+    }
 
     fetch("/api/games/update/card", {
         method: "POST", body: JSON.stringify({
@@ -211,7 +219,7 @@ function sendCustomCard() {
             firstTeam: lxor(first, teamsSwapped),
             leftPlayer: selectedPlayer,
             color: color,
-            duration: +(document.getElementById("duration").value),
+            duration: duration,
             reason: reason
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -380,7 +388,6 @@ function timeout(firstTeam) {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -406,7 +413,6 @@ function endTimeout(firstTeam) {
     fetch("/api/games/update/endTimeout", {
         method: "POST", body: JSON.stringify({
             id: id,
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
@@ -450,7 +456,6 @@ function undo() {
     waiting = true
     fetch("/api/games/update/undo", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -472,7 +477,6 @@ function swapServe() {
     waiting = true
     fetch("/api/games/update/swapServe", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -494,7 +498,6 @@ function swapServeTeam() {
     waiting = true
     fetch("/api/games/update/swapServeTeam", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
@@ -516,7 +519,6 @@ function swapPlayerSides(first) {
     waiting = true
     fetch("/api/games/update/swapPlayerSides", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id,
             firstTeam: first
         }), headers: {

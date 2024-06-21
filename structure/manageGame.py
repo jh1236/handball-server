@@ -103,6 +103,7 @@ def _swap_server(game_id, team_to_serve, c, swap=True):
     query = c.execute(
         """SELECT sideServed FROM gameEvents WHERE gameId = ? AND teamWhoServed = ? ORDER BY id DESC LIMIT 1""",
         (game_id, team_to_serve)).fetchone()
+
     if query is None:  # this team is yet to serve
         old_side = "Right" if swap else "Left"
     else:
@@ -128,6 +129,8 @@ WHERE games.id = ?
   AND cardTimeRemaining = 0
 ORDER BY o desc""",
         (new_side, game_id, team_to_serve)).fetchall()
+    if not player_to_serve:
+        return None, None
     return player_to_serve[0][0], new_side
 
 
