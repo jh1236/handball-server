@@ -102,7 +102,7 @@
                 {% endif %}</td>
             <td></td>
             <td>
-                {% if teams[1].has_sub and game.round_number <= 9 %}
+                {% if teams[1].has_sub and game.round <= 9 %}
                     <div class="dropdown" style="background-color: #2a5d88;">
                         <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
                             Substitute {{ teams[1].name }}</button>
