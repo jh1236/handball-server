@@ -36,6 +36,7 @@ class Swiss(FixturesGenerator):
             p.append(j[0])
             f.append(j[1])
         priority = [x for _, x in sorted(zip(f, p))] # sort to find the teams we care most about
+        priority = [x for x in priority if x != None]
         while len(priority) >= 2:
             initial = teams.index(priority.pop(0))
             team1 = teams.pop(initial)
@@ -54,8 +55,8 @@ class Swiss(FixturesGenerator):
                 # shit broke, time to brute force :cries:
                 games, teams = self.brute_force(previousGames, [x for _, x in sorted(zip(f, p))])
                 break
-        if len(teams) == 1:
-            games += [(teams[0], 1)] # add a bye game
+        if len(priority) == 1:
+            games += [(priority[0], 1)] # add a bye game
         return games
     
     def _end_of_round(self, tournament):
