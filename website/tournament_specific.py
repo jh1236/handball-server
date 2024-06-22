@@ -204,7 +204,8 @@ def add_tournament_specific(app):
                                     tournamentId = ? AND
                                     isFinal = 0;""", (tournamentId,)
             ).fetchall()
-        # me when i criticize Jareds code then write this abomination
+
+            # me when i criticize Jareds code then write this abomination
 
             @dataclass
             class Game:
@@ -213,6 +214,7 @@ def add_tournament_specific(app):
                 id: int
                 court: int
                 bye: bool
+
             # me when i criticize Jareds code then write this abomination
             fixtures = defaultdict(list)
             for game in games:
@@ -221,7 +223,7 @@ def add_tournament_specific(app):
                 )
             new_fixtures = {}
             for k, v in fixtures.items():
-                new_fixtures[k] = [j[3] for j in fixture_sorter([(i.id, i.court, i.bye,i) for i in v])]
+                new_fixtures[k] = [j[3] for j in fixture_sorter([(i.id, i.court, i.bye, i) for i in v])]
             fixtures = new_fixtures
 
             games = c.execute(
@@ -841,9 +843,10 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
         court = int(request.args.get("court"))
         with DatabaseManager() as c:
             tournament = get_tournament_id(request.args.get("tournament"), c)
-            game_id = c.execute("""SELECT id FROM games WHERE court = ? AND tournamentId = ? AND started = 1 ORDER BY id desc""",
-                                (court, tournament)).fetchone()
-        return scoreboard( )
+            game_id = c.execute(
+                """SELECT id FROM games WHERE court = ? AND tournamentId = ? AND started = 1 ORDER BY id desc""",
+                (court, tournament)).fetchone()
+        return scoreboard()
 
     @app.get("/games/<game_id>/")
     def game_site(game_id):
@@ -1950,7 +1953,8 @@ FROM games
                     WHERE games.id = ?
                     GROUP BY teams.id
 ORDER BY teams.id <> games.teamOne""", (game_id,)).fetchall()
-            players_query = c.execute("""SELECT
+            players_query = c.execute("""
+SELECT
             playerGameStats.teamId, people.name, people.searchableName, playerGameStats.cardTimeRemaining <> 0,
             playerGameStats.points,
             playerGameStats.aces,
@@ -1966,12 +1970,17 @@ FROM games
          INNER JOIN playerGameStats on games.id = playerGameStats.gameId AND (eventType is null or (playerGameStats.playerId = gameEvents.teamOneLeft OR playerGameStats.playerId = gameEvents.teamOneRight
             OR playerGameStats.playerId = gameEvents.teamTwoLeft OR playerGameStats.playerId = gameEvents.teamTwoRight))
          INNER JOIN people on people.id = playerGameStats.playerId
-         WHERE games.id = ? ORDER BY playerGameStats.teamId, (gameEvents.teamOneLeft = playerGameStats.playerId OR gameEvents.teamTwoLeft = playerGameStats.playerId) DESC""", (game_id,)).fetchall()
+         INNER JOIN teams on playerGameStats.teamId = teams.id
+         WHERE games.id = ? 
+         ORDER BY playerGameStats.teamId, (gameEvents.teamOneLeft = playerGameStats.playerId OR gameEvents.teamTwoLeft = playerGameStats.playerId) DESC, teams.substitute = playerGameStats.playerId""",
+                                      (game_id,)).fetchall()
+
             cards_query = c.execute("""SELECT people.name, playerGameStats.teamId, type, reason, hex 
             FROM punishments 
             INNER JOIN people on people.id = punishments.playerId
             INNER JOIN playerGameStats on playerGameStats.playerId = punishments.playerId and playerGameStats.teamId = punishments.teamId and playerGameStats.gameId = ?
-         WHERE playerGameStats.tournamentId = punishments.tournamentId""", (game_id,)).fetchall()
+         WHERE playerGameStats.tournamentId = punishments.tournamentId
+         """, (game_id,)).fetchall()
             officials_query = c.execute("""SELECT searchableName, name 
 FROM officials INNER JOIN people on officials.personId = people.id""").fetchall()
 
@@ -2103,7 +2112,8 @@ FROM officials INNER JOIN people on officials.personId = people.id""").fetchall(
                     game=game,
                     timeout_time=manageGame.get_timeout_time(game_id) * 1000,
                     timeout_first=manageGame.get_timeout_caller(game_id),
-                    match_points=0 if (max([i.score for i in teams]) < 10 or game.someone_has_won) else abs(teams[0].score - teams[1].score),
+                    match_points=0 if (max([i.score for i in teams]) < 10 or game.someone_has_won) else abs(
+                        teams[0].score - teams[1].score),
                     VERBAL_WARNINGS=VERBAL_WARNINGS
                 ),
                 200,
@@ -2356,6 +2366,7 @@ FROM games
     @app.get("/players/")
     def universal_players_site():
         return players_site(None)
+
     @app.get("/players/detailed/")
     def universal_detailed_players_site():
         return detailed_players_site(None)
