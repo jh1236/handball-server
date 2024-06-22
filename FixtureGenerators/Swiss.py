@@ -44,10 +44,12 @@ class Swiss(FixturesGenerator):
             for j in range(len(teams)):
                 index = (initial + j) % len(teams) # to match teams with the same "skill" level, while prioritising players
                 team2 = teams[index]
-                if self.__can_be_played(previousGames, team1, team2):
+
+                if self.__can_be_played(previousGames, team1, team2) and team1 != team2 and team2 and team1:
                     games += [(team1, team2)]
                     # remove the team from the priority list as well
                     found = True
+                    print(team2)
                     priority.remove(team2)
                     teams.remove(team2)
                     break
@@ -64,7 +66,7 @@ class Swiss(FixturesGenerator):
             rounds = (c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament,)).fetchone()[0] or 0) + 1
             teamCount = c.execute("SELECT COUNT(*) FROM tournamentTeams WHERE tournamentId = ?;", (tournament,)).fetchone()[0]
             
-            maxRound = ceil(log2(teamCount)) + 1 # we will do 1 round above the maximum
+            maxRound = ceil(log2(teamCount)) + 2 # we will do 1 round above the maximum
             if rounds == 1:
                 teams = c.execute(
                     """
