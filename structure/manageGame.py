@@ -80,8 +80,9 @@ SELECT playerGameStats.playerId
 FROM games
          INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
          INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamOne
+         INNER JOIN teams ON playerGameStats.teamId = teams.id
          WHERE games.id = ?
-         ORDER BY teamOneLeft = playerGameStats.playerId = ? DESC
+         ORDER BY teams.substitute = playerGameStats.playerId, (teamOneLeft = playerGameStats.playerId) = ? DESC
 """, (game_id, left_player)).fetchone()
         player = player[0]
     else:
@@ -89,8 +90,9 @@ FROM games
 FROM games
          INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
          INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamTwo
+         INNER JOIN teams ON playerGameStats.teamId = teams.id
          WHERE games.id = ?
-         ORDER BY (teamTwoLeft = playerGameStats.playerId) = ? DESC
+         ORDER BY teams.substitute = playerGameStats.playerId, (teamTwoLeft = playerGameStats.playerId) = ? DESC
         """, (game_id, left_player)).fetchone()[0]
     return player
 

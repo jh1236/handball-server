@@ -1972,7 +1972,7 @@ FROM games
          INNER JOIN people on people.id = playerGameStats.playerId
          INNER JOIN teams on playerGameStats.teamId = teams.id
          WHERE games.id = ? 
-         ORDER BY playerGameStats.teamId, (gameEvents.teamOneLeft = playerGameStats.playerId OR gameEvents.teamTwoLeft = playerGameStats.playerId) DESC, teams.substitute = playerGameStats.playerId""",
+         ORDER BY playerGameStats.teamId, teams.substitute = playerGameStats.playerId, (gameEvents.teamOneLeft = playerGameStats.playerId OR gameEvents.teamTwoLeft = playerGameStats.playerId) DESC""",
                                       (game_id,)).fetchall()
 
             cards_query = c.execute("""SELECT people.name, playerGameStats.teamId, type, reason, hex 
