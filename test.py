@@ -47,4 +47,4 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
 if __name__ == '__main__':
     # regen_elo()
     manageGame.create_tournament("The Sixth SUSS Championship", "Swiss", "BasicFinals",
-                                 True, True, True, [93, 92, 40, 52, 94, 95, 56], [2, 4, 3, 1, 7, 9, 13])
+                                 True, True, True, [93, 92, 40, 52, 94, 95, 56], [2, 4, 3, 1, 7, 9])

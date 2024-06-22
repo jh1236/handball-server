@@ -843,7 +843,7 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
             tournament = get_tournament_id(request.args.get("tournament"), c)
             game_id = c.execute("""SELECT id FROM games WHERE court = ? AND tournamentId = ? AND started = 1 ORDER BY id desc""",
                                 (court, tournament)).fetchone()
-        return scoreboard(game_id[0])
+        return scoreboard( )
 
     @app.get("/games/<game_id>/")
     def game_site(game_id):
@@ -1232,7 +1232,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games
         priority = {
             "Name": 1,
             "B&F Votes": 1,
-            "Elo": 2,
+            "Elo": 1,
             "Points Scored": 2,
             "Aces Scored": 2,
             "Faults": 5,
@@ -1304,7 +1304,7 @@ GROUP BY people.id""",
         for i in players_query:
             players.append(
                 (i[2], i[0], i[1], [(v, (priority_to_classname(priority[k]))) for k, v in zip(player_headers, i[3:])]))
-
+        print(players[1])
         return (
             render_template_sidebar(
                 "tournament_specific/players.html",
@@ -1518,8 +1518,8 @@ group by people.searchableName
        coalesce(SUM(playerGameStats.isBestPlayer), 0),
        ROUND(1500.0 + (SELECT SUM(eloChange)
                        from eloChange
-                       where eloChange.playerId = people.id AND eloChange.id <=
-                                                                (SELECT MAX(id) FROM eloChange WHERE eloChange.tournamentId = playerGameStats.tournamentId)), 2) as elo,
+                       where eloChange.playerId = people.id AND eloChange.gameid <=
+                                                                (SELECT MAX(id) FROM games WHERE games.tournamentId = playerGameStats.tournamentId)), 2) as elo,
        coalesce(SUM(winningTeam = teams.id), 0),
        coalesce(SUM(winningTeam <> teams.id), 0),
        COUNT(DISTINCT games.id),
