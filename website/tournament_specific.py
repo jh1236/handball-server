@@ -1138,33 +1138,33 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
                teams.imageURL
            end,
        tournamentTeams.pool,
-       COUNT(DISTINCT games.id)                      as played,
-       SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam,
-               0))                                   as wins,
+       COUNT(DISTINCT IIF(g.someOneHasWon, g.id, null)) as played,
+       SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = g.winningTeam,
+               0))                                      as wins,
        ROUND(100.0 * coalesce(
-               Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) /
-               COUNT(DISTINCT games.id), 0),
+               Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = g.winningTeam, 0)) AS REAL) /
+               COUNT(DISTINCT IIF(g.someOneHasWon, g.id, null)), 0),
              2) ||
-       '%'                                           as percentage,
-       COUNT(DISTINCT games.id) - SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam,
-                                          0))        as losses,
-       coalesce(SUM(playerGameStats.greenCards), 0)  as greenCards,
-       coalesce(SUM(playerGameStats.yellowCards), 0) as yellowCards,
-       coalesce(SUM(playerGameStats.redCards), 0)    as redCards,
-       coalesce(SUM(playerGameStats.faults), 0)      as faults,
+       '%'                                              as percentage,
+       COUNT(DISTINCT IIF(g.someOneHasWon, g.id, null)) - SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = g.winningTeam,
+                                      0))               as losses,
+       coalesce(SUM(playerGameStats.greenCards), 0)     as greenCards,
+       coalesce(SUM(playerGameStats.yellowCards), 0)    as yellowCards,
+       coalesce(SUM(playerGameStats.redCards), 0)       as redCards,
+       coalesce(SUM(playerGameStats.faults), 0)         as faults,
        SUM(IIF(playerGameStats.playerId = teams.captain,
-               IIF(games.teamOne = teams.id, teamOneTimeouts, teamTwoTimeouts), 0)),
-       coalesce(SUM(playerGameStats.points), 0)      as pointsScored,
+               IIF(g.teamOne = teams.id, teamOneTimeouts, teamTwoTimeouts), 0)),
+       coalesce(SUM(playerGameStats.points), 0)         as pointsScored,
        coalesce((SELECT SUM(playerGameStats.points)
                  FROM playerGameStats
                  where playerGameStats.opponentId = teams.id
                    and playerGameStats.tournamentId = tournaments.id),
-                0)                                   as pointsConceded,
+                0)                                      as pointsConceded,
        coalesce(SUM(playerGameStats.points) - (SELECT SUM(playerGameStats.points)
                                                FROM playerGameStats
                                                where playerGameStats.opponentId = teams.id
                                                  and playerGameStats.tournamentId = tournaments.id),
-                0)                                   as difference,
+                0)                                      as difference,
        ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
                                 from eloChange
                                          INNER JOIN teams inside ON inside.id = teams.id
@@ -1174,22 +1174,26 @@ order by teams.id <> games.teamOne, (playerGameStats.playerId <> lastGE.teamOneL
                                 where eloChange.playerId = sub.id
                                    or eloChange.playerId = captain.id
                                    or eloChange.playerId = nonCaptain.id AND eloChange.gameId <=
-                                                                             (SELECT MAX(id) FROM games WHERE games.tournamentId = tournaments.id)), 0)
+                                                                             (SELECT MAX(id)
+                                                                              FROM games inn
+                                                                              WHERE inn.tournamentId = tournaments.id)),
+                               0)
            /
                       COUNT(teams.captain is not null + teams.noncaptain is not null + teams.substitute is not null),
-             2)                                     as elo
+             2)                                         as elo
 
 FROM teams
          INNER JOIN tournamentTeams on teams.id = tournamentTeams.teamId
-         LEFT JOIN (SELECT * FROM games WHERE someoneHasWon = 1) as games ON (games.teamOne = teams.id OR games.teamTwo = teams.id) AND games.isFinal = 0 AND
-                            games.isBye = 0 AND (IIF(? is null, games.isRanked, 1) OR teams.nonCaptain is null) AND games.tournamentId = tournamentTeams.tournamentId
-         LEFT JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
+         LEFT JOIN games g ON (g.teamOne = teams.id OR g.teamTwo = teams.id) AND g.isFinal = 0 AND
+                              g.isBye = 0 AND (IIF(? is null, g.isRanked, 1) OR teams.nonCaptain is null) AND
+                              g.tournamentId = tournamentTeams.tournamentId
+         LEFT JOIN playerGameStats ON teams.id = playerGameStats.teamId AND g.id = playerGameStats.gameId
          LEFT JOIN tournaments on tournaments.id = tournamentTeams.tournamentId
 
 where IIF(? is NULL, 1, tournaments.id = ?)
 GROUP BY teams.name
-ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games.winningTeam, 0)) AS REAL) /
-         COUNT(DISTINCT games.id) DESC,
+ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = g.winningTeam, 0)) AS REAL) /
+         COUNT(DISTINCT g.id) DESC,
          difference DESC,
          pointsScored DESC,
          greenCards + yellowCards + redCards ASC,
