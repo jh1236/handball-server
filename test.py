@@ -9,7 +9,7 @@ def regen_elo():
         request = c.execute("""SELECT id, tournamentId FROM games""").fetchall()
         for game_id, tournament_id in request:
             players = c.execute("""
-SELECT games.isRanked as ranked,
+SELECT games.isRanked and not games.isFinal as ranked,
        games.winningTeam = teamId as myTeamWon,
        games.teamOne <> playerGameStats.teamId as isSecond,
        ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
@@ -45,6 +45,6 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
 
 
 if __name__ == '__main__':
-    # regen_elo()
-    manageGame.create_tournament("The Sixth SUSS Championship", "Swiss", "BasicFinals",
-                                 True, True, True, [93, 92, 40, 52, 96, 95, 56], [2, 4, 3, 1, 7, 9])
+    regen_elo()
+    # manageGame.create_tournament("The Sixth SUSS Championship", "Swiss", "BasicFinals",
+    #                              True, True, True, [93, 92, 40, 52, 96, 95, 56], [2, 4, 3, 1, 7, 9])

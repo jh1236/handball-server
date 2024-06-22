@@ -448,7 +448,7 @@ def end_game(game_id, bestPlayer,
             _add_to_game(game_id, c, "Protest", False, None, notes=protest_team_two)
         _add_to_game(game_id, c, "End Game", None, None, notes=notes, details=best)
         teams = c.execute("""
-SELECT games.isRanked as ranked,
+SELECT games.isRanked and not games.isFinal as ranked,
        games.winningTeam = teamId as myTeamWon,
        games.teamOne <> playerGameStats.teamId as isSecond,
        ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
