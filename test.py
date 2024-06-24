@@ -1,3 +1,5 @@
+from database import db
+from start import app
 from structure import manageGame
 from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
@@ -43,8 +45,11 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
                     """INSERT INTO eloChange(gameId, playerId, tournamentId, eloChange) VALUES (?, ?, ?, ?)""",
                     (game_id, player_id, tournament_id, elo_delta))
 
+import database.models as models
 
 if __name__ == '__main__':
-    regen_elo()
-    # manageGame.create_tournament("The Sixth SUSS Championship", "Swiss", "BasicFinals",
-    #                              True, True, True, [93, 92, 40, 52, 96, 95, 56], [2, 4, 3, 1, 7, 9])
+    with app.app_context():
+        db.create_all()
+        print(models.People.query.all())
+
+

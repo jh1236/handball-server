@@ -180,7 +180,7 @@ WHERE playerGameStats.id = lg.id
 
 
 if __name__ == "__main__":
-    database_file = './resources/database.db'
+    database_file = 'resources/database.db'
     if os.path.exists(database_file):
         os.remove(database_file)
 
