@@ -29,6 +29,6 @@ class People(db.Model):
     name = db.Column(db.Text(), nullable=False)
     searchable_name = db.Column(db.Text(), nullable=False)
     password = db.Column(db.Text())
-    imageUrl = db.Column(db.Text())
+    image_url = db.Column(db.Text())
     session_token = db.Column(db.Text())
     token_timeout = db.Column(db.Integer())
