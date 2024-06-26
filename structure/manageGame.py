@@ -13,6 +13,7 @@ def searchable_of(name: str):
     s = name.lower().replace(" ", "_").replace(",", "").replace("the_", "")
     return re.sub("[^a-zA-Z0-9_]", "", s)
 
+
 def sync(c, game_id):
     c.execute("""UPDATE games
 SET teamOneScore    = lg.teamOneScore,
@@ -148,7 +149,7 @@ def game_has_started(game_id, c):
     return c.execute("""SELECT started FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
 
 
-def _score_point(game_id, c, first_team, left_player, penalty=False, points = 1):
+def _score_point(game_id, c, first_team, left_player, penalty=False, points=1):
     if game_is_over(game_id, c):
         raise ValueError("Game is Already Over!")
     for _ in range(points):
@@ -176,7 +177,9 @@ def _add_to_game(game_id, c, char: str, first_team, left_player, team_to_serve=N
     """IMPORTANT: if the item added to game is a penalty, THE CALLER IS RESPONSIBLE FOR SYNCING"""
     player = _team_and_position_to_id(game_id, first_team, left_player, c) if left_player is not None else None
     team = get_information.get_team_id_from_game_and_side(game_id, first_team, c) if first_team is not None else None
-    next_team_to_serve = None if team_to_serve is None else get_information.get_team_id_from_game_and_side(game_id, team_to_serve, c)
+    next_team_to_serve = None if team_to_serve is None else get_information.get_team_id_from_game_and_side(game_id,
+                                                                                                           team_to_serve,
+                                                                                                           c)
     players = _get_player_details(game_id, c)
     tournament = _tournament_from_game(game_id, c)
     team_who_served, player_who_served, serve_side = _get_serve_details(game_id, c)
@@ -439,7 +442,8 @@ def end_game(game_id, bestPlayer,
             allowed = c.execute("""SELECT SUM(eventType = 'Forfeit') > 0 FROM gameEvents WHERE gameId = ?""",
                                 (game_id,)).fetchone()[0]
             allowed |= bool(c.execute("""SELECT teams.id FROM games INNER JOIN teams ON 
-            (teams.id = games.teamOne or games.teamTwo = teams.id) WHERE (teams.nonCaptain is null) AND games.id = ?""", (game_id,)).fetchone())
+            (teams.id = games.teamOne or games.teamTwo = teams.id) WHERE (teams.nonCaptain is null) AND games.id = ?""",
+                                      (game_id,)).fetchone())
             if not allowed:
                 raise ValueError("Best Player was not provided")
         if protest_team_one:
@@ -479,9 +483,13 @@ FROM games
             c.execute("""UPDATE games SET adminStatus = 'Official' WHERE id = ?""", (game_id,))
         end_time = time.time() - start_time
 
-        c.execute("""UPDATE games SET status = 'Official', noteableStatus = adminStatus, length = ?, bestPlayer = ?, notes = ? WHERE id = ?""", (end_time, best, notes.strip(), game_id,))
+        c.execute(
+            """UPDATE games SET status = 'Official', noteableStatus = adminStatus, length = ?, bestPlayer = ?, notes = ? WHERE id = ?""",
+            (end_time, best, notes.strip(), game_id,))
 
-        c.execute("""UPDATE playerGameStats SET isBestPlayer = (SELECT games.bestPlayer = playerGameStats.playerId FROM games WHERE games.id = playerGameStats.gameId) WHERE playerGameStats.gameid = ?""", (game_id,))
+        c.execute(
+            """UPDATE playerGameStats SET isBestPlayer = (SELECT games.bestPlayer = playerGameStats.playerId FROM games WHERE games.id = playerGameStats.gameId) WHERE playerGameStats.gameid = ?""",
+            (game_id,))
 
         if teams[0][0]:  # the game is unranked, so doing elo stuff is silly
             elos = [0, 0]
@@ -522,11 +530,9 @@ FROM games
             finals.end_of_round()
 
 
-
 def substitute(game_id, first_team, left_player):
     with DatabaseManager() as c:
         _add_to_game(game_id, c, "Substitute", first_team, left_player)
-
 
 
 def create_game(tournamentId, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,
@@ -617,12 +623,11 @@ WHERE (captain = ? or nonCaptain = ? or substitute = ?)
                 last_start, round_number = (-1, 0)
             else:
                 last_start, round_number = last_start
-            last_start = last_start or 1
+            print(f"{time.time() - last_start }, {round_number}")
             if (
                     time.time()
                     - last_start
-                    > 32400 and
-                    round_number < 0
+                    > 32400
             ):
                 round_number = round_number + 1
         is_bye = 1 in [first_team, second_team]
