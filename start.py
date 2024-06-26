@@ -1,9 +1,7 @@
 import flask
 
 from database import db
-import database.models
 from structure.Tournament import load_all_tournaments
-from utils.databaseManager import DatabaseManager
 from website.website import init_api
 
 app = flask.Flask(__name__)
@@ -15,6 +13,7 @@ comps = load_all_tournaments()
 db.init_app(app)
 init_api(app, comps)
 
+import database.models
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

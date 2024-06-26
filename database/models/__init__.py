@@ -7,3 +7,5 @@ from .Teams import Teams
 from .TournamentOfficials import TournamentOfficials
 from .TournamentTeams import TournamentTeams
 from .Tournaments import Tournaments
+from .Taunts import Taunts
+from .EloChange import EloChange
