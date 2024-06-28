@@ -66,6 +66,7 @@ class PlayerGameStats(db.Model):
     start_side = db.Column(db.Text())
 
     tournament = db.relationship("Tournaments", foreign_keys=[tournament_id])
+    player = db.relationship("People", foreign_keys=[player_id])
     team = db.relationship("Teams", foreign_keys=[team_id])
     opponent = db.relationship("Teams", foreign_keys=[opponent_id])
     game = db.relationship("Games", foreign_keys=[game_id])

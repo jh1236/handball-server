@@ -458,10 +458,10 @@ END;
 
 
 class DatabaseManager:
-    def __init__(self, force_create_tables=False, path = None):
+    def __init__(self, force_create_tables=False, path=None):
         self.closed = False
-        self.path = path or "./resources/database.db"
-        self.conn = sqlite3.connect("./resources/database.db")
+        self.path = path or "./instance/database.db"
+        self.conn = sqlite3.connect("./instance/database.db")
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.conn.commit()
         # Create a cursor with read-only permission
