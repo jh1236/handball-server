@@ -1,6 +1,5 @@
 """Defines the comments object and provides functions to get and manipulate one"""
-
-from datetime import datetime
+import time
 
 from database import db
 
@@ -40,7 +39,7 @@ class PlayerGameStats(db.Model):
 
     # Auto-initialised fields
     id = db.Column(db.Integer(), primary_key=True)
-    created_at = db.Column(db.DateTime(), default=datetime.now, nullable=False)
+    created_at = db.Column(db.Integer(), default=time.time, nullable=False)
 
     # Set fields
     game_id = db.Column(db.Integer(), db.ForeignKey("games.id"), nullable=False)
@@ -67,6 +66,7 @@ class PlayerGameStats(db.Model):
     start_side = db.Column(db.Text())
 
     tournament = db.relationship("Tournaments", foreign_keys=[tournament_id])
+    player = db.relationship("People", foreign_keys=[player_id])
     team = db.relationship("Teams", foreign_keys=[team_id])
     opponent = db.relationship("Teams", foreign_keys=[opponent_id])
     game = db.relationship("Games", foreign_keys=[game_id])

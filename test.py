@@ -1,6 +1,8 @@
+from sqlalchemy import select
+
 from database import db
+from database.models import *
 from start import app
-from structure import manageGame
 from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
 
@@ -23,7 +25,7 @@ SELECT games.isRanked and not games.isFinal as ranked,
          INNER JOIN games ON playerGameStats.gameId = games.id
 WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
             if not players[0][0]:
-                continue # the game is unranked, so doing elo stuff is silly
+                continue  # the game is unranked, so doing elo stuff is silly
             elos = [0, 0]
             team_sizes = [0, 0]
             for i in players:
@@ -45,11 +47,19 @@ WHERE games.id = ? ORDER BY isSecond""", (game_id,)).fetchall()
                     """INSERT INTO eloChange(gameId, playerId, tournamentId, eloChange) VALUES (?, ?, ?, ?)""",
                     (game_id, player_id, tournament_id, elo_delta))
 
-import database.models as models
 
 if __name__ == '__main__':
-    with app.app_context():
+    with (app.app_context()):
         db.create_all()
-        print(models.People.query.all())
-
-
+        """
+SELECT playerGameStats.playerId
+FROM games
+         INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
+         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamOne
+         INNER JOIN teams ON playerGameStats.teamId = teams.id
+         WHERE games.id = ?
+         ORDER BY teams.substitute = playerGameStats.playerId, (teamOneLeft = playerGameStats.playerId) = ? DESC
+"""
+        game = GameEvents.query.filter(GameEvents.game_id == 311).order_by(GameEvents.id.desc()).first()
+        print(game.team_one_left)
+        print([i.name for i in People.query.all()])

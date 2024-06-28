@@ -1,6 +1,5 @@
 """Defines the comments object and provides functions to get and manipulate one"""
-
-from datetime import datetime
+import time
 
 from database import db
 
@@ -23,7 +22,7 @@ class People(db.Model):
 
     # Auto-initialised fields
     id = db.Column(db.Integer(), primary_key=True)
-    created_at = db.Column(db.DateTime(), default=datetime.now, nullable=False)
+    created_at = db.Column(db.Integer(), default=time.time, nullable=False)
 
     # Set fields
     name = db.Column(db.Text(), nullable=False)

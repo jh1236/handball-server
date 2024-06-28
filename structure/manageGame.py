@@ -2,6 +2,8 @@ import re
 import time
 
 from FixtureGenerators.FixturesGenerator import get_type_from_name
+from database.database_utilities import on_court_for_game
+from database.models import *
 from structure import get_information
 from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
@@ -74,42 +76,29 @@ def game_string_lookup(char: str):
 
 
 def _team_and_position_to_id(game_id, first_team, left_player, c) -> int:
+    game = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
+
     if first_team:
-        player = c.execute("""
-SELECT playerGameStats.playerId
-FROM games
-         INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
-         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamOne
-         INNER JOIN teams ON playerGameStats.teamId = teams.id
-         WHERE games.id = ?
-         ORDER BY teams.substitute = playerGameStats.playerId, (teamOneLeft = playerGameStats.playerId) = ? DESC
-""", (game_id, left_player)).fetchone()
-        player = player[0]
+        left = game.team_one_left_id
+        right = game.team_one_right_id or left
+        return [right, left][left_player]
     else:
-        player = c.execute("""SELECT playerGameStats.playerId
-FROM games
-         INNER JOIN gameEvents ON gameEvents.id = (SELECT max(id) FROM gameEvents WHERE games.id = gameEvents.gameId)
-         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND playerGameStats.teamId = games.teamTwo
-         INNER JOIN teams ON playerGameStats.teamId = teams.id
-         WHERE games.id = ?
-         ORDER BY teams.substitute = playerGameStats.playerId, (teamTwoLeft = playerGameStats.playerId) = ? DESC
-        """, (game_id, left_player)).fetchone()[0]
-    return player
+        left = game.team_two_left_id
+        right = game.team_two_right_id or left
+        return [right, left][left_player]
 
 
 def _tournament_from_game(game_id, c):
-    return c.execute("""SELECT tournamentId FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
+    return Games.query.filter(Games.id == game_id).first().tournament_id
 
 
 def _swap_server(game_id, team_to_serve, c, swap=True):
-    query = c.execute(
-        """SELECT sideServed FROM gameEvents WHERE gameId = ? AND teamWhoServed = ? ORDER BY id DESC LIMIT 1""",
-        (game_id, team_to_serve)).fetchone()
+    game = GameEvents.query.filter((GameEvents.game_id == game_id) & (GameEvents.team_who_served_id == team_to_serve)).order_by(GameEvents.id.desc()).first()
 
-    if query is None:  # this team is yet to serve
+    if game is None:  # this team is yet to serve
         old_side = "Right" if swap else "Left"
     else:
-        old_side = query[0]
+        old_side = game.side_served
     if swap:
         if old_side == "Left":
             new_side = "Right"
@@ -117,27 +106,15 @@ def _swap_server(game_id, team_to_serve, c, swap=True):
             new_side = "Left"
     else:
         new_side = old_side
-    player_to_serve = c.execute(
-        """SELECT playerGameStats.playerId,
-       (teamOneLeft = playerGameStats.playerId OR teamTwoLeft = playerGameStats.playerId) = (? = 'Left') as o
-FROM games
-         INNER JOIN gameEvents ON gameEvents.id = (SELECT MAX(id) FROM gameEvents WHERE gameEvents.gameId = games.id)
-         INNER JOIN playerGameStats ON games.id = playerGameStats.gameId AND (teamOneLeft = playerGameStats.playerId OR
-                                                                              teamOneRight = playerGameStats.playerId OR
-                                                                              teamTwoLeft = playerGameStats.playerId OR
-                                                                              teamTwoRight = playerGameStats.playerId)
-WHERE games.id = ?
-  AND playerGameStats.teamId = ?
-  AND cardTimeRemaining = 0
-ORDER BY o desc""",
-        (new_side, game_id, team_to_serve)).fetchall()
+    players = on_court_for_game(game_id, team_to_serve)
+    player_to_serve = next(i.player_id for i in players if i.card_time_remaining == 0)
     if not player_to_serve:
         return None, None
-    return player_to_serve[0][0], new_side
+    return player_to_serve, new_side
 
 
 def game_is_over(game_id, c):
-    return c.execute("""SELECT someoneHasWon FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
+    return Games.query.filter(Games.id == game_id)
 
 
 def game_is_ended(game_id, c):
