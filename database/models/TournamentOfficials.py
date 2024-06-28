@@ -24,6 +24,8 @@ class TournamentOfficials(db.Model):
     # Set fields
     tournament_id = db.Column(db.Integer(), db.ForeignKey("tournaments.id"), nullable=False)
     official_id = db.Column(db.Integer(), db.ForeignKey("officials.id"), nullable=False)
+    is_scorer = db.Column(db.Boolean(), default=True, nullable=False)
+    is_umpire = db.Column(db.Boolean(), default=True, nullable=False)
 
     tournament = db.relationship("Tournaments")
     official = db.relationship("Officials")

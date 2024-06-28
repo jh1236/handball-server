@@ -7,11 +7,11 @@ from database import db
 
 # create table main.taunts
 # (
-#     id    INTEGER
-# primary key autoincrement,
+#     id    INTEGER primary key autoincrement,
 # event TEXT,
 # taunt TEXT
 # );
+#
 
 
 class Taunts(db.Model):
