@@ -2,6 +2,7 @@
 import time
 
 from database import db
+from database.models import People
 
 
 # create table main.gameEvents
@@ -36,22 +37,22 @@ class GameEvents(db.Model):
 
     # Set fields
     game_id = db.Column(db.Integer(), db.ForeignKey("games.id"), nullable=False)
-    team_id = db.Column(db.Integer(), db.ForeignKey("teams.id"), nullable=False)
-    player_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
     tournament_id = db.Column(db.Integer(), db.ForeignKey("tournaments.id"), nullable=False)
     event_type = db.Column(db.Text(), nullable=False)
+    team_id = db.Column(db.Integer(), db.ForeignKey("teams.id"))
+    player_id = db.Column(db.Integer(), db.ForeignKey("people.id"))
     details = db.Column(db.Integer())
     notes = db.Column(db.Text())
-    player_who_served_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
-    team_who_served_id = db.Column(db.Integer(), db.ForeignKey("teams.id"), nullable=False)
+    player_who_served_id = db.Column(db.Integer(), db.ForeignKey("people.id"))
+    team_who_served_id = db.Column(db.Integer(), db.ForeignKey("teams.id"))
     side_served = db.Column(db.Text())
-    player_to_serve_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
-    team_to_serve_id = db.Column(db.Integer(), db.ForeignKey("teams.id"), nullable=False)
+    player_to_serve_id = db.Column(db.Integer(), db.ForeignKey("people.id"))
+    team_to_serve_id = db.Column(db.Integer(), db.ForeignKey("teams.id"))
     side_to_serve = db.Column(db.Text())
-    team_one_left_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
-    team_one_right_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
-    team_two_left_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
-    team_two_right_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
+    team_one_left_id = db.Column(db.Integer(), db.ForeignKey("people.id"))
+    team_one_right_id = db.Column(db.Integer(), db.ForeignKey("people.id"))
+    team_two_left_id = db.Column(db.Integer(), db.ForeignKey("people.id"))
+    team_two_right_id = db.Column(db.Integer(), db.ForeignKey("people.id"))
 
     game = db.relationship("Games", foreign_keys=[game_id])
     team = db.relationship("Teams", foreign_keys=[team_id])

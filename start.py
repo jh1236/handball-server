@@ -13,7 +13,6 @@ comps = load_all_tournaments()
 db.init_app(app)
 init_api(app, comps)
 
-import database.models
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

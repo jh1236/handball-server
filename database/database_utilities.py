@@ -8,5 +8,7 @@ def on_court_for_game(game_id, team_id) -> list[PlayerGameStats]:
         | (game.team_one_right_id == PlayerGameStats.team_id)
         | (game.team_two_right_id == PlayerGameStats.team_id)
         | (game.team_two_left_id == PlayerGameStats.team_id)).filter(
-        (PlayerGameStats.game_id == game_id) & (PlayerGameStats.team_id == team_id)).all()
-    return players
+        (PlayerGameStats.game_id == game_id))
+    if team_id:
+        players = players.filter(PlayerGameStats.team_id == team_id)
+    return players.all()

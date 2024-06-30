@@ -93,3 +93,17 @@ class Games(db.Model):
     iga_side = db.relationship("Teams", foreign_keys=[iga_side_id])
     player_to_serve = db.relationship("People", foreign_keys=[player_to_serve_id])
     team_to_serve = db.relationship("Teams", foreign_keys=[team_to_serve_id])
+
+    def reset(self):
+        self.started = False
+        self.someone_has_won = False
+        self.ended = False
+        self.protested = False
+        self.resolved = False
+        self.best_player_id = None
+        self.team_one_score = 0
+        self.team_two_score = 0
+        self.team_one_timeouts = 0
+        self.team_two_timeouts = 0
+        self.notes = None
+        self.winning_team_id = None

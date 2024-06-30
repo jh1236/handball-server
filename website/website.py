@@ -24,7 +24,7 @@ def init_api(app, comps: dict[str, Tournament]):
         with DatabaseManager() as c:
             comps = c.execute(
                 """
-                SELECT name, searchableName, imageURL
+                SELECT name, searchable_name, image_url
                 FROM tournaments
                 """,
             ).fetchall()

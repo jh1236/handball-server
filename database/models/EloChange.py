@@ -17,7 +17,7 @@ from database import db
 
 
 class EloChange(db.Model):
-    __tablename__ = "eloChanges"
+    __tablename__ = "eloChange"
 
     # Auto-initialised fields
     id = db.Column(db.Integer(), primary_key=True)

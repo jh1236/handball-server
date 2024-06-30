@@ -53,8 +53,8 @@ class PlayerGameStats(db.Model):
     aces_scored = db.Column(db.Integer(), default=0, nullable=False)
     faults = db.Column(db.Integer(), default=0, nullable=False)
     double_faults = db.Column(db.Integer(), default=0, nullable=False)
-    points_served = db.Column(db.Integer(), default=0, nullable=False)
-    points_served_won = db.Column(db.Integer(), default=0, nullable=False)
+    served_points = db.Column(db.Integer(), default=0, nullable=False)
+    served_points_won = db.Column(db.Integer(), default=0, nullable=False)
     serves_received = db.Column(db.Integer(), default=0, nullable=False)
     serves_returned = db.Column(db.Integer(), default=0, nullable=False)
     warnings = db.Column(db.Integer(), default=0, nullable=False)
@@ -71,3 +71,21 @@ class PlayerGameStats(db.Model):
     opponent = db.relationship("Teams", foreign_keys=[opponent_id])
     game = db.relationship("Games", foreign_keys=[game_id])
 
+    def reset_stats(self):
+        self.rounds_on_court = 0
+        self.rounds_carded = 0
+        self.points_scored = 0
+        self.aces_scored = 0
+        self.faults = 0
+        self.double_faults = 0
+        self.served_points = 0
+        self.served_points_won = 0
+        self.serves_received = 0
+        self.serves_returned = 0
+        self.warnings = 0
+        self.green_cards = 0
+        self.yellow_cards = 0
+        self.red_cards = 0
+        self.card_time = 0
+        self.card_time_remaining = 0
+        self.start_side = 0

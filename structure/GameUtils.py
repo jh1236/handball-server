@@ -21,32 +21,32 @@ def game_string_to_commentary(game: int) -> list[str]:
     out = []
     with DatabaseManager() as c:
         game_events = c.execute("""SELECT
-    (SELECT taunt FROM taunts WHERE eventType = taunts.event ORDER BY random()) as newTaunt,
+    (SELECT taunt FROM taunts WHERE event_type = taunts.event ORDER BY random()) as newTaunt,
     people.name                                                                 as person,
     t1.name                                                                     as team,
     (SELECT people.name
      FROM teams
-              INNER JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
-              INNER JOIN people ON playerGameStats.playerId = people.id
-     WHERE (teamOneLeft = people.id OR teamOneRight = people.id OR teamTwoLeft = people.id OR teamTwoRight = people.id)
-       AND people.id <> gameEvents.playerId
+              INNER JOIN playerGameStats ON teams.id = playerGameStats.team_id AND games.id = playerGameStats.game_id
+              INNER JOIN people ON playerGameStats.player_id = people.id
+     WHERE (team_one_left_id = people.id OR team_one_right_id = people.id OR team_two_left_id = people.id OR team_two_right_id = people.id)
+       AND people.id <> gameEvents.player_id
        AND teams.id = t1.id)                                                    as team_mate,
     (SELECT people.name
      FROM teams
-              INNER JOIN playerGameStats ON playerGameStats.teamId = teams.id
-              INNER JOIN people ON playerGameStats.playerId = people.id
+              INNER JOIN playerGameStats ON playerGameStats.team_id = teams.id
+              INNER JOIN people ON playerGameStats.player_id = people.id
      WHERE teams.id = t2.id
      ORDER BY random())                                                         as other_player,
     t2.name                                                                     as other_team,
     off.name                                                                    as umpire
 
 FROM gameEvents
-         INNER JOIN people on people.id = gameEvents.playerId
-         INNER JOIN teams t1 on gameEvents.teamId = t1.id
-         INNER JOIN games on gameEvents.gameId = games.id
-         INNER JOIN officials on officials.id = games.official
-         INNER JOIN people off on off.id = officials.personId
-         INNER JOIN teams t2 on (games.teamTwo + games.teamOne - t1.id) = t2.id
+         INNER JOIN people on people.id = gameEvents.player_id
+         INNER JOIN teams t1 on gameEvents.team_id = t1.id
+         INNER JOIN games on gameEvents.game_id = games.id
+         INNER JOIN officials on officials.id = games.official_id
+         INNER JOIN people off on off.id = officials.person_id
+         INNER JOIN teams t2 on (games.team_two_id + games.team_one_id - t1.id) = t2.id
 
 WHERE games.id = ? AND newTaunt is not null AND (gameEvents.notes is null OR gameEvents.notes <> 'Penalty')
 GROUP BY gameEvents.id;""", (game,)).fetchall()
@@ -70,33 +70,33 @@ def game_string_to_events(game: int) -> list[str]:
     out = []
     with DatabaseManager() as c:
         game_events = c.execute("""SELECT
-       eventType as taunt,
+       event_type as taunt,
        people.name                                                                 as person,
        t1.name                                                                     as team,
        (SELECT people.name
         FROM teams
-                 INNER JOIN playerGameStats ON teams.id = playerGameStats.teamId AND games.id = playerGameStats.gameId
-                 INNER JOIN people ON playerGameStats.playerId = people.id
-        WHERE (teamOneLeft = people.id OR teamOneRight = people.id OR teamTwoLeft = people.id OR teamTwoRight = people.id) 
-          AND people.id <> gameEvents.playerId
+                 INNER JOIN playerGameStats ON teams.id = playerGameStats.team_id AND games.id = playerGameStats.game_id
+                 INNER JOIN people ON playerGameStats.player_id = people.id
+        WHERE (team_one_left_id = people.id OR team_one_right_id = people.id OR team_two_left_id = people.id OR team_two_right_id = people.id) 
+          AND people.id <> gameEvents.player_id
           AND teams.id = t1.id)                                                    as team_mate,
        (SELECT people.name
         FROM teams
-                 INNER JOIN playerGameStats ON playerGameStats.teamId = teams.id
-                 INNER JOIN people ON playerGameStats.playerId = people.id
-            AND (eventType <> 'Ace' OR (gameEvents.sideServed = 'Left') = (people.id = gameEvents.teamOneLeft OR people.id = gameEvents.teamTwoLeft))
+                 INNER JOIN playerGameStats ON playerGameStats.team_id = teams.id
+                 INNER JOIN people ON playerGameStats.player_id = people.id
+            AND (event_type <> 'Ace' OR (gameEvents.side_served = 'Left') = (people.id = gameEvents.team_one_left_id OR people.id = gameEvents.team_two_left_id))
         WHERE teams.id = t2.id
         ORDER BY random())                                                         as other_player,
        t2.name                                                                     as other_team,
        off.name                                                                    as umpire
 
 FROM gameEvents
-         INNER JOIN people on people.id = gameEvents.playerId
-         INNER JOIN teams t1 on gameEvents.teamId = t1.id
-         INNER JOIN games on gameEvents.gameId = games.id
-         INNER JOIN officials on officials.id = games.official
-         INNER JOIN people off on off.id = officials.personId
-         INNER JOIN teams t2 on (games.teamTwo + games.teamOne - t1.id) = t2.id
+         INNER JOIN people on people.id = gameEvents.player_id
+         INNER JOIN teams t1 on gameEvents.team_id = t1.id
+         INNER JOIN games on gameEvents.game_id = games.id
+         INNER JOIN officials on officials.id = games.official_id
+         INNER JOIN people off on off.id = officials.person_id
+         INNER JOIN teams t2 on (games.team_two_id + games.team_one_id - t1.id) = t2.id
 
 WHERE games.id = ? AND (gameEvents.notes is null OR gameEvents.notes <> 'Penalty')
 GROUP BY gameEvents.id""", (game,)).fetchall()

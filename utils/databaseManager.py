@@ -53,18 +53,18 @@ create_tournaments_table = """CREATE TABLE IF NOT EXISTS tournaments (
     imageURL TEXT
 );"""
 create_punishments_view = """CREATE VIEW IF NOT EXISTS punishments AS
-SELECT playerId as playerId,
-       teamId as teamId,
-       g.official as officialId,
-       g.id as gameId,
-       g.tournamentId as tournamentId,
-       REPLACE(eventType, ' Card', '') as type,
+SELECT player_id as player_id,
+       team_id as team_id,
+       g.official_id as official_id,
+       g.id as game_id,
+       g.tournament_id as tournament_id,
+       REPLACE(event_type, ' Card', '') as type,
        gameEvents.notes as reason,
-       case WHEN eventType = 'Green Card' THEN '#84AA63' WHEN eventType = 'Yellow Card' THEN '#C96500'  WHEN eventType = 'Red Card' THEN '#EC4A4A' ELSE '#777777' END as hex
+       case WHEN event_type = 'Green Card' THEN '#84AA63' WHEN event_type = 'Yellow Card' THEN '#C96500'  WHEN event_type = 'Red Card' THEN '#EC4A4A' ELSE '#777777' END as hex
 FROM gameEvents
-         INNER JOIN main.games g on gameEvents.gameId = g.id
-WHERE eventType LIKE '% Card'
-   or eventType = 'Warning';"""
+         INNER JOIN main.games g on gameEvents.game_id = g.id
+WHERE event_type LIKE '% Card'
+   or event_type = 'Warning';"""
 create_games_table = """CREATE TABLE IF NOT EXISTS games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournamentId INTEGER,
@@ -486,9 +486,9 @@ class DatabaseManager:
         self.read_write_c.execute(create_player_game_stats_table)
         self.read_write_c.execute(create_elo_change_table)
         self.read_write_c.execute(create_game_event_table)
-        self.read_write_c.execute(create_live_games_view)
+        # self.read_write_c.execute(create_live_games_view)
         self.read_write_c.execute(create_punishments_view)
-        self.read_write_c.execute(create_player_game_stats_view)
+        # self.read_write_c.execute(create_player_game_stats_view)
         # TOO SLOW!!
         # self.read_write_c.execute(create_insert_game_event_trigger)
         # self.read_write_c.execute(create_delete_game_event_trigger)

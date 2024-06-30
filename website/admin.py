@@ -57,9 +57,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                         INNER JOIN playerGameStats ON playerGameStats.gameId = games.id
                         INNER JOIN teams AS serving ON games.teamOne = serving.id 
                         INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
-                        LEFT JOIN officials AS u ON games.official = u.id
+                        LEFT JOIN officials AS u ON games.official_id = u.id
                             LEFT JOIN people AS umpire ON u.personId = umpire.id
-                        LEFT JOIN officials AS s ON games.scorer = s.id
+                        LEFT JOIN officials AS s ON games.scorer_id = s.id
                             LEFT JOIN people AS scorer ON s.personId = scorer.id
                         WHERE
                             games.tournamentId = ? AND
@@ -97,9 +97,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                         INNER JOIN playerGameStats ON playerGameStats.gameId = games.id
                         INNER JOIN teams AS serving ON games.teamOne = serving.id 
                         INNER JOIN teams AS receiving ON games.teamTwo = receiving.id
-                        LEFT JOIN officials AS u ON games.official = u.id
+                        LEFT JOIN officials AS u ON games.official_id = u.id
                             LEFT JOIN people AS umpire ON u.personId = umpire.id
-                        LEFT JOIN officials AS s ON games.scorer = s.id
+                        LEFT JOIN officials AS s ON games.scorer_id = s.id
                             LEFT JOIN people AS scorer ON s.personId = scorer.id
                         WHERE
                             games.tournamentId = ? AND
@@ -199,7 +199,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                                        coalesce(playerGameStats.redCards, 0),
                                        games.isBye,   --i[12]
                                        tournaments.name,
-                                       tournaments.searchableName,
+                                       tournaments.searchable_name,
                                        teams.name, --15
                                        teams.searchableName,
                                        games.teamOne = teams.id,
@@ -214,7 +214,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                                        best.name,
                                        best.searchableName,
                                        coalesce(games.startTime, -1),
-                                       tournaments.searchableName,
+                                       tournaments.searchable_name,
                                        teams.name, --30
                                        teams.searchableName,
                                        case 
@@ -234,9 +234,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
                                 FROM games
                                          LEFT JOIN playerGameStats on playerGameStats.gameId = games.id
                                          INNER JOIN tournaments on tournaments.id = games.tournamentId
-                                         LEFT JOIN officials o on o.id = games.official
+                                         LEFT JOIN officials o on o.id = games.official_id
                                          LEFT JOIN people po on po.id = o.personId
-                                         LEFT JOIN officials s on s.id = games.scorer
+                                         LEFT JOIN officials s on s.id = games.scorer_id
                                          LEFT JOIN people ps on ps.id = s.personId
                                          LEFT JOIN people on people.id = playerGameStats.playerId
                                          LEFT JOIN people best on best.id = games.bestPlayer
@@ -254,7 +254,7 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
          WHERE playerGameStats.gameId = ?
 """, (game_id,)).fetchall()
             other_matches = c.execute(
-                """ SELECT s.name, r.name, g2.teamOneScore, g2.teamTwoScore, g2.id, tournaments.searchableName
+                """ SELECT s.name, r.name, g2.teamOneScore, g2.teamTwoScore, g2.id, tournaments.searchable_name
                     FROM games g1
                              INNER JOIN games g2
                                         ON ((g2.teamOne = g1.teamOne AND g2.teamTwo = g1.teamTwo)
@@ -528,9 +528,9 @@ def add_admin_pages(app, comps: dict[str, Tournament]):
        ROUND(1500.0 + coalesce((SELECT SUM(eloChange)
                                 from eloChange
                                          INNER JOIN teams inside ON inside.id = teams.id
-                                         INNER JOIN people captain ON captain.id = inside.captain
+                                         INNER JOIN people captain ON captain.id = inside.captain_id
                                          LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
-                                         LEFT JOIN people sub ON sub.id = inside.substitute
+                                         LEFT JOIN people sub ON sub.id = inside.substitute_id
                                 where eloChange.playerId = sub.id
                                    or eloChange.playerId = captain.id
                                    or eloChange.playerId = nonCaptain.id AND eloChange.id <=
@@ -681,12 +681,12 @@ FROM punishments INNER JOIN teams ON teams.id = teamId INNER JOIN people ON play
 WHERE teams.searchableName = ?
   AND tournamentId = ?""", (team_name, tournament_id)).fetchall()
             key_games = c.execute(
-                """ SELECT s.name, r.name, g1.teamOneScore, g1.teamTwoScore, g1.id, tournaments.searchableName, noteableStatus
+                """ SELECT s.name, r.name, g1.teamOneScore, g1.teamTwoScore, g1.id, tournaments.searchable_name, noteableStatus
                     FROM games g1
                              INNER JOIN tournaments on g1.tournamentId = tournaments.id
                              INNER JOIN teams r on g1.teamTwo = r.id
                              INNER JOIN teams s on g1.teamOne = s.id
-                    WHERE (r.searchableName = ? or s.searchableName = ?) and tournaments.searchableName = ? and g1.ended = 1 AND g1.noteableStatus <> 'Official'
+                    WHERE (r.searchableName = ? or s.searchableName = ?) and tournaments.searchable_name = ? and g1.ended = 1 AND g1.noteableStatus <> 'Official'
                     ORDER BY g1.id DESC 
                     LIMIT 20""", (team_name, team_name, tournament)).fetchall()
         players = [PlayerStats(i[0], i[1], {k: v for k, v in zip(player_headers, i[2:])}) for i in players]
@@ -1052,7 +1052,7 @@ FROM punishments INNER JOIN people ON playerId = people.id
 WHERE people.searchableName = ?
   AND tournamentId = ?""", (player_name, tournament_id)).fetchall()
             key_games = c.execute(
-                """ SELECT s.name, r.name, g1.teamOneScore, g1.teamTwoScore, g1.id, tournaments.searchableName, noteableStatus
+                """ SELECT s.name, r.name, g1.teamOneScore, g1.teamTwoScore, g1.id, tournaments.searchable_name, noteableStatus
                     FROM games g1
                              INNER JOIN tournaments on g1.tournamentId = tournaments.id
                              INNER JOIN teams r on g1.teamTwo = r.id
@@ -1155,7 +1155,7 @@ WHERE people.searchableName = ?
                 (tournamentId,),
             ).fetchall()
             tourney = c.execute(
-                "SELECT name, searchableName, fixturesGenerator, isPooled from tournaments where id = ?",
+                "SELECT name, searchable_name, fixturesGenerator, isPooled from tournaments where id = ?",
                 (tournamentId,),
             ).fetchone()
 

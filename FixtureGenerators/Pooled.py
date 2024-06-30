@@ -16,9 +16,9 @@ SELECT tournamentTeams.teamId, pool,
 coalesce((SELECT SUM(eloChange)
                        from eloChange
                                 INNER JOIN teams inside ON inside.id = tournamentTeams.teamId
-                                INNER JOIN people captain ON captain.id = inside.captain
+                                INNER JOIN people captain ON captain.id = inside.captain_id
                                 LEFT JOIN people nonCaptain ON nonCaptain.id = inside.nonCaptain
-                                LEFT JOIN people sub ON sub.id = inside.substitute
+                                LEFT JOIN people sub ON sub.id = inside.substitute_id
                        where eloChange.playerId = sub.id
                           or eloChange.playerId = captain.id
                           or eloChange.playerId = nonCaptain.id)
