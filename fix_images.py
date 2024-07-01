@@ -18,7 +18,7 @@ def load_image(id_in, name):
 def load_images():
     global active, last_time
     with DatabaseManager() as c:
-        teams = c.execute("""Select id, name FROM teams WHERE imageUrl is null""").fetchall()
+        teams = c.execute("""Select id, name FROM teams WHERE image_url is null""").fetchall()
         for id, url in teams:
             active += 1
             threading.Thread(target=lambda: load_image(id, url)).start()
@@ -27,7 +27,7 @@ def load_images():
                 print(f"waiting on {active} threads")
                 last_time = time.time() + .5
         for id, url in images.items():
-            c.execute("""UPDATE teams SET imageURL = ? WHERE id = ?""", (url, id))
+            c.execute("""UPDATE teams SET image_uRL = ? WHERE id = ?""", (url, id))
 
 
 if __name__ == "__main__":
