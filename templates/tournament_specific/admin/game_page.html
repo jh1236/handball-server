@@ -144,7 +144,7 @@
             <div style="min-height: 150px">
                 <h2>Resolve</h2>
                 <br>
-                {% if not game.status not in ['Official', 'Resolved']  %}
+                {% if not game.status not in ['Official', 'Resolved', 'Bye']  %}
                     <i>This game does not need resolution</i>
                 {% else %}
                     <button onclick="resolveGame()" class="button">Resolve</button>

@@ -181,6 +181,6 @@ h1.big {
 }
 
 @keyframes yellow_animation {
-    0%   {font-size: 100px; color: #7D4F0A; height: 400px; transform: translate(0, -100%)}
-    40%   {font-size: 100px; color: #7D4F0A; height: 400px; transform: translate(0, -100%)}
+    0%   {font-size: 100px; width: 100%; color: #7D4F0A; height: 400px; transform: translate(0, -100%)}
+    40%   {font-size: 100px;width: 100%; color: #7D4F0A; height: 400px; transform: translate(0, -100%)}
 }

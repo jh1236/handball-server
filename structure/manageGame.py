@@ -102,11 +102,15 @@ def sync(game_id):
             case "End Game":
                 game.best_player_id = i.details
                 game.notes = i.notes
-                game.winning_team_id = game.team_one if game.team_one_score > game.team_two_score else game.team_two
+                game.ended = True
             case "Start":
                 game.started = True
             case _:
                 pass
+
+    if max(game.team_two_score, game.team_one_score) >= 11 and abs(game.team_two_score - game.team_one_score) >= 2:
+        game.someone_has_won = True
+        game.winning_team_id = game.team_one_id if game.team_one_score > game.team_two_score else game.team_two_id
     if i:  # cursed python, i will always be the last
         game.player_to_serve_id = i.player_to_serve_id
         game.team_to_serve_id = i.team_to_serve_id
@@ -170,13 +174,20 @@ def _score_point(game_id, first_team, left_player, penalty=False, points=1):
 def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None, details=None, notes=None):
     """IMPORTANT: if the item added to game is a penalty, THE CALLER IS RESPONSIBLE FOR SYNCING"""
     game = Games.query.filter(Games.id == game_id).first()
-    team = Teams.query.filter(Teams.id == (game.team_one_id if first_team else game.team_two_id)).first()
-    last_game_event = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
-    player: PlayerGameStats
-    if first_team:
-        player = last_game_event.team_one_left if left_player else last_game_event.team_one_right
+    if first_team is not None:
+        team = Teams.query.filter(Teams.id == (game.team_one_id if first_team else game.team_two_id)).first()
     else:
-        player = last_game_event.team_two_left if left_player else last_game_event.team_two_right
+        team = None
+    last_game_event = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
+    player: PlayerGameStats | None
+    if left_player is None:
+        player = None
+    else:
+        if first_team:
+            player = last_game_event.team_one_left if left_player else last_game_event.team_one_right
+        else:
+            player = last_game_event.team_two_left if left_player else last_game_event.team_two_right
+
     next_team_to_serve = None if team_to_serve is None else Teams.query.filter(
         Teams.id == (game.team_one_id if team_to_serve else game.team_two_id)).first().id
     players = on_court_for_game(game_id, None)
@@ -213,8 +224,11 @@ def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None
 
     print(serve_side)
 
+    team_id = team.id if team is not None else None
+    player_id = player.id if player is not None else None
+
     to_add = GameEvents(game_id=game.id, tournament_id=game.tournament_id, event_type=char,
-                        details=details, notes=notes, team_id=team.id, player_id=player.id,
+                        details=details, notes=notes, team_id=team_id, player_id=player_id,
                         team_who_served_id=team_who_served, player_who_served_id=player_who_served.id,
                         side_served=serve_side,
                         team_to_serve_id=next_team_to_serve, player_to_serve_id=next_player_to_serve.id,
@@ -386,7 +400,7 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
         _add_to_game(game_id, "Protest", True, None, notes=protest_team_one)
     if protest_team_two:
         _add_to_game(game_id, "Protest", False, None, notes=protest_team_two)
-        _add_to_game(game_id, "End Game", None, None, notes=notes, details=best)
+    _add_to_game(game_id, "End Game", None, None, notes=notes, details=best)
 
     if any(i.yellow_cards for i in players):
         game.admin_status = 'Red Card Awarded'
@@ -410,18 +424,18 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
                                                 PlayerGameStats.team_id == game.team_one_id,
                                                 PlayerGameStats.game_id == game.id).all()
         team_two = PlayerGameStats.query.filter((PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded) > 0,
-                                                PlayerGameStats.team_id == game.team_one_id,
+                                                PlayerGameStats.team_id == game.team_two_id,
                                                 PlayerGameStats.game_id == game.id).all()
         teams = [team_one, team_two]
         elos = [0, 0]
         for i, v in enumerate(teams):
-            elos[i] = sum(j.elo() for j in v)
+            elos[i] = sum(j.player.elo() for j in v)
             elos[i] /= len(v)
 
         print(elos)
         for i in teams:
-            my_team = i[0].team_id
-            win = game.winning_team_id == my_team
+            my_team = i != teams[0]
+            win = game.winning_team_id == i[0].team_id
             for j in i:
                 player_id = j.player_id
                 elo_delta = calc_elo(elos[my_team], elos[not my_team], win)
@@ -497,7 +511,8 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
         else:
             second_team = Teams.query.filter(Teams.searchable_name == team_two).first()
     ranked = True
-
+    print(first_team)
+    print(second_team)
     for i in [first_team, second_team]:
         if i == 1: continue
         if not TournamentTeams.query.filter(TournamentTeams.team_id == i.id,
@@ -506,7 +521,8 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
             db.session.add(t)
         ranked &= i.non_captain is not None
     if official is not None:
-        official = Officials.query.filter(Officials.person.searchable_name == official).first()
+        person = People.query.filter(People.searchable_name == official).first()
+        official = Officials.query.filter(Officials.person_id == person.id).first().id
 
     if round_number < 0:
         last_start = Games.query.filter(Games.tournament_id == tournament_id).order_by(
@@ -568,9 +584,11 @@ def create_tournament(name, fixtures_gen, finals_gen, ranked, two_courts, scorer
 
 def get_timeout_time(game_id):
     """Returns the time which the timeout expires"""
-    most_recent_end = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'End Timeout').id
+    most_recent_end = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'End Timeout')
+                       .order_by(GameEvents.id.desc()).first())
+    if not most_recent_end: return 0
     last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout',
-                                            GameEvents.id < most_recent_end).first()
+                                            GameEvents.id < most_recent_end.id).order_by(GameEvents.id.desc()).first()
     time_out_time = last_time_out.created_at
     return time_out_time + 30 if (time_out_time > 0) else 0
 
@@ -578,16 +596,18 @@ def get_timeout_time(game_id):
 def get_timeout_caller(game_id):
     """Returns if the first team listed called the timeout"""
     game = Games.query.filter(Games.id == game_id).first()
-    most_recent_end = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'End Timeout').id
+    most_recent_end = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'End Timeout')
+                       .order_by(GameEvents.id.desc()).first())
+    if not most_recent_end: return 0
     last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout',
-                                            GameEvents.id < most_recent_end).first()
+                                            GameEvents.id < most_recent_end.id).order_by(GameEvents.id.desc()).first()
     return last_time_out.team_id == game.team_one_id
 
 
 def delete(game_id):
-    GameEvents.query.filter(GameEvents.game_id == game_id).all().delete()
-    PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).all().delete()
-    Games.query.filter(Games.id == game_id).all().delete()
+    GameEvents.query.filter(GameEvents.game_id == game_id).delete()
+    PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).delete()
+    Games.query.filter(Games.id == game_id).delete()
     db.session.commit()
 
 
@@ -598,6 +618,8 @@ def resolve_game(game_id):
 
 
 def serve_timer(game_id, start):
+    if game_is_over(game_id):
+        raise ValueError("Game is Already Over!")
     game = Games.query.filter(Games.id == game_id).first()
     if start:
         game.serve_timer = time.time() + 8
@@ -608,4 +630,4 @@ def serve_timer(game_id, start):
 
 def get_serve_timer(game_id):
     game = Games.query.filter(Games.id == game_id).first()
-    return game.serve_timer if game.serve_timer + 3 > time.time() else -1
+    return game.serve_timer if (game.serve_timer or -1) + 3 > time.time() else -1

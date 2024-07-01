@@ -782,7 +782,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             players: list[Player]
             name: str
             searchableName: str
-            image_url: str
+            imageUrl: str
             score: int
             timeouts: int
             cardTime: int = 0

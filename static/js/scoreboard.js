@@ -51,7 +51,7 @@ function deleteFireworks() {
 }
 
 function main() {
-    fetch(`/api/games/change_code?id=${id}&tournament=${tournament.replace("/", "")}`, {
+    fetch(`/api/games/change_code?id=${id}`, {
         method: "GET"
     }).then((res) => {
         res.json().then(

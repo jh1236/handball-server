@@ -15,7 +15,6 @@ def add_game_endpoints(app, comps):
                 id: <int> = id of the current game
             }
         """
-        logger.info(f"Request for change_code: {request.json}")
         game_id = int(request.args["id"])
         return jsonify({"code": manageGame.change_code(game_id)})
 

@@ -88,4 +88,3 @@ class PlayerGameStats(db.Model):
         self.red_cards = 0
         self.card_time = 0
         self.card_time_remaining = 0
-        self.start_side = 0

@@ -102,7 +102,7 @@ WHERE games.id = ? AND (gameEvents.notes is null OR gameEvents.notes <> 'Penalty
 GROUP BY gameEvents.id""", (game,)).fetchall()
     for taunt, player, team, team_mate, other_player, other_team, umpire in game_events:
         team_mate = team_mate or player
-        string = f"{taunt} by {player} from ({team})."
+        string = f"{taunt} for {player} from ({team})."
         out.append(string)
     return out
 

@@ -156,7 +156,7 @@ def init_api(app, comps: dict[str, Tournament]):
     add_tournament_specific(app)
     add_old_tournament_specific(app, comps)
     add_universal_tournament(app, comps)
-    add_admin_pages(app, comps)
+    add_admin_pages(app)
 
 
 def sign(elo_delta):
