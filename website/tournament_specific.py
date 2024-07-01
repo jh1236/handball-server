@@ -511,8 +511,7 @@ def add_tournament_specific(app):
                                          LEFT JOIN people sub ON sub.id = inside.substitute_id
                                 where eloChange.player_id = sub.id
                                    or eloChange.player_id = captain.id
-                                   or eloChange.player_id = non_captain.id AND eloChange.game_id <=
-                                      (SELECT MAX(id) FROM games WHERE games.tournament_id = tournaments.id)), 0)
+                                   or eloChange.player_id = non_captain.id AND eloChange.game_id <= MAX(games.id)), 0)
            /
                       COUNT(teams.captain_id is not null + teams.non_captain_id is not null + teams.substitute_id is not null),
              2) as elo,
@@ -574,10 +573,9 @@ where IIF(? is NULL, 1, tournaments.id = ?)
                 """SELECT people.name,
        people.searchable_name,
        coalesce(SUM(games.best_player_id = player_id), 0),
-       ROUND(1500.0 + (SELECT SUM(elo_delta)
+       ROUND(1500.0 + coalesce((SELECT SUM(elo_delta)
                        from eloChange
-                       where eloChange.player_id = people.id AND eloChange.game_id <=
-                                      (SELECT MAX(id) FROM games WHERE games.tournament_id = playerGameStats.tournament_id)), 2) as elo,
+                       where eloChange.player_id = people.id AND eloChange.game_id <= MAX(games.id)), 0), 2) as elo,
        coalesce(SUM(playerGameStats.points_scored), 0),
        coalesce(SUM(playerGameStats.aces_scored), 0),
        coalesce(SUM(playerGameStats.faults), 0),
@@ -1183,10 +1181,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
                                          LEFT JOIN people sub ON sub.id = inside.substitute_id
                                 where eloChange.player_id = sub.id
                                    or eloChange.player_id = captain.id
-                                   or eloChange.player_id = non_captain.id AND eloChange.game_id <=
-                                                                             (SELECT MAX(id)
-                                                                              FROM games inn
-                                                                              WHERE inn.tournament_id = tournaments.id)),
+                                   or eloChange.player_id = non_captain.id AND eloChange.game_id <=MAX(g.id)),
                                0)
            /
                       COUNT(teams.captain_id is not null + teams.non_captain_id is not null + teams.substitute_id is not null),
@@ -1285,8 +1280,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
        coalesce(SUM(games.best_player_id = player_id), 0),
        ROUND(1500.0 + coalesce((SELECT SUM(elo_delta)
                        from eloChange
-                       where eloChange.player_id = people.id AND eloChange.game_id <=
-                                      (SELECT MAX(id) FROM games WHERE games.tournament_id = tournaments.id)), 0), 2) as elo,
+                       where eloChange.player_id = people.id AND eloChange.game_id <= MAX(games.id)), 0), 2)  as elo,
        coalesce(SUM(games.winning_team_id = playerGameStats.team_id), 0),
        COUNT(DISTINCT games.id),
        coalesce(SUM(playerGameStats.points_scored), 0),
@@ -1342,8 +1336,7 @@ GROUP BY people.id""",
        coalesce(SUM(games.best_player_id = player_id), 0),
        ROUND(1500.0 + coalesce((SELECT SUM(elo_delta)
                        from eloChange
-                       where eloChange.player_id = people.id AND eloChange.id <=
-                                      (SELECT MAX(id) FROM eloChange WHERE eloChange.tournament_id = tournaments.id)), 0), 2) as elo,
+                       where eloChange.player_id = people.id AND eloChange.game_id <= MAX(games.id)), 0), 2)  as elo,
        coalesce(SUM(winning_team_id = teams.id), 0),
        coalesce(SUM(winning_team_id <> teams.id), 0),
        COUNT(DISTINCT games.id),
@@ -1530,10 +1523,9 @@ group by people.searchable_name
                 """SELECT people.name,
        teams.searchable_name,
        coalesce(SUM(best_player_id = player_id), 0),
-       ROUND(1500.0 + (SELECT SUM(elo_delta)
+       ROUND(1500.0 + coalesce((SELECT SUM(elo_delta)
                        from eloChange
-                       where eloChange.player_id = people.id AND eloChange.game_id <=
-                                                                (SELECT MAX(id) FROM games WHERE games.tournament_id = playerGameStats.tournament_id)), 2) as elo,
+                       where eloChange.player_id = people.id AND eloChange.game_id <= MAX(games.id)), 0), 2) ,
        coalesce(SUM(winning_team_id = teams.id), 0),
        coalesce(SUM(winning_team_id <> teams.id), 0),
        COUNT(DISTINCT games.id),
@@ -1616,8 +1608,7 @@ WHERE people.searchable_name = ?
        coalesce(SUM(best_player_id = player_id), 0),
        ROUND(1500.0 + (SELECT SUM(elo_delta)
                        from eloChange
-                       where eloChange.player_id = people.id AND eloChange.game_id <=
-                                                                (SELECT MAX(id) FROM games WHERE games.tournament_id = playerGameStats.tournament_id)), 2) as elo,
+                       where eloChange.player_id = people.id AND eloChange.game_id <= MAX(games.id))) as elo,
        coalesce(SUM(winning_team_id = teams.id), 0),
        coalesce(SUM(winning_team_id <> teams.id), 0),
        COUNT(DISTINCT games.id),
