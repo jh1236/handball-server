@@ -302,13 +302,8 @@ function startServeClock() {
             "Content-type": "application/json; charset=UTF-8"
         }
     }).then(
-        (res) => {
+        () => {
             waiting = false
-            if (res.ok) {
-                location.reload()
-            } else {
-                alert("Error!")
-            }
         }
     );
 }
@@ -332,7 +327,7 @@ function forfeit(firstTeam) {
                 alert("Error!")
             }
         }
-    );;
+    );
 }
 
 function stopServeClock() {
@@ -410,7 +405,7 @@ function endTimeout(firstTeam) {
     }
     element.style = ""
     element.innerHTML = `<s>Timeout ${teamName}</s>`
-    fetch("/api/games/update/endTimeout", {
+    fetch("/api/games/update/end_timeout", {
         method: "POST", body: JSON.stringify({
             id: id,
         }), headers: {

@@ -74,6 +74,7 @@ class Games(db.Model):
     team_to_serve_id = db.Column(db.Integer(), db.ForeignKey("teams.id"))
     side_to_serve = db.Column(db.Text(), default='Left', nullable=False)
     start_time = db.Column(db.Integer())
+    serve_timer = db.Column(db.Integer())
     length = db.Column(db.Integer())
     court = db.Column(db.Integer(), default=0, nullable=False)
     is_final = db.Column(db.Boolean(), default=False, nullable=False)

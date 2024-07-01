@@ -31,3 +31,8 @@ class People(db.Model):
     image_url = db.Column(db.Text())
     session_token = db.Column(db.Text())
     token_timeout = db.Column(db.Integer())
+
+    def elo(self):
+        from database.models import EloChange
+        elo_deltas = EloChange.query.filter(self.id == EloChange.player_id)
+        return 1500.0 + sum(i.elo_delta for i in elo_deltas)

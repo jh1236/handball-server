@@ -835,8 +835,8 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
                 players=player_stats,
                 teams=teams,
                 update_count=manageGame.change_code(game_id),
-                timeout_time=manageGame.get_timeout_time(game_id) * 1000,  # TODO: fix
-                serve_time=0,  # Todo: Fix
+                timeout_time=manageGame.get_timeout_time(game_id) * 1000,
+                serve_time=manageGame.get_serve_timer(game_id) * 1000,
             ),
             200,
         )
