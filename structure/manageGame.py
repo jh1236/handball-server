@@ -287,6 +287,7 @@ def score_point(game_id, first_team, left_player):
     if game_is_over(game_id):
         raise ValueError("Game is Already Over!")
     _score_point(game_id, first_team, left_player)
+    db.session.commit()
 
 
 def ace(game_id):
@@ -297,6 +298,7 @@ def ace(game_id):
     left_player = bool(game.side_to_serve == 'Left')
     _add_to_game(game_id, "Ace", first_team, left_player)
     _score_point(game_id, first_team, left_player, penalty=True)
+    db.session.commit()
 
 
 def fault(game_id):
@@ -310,6 +312,7 @@ def fault(game_id):
     _add_to_game(game_id, "Fault", first_team, left_player)
     if prev_event == "Fault":
         _score_point(game_id, not first_team, None, penalty=True)
+    db.session.commit()
 
 
 def card(game_id, first_team, left_player, color, duration, reason):
@@ -329,6 +332,7 @@ def card(game_id, first_team, left_player, color, duration, reason):
             my_score, their_score = their_score, my_score
         both_carded = min(both_carded, max(11 - their_score, my_score + 2 - their_score))
         _score_point(game_id, not first_team, None, penalty=True, points=both_carded)
+    db.session.commit()
 
 
 def undo(game_id):
@@ -349,18 +353,21 @@ def time_out(game_id, first_team):
     if game_is_over(game_id):
         raise ValueError("Game is Already Over!")
     _add_to_game(game_id, "Timeout", first_team, None)
+    db.session.commit()
 
 
 def forfeit(game_id, first_team):
     if game_is_over(game_id):
         raise ValueError("Game is Already Over!")
     _add_to_game(game_id, "Forfeit", first_team, None)
+    db.session.commit()
 
 
 def end_timeout(game_id):
     if game_is_over(game_id):
         raise ValueError("Game is Already Over!")
     _add_to_game(game_id, "End Timeout", None, None)
+    db.session.commit()
 
 
 def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
@@ -432,109 +439,108 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
         if tournament.in_finals and not tournament.finished:
             finals = get_type_from_name(tournament.finals_type, tournament.id)
             finals.end_of_round()
+    db.session.commit()
 
 
 def substitute(game_id, first_team, left_player):
     if game_is_over(game_id):
         raise ValueError("Game is Already Over!")
     _add_to_game(game_id, "Substitute", first_team, left_player)
+    db.session.commit()
 
 
 def create_game(tournament_id, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,
                 court=0, is_final=False):
     """Pass team_one & team_two in as either int (team id) or str (searchable_name)."""
-    with DatabaseManager() as c:
-        if isinstance(tournament_id, str):
-            tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament_id).first().id
-        if players_one is not None:
-            players = [None, None, None]
-            for i, v in enumerate(players_one):
-                players[i] = People.query.filter(People.searchable_name == v).first()
-            print(players)
-            teams = Teams.query.all()
-            first_team = None
-            for i in teams:
-                if sorted([i.non_captain_id, i.captain_id, i.substitute_id]) == sorted(players):
-                    first_team = i
-                    break
-            if not first_team:
-                add = Teams(name=team_one, searchable_name=searchable_of(team_one), captain_id=players[0],
-                            non_captain_id=players[1], substitute_id=players[2])
-                db.session.add(add)
-                first_team = add
+    if isinstance(tournament_id, str):
+        tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament_id).first().id
+    if players_one is not None:
+        players = [None, None, None]
+        for i, v in enumerate(players_one):
+            players[i] = People.query.filter(People.searchable_name == v).first()
+        print(players)
+        teams = Teams.query.all()
+        first_team = None
+        for i in teams:
+            if sorted([i.non_captain_id, i.captain_id, i.substitute_id]) == sorted(players):
+                first_team = i
+                break
+        if not first_team:
+            add = Teams(name=team_one, searchable_name=searchable_of(team_one), captain_id=players[0],
+                        non_captain_id=players[1], substitute_id=players[2])
+            db.session.add(add)
+            first_team = add
+    else:
+        if isinstance(team_one, int):
+            first_team = Teams.query.filter(Teams.id == team_one).first()
         else:
-            if isinstance(team_one, int):
-                first_team = Teams.query.filter(Teams.id == team_one).first()
-            else:
-                first_team = Teams.query.filter(Teams.searchable_name == team_one).first()
-        if players_two is not None:
-            players = [None, None, None]
-            for i, v in enumerate(players_two):
-                players[i] = People.query.filter(People.searchable_name == v).first()
-            print(players)
-            teams = Teams.query.all()
-            second_team = None
-            for i in teams:
-                if sorted([i.non_captain_id, i.captain_id, i.substitute_id]) == sorted(players):
-                    second_team = i
-                    break
-            if not second_team:
-                add = Teams(name=team_two, searchable_name=searchable_of(team_two), captain_id=players[0],
-                            non_captain_id=players[1], substitute_id=players[2])
-                db.session.add(add)
-                second_team = add
+            first_team = Teams.query.filter(Teams.searchable_name == team_one).first()
+    if players_two is not None:
+        players = [None, None, None]
+        for i, v in enumerate(players_two):
+            players[i] = People.query.filter(People.searchable_name == v).first()
+        print(players)
+        teams = Teams.query.all()
+        second_team = None
+        for i in teams:
+            if sorted([i.non_captain_id, i.captain_id, i.substitute_id]) == sorted(players):
+                second_team = i
+                break
+        if not second_team:
+            add = Teams(name=team_two, searchable_name=searchable_of(team_two), captain_id=players[0],
+                        non_captain_id=players[1], substitute_id=players[2])
+            db.session.add(add)
+            second_team = add
+    else:
+        if isinstance(team_two, int):
+            second_team = Teams.query.filter(Teams.id == team_two).first()
         else:
-            if isinstance(team_two, int):
-                second_team = Teams.query.filter(Teams.id == team_two).first()
-            else:
-                second_team = Teams.query.filter(Teams.searchable_name == team_two).first()
-        ranked = True
+            second_team = Teams.query.filter(Teams.searchable_name == team_two).first()
+    ranked = True
 
-        for i in [first_team, second_team]:
-            if i == 1: continue
-            if not TournamentTeams.query.filter(TournamentTeams.team_id == i.id,
-                                                TournamentTeams.tournament_id == tournament_id):
-                t = TournamentTeams(tournament_id=tournament_id, team_id=i)
-                db.session.add(t)
-            ranked &= i.non_captain is not None
-        if official is not None:
-            official = c.execute(
-                """SELECT officials.id FROM officials INNER JOIN people ON person_id = people.id WHERE searchable_name = ?""",
-                (official,)).fetchone()[0]
+    for i in [first_team, second_team]:
+        if i == 1: continue
+        if not TournamentTeams.query.filter(TournamentTeams.team_id == i.id,
+                                            TournamentTeams.tournament_id == tournament_id):
+            t = TournamentTeams(tournament_id=tournament_id, team_id=i)
+            db.session.add(t)
+        ranked &= i.non_captain is not None
+    if official is not None:
+        official = Officials.query.filter(Officials.person.searchable_name == official).first()
 
-        if round_number < 0:
-            last_start = Games.query.filter(Games.tournament_id == tournament_id).order_by(
-                Games.start_time.desc()).first()
-            if not last_start:
-                last_start, round_number = (-1, 0)
-            else:
-                last_start, round_number = last_start.start_time, last_start.round
-            last_start = last_start or 1
-            if (
-                    time.time()
-                    - last_start
-                    > 32400 and
-                    round_number < 0
-            ):
-                round_number = round_number + 1
-        is_bye = 1 in [first_team.id, second_team.id]
-        court = -1 if is_bye else court
-        if is_bye and first_team.id == 1:
-            first_team, second_team = second_team, first_team
+    if round_number < 0:
+        last_start = Games.query.filter(Games.tournament_id == tournament_id).order_by(
+            Games.start_time.desc()).first()
+        if not last_start:
+            last_start, round_number = (-1, 0)
+        else:
+            last_start, round_number = last_start.start_time, last_start.round
+        last_start = last_start or 1
+        if (
+                time.time()
+                - last_start
+                > 32400 and
+                round_number < 0
+        ):
+            round_number = round_number + 1
+    is_bye = 1 in [first_team.id, second_team.id]
+    court = -1 if is_bye else court
+    if is_bye and first_team.id == 1:
+        first_team, second_team = second_team, first_team
 
-        g = Games(tournament_id=tournament_id, team_one_id=first_team.id, team_two_id=second_team.id,
-                  official_id=official, court=court, is_final=is_final, round=round_number, ranked=ranked)
-        db.session.add(g)
-        db.session.commit()  # this is a risk, but i want this to work so ¯\_(ツ)_/¯
-        for i, opp in [(first_team, second_team), (second_team, first_team)]:
-            players = [i.captain_id, i.non_captain_id, i.substitute_id]
-            for j in players:
-                if not j: break
-                p = PlayerGameStats(game_id=g.id, player_id=j, team_id=i.id, opponent_id=opp.id,
-                                    tournament_id=tournament_id)
-                db.session.add(p)
-        db.session.commit()
-        return g.id
+    g = Games(tournament_id=tournament_id, team_one_id=first_team.id, team_two_id=second_team.id,
+              official_id=official, court=court, is_final=is_final, round=round_number, ranked=ranked)
+    db.session.add(g)
+    db.session.commit()  # this is a risk, but i want this to work so ¯\_(ツ)_/¯
+    for i, opp in [(first_team, second_team), (second_team, first_team)]:
+        players = [i.captain_id, i.non_captain_id, i.substitute_id]
+        for j in players:
+            if not j: break
+            p = PlayerGameStats(game_id=g.id, player_id=j, team_id=i.id, opponent_id=opp.id,
+                                tournament_id=tournament_id)
+            db.session.add(p)
+    db.session.commit()
+    return g.id
 
 
 def create_tournament(name, fixtures_gen, finals_gen, ranked, two_courts, scorer, teams: list[int] = None,
@@ -582,11 +588,13 @@ def delete(game_id):
     GameEvents.query.filter(GameEvents.game_id == game_id).all().delete()
     PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).all().delete()
     Games.query.filter(Games.id == game_id).all().delete()
+    db.session.commit()
 
 
 def resolve_game(game_id):
     _add_to_game(game_id, "Resolve", None, None)
     Games.query.filter(Games.id == game_id).first().admin_status = "Resolved"
+    db.session.commit()
 
 
 def serve_timer(game_id, start):
