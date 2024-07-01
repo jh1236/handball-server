@@ -2,7 +2,7 @@ import time
 
 from flask import request, jsonify
 
-from structure import manageGame
+from structure import manage_game
 from utils.logging_handler import logger
 
 
@@ -16,7 +16,7 @@ def add_game_endpoints(app, comps):
             }
         """
         game_id = int(request.args["id"])
-        return jsonify({"code": manageGame.change_code(game_id)})
+        return jsonify({"code": manage_game.change_code(game_id)})
 
     @app.post("/api/games/update/start")
     def start():
@@ -40,7 +40,7 @@ def add_game_endpoints(app, comps):
         first_is_iga = request.json["teamOneIGA"]
         umpire = request.json.get("official", None)
         scorer = request.json.get("scorer", None)
-        manageGame.start_game(game_id, swap_serve, team_one, team_two,
+        manage_game.start_game(game_id, swap_serve, team_one, team_two,
                               first_is_iga,
                               umpire, scorer)
         return "", 204
@@ -59,7 +59,7 @@ def add_game_endpoints(app, comps):
         game_id = int(request.json["id"])
         first_team = request.json["firstTeam"]
         left_player = request.json["leftPlayer"]
-        manageGame.score_point(game_id, first_team, left_player)
+        manage_game.score_point(game_id, first_team, left_player)
         return "", 204
 
     @app.post("/api/games/update/ace")
@@ -72,7 +72,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for ace: {request.json}")
         game_id = request.json["id"]
-        manageGame.ace(game_id)
+        manage_game.ace(game_id)
         return "", 204
 
     @app.post("/api/games/update/substitute")
@@ -89,7 +89,7 @@ def add_game_endpoints(app, comps):
         game_id = request.json["id"]
         first_team = request.json["firstTeam"]
         first_player = request.json["leftPlayer"]
-        manageGame.substitute(game_id, first_team, first_player)
+        manage_game.substitute(game_id, first_team, first_player)
         return "", 204
 
 
@@ -108,7 +108,7 @@ def add_game_endpoints(app, comps):
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
         best = request.json.get("bestPlayer", None)
-        manageGame.end_game(game_id,  best, request.json.get("notes", None), request.json["protestTeamOne"], request.json["protestTeamTwo"])
+        manage_game.end_game(game_id,  best, request.json.get("notes", None), request.json["protestTeamOne"], request.json["protestTeamTwo"])
         return "", 204
 
 
@@ -125,7 +125,7 @@ def add_game_endpoints(app, comps):
         logger.info(f"Request for timeout: {request.json}")
         first_team = request.json["firstTeam"]
         game_id = request.json["id"]
-        manageGame.time_out(game_id, first_team)
+        manage_game.time_out(game_id, first_team)
         return "", 204
 
     @app.post("/api/games/update/forfeit")
@@ -140,7 +140,7 @@ def add_game_endpoints(app, comps):
         logger.info(f"Request for forfeit: {request.json}")
         first_team = request.json["firstTeam"]
         game_id = request.json["id"]
-        manageGame.forfeit(game_id, first_team)
+        manage_game.forfeit(game_id, first_team)
         return "", 204
 
     @app.post("/api/games/update/end_timeout")
@@ -153,7 +153,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for end_timeout: {request.json}")
         game_id = request.json["id"]
-        manageGame.end_timeout(game_id)
+        manage_game.end_timeout(game_id)
         return "", 204
 
     @app.post("/api/games/update/serve_clock")
@@ -167,7 +167,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for serve_clock: {request.json}")
         game_id = request.json["id"]
-        manageGame.serve_timer(game_id, request.json['start'])
+        manage_game.serve_timer(game_id, request.json['start'])
         return "", 204
 
     @app.post("/api/games/update/fault")
@@ -180,7 +180,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for fault: {request.json}")
         game_id = request.json["id"]
-        manageGame.fault(game_id)
+        manage_game.fault(game_id)
         return "", 204
 
     @app.post("/api/games/update/undo")
@@ -193,7 +193,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for undo: {request.json}")
         game_id = request.json["id"]
-        manageGame.undo(game_id)
+        manage_game.undo(game_id)
         return "", 204
 
     @app.post("/api/games/update/delete")
@@ -206,7 +206,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for delete: {request.json}")
         game_id = request.json["id"]
-        manageGame.delete(game_id)
+        manage_game.delete(game_id)
         return "", 204
 
 
@@ -230,5 +230,5 @@ def add_game_endpoints(app, comps):
         game_id = request.json["id"]
         duration = -1 if color == "Red" else request.json.get("duration", 3) if color == "Yellow" else 0
         reason = request.json["reason"]
-        manageGame.card(game_id, first_team, left_player, color, duration, reason)
+        manage_game.card(game_id, first_team, left_player, color, duration, reason)
         return "", 204

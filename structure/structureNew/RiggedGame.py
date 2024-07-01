@@ -1,4 +1,4 @@
-from structure.manageGame import game_string_lookup
+from structure.manage_game import game_string_lookup
 from utils.util import chunks_sized
 
 

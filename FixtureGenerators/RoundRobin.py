@@ -1,5 +1,5 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
-from structure import manageGame
+from structure import manage_game
 from utils.databaseManager import DatabaseManager
 
 
@@ -40,4 +40,4 @@ ORDER BY tournamentTeams.teamId""",
         for j in range(mid):
             team_one = teams[j]
             team_two = teams[len(teams) - 1 - j]
-            manageGame.create_game(tournament, team_one, team_two, round_number=rounds)
+            manage_game.create_game(tournament, team_one, team_two, round_number=rounds)

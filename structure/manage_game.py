@@ -1,6 +1,7 @@
 import re
 import time
 
+from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.database_utilities import on_court_for_game
@@ -171,8 +172,45 @@ def _score_point(game_id, first_team, left_player, penalty=False, points=1):
                      notes="Penalty" if penalty else None)
 
 
+def get_serve_details(game, team_one, team_two, team_who_served, player_who_served, next_team_to_serve, serve_side):
+    serve_team = team_one if next_team_to_serve == game.team_one_id else team_two
+    if not Config().badminton_style_serves:
+        if team_who_served != next_team_to_serve:
+            last_time_served = GameEvents.query.filter(
+                (GameEvents.game_id == game.id) & (GameEvents.team_who_served_id == next_team_to_serve)).order_by(
+                GameEvents.id.desc()).first()
+            if not last_time_served:
+                next_serve_side = 'Left'
+                next_player_to_serve = team_one[0] if next_team_to_serve == game.team_one_id else team_two[0]
+            else:
+                next_serve_side = 'Right' if last_time_served.side_served == 'Left' else 'Left'
+                new_right = next_serve_side == 'Right'
+                next_player_to_serve = team_one[new_right] if next_team_to_serve == game.team_one_id else team_two[
+                    new_right]
+        else:
+            next_serve_side = serve_side
+            next_player_to_serve = serve_team[next_serve_side == 'Right']
+    else:
+        if team_who_served == next_team_to_serve:
+            # ABSOLUTELY EVIL HACK
+            # THEY CAN NOT GIVE ME ACCESS TO MUTABLE ARRAYS
+            serve_team[0], serve_team[1] = serve_team[1], serve_team[0]
+            next_serve_side = 'Right' if serve_side == 'Left' else 'Left'
+            next_player_to_serve = serve_team[next_serve_side == 'Right']
+        else:
+            last_time_served = GameEvents.query.filter(
+                (GameEvents.game_id == game.id) & (GameEvents.team_who_served_id == next_team_to_serve)).order_by(
+                GameEvents.id.desc()).first()
+            if last_time_served:
+                next_serve_side = 'Right' if last_time_served.side_served == 'Left' else 'Left'
+                next_player_to_serve = [i for i in serve_team if i.id != last_time_served.player_who_served_id][0]
+            else:
+                next_serve_side = 'Left'
+                next_player_to_serve = serve_team[0]
+    return next_player_to_serve, next_serve_side
+
+
 def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None, details=None, notes=None):
-    """IMPORTANT: if the item added to game is a penalty, THE CALLER IS RESPONSIBLE FOR SYNCING"""
     game = Games.query.filter(Games.id == game_id).first()
     if first_team is not None:
         team = Teams.query.filter(Teams.id == (game.team_one_id if first_team else game.team_two_id)).first()
@@ -195,7 +233,6 @@ def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None
     player_who_served = last_game_event.player_to_serve
     serve_side = last_game_event.side_to_serve or 'Left'
     next_team_to_serve = next_team_to_serve or team_who_served
-    swap = team_who_served != next_team_to_serve
     team_one = [last_game_event.team_one_left, last_game_event.team_one_right]
     team_two = [last_game_event.team_two_left, last_game_event.team_two_right]
     if char == "Substitute":
@@ -205,24 +242,13 @@ def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None
             team_one[not left_player] = player_on.player
         else:
             team_two[not left_player] = player_on.player
-    if swap:
-        last_time_served = GameEvents.query.filter(
-            (GameEvents.game_id == game_id) & (GameEvents.team_who_served_id == next_team_to_serve)).order_by(
-            GameEvents.id.desc()).first()
-        if not last_time_served:
-            next_serve_side = 'Left'
-            next_player_to_serve = team_one[0] if next_team_to_serve == game.team_one_id else team_two[0]
-        else:
-            next_serve_side = 'Right' if last_time_served.side_served == 'Left' else 'Left'
-            new_right = next_serve_side == 'Right'
-            next_player_to_serve = team_one[new_right] if next_team_to_serve == game.team_one_id else team_two[
-                new_right]
+    if char == 'Score':
+        next_player_to_serve, next_serve_side = get_serve_details(game, team_one, team_two, team_who_served,
+                                                                  player_who_served, next_team_to_serve, serve_side)
     else:
         next_serve_side = serve_side
         serve_team = team_one if next_team_to_serve == game.team_one_id else team_two
         next_player_to_serve = serve_team[next_serve_side == 'Right']
-
-    print(serve_side)
 
     team_id = team.id if team is not None else None
     player_id = player.id if player is not None else None
@@ -244,7 +270,7 @@ def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None
                                           PlayerGameStats.game_id == game.id).first()
     server_team_players_on_court = [i.player_id for i in players if
                                     i.team_id == to_add.team_to_serve_id and i.card_time_remaining == 0]
-    if "Card" in char and server.card_time_remaining != 0 and server_team_players_on_court:
+    if server.card_time_remaining != 0 and server_team_players_on_court:
         to_add.player_to_serve_id = server_team_players_on_court[0]
         sync(game_id)
     db.session.commit()
@@ -322,7 +348,8 @@ def fault(game_id):
     first_team = bool(game.team_one == game.team_to_serve)
     left_player = bool(game.side_to_serve == 'Left')
     prev_event = GameEvents.query.filter(GameEvents.game_id == game_id, (GameEvents.event_type == 'Fault') | (
-            GameEvents.event_type == 'Score')).first().event_type
+            GameEvents.event_type == 'Score')).order_by(GameEvents.id.desc()).first().event_type
+    print(prev_event)
     _add_to_game(game_id, "Fault", first_team, left_player)
     if prev_event == "Fault":
         _score_point(game_id, not first_team, None, penalty=True)
@@ -361,7 +388,7 @@ def undo(game_id):
 def change_code(game_id):
     ge = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
     return (0 if not ge else ge.id +
-            (get_serve_timer(game_id) > 0))
+                             (get_serve_timer(game_id) > 0))
 
 
 def time_out(game_id, first_team):

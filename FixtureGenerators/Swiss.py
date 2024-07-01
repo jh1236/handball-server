@@ -1,5 +1,5 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
-from structure import manageGame
+from structure import manage_game
 from utils.databaseManager import DatabaseManager
 from collections import defaultdict
 from math import log2,ceil
@@ -146,5 +146,5 @@ class Swiss(FixturesGenerator):
                 c.execute("""UPDATE tournaments SET inFinals = 1 WHERE tournaments.id = ?""", (tournament,))
                 return  
             for team1, team2 in games:
-                manageGame.create_game(tournament, team1, team2, round_number=rounds)
+                manage_game.create_game(tournament, team1, team2, round_number=rounds)
 

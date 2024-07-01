@@ -1,14 +1,9 @@
-import json
-from random import Random
 from typing import Callable
 
 from werkzeug.datastructures import MultiDict
 
 from structure.Game import Game
-from utils.util import chunks_sized
-
 from utils.databaseManager import DatabaseManager
-from collections import defaultdict
 
 
 def copy_case(string: str, other: str) -> str:
@@ -101,7 +96,6 @@ FROM gameEvents
 WHERE games.id = ? AND (gameEvents.notes is null OR gameEvents.notes <> 'Penalty')
 GROUP BY gameEvents.id""", (game,)).fetchall()
     for taunt, player, team, team_mate, other_player, other_team, umpire in game_events:
-        team_mate = team_mate or player
         string = f"{taunt} for {player} from ({team})."
         out.append(string)
     return out

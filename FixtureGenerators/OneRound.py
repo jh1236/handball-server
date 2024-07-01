@@ -1,5 +1,5 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
-from structure import manageGame
+from structure import manage_game
 from utils.databaseManager import DatabaseManager
 
 

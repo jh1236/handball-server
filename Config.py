@@ -9,5 +9,5 @@ class Config(object):
         return cls._instance
 
     def _setup(self):
-        self.use_warnings = False
-        self.badminton_style_serves = False
+        self.use_warnings = True
+        self.badminton_style_serves = True

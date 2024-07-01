@@ -1,6 +1,6 @@
 from typing import Generator
 
-from structure import manageGame
+from structure import manage_game
 from structure.Game import Game
 from FixtureMakers.FixtureMaker import FixtureMaker
 from utils.databaseManager import DatabaseManager

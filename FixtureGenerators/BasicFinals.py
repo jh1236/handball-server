@@ -1,5 +1,5 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
-from structure import manageGame
+from structure import manage_game
 from utils.databaseManager import DatabaseManager
 
 
@@ -50,8 +50,8 @@ ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games
                 c.execute("""UPDATE tournaments SET isFinished = 1 WHERE tournaments.id = ?""", (tournament_id,))
                 return
         if finals_games:
-            manageGame.create_game(tournament_id, finals_games[0][1], finals_games[1][1], is_final=True, round_number=rounds)
-            manageGame.create_game(tournament_id, finals_games[0][0], finals_games[1][0], is_final=True, round_number=rounds)
+            manage_game.create_game(tournament_id, finals_games[0][1], finals_games[1][1], is_final=True, round_number=rounds)
+            manage_game.create_game(tournament_id, finals_games[0][0], finals_games[1][0], is_final=True, round_number=rounds)
         else:
-            manageGame.create_game(tournament_id, ladder[0][0], ladder[3][0], is_final=True,round_number=rounds)
-            manageGame.create_game(tournament_id, ladder[1][0], ladder[2][0], is_final=True,round_number=rounds)
+            manage_game.create_game(tournament_id, ladder[0][0], ladder[3][0], is_final=True,round_number=rounds)
+            manage_game.create_game(tournament_id, ladder[1][0], ladder[2][0], is_final=True,round_number=rounds)

@@ -1,7 +1,7 @@
 import itertools
 
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
-from structure import manageGame
+from structure import manage_game
 from utils.databaseManager import DatabaseManager
 from utils.util import n_chunks
 from structure.Game import Game
@@ -50,10 +50,10 @@ ORDER BY Cast(SUM(IIF(playerGameStats.playerId = teams.captain, teams.id = games
                                      (tournament_id,pool_one[0], pool_one[0], pool_two[0], pool_two[0])).fetchall()
 
         if finals_games:
-            manageGame.create_game(tournament_id, finals_games[0][1], finals_games[1][1], is_final=True)
-            manageGame.create_game(tournament_id, finals_games[0][0], finals_games[1][0], is_final=True)
+            manage_game.create_game(tournament_id, finals_games[0][1], finals_games[1][1], is_final=True)
+            manage_game.create_game(tournament_id, finals_games[0][0], finals_games[1][0], is_final=True)
         else:
-            manageGame.create_game(tournament_id, pool_one[0], pool_two[1])
-            manageGame.create_game(tournament_id, pool_one[1], pool_two[0])
+            manage_game.create_game(tournament_id, pool_one[0], pool_two[1])
+            manage_game.create_game(tournament_id, pool_one[1], pool_two[0])
             for p1, p2 in zip(pool_one[2:], pool_two[2:]):
-                manageGame.create_game(tournament_id, p1, p2)
+                manage_game.create_game(tournament_id, p1, p2)

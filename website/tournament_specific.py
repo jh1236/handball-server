@@ -6,7 +6,7 @@ from flask import render_template, request
 
 from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
-from structure import manageGame
+from structure import manage_game
 from structure.AllTournament import (
     get_all_officials,
 )
@@ -761,7 +761,6 @@ GROUP BY people.name
 order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.team_one_left_id) AND (playerGameStats.player_id <> lastGE.team_two_left_id);""",
                 (game_id,),
             ).fetchall()
-        print(players)
         if not players:
             return (
                 render_template(
@@ -840,9 +839,9 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
                 status="Status",  # TODO: fix
                 players=player_stats,
                 teams=teams,
-                update_count=manageGame.change_code(game_id),
-                timeout_time=manageGame.get_timeout_time(game_id) * 1000,
-                serve_time=manageGame.get_serve_timer(game_id) * 1000,
+                update_count=manage_game.change_code(game_id),
+                timeout_time=manage_game.get_timeout_time(game_id) * 1000,
+                serve_time=manage_game.get_serve_timer(game_id) * 1000,
             ),
             200,
         )
@@ -2073,8 +2072,8 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
             teams = list(reversed(teams))
         key = fetch_user()
         is_admin = key in [i.key for i in get_all_officials() if i.admin]
-        team_one_players = [((1 - i), v) for i, v in enumerate(teams[0].players[:2])]
-        team_two_players = [((1 - i), v) for i, v in enumerate(teams[1].players[:2])]
+        team_one_players = sorted([((1 - i), v) for i, v in enumerate(teams[0].players[:2])], key=lambda a: a[1].searchable_name)
+        team_two_players = sorted([((1 - i), v) for i, v in enumerate(teams[1].players[:2])], key=lambda a: a[1].searchable_name)
 
         # TODO: Write a permissions decorator for scorers and primary officials
         # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
@@ -2119,8 +2118,8 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
                     teams=teams,
                     enum_teams=enumerate(teams),
                     game=game,
-                    timeout_time=manageGame.get_timeout_time(game_id) * 1000,
-                    timeout_first=manageGame.get_timeout_caller(game_id),
+                    timeout_time=manage_game.get_timeout_time(game_id) * 1000,
+                    timeout_first=manage_game.get_timeout_caller(game_id),
                     match_points=0 if (max([i.score for i in teams]) < 10 or game.someone_has_won) else abs(
                         teams[0].score - teams[1].score),
                     VERBAL_WARNINGS=Config().use_warnings
