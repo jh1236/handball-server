@@ -562,33 +562,20 @@ def create_tournament(name, fixtures_gen, finals_gen, ranked, two_courts, scorer
 
 def get_timeout_time(game_id):
     """Returns the time which the timeout expires"""
-    with DatabaseManager() as c:
-        time_out_time = (c.execute("""SELECT created_at
-                    FROM gameEvents
-                    WHERE game_id = ?
-                      AND event_type = 'Timeout'
-                      AND not EXISTS(SELECT id
-                                     FROM gameEvents i
-                                     WHERE i.id > gameEvents.id
-                                     AND i.game_id = gameEvents.game_id
-                                       AND i.event_type = 'End Timeout')""", (game_id,)).fetchone() or [-1])[0]
-        return time_out_time + 30 if (time_out_time > 0) else 0
+    most_recent_end = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'End Timeout').id
+    last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout',
+                                            GameEvents.id < most_recent_end).first()
+    time_out_time = last_time_out.created_at
+    return time_out_time + 30 if (time_out_time > 0) else 0
 
 
 def get_timeout_caller(game_id):
     """Returns if the first team listed called the timeout"""
-    with DatabaseManager() as c:
-        time_out_time = (c.execute("""SELECT team_id == games.team_one_id
-                    FROM gameEvents INNER join games on gameEvents.game_id = games.id
-                    WHERE games.Id = ?
-                      AND event_type = 'Timeout'
-                      AND not EXISTS(SELECT i.id
-                                     FROM gameEvents i
-                                     WHERE i.id > gameEvents.id
-                                     AND i.game_id = gameEvents.game_id
-                                       AND i.event_type = 'End Timeout') ORDER BY gameEvents.id desc LIMIT 1""",
-                                   (game_id,)).fetchone() or [0])[0]
-        return time_out_time
+    game = Games.query.filter(Games.id == game_id).first()
+    most_recent_end = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'End Timeout').id
+    last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout',
+                                            GameEvents.id < most_recent_end).first()
+    return last_time_out.team_id == game.team_one_id
 
 
 def delete(game_id):
