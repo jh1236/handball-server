@@ -44,7 +44,7 @@ def sync(game_id):
         match i.event_type:
             case "Score":
                 fault = False
-                if i.details != "Penalty":
+                if i.details != "Penalty" and player is not None:
                     player.points_scored += 1
                     player_who_served = [j for j in all_players if j.player_id == i.player_who_served_id][0]
                     player_who_served.served_points += 1
@@ -359,7 +359,8 @@ def undo(game_id):
 
 
 def change_code(game_id):
-    return (GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first().id +
+    ge = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
+    return (0 if not ge else ge.id +
             (get_serve_timer(game_id) > 0))
 
 
@@ -565,6 +566,7 @@ def create_tournament(name, fixtures_gen, finals_gen, ranked, two_courts, scorer
     teams = teams or []
     with DatabaseManager() as c:
         searchable_name = searchable_of(name)
+        # tournament = Tournaments(name=name, searchable_name=searchable_name, fixtures_type=fixtures_gen,finals_type=finals_gen, ranked=ranked, two_courts=two_courts,has_scorer=scorer,image_ur;=)
         c.execute("""INSERT INTO tournaments(name, searchable_name, fixtures_type, finals_type, ranked, two_courts,  has_scorer, image_url, finished, is_pooled, notes, in_finals) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, '', 0)""", (
             name, searchable_name, fixtures_gen, finals_gen, ranked, two_courts, scorer,
@@ -630,4 +632,6 @@ def serve_timer(game_id, start):
 
 def get_serve_timer(game_id):
     game = Games.query.filter(Games.id == game_id).first()
+    if not game:
+        return -1
     return game.serve_timer if (game.serve_timer or -1) + 3 > time.time() else -1

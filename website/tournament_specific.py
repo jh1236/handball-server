@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from flask import render_template, request
 
+from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from structure import manageGame
 from structure.AllTournament import (
@@ -21,7 +22,6 @@ from utils.sidebar_wrapper import render_template_sidebar, link
 from utils.util import fixture_sorter
 from website.website import numbers
 
-VERBAL_WARNINGS = True
 
 
 def priority_to_classname(p):
@@ -700,6 +700,9 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
        playerGameStats.card_time_remaining,
        playerGameStats.player_id = games.player_to_serve_id,
        coalesce(punishments.hex, '#000000'),
+       coalesce((SELECT SUM(p.type == 'Green')
+        FROM punishments p
+        WHERE p.game_id = games.id AND p.player_id = people.id), 0),
        teams.name, -- 6
        teams.searchable_name,
        case
@@ -710,6 +713,7 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
            end,
        IIF(teams.id = games.team_one_id, games.team_one_score, games.team_two_score),
        1 - coalesce(IIF(teams.id = games.team_one_id, games.team_one_timeouts, games.team_two_timeouts), 0),
+       
        games.id, --11
        po.name,
        po.searchable_name,
@@ -731,9 +735,8 @@ FROM games
                                                                      (SELECT MAX(id)
                                                                       FROM gameEvents
                                                                       WHERE games.id = gameEvents.game_id)
-         INNER JOIN playerGameStats on
-    (lastGE.team_one_left_id = playerGameStats.player_id OR lastGE.team_one_right_id = playerGameStats.player_id OR
-     lastGE.team_two_left_id = playerGameStats.player_id OR lastGE.team_two_right_id = playerGameStats.player_id) AND games.id = playerGameStats.game_id
+         LEFT JOIN playerGameStats on(lastGE.team_one_left_id = playerGameStats.player_id OR lastGE.team_one_right_id = playerGameStats.player_id OR
+                                      lastGE.team_two_left_id = playerGameStats.player_id OR lastGE.team_two_right_id = playerGameStats.player_id OR lastGE.event_type is null) AND games.id = playerGameStats.game_id
          INNER JOIN tournaments on tournaments.id = games.tournament_id
          LEFT JOIN officials o on o.id = games.official_id
          LEFT JOIN people po on po.id = o.person_id
@@ -776,6 +779,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             cardTimeRemaining: int
             serving: bool
             hex: str
+            green_carded: bool
 
         @dataclass
         class Team:
@@ -787,6 +791,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             timeouts: int
             cardTime: int = 0
             cardTimeRemaining: int = 0
+            green_carded: bool = False
 
         @dataclass
         class Game:
@@ -809,21 +814,22 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
         player_stats = []
 
         for i in players:
-            pl = Player(*i[:6])
+            pl = Player(*i[:7])
             player_stats.append(pl)
-            if i[6] not in teams:
-                teams[i[6]] = Team([], *i[6:11])
-            teams[i[6]].players.append(pl)
-            if teams[i[6]].cardTime != -1:
-                if pl.cardTime and pl.cardTime < 0: teams[i[6]].cardTime = -1
-                teams[i[6]].cardTime = max(pl.cardTime or 0, teams[i[6]].cardTime)
-                if pl.cardTime and pl.cardTimeRemaining < 0: teams[i[6]].cardTimeRemaining = -1
-                teams[i[6]].cardTimeRemaining = max(pl.cardTimeRemaining or 0, teams[i[6]].cardTimeRemaining)
+            if i[7] not in teams:
+                teams[i[7]] = Team([], *i[7:12])
+            teams[i[7]].players.append(pl)
+            if teams[i[7]].cardTime != -1:
+                if pl.cardTime and pl.cardTime < 0: teams[i[7]].cardTime = -1
+                teams[i[7]].cardTime = max(pl.cardTime or 0, teams[i[7]].cardTime)
+                if pl.cardTime and pl.cardTimeRemaining < 0: teams[i[7]].cardTimeRemaining = -1
+                teams[i[7]].cardTimeRemaining = max(pl.cardTimeRemaining or 0, teams[i[7]].cardTimeRemaining)
+                if pl.green_carded: teams[i[7]].green_carded = True
         visual_swap = request.args.get("swap", "false") == "true"
         teams = list(teams.values())
         game = Game(player_stats,
                     teams, f"Court {players[0][16]}",
-                    f"{teams[0].score} - {teams[1].score}", *players[0][11:])
+                    f"{teams[0].score} - {teams[1].score}", *players[0][12:])
         if visual_swap:
             teams = list(reversed(teams))
 
@@ -2117,7 +2123,7 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
                     timeout_first=manageGame.get_timeout_caller(game_id),
                     match_points=0 if (max([i.score for i in teams]) < 10 or game.someone_has_won) else abs(
                         teams[0].score - teams[1].score),
-                    VERBAL_WARNINGS=VERBAL_WARNINGS
+                    VERBAL_WARNINGS=Config().use_warnings
                 ),
                 200,
             )

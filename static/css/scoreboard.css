@@ -184,3 +184,46 @@ h1.big {
     0%   {font-size: 100px; width: 100%; color: #7D4F0A; height: 400px; transform: translate(0, -100%)}
     40%   {font-size: 100px;width: 100%; color: #7D4F0A; height: 400px; transform: translate(0, -100%)}
 }
+.green_card {
+    animation-name: green_animation;
+    animation-duration: 1.2s;
+    text-align: center;
+    display: flex;
+    justify-content: center; /* Align horizontal */
+    align-items: center;
+    font-size: 10px;
+}
+
+@keyframes green_animation {
+    0%   {font-size: 100px; width: 100%; color: #2b7d0a; height: 400px; transform: translate(0, -100%)}
+    40%   {font-size: 100px;width: 100%; color: #2b7d0a; height: 400px; transform: translate(0, -100%)}
+}
+
+.fade-fly {
+    animation-name: fade-fly;
+    animation-duration: 7s;
+    opacity: 0;
+}
+.fade {
+    animation-name: fade-out;
+    animation-duration: 7s;
+    animation-delay: .5s;
+    opacity: 0;
+}
+
+@keyframes fade-fly {
+    0%      {transform: translate(0, -100%)}
+    25%     {transform: translate(0, 0); opacity: 1}
+    75%     {transform: translate(0, 0); opacity: 1}
+    100%    {transform: translate(0, -100%);opacity: 0;}
+}
+
+@keyframes fade-out {
+    0%      {}
+    25%     {opacity: 1}
+    75%     {opacity: 1}
+    100%    {opacity: 0;}
+}
+
+
+
