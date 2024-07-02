@@ -42,3 +42,11 @@ class Teams(db.Model):
     captain = db.relationship("People", foreign_keys=[captain_id])
     non_captain = db.relationship("People", foreign_keys=[non_captain_id])
     substitute = db.relationship("People", foreign_keys=[substitute_id])
+
+    def elo(self, last_game=None):
+        from database.models import People
+        players = People.query.filter((People.id == self.captain_id) | (People.id == self.non_captain_id) | (People.id == self.substitute_id))
+        elos = []
+        for i in players:
+            elos.append(i.elo(last_game))
+        return sum(elos) / len(elos)

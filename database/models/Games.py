@@ -94,6 +94,23 @@ class Games(db.Model):
     iga_side = db.relationship("Teams", foreign_keys=[iga_side_id])
     player_to_serve = db.relationship("People", foreign_keys=[player_to_serve_id])
     team_to_serve = db.relationship("Teams", foreign_keys=[team_to_serve_id])
+    row_titles = ["Rounds",
+                  "Score Difference",
+                  "Elo Gap",
+                  "Length",
+                  "Cards",
+                  "Warnings",
+                  "Green Cards",
+                  "Yellow Cards",
+                  "Red Cards",
+                  "Timeouts Used",
+                  "Aces Scored",
+                  "Ace Percentage",
+                  "Faults",
+                  "Fault Percentage",
+                  "Start Time",
+                  "Court"
+                  ]
 
     def reset(self):
         self.started = False
@@ -108,3 +125,26 @@ class Games(db.Model):
         self.team_two_timeouts = 0
         self.notes = None
         self.winning_team_id = None
+
+    def stats(self):
+        from database.models import PlayerGameStats
+        pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == self.id).all()
+        return {
+            "Rounds": self.team_one_score + self.team_two_score,
+            "Score Difference": abs(self.team_one_score - self.team_two_score),
+            "Elo Gap": abs(self.team_one.elo(self.id) - self.team_two.elo(self.id)),
+            "Length": self.length,
+            "Cards": sum(i.green_cards + i.yellow_cards + i.red_cards for i in pgs),
+            "Warnings": sum(i.warnings for i in pgs),
+            "Green Cards": sum(i.green_cards for i in pgs),
+            "Yellow Cards": sum(i.yellow_cards for i in pgs),
+            "Red Cards": sum(i.red_cards for i in pgs),
+            "Timeouts Used": self.team_one_timeouts + self.team_two_timeouts,
+            "Aces Scored": sum(i.aces_scored for i in pgs),
+            "Ace Percentage": sum(i.aces_scored for i in pgs) / ((self.team_one_score + self.team_two_score) or 1),
+            "Faults": sum(i.faults for i in pgs),
+            "Fault Percentage": sum(i.faults for i in pgs) / ((self.team_one_score + self.team_two_score) or 1),
+            "Start Time": 0 if not self.start_time or self.start_time <= 0 else (self.start_time - Games.query.filter(Games.start_time > 0).order_by(Games.start_time).first().start_time) / (24.0 * 60 * 60 * 60),
+            "Court": self.court,
+            "Ranked": self.ranked,
+        }

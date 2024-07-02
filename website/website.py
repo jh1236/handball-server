@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from flask import send_file, request
 
 import utils.permissions
+from database.models import PlayerGameStats
 from structure.AllTournament import get_all_officials, get_all_players, get_all_games
 from structure.GameUtils import filter_games, get_query_descriptor
 from structure.Tournament import Tournament
@@ -125,7 +126,7 @@ def init_api(app, comps: dict[str, Tournament]):
     def game_finder():
         details: set[str]
         games: list[tuple[object, set]]
-        games, details = filter_games(get_all_games(), request.args, get_details=True)
+        games, details = filter_games(request.args, get_details=True)
         print("\n".join(f"'{k}': '{v}'" for k, v in request.args.items(multi=True)))
         if not games and any("," in i for i in request.args.values()):
             return (
@@ -139,9 +140,7 @@ def init_api(app, comps: dict[str, Tournament]):
             details=[i for i in details if i and i not in ["Count", "Player"]],
             headings=sorted(
                 (
-                    (p := get_all_games()[0].all_players[0]).get_stats_detailed()
-                    | p.get_game_details()
-                    | {"Count": 1}
+                    PlayerGameStats.rows
                 )
             ),
         )
@@ -150,12 +149,11 @@ def init_api(app, comps: dict[str, Tournament]):
     from website.old_tournament import add_old_tournament_specific
     from website.admin import add_admin_pages
     from website.universal_stats import add_universal_tournament
-    from website.clips import add_video_player
 
     # add_video_player(app)
     add_tournament_specific(app)
     add_old_tournament_specific(app, comps)
-    add_universal_tournament(app, comps)
+    add_universal_tournament(app)
     add_admin_pages(app)
 
 

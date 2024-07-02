@@ -38,19 +38,22 @@ def sync(game_id):
         i.card_time_remaining = max(old_card_time, 0)
         i.card_time = i.card_time_remaining
     i = None
-    for i in events:
-        players_on_court = on_court_for_game(game_id, None)
+    for c, i in enumerate(events):
+        players_on_court = on_court_for_game(game_id, None, event = i)
         is_team_one = i.team_id == game.team_one_id
         player: PlayerGameStats = ([j for j in all_players if j.player_id == i.player_id] + [None])[0]
+        left_served = i.side_to_serve == 'Left'
+        non_serving_team = [i.team_one_left, i.team_one_right] if i.team_who_served_id != game.team_one_id else [i.team_two_left, i.team_two_right]
         match i.event_type:
             case "Score":
+                prev_event = events[c-1].event_type
                 fault = False
-                if i.details != "Penalty" and player is not None:
+                if player is not None:
                     player.points_scored += 1
                     player_who_served = [j for j in all_players if j.player_id == i.player_who_served_id][0]
                     player_who_served.served_points += 1
                     if player_who_served.team_id == i.team_id:
-                        player_who_served.served_points += 1
+                        player_who_served.served_points_won += 1
                 if is_team_one:
                     game.team_one_score += 1
                 else:
@@ -62,10 +65,16 @@ def sync(game_id):
                         j.rounds_carded += 1
                         if j.card_time_remaining > 0:
                             j.card_time_remaining -= 1
+                    if non_serving_team[left_served].id == j.player_id and (i.notes != 'Penalty' or prev_event == 'Ace'):
+                        j.serves_received += 1
+                        if prev_event != 'Ace':
+                            j.serves_returned += 1
+
             case "Ace":
                 player.aces_scored += 1
             case "Fault":
                 player.faults += 1
+                player.served_points += 1
                 if fault:
                     player.double_faults += 1
                     fault = False

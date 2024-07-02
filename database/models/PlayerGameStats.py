@@ -71,6 +71,25 @@ class PlayerGameStats(db.Model):
     opponent = db.relationship("Teams", foreign_keys=[opponent_id])
     game = db.relationship("Games", foreign_keys=[game_id])
 
+    rows = {
+        "Rounds on Court": rounds_on_court,
+        "Rounds Carded": rounds_carded,
+        "Points Scored": points_scored,
+        "Aces Scored": aces_scored,
+        "Faults": faults,
+        "Double Faults": double_faults,
+        "Served Points": served_points,
+        "Served Points Won": served_points_won,
+        "Serves Received": serves_received,
+        "Serves Returned": serves_returned,
+        "Warnings": warnings,
+        "Green Cards": green_cards,
+        "Yellow Cards": yellow_cards,
+        "Red Cards": red_cards,
+        "Cards": green_cards + yellow_cards + red_cards,
+        "Elo": None,
+    }
+
     def reset_stats(self):
         self.rounds_on_court = 0
         self.rounds_carded = 0
@@ -88,3 +107,27 @@ class PlayerGameStats(db.Model):
         self.red_cards = 0
         self.card_time = 0
         self.card_time_remaining = 0
+
+    def stats(self):
+        return {
+            "Rounds on Court": self.rounds_on_court,
+            "Rounds Carded": self.rounds_carded,
+            "Points Scored": self.points_scored,
+            "Aces Scored": self.aces_scored,
+            "Faults": self.faults,
+            "Double Faults": self.double_faults,
+            "Served Points": self.served_points,
+            "Served Points Won": self.served_points_won,
+            "Serves Received": self.serves_received,
+            "Serves Returned": self.serves_returned,
+            "Warnings": self.warnings,
+            "Green Cards": self.green_cards,
+            "Yellow Cards": self.yellow_cards,
+            "Red Cards": self.red_cards,
+            "Cards": self.red_cards + self.yellow_cards + self.green_cards,
+            "Elo": self.player.elo(self.game_id)
+        }
+
+    @classmethod
+    def row_by_name(cls, name):
+        return cls.rows[name]

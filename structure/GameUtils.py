@@ -2,6 +2,8 @@ from typing import Callable
 
 from werkzeug.datastructures import MultiDict
 
+from database import db
+from database.models import Games, PlayerGameStats
 from structure.Game import Game
 from utils.databaseManager import DatabaseManager
 
@@ -101,66 +103,42 @@ GROUP BY gameEvents.id""", (game,)).fetchall()
     return out
 
 
-def filter_games(games_to_check, args, get_details=False):
-    out: list[tuple[Game, set]] = []
+def filter_games(args, get_details=False):
+    games = db.session.query(Games).join(PlayerGameStats)
     details = MultiDict((k, v) for k, v in args.items(multi=True) if not v.startswith("$"))
     sort = ([k for k, v in args.items(multi=True) if v.startswith("^")] + [None])[0]
-    for i in games_to_check:
-        if i.bye:
-            continue
-        failed = False
-        players = set([j.nice_name() for j in i.all_players])
-        for k, v in args.items(multi=True):
-            v = v.strip("$^")
-            marked = v[0] == "~"
-            v = v.strip("~")
-            comparer: Callable
-            absolute = len(v) > 1 and v[0] == v[1] or v[0] == "="
-            if v.startswith("!"):
-                v = v.strip("!")
-                comparer = lambda i: float(i) != float(v) if str(v).strip().isnumeric() else str(i) != str(v)
-            elif v.startswith(">"):
-                v = v.strip(">")
-                comparer = lambda i: float(i) > float(v)
-            elif v.startswith("<"):
-                v = v.strip("<")
-                comparer = lambda i: float(i) < float(v)
-            elif v == "*":
-                comparer = lambda i: True
-            else:
-                v = v.strip("=")
-                comparer = lambda i: float(i) == float(v) if str(v).strip().isnumeric() else str(i) == str(v)
-            match k:
-                case "Count":
-                    if not comparer(len(players)):
-                        failed = True
-                        break
-                case _:
-                    if absolute and any(
-                            not comparer((j.get_game_details() | j.get_stats_detailed())[k]) for j in i.all_players if
-                            not marked or j.nice_name() in players):
-                        failed = True
-                        break
-                    current_players = set()
-                    for j in i.all_players:
-                        if comparer((j.get_game_details() | j.get_stats_detailed())[k]):
-                            current_players |= {j.nice_name()}
-                    if not current_players:
-                        failed = True
-                        break
-                    if marked:
-                        players &= current_players
-            if not players:
-                failed = True
-                break
-        if not failed:
-            out.append((i, players))
+    for k, v in args.items(multi=True):
+        v = v.strip("$^")
+        marked = v[0] == "~"
+        v = v.strip("~")
+        comparer: Callable
+        absolute = len(v) > 1 and v[0] == v[1] or v[0] == "="
+        if v.startswith("!"):
+            v = v.strip("!")
+            comparer = lambda i: i != float(v) if str(v).strip().isnumeric() else str(i) != str(v)
+        elif v.startswith(">"):
+            v = v.strip(">")
+            comparer = lambda i: i > float(v)
+        elif v.startswith("<"):
+            v = v.strip("<")
+            comparer = lambda i: i < float(v)
+        elif v == "*":
+            comparer = lambda i: True
+        else:
+            v = v.strip("=")
+            comparer = lambda i: str(i) == str(v)
+        match k:
+            case _:
+                games = games.filter(comparer(PlayerGameStats.row_by_name(k)))
+
     if sort:
-        out.sort(key=lambda a: -max(
-            [(i.get_game_details() | i.get_stats_detailed())[sort] for i in a[0].all_players if i.nice_name() in a[1]]))
+        games.order_by(PlayerGameStats.row_by_name(sort))
+    games = games.all()
+    games = [(i, PlayerGameStats.query.filter(PlayerGameStats.game_id == i.id).all()) for i in games]
+    print(games)
     if get_details:
-        return out, details
-    return out
+        return games, details
+    return games
 
 
 def get_query_descriptor(details):
