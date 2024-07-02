@@ -69,6 +69,6 @@ def add_endpoints(app, comps):
 
 
     add_tourney_endpoints(app, comps)
-    add_graph_endpoints(app, comps)
+    add_graph_endpoints(app)
     add_game_endpoints(app, comps)
     # add_clip_endpoints(app, comps)

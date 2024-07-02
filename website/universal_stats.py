@@ -8,7 +8,7 @@ from utils.sidebar_wrapper import render_template_sidebar
 from utils.statistics import get_player_stats
 
 
-def add_universal_tournament(app, comps: dict[str, Tournament]):
+def add_universal_tournament(app):
 
     @app.get("/signup/")
     def sign_up_page():

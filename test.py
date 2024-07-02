@@ -1,6 +1,10 @@
+from werkzeug.datastructures import MultiDict
+
 from database import db
 from database.models import *
 from start import app
+from structure import manage_game
+from structure.GameUtils import filter_games
 from utils.statistics import calc_elo
 
 
@@ -40,6 +44,42 @@ def regen_elo():
     db.session.commit()
 
 
+def sync_all_games():
+    games = Games.query.all()
+    for i in games:
+        if i.is_bye: continue
+        if i.id % 20 == 0:
+            print(f"Syncing Game {i.id}")
+        try:
+            manage_game.sync(i.id)
+        except Exception:
+            print(f"Game {i.id} failed to sync")
+    db.session.commit()
+
+
+def interpolate_start_times():
+    games = Games.query.filter(Games.tournament_id == 1).all()
+    first_ever_game = 1690887600
+    last_time_stamp = 1709901482.6885524
+    time_per_event = 29.718165623703534
+    current_start_time = 0
+    prev_round = 0
+    for i in games:
+        print(i.id)
+        if i.start_time and i.start_time > 0:
+            continue
+        if i.round != prev_round:
+            prev_round = i.round
+            # linearly interpolate the two start times
+            current_start_time = first_ever_game + ((i.round - 1) / 32) * last_time_stamp
+        length = len(GameEvents.query.filter(GameEvents.game_id == i.id).all()) * time_per_event
+        i.start_time = current_start_time
+        i.length = length
+        current_start_time += length + 300
+    db.session.commit()
+
 if __name__ == '__main__':
+    # with app.app_context():
+    #     regen_elo()
     with app.app_context():
-        regen_elo()
+        interpolate_start_times()
