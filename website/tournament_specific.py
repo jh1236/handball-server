@@ -85,7 +85,7 @@ def add_tournament_specific(app):
                                 WHERE games.tournament_id = ? AND NOT games.is_final AND NOT games.is_bye
                                 group by teams.id 
                                 ORDER BY 
-                                    CAST(gamesWon AS REAL) / gamesPlayed DESC  
+                                    CAST(gamesWon AS REAL) / gamesPlayed DESC, gamesPlayed DESC  
                                 LIMIT 10;""",
                 (tournament_id,),
             ).fetchall()
@@ -477,6 +477,7 @@ def add_tournament_specific(app):
                           "Cards Per Game",
                           "Cards",
                           "Points Per Card",
+                          "Serves Per Game",
                           "Serves Per Ace",
                           "Serves Per Fault",
                           "Serve Ace Rate",
@@ -611,6 +612,7 @@ where IIF(? is NULL, 1, tournaments.id = ?)
        ROUND(coalesce(CAST(SUM(playerGameStats.points_scored) AS REAL) /
                       (SUM(playerGameStats.green_cards + playerGameStats.yellow_cards + playerGameStats.red_cards)), 0),
              2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (COUNT(DISTINCT games.id)), 0), 2),
        ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (SUM(playerGameStats.aces_scored)), 0), 2),
        ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (SUM(playerGameStats.faults)), 0), 2),
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.aces_scored) AS REAL) / (SUM(playerGameStats.served_points)), 0), 2) ||
@@ -1274,7 +1276,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
         # TODO (LACHIE): please help me make this less queries...
         with DatabaseManager() as c:
             players_query = c.execute(
-                """SELECT teams.image_url,
+                """SELECT coalesce(min(teams.image_url) FILTER ( WHERE teams.image_url Like '/api/teams/image?%'),teams.image_url),
        people.searchable_name,
        people.name,
        coalesce(SUM(games.best_player_id = player_id), 0),
@@ -1376,6 +1378,7 @@ GROUP BY people.id""",
        ROUND(coalesce(CAST(SUM(playerGameStats.points_scored) AS REAL) /
                       (SUM(playerGameStats.green_cards + playerGameStats.yellow_cards + playerGameStats.red_cards)), 0),
              2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (COUNT(DISTINCT games.id)), 0), 2),
        ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (SUM(playerGameStats.aces_scored)), 0), 2),
        ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (SUM(playerGameStats.faults)), 0), 2),
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.aces_scored) AS REAL) / (SUM(playerGameStats.served_points)), 0), 2) ||
@@ -1449,6 +1452,7 @@ group by people.searchable_name
                           "Cards Per Game",
                           "Cards",
                           "Points Per Card",
+                          "Serves Per Game",
                           "Serves Per Ace",
                           "Serves Per Fault",
                           "Serve Ace Rate",
@@ -1502,6 +1506,7 @@ group by people.searchable_name
                           "Cards Per Game",
                           "Cards",
                           "Points Per Card",
+                          "Serves Per Game",
                           "Serves Per Ace",
                           "Serves Per Fault",
                           "Serve Ace Rate",
@@ -1521,7 +1526,8 @@ group by people.searchable_name
         with DatabaseManager() as c:
             players = c.execute(
                 """SELECT people.name,
-       teams.searchable_name,
+       coalesce(min(teams.searchable_name) FILTER ( WHERE teams.image_url Like '/api/teams/image?%'),teams.searchable_name),
+       coalesce(min(teams.image_url) FILTER ( WHERE teams.image_url Like '/api/teams/image?%'),teams.image_url),
        coalesce(SUM(best_player_id = player_id), 0),
        ROUND(1500.0 + coalesce((SELECT SUM(elo_delta)
                        from eloChange
@@ -1565,6 +1571,7 @@ group by people.searchable_name
        ROUND(coalesce(CAST(SUM(playerGameStats.points_scored) AS REAL) /
                       (SUM(playerGameStats.green_cards + playerGameStats.yellow_cards + playerGameStats.red_cards)), 0),
              2),
+       ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (COUNT(DISTINCT games.id)), 0), 2),
        ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (SUM(playerGameStats.aces_scored)), 0), 2),
        ROUND(coalesce(CAST(SUM(playerGameStats.served_points) AS REAL) / (SUM(playerGameStats.faults)), 0), 2),
        ROUND(coalesce(CAST(100.0 * SUM(playerGameStats.aces_scored) AS REAL) / (SUM(playerGameStats.served_points)), 0), 2) ||
@@ -1599,7 +1606,8 @@ FROM teams
          LEFT JOIN playerGameStats on people.id = playerGameStats.player_id AND games.id = playerGameStats.game_id
 WHERE people.searchable_name = ?
 
-  and IIF(? is NULL, 1, tournamentTeams.tournament_id = ?)""",
+  and IIF(? is NULL, 1, tournamentTeams.tournament_id = ?)
+  ORDER BY teams.image_url LIKE '/api/teams/image?%'""",
                 (tournament_id, player_name, tournament_id, tournament_id), ).fetchone()
 
             courts = c.execute(
@@ -1726,7 +1734,7 @@ WHERE people.searchable_name = ?
         ]
 
         stats = {}
-        for k, v in zip(player_headers, players[2:]):
+        for k, v in zip(player_headers, players[3:]):
             stats[k] = v
         stats |= {
             f"Court {i + 1}": {k: v for k, v in zip(player_headers, j[2:])} for i, j in enumerate(courts)
@@ -1740,6 +1748,7 @@ WHERE people.searchable_name = ?
                     name=players[0],
                     player=player_name,
                     team=players[1],
+                    team_image=players[2],
                     recent_games=recent,
                     upcoming_games=upcoming,
                 ),
@@ -1751,7 +1760,7 @@ WHERE people.searchable_name = ?
                     "tournament_specific/new_player_stats.html",
                     stats=[
                         (k, v)
-                        for k, v in zip(player_headers, players[2:])
+                        for k, v in zip(player_headers, players[3:])
                     ],
                     name=players[0],
                     team=players[1],
