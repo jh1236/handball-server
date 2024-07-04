@@ -427,8 +427,15 @@ def undo(game_id):
 
 
 def change_code(game_id):
+    if game_id <= 0:
+        game = Games.query.filter(Games.court == abs(game_id), Games.started).order_by(Games.id.desc()).first()
+        game_id = game.id
+    else:
+        game = Games.query.filter(Games.id == game_id).first()
+    if game is None:
+        return 1
     ge = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
-    return (0 if not ge else ge.id +
+    return (game_id if not ge else ge.id +
                              (get_serve_timer(game_id) > 0))
 
 

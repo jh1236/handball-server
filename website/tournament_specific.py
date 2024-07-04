@@ -691,8 +691,12 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
             200,
         )
 
-    @app.get("/games/<game_id>/display")
-    def scoreboard(game_id):
+    @app.get("/games/<true_game_id>/display")
+    def scoreboard(true_game_id):
+        if int(true_game_id) <= 0:
+            game_id = Games.query.filter(Games.started, Games.court == abs(true_game_id)).order_by(Games.id.desc()).first().id
+        else:
+            game_id = int(true_game_id)
         with DatabaseManager() as c:
             players = c.execute(
                 """SELECT people.name,
@@ -762,33 +766,25 @@ GROUP BY people.name
 order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.team_one_left_id) AND (playerGameStats.player_id <> lastGE.team_two_left_id);""",
                 (game_id,),
             ).fetchall()
-        if not players:
-            return (
-                render_template(
-                    "tournament_specific/game_editor/game_done.html",
-                    error="Game Does not exist",
-                ),
-                404,
-            )
 
         @dataclass
         class Player:
-            name: str
-            searchableName: str
-            cardTime: int
-            cardTimeRemaining: int
-            serving: bool
-            hex: str
-            green_carded: bool
+            name: str = "?"
+            searchableName: str = "?"
+            cardTime: int = 0
+            cardTimeRemaining: int = 0
+            serving: bool = False
+            hex: str = "#ffffff"
+            green_carded: bool = False
 
         @dataclass
         class Team:
             players: list[Player]
-            name: str
-            searchableName: str
-            imageUrl: str
-            score: int
-            timeouts: int
+            name: str = "?"
+            searchableName: str = "?"
+            imageUrl: str = "/api/teams/image?name=bye"
+            score: int = 0
+            timeouts: int = 1
             cardTime: int = 0
             cardTimeRemaining: int = 0
             green_carded: bool = False
@@ -797,18 +793,37 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
         class Game:
             players: list[Player]
             teams: list[Team]
-            courtName: str
-            score_string: str
-            id: int
-            umpire: str
-            umpireSearchableName: str
-            scorer: str
-            scorerSearchableName: str
-            court: int
-            round: int
-            faulted: bool
-            serverSide: str
-            type: str
+            courtName: str = "Court 1"
+            score_string: str = "0 - 0"
+            id: int = int(true_game_id)
+            umpire: str = "?"
+            umpireSearchableName: str = "?"
+            scorer: str = "?"
+            scorerSearchableName: str = "?"
+            court: int = 0
+            round: int = 0
+            faulted: bool = False
+            serverSide: str = "Left"
+            event_type: str = "Start"
+
+        if not players:
+            left_player = Player(name="Left Player")
+            right_player = Player(name="Right Player")
+            team_one = Team([left_player, right_player], name="Team One")
+            team_two = Team([left_player, right_player], name="Team Two")
+            game = Game([left_player, right_player] * 2, [team_one, team_two])
+            return (
+                render_template_sidebar(
+                    "tournament_specific/scoreboard.html",
+                    update_count=manage_game.change_code(game_id),
+                    timeout_time=0,
+                    serve_time=0,
+                    game=game,
+                    teams=[team_one, team_two],
+                    players=[left_player, right_player] * 2,
+                ),
+                404,
+            )
 
         teams = {}
         player_stats = []
@@ -833,11 +848,12 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
         if visual_swap:
             teams = list(reversed(teams))
 
+        game.id = int(true_game_id)
+
         return (
             render_template_sidebar(
                 "tournament_specific/scoreboard.html",
                 game=game,
-                status="Status",  # TODO: fix
                 players=player_stats,
                 teams=teams,
                 update_count=manage_game.change_code(game_id),
@@ -850,12 +866,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
     @app.get("/games/display")
     def court_scoreboard():
         court = int(request.args.get("court"))
-        with DatabaseManager() as c:
-            tournament = get_tournament_id(request.args.get("tournament"), c)
-            game_id = c.execute(
-                """SELECT id FROM games WHERE court = ? AND tournament_id = ? AND started = 1 ORDER BY id desc""",
-                (court, tournament)).fetchone()
-        return scoreboard()
+        return scoreboard(-court)
 
     @app.get("/games/<game_id>/")
     def game_site(game_id):

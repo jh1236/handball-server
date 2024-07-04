@@ -17,7 +17,7 @@
     <div class="overlay"><h1 class="big" style="top: 50%" id="timeout">30</h1></div>
     <script>timeout({{ timeout_time }})</script>
 {% endif %}
-{% if game.type == "Ace" %}
+{% if game.event_type == "Ace" %}
     <img class="fade" src="https://cliply.co/wp-content/uploads/2021/09/CLIPLY_372109170_FREE_FIREWORKS_400.gif"
          width="100%" height="100%" style="left: 0; position: fixed">
     <img class="fade" src="https://i.pinimg.com/originals/29/8f/2c/298f2ce6dead72fe992253c5ba0eba95.gif" width="25%"
@@ -92,23 +92,23 @@
     <tr>
         <td>
             {% if teams[0].cardTimeRemaining < 0 %}
-                <div class="rectangle {% if game.type == "Red Card" %}red_card{% endif %}"
+                <div class="rectangle {% if game.event_type == "Red Card" %}red_card{% endif %}"
                      style="background-color: #EC4A4A; color:#EC4A4A; width:100%">Red Card
                 </div>
             {% elif teams[0].cardTimeRemaining > 0 %}
                 {% if teams[0].cardTime > 2 %}
-                    <div class="rectangle {% if game.type == "Yellow Card" %}yellow_card{% endif %}"
+                    <div class="rectangle {% if game.event_type == "Yellow Card" %}yellow_card{% endif %}"
                          style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardTime }}%">
                         Yellow Card
                     </div>
                 {% else %}
-                    <div class="rectangle {% if game.type == "Green Card" %}green_card{% endif %}"
+                    <div class="rectangle {% if game.event_type == "Green Card" %}green_card{% endif %}"
                          style="background-color: #84AA63; color: #84AA63;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardTime }}%">
                         Green Card
                     </div>
                 {% endif %}
             {% elif teams[0].green_carded %}
-                <div class="rectangle {% if game.type == "Green Card" %}green_card{% endif %}"
+                <div class="rectangle {% if game.event_type == "Green Card" %}green_card{% endif %}"
                      style="background-color: #84AA63; color:#84AA63; width:100%">Green Card
                 </div>
             {% endif %}
@@ -116,23 +116,23 @@
         <td></td>
         <td>
             {% if teams[1].cardTimeRemaining < 0 %}
-                <div class="rectangle {% if game.type == "Red Card" %}red_card{% endif %}"
+                <div class="rectangle {% if game.event_type == "Red Card" %}red_card{% endif %}"
                      style="background-color: #EC4A4A; color:#EC4A4A; width:100%">Red Card
                 </div>
             {% elif teams[1].cardTimeRemaining > 0 %}
                 {% if teams[1].cardTime > 2 %}
-                    <div class="rectangle {% if game.type == "Yellow Card" %}yellow_card{% endif %}"
+                    <div class="rectangle {% if game.event_type == "Yellow Card" %}yellow_card{% endif %}"
                          style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(teams[1].cardTimeRemaining) / teams[1].cardTime }}%">
                         Yellow Card
                     </div>
                 {% else %}
-                    <div class="rectangle {% if game.type == "Green Card" %}green_card{% endif %}"
+                    <div class="rectangle {% if game.event_type == "Green Card" %}green_card{% endif %}"
                          style="background-color: #84AA63; color: #84AA63;width:{{ 100*(teams[1].cardTimeRemaining) / teams[1].cardTime }}%">
                         Green Card
                     </div>
                 {% endif %}
             {% elif teams[1].green_carded %}
-                <div class="rectangle {% if game.type == "Green Card" %}green_card{% endif %}"
+                <div class="rectangle {% if game.event_type == "Green Card" %}green_card{% endif %}"
                      style="background-color: #84AA63; color:#84AA63; width:100%">Green Card
                 </div>
             {% endif %}
