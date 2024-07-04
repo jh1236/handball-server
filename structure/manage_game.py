@@ -31,16 +31,19 @@ def sync(game_id):
 
     for i in all_players:
         i.reset_stats()
-        old_card_time = PlayerGameStats.query.filter((PlayerGameStats.player_id == i.player_id) &
-                                                     (PlayerGameStats.tournament_id == i.tournament_id) &
-                                                     (PlayerGameStats.game_id < i.game_id)).order_by(
+        prev_game_player = PlayerGameStats.query.filter(PlayerGameStats.player_id == i.player_id,
+                                                        PlayerGameStats.tournament_id == i.tournament_id,
+                                                        PlayerGameStats.team_id == i.team_id,
+                                                        PlayerGameStats.game_id < i.game_id).order_by(
             PlayerGameStats.game_id.desc()).first()
-        if old_card_time:
-            old_card_time = old_card_time.card_time_remaining
+        if prev_game_player:
+            card_time_left = max(prev_game_player.card_time_remaining, 0) if not prev_game_player.red_cards else -1
+            card_time = max(prev_game_player.card_time, 0) if not prev_game_player.red_cards else -1
         else:
-            old_card_time = 0
-        i.card_time_remaining = max(old_card_time, 0)
-        i.card_time = i.card_time_remaining
+            card_time = 0
+            card_time_left = 0
+        i.card_time_remaining = card_time_left
+        i.card_time = card_time
     i = None
     for c, i in enumerate(events):
         players_on_court = on_court_for_game(game_id, None, event=i)

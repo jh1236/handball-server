@@ -1809,7 +1809,7 @@ WHERE games.id = ?
                teams.image_url
            end,
         teams.id = games.team_to_serve_id,
-        IIF(sum(playerGameStats.red_cards) > 0, -1, max(playerGameStats.card_time_remaining)),
+        IIF(min(playerGameStats.card_time_remaining) < 0, -1, max(playerGameStats.card_time_remaining)),
         max(IIF(playerGameStats.card_time is null, 0, playerGameStats.card_time)),
         max(playerGameStats.green_cards) > 0,
         Case
