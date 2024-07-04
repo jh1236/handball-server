@@ -1,8 +1,0 @@
-second
-ongoing_season_one
-third
-ongoing_season_two
-fourth
-ongoing_season_three
-fifth
-ongoing_season_four

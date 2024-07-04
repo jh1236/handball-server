@@ -63,26 +63,26 @@ class Swiss(FixturesGenerator):
     
     def _end_of_round(self, tournament):
         with DatabaseManager() as c:
-            rounds = (c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament,)).fetchone()[0] or 0) + 1
-            teamCount = c.execute("SELECT COUNT(*) FROM tournamentTeams WHERE tournamentId = ?;", (tournament,)).fetchone()[0]
+            rounds = (c.execute("""SELECT MAX(round) FROM games WHERE tournament_id = ?""", (tournament,)).fetchone()[0] or 0) + 1
+            teamCount = c.execute("SELECT COUNT(*) FROM tournamentTeams WHERE tournament_id = ?;", (tournament,)).fetchone()[0]
             
             maxRound = ceil(log2(teamCount)) + 2 # we will do 1 round above the maximum
             if rounds == 1:
                 teams = c.execute(
                     """
                         SELECT 
-                            tournamentTeams.teamId, 
+                            tournamentTeams.team_id, 
                             (IFNULL(e1.elo, 1500) + IFNULL(e2.elo, 0) + IFNULL(e3.elo, 0))/(1 + (e2.elo IS NOT NULL) + (e3.elo IS NOT NULL)) as eloFinal
                         FROM 
                             tournamentTeams
-                            LEFT JOIN teams ON teams.id = tournamentTeams.teamId
-                            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e1 ON e1.playerId = teams.captain
-                            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e2 ON e2.playerId = teams.nonCaptain
-                            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e3 ON e3.playerId = teams.substitute
+                            LEFT JOIN teams ON teams.id = tournamentTeams.team_id
+                            LEFT JOIN (SELECT player_id, SUM(elo_delta)+1500 as elo FROM eloChange GROUP BY player_id) AS e1 ON e1.player_id = teams.captain_id
+                            LEFT JOIN (SELECT player_id, SUM(elo_delta)+1500 as elo FROM eloChange GROUP BY player_id) AS e2 ON e2.player_id = teams.non_captain_id
+                            LEFT JOIN (SELECT player_id, SUM(elo_delta)+1500 as elo FROM eloChange GROUP BY player_id) AS e3 ON e3.player_id = teams.substitute_id
                         WHERE 
-                            tournamentTeams.tournamentId = ?
+                            tournamentTeams.tournament_id = ?
                         GROUP BY 
-                            tournamentTeams.teamId
+                            tournamentTeams.team_id
                         ORDER BY 
                             eloFinal DESC;
                             """,(tournament,),
@@ -96,54 +96,54 @@ class Swiss(FixturesGenerator):
                 teams = c.execute("""
                                 SELECT Team, sum(games), (sum(wins)*100)/(sum(games)) as resultWinPercentage, sum(elo) as resultElo
                                 FROM (
-                                    SELECT teamOne as Team, count(teamOne) as games, 0 as wins,0 AS elo
+                                    SELECT team_one_id as Team, count(team_one_id) as games, 0 as wins,0 AS elo
                                         FROM games
                                         WHERE 
-                                            tournamentId = ?
+                                            tournament_id = ?
                                             AND ended = 1 -- basically to ignore BYE game
-                                            AND isFinal = 0
-                                            AND teamOne != 1
-                                        GROUP BY teamOne
+                                            AND is_final = 0
+                                            AND team_one_id != 1
+                                        GROUP BY team_one_id
                                     UNION ALL
-                                    SELECT teamTwo as Team, count(teamTwo) as games, 0 as wins,0 AS elo
+                                    SELECT team_two_id as Team, count(team_two_id) as games, 0 as wins,0 AS elo
                                         FROM games
                                         WHERE 
-                                            tournamentId = ?
+                                            tournament_id = ?
                                             AND ended = 1
-                                            AND isFinal = 0
-                                            AND teamTwo != 1
-                                        GROUP BY teamTwo
+                                            AND is_final = 0
+                                            AND team_two_id != 1
+                                        GROUP BY team_two_id
                                     UNION ALL
                                     SELECT 
-                                        tournamentTeams.teamId, 0, 0,
+                                        tournamentTeams.team_id, 0, 0,
                                         (e1.elo + IFNULL(e2.elo, 0) + IFNULL(e3.elo, 0))/(1 + (e2.elo IS NOT NULL) + (e3.elo IS NOT NULL)) as elo
                                         FROM 
                                             tournamentTeams
-                                            LEFT JOIN teams ON teams.id = tournamentTeams.teamId
-                                            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e1 ON e1.playerId = teams.captain
-                                            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e2 ON e2.playerId = teams.nonCaptain
-                                            LEFT JOIN (SELECT playerId, SUM(eloChange)+1500 as elo FROM eloChange GROUP BY playerId) AS e3 ON e3.playerId = teams.substitute
+                                            LEFT JOIN teams ON teams.id = tournamentTeams.team_id
+                                            LEFT JOIN (SELECT player_id, SUM(elo_delta)+1500 as elo FROM eloChange GROUP BY player_id) AS e1 ON e1.player_id = teams.captain_id
+                                            LEFT JOIN (SELECT player_id, SUM(elo_delta)+1500 as elo FROM eloChange GROUP BY player_id) AS e2 ON e2.player_id = teams.non_captain_id
+                                            LEFT JOIN (SELECT player_id, SUM(elo_delta)+1500 as elo FROM eloChange GROUP BY player_id) AS e3 ON e3.player_id = teams.substitute_id
                                         WHERE 
-                                            tournamentTeams.tournamentId = ?
+                                            tournamentTeams.tournament_id = ?
                                         GROUP BY 
-                                            tournamentTeams.teamId
+                                            tournamentTeams.team_id
                                     UNION ALL
                                     SELECT winningTeam as Team, 0 as games, count(winningTeam) as wins, 0 AS elo
                                         FROM games
                                         WHERE 
-                                            tournamentId = ?
+                                            tournament_id = ?
                                             AND ended = 1
-                                            AND isFinal = 0
+                                            AND is_final = 0
                                             and isRanked = 1
                                         GROUP BY winningTeam
                                 )
                                 GROUP BY Team
                                 ORDER BY resultWinPercentage DESC, resultElo DESC;""", 
                                 (tournament,)*4).fetchall()
-                previous_games = c.execute("""SELECT teamOne, teamTwo FROM games WHERE tournamentId = ? AND isFinal = 0 AND ended = 1""", (tournament,)).fetchall()
+                previous_games = c.execute("""SELECT team_one_id, team_two_id FROM games WHERE tournament_id = ? AND is_final = 0 AND ended = 1""", (tournament,)).fetchall()
                 games = self.find_bracket(previous_games, teams)
             else:
-                c.execute("""UPDATE tournaments SET inFinals = 1 WHERE tournaments.id = ?""", (tournament,))
+                c.execute("""UPDATE tournaments SET in_finals = 1 WHERE tournaments.id = ?""", (tournament,))
                 return  
             for team1, team2 in games:
                 manage_game.create_game(tournament, team1, team2, round_number=rounds)

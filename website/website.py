@@ -4,10 +4,8 @@ from dataclasses import dataclass
 from flask import send_file, request
 
 import utils.permissions
-from database.models import PlayerGameStats
-from structure.AllTournament import get_all_officials, get_all_players, get_all_games
+from database.models import PlayerGameStats, People
 from structure.GameUtils import filter_games, get_query_descriptor
-from structure.Tournament import Tournament
 from utils.databaseManager import DatabaseManager
 from utils.permissions import fetch_user, officials_only
 from utils.sidebar_wrapper import render_template_sidebar
@@ -16,9 +14,9 @@ from website.endpoints.endpoints import add_endpoints
 numbers = ["Zero", "One", "Two", "Three", "Four", "Five", "Six"]
 
 
-def init_api(app, comps: dict[str, Tournament]):
+def init_api(app):
 
-    add_endpoints(app, comps)
+    add_endpoints(app)
 
     @app.get("/")
     def root():
@@ -83,44 +81,9 @@ def init_api(app, comps: dict[str, Tournament]):
     @officials_only
     def user_page():
         key = fetch_user()
-        user = next(i for i in get_all_officials() if i.key == key)
-        player = (
-            [i for i in get_all_players() if i.nice_name() == user.nice_name()]
-            + ["This will never match!"]
-        )[0]
-        with open("./clips/required.txt") as fp:
-            reqd = [i.strip() for i in fp.readlines()]
-        from website.clips import answers
+        user = People.query.filter(People.password == key).first()
 
-        seen_videos = [str(j["id"]) for j in answers if j["name"] == user.nice_name()]
-        reqd = [i for i in reqd if i not in seen_videos]
-        all_games = get_all_games()
-        to_officiate = []
-        to_play = []
-        for i in all_games:
-            if i.best_player:
-                continue
-            if user.nice_name() in [
-                i.primary_official.nice_name(),
-                i.scorer.nice_name(),
-            ]:
-                to_officiate.append(i)
-            if user.nice_name() in [k.nice_name() for k in i.all_players]:
-                to_play.append(i)
-        if len(reqd) > 4:
-            reqd = reqd[:4]
-        if len(to_officiate) > 4:
-            to_officiate = to_officiate[:4]
-        if len(to_play) > 4:
-            to_play = to_play[:4]
-        return render_template_sidebar(
-            "user_file.html",
-            user=user,
-            player=player,
-            reqd=reqd,
-            to_play=to_play,
-            to_officiate=to_officiate,
-        )
+        return "Todo", 500
 
     @app.get("/find")
     def game_finder():
@@ -146,13 +109,10 @@ def init_api(app, comps: dict[str, Tournament]):
         )
 
     from website.tournament_specific import add_tournament_specific
-    from website.old_tournament import add_old_tournament_specific
     from website.admin import add_admin_pages
     from website.universal_stats import add_universal_tournament
 
-    # add_video_player(app)
     add_tournament_specific(app)
-    add_old_tournament_specific(app, comps)
     add_universal_tournament(app)
     add_admin_pages(app)
 

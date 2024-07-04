@@ -1,4 +1,3 @@
-import datetime
 import time
 from collections import defaultdict
 from dataclasses import dataclass
@@ -9,9 +8,6 @@ from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database.models import People, PlayerGameStats, Games
 from structure import manage_game
-from structure.AllTournament import (
-    get_all_officials,
-)
 from structure.GameUtils import game_string_to_commentary
 from structure.get_information import get_tournament_id
 from utils.databaseManager import DatabaseManager
@@ -1956,7 +1952,6 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
         if visual_swap:
             teams = list(reversed(teams))
         key = fetch_user()
-        is_admin = key in [i.key for i in get_all_officials() if i.admin]
         team_one_players = sorted([((1 - i), v) for i, v in enumerate(teams[0].players[:2])],
                                   key=lambda a: a[1].searchable_name)
         team_two_players = sorted([((1 - i), v) for i, v in enumerate(teams[1].players[:2])],
@@ -2151,12 +2146,8 @@ FROM games
         teams = list(teams.values())
         if visual_swap:
             teams = list(reversed(teams))
-        key = fetch_user()
-        is_admin = key in [i.key for i in get_all_officials() if i.admin]
 
-        if game.someone_has_won or key in [
-            i.key for i in get_all_officials() if i.admin
-        ]:
+        if game.someone_has_won:
             return (
                 render_template(
                     "tournament_specific/game_editor/team_signatures.html",

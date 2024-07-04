@@ -12,22 +12,22 @@ class RoundRobin(FixturesGenerator):
         with DatabaseManager() as c:
             teams = c.execute(
                 """
-SELECT tournamentTeams.teamId
+SELECT tournamentTeams.team_id
 FROM tournamentTeams
-LEFT JOIN playerGameStats ON playerGameStats.teamId = tournamentTeams.teamId
-WHERE  tournamentTeams.tournamentId = ?
-GROUP BY tournamentTeams.teamId
-ORDER BY tournamentTeams.teamId""",
+LEFT JOIN playerGameStats ON playerGameStats.team_id = tournamentTeams.team_id
+WHERE  tournamentTeams.tournament_id = ?
+GROUP BY tournamentTeams.team_id
+ORDER BY tournamentTeams.team_id""",
                 (tournament,),
             ).fetchall()
-            rounds = (c.execute("""SELECT MAX(round) FROM games WHERE tournamentId = ?""", (tournament,)).fetchone()[0] or 0) + 1
+            rounds = (c.execute("""SELECT MAX(round) FROM games WHERE tournament_id = ?""", (tournament,)).fetchone()[0] or 0) + 1
 
         teams = [i[0] for i in teams]
         if len(teams) % 2 != 0:
             teams += [1]
         if len(teams) <= rounds:
             with DatabaseManager() as c:
-                c.execute("""UPDATE tournaments SET inFinals = 1 WHERE tournaments.id = ?""", (tournament,))
+                c.execute("""UPDATE tournaments SET in_finals = 1 WHERE tournaments.id = ?""", (tournament,))
             return
         print(teams)
 

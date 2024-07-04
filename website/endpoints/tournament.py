@@ -10,7 +10,7 @@ from structure import manage_game
 from utils.logging_handler import logger
 
 
-def add_tourney_endpoints(app, comps):
+def add_tourney_endpoints(app):
     @app.post("/api/note")
     def note():
         """
@@ -30,6 +30,12 @@ def add_tourney_endpoints(app, comps):
 
     @app.get("/api/tournaments/image")
     def tourney_image():
+        """
+        SCHEMA:
+            {
+                name: str = the searchable name of the tournament
+            }
+        """
         tournament = request.args.get("name", type=str)
         if os.path.isfile(f"./resources/images/tournaments/{tournament}.png"):
             return send_file(
@@ -127,7 +133,4 @@ def add_tourney_endpoints(app, comps):
         print(request.json["umpires"])
         with open("config/signups/officials.json", "w+") as fp:
             json.dump(umpires, fp)
-        for v in comps.values():
-            v.initial_load()
-            v.load()
         return "", 204

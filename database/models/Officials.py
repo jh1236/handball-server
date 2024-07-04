@@ -24,7 +24,6 @@ class Officials(db.Model):
 
     # Set fields
     person_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
-    is_admin = db.Column(db.Boolean(), nullable=False)
     proficiency = db.Column(db.Text(), nullable=False)
 
     person = db.relationship("People", foreign_keys=[person_id])

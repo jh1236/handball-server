@@ -6,7 +6,7 @@ from structure import manage_game
 from utils.logging_handler import logger
 
 
-def add_game_endpoints(app, comps):
+def add_game_endpoints(app):
     @app.get("/api/games/change_code")
     def change_code():
         """

@@ -4,7 +4,6 @@ from werkzeug.datastructures import MultiDict
 
 from database import db
 from database.models import Games, PlayerGameStats
-from structure.Game import Game
 from utils.databaseManager import DatabaseManager
 
 

@@ -51,7 +51,3 @@ def google_image(word):
     bs = BeautifulSoup(page, 'html.parser')
     images = bs.find_all('img', {'src': re.compile('.*gstatic.com.*')})
     return images[0]['src']
-
-
-if __name__ == "__main__":
-    pass

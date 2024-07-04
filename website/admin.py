@@ -9,8 +9,7 @@ from flask import render_template
 
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from structure.GameUtils import game_string_to_events
-from structure.Player import Player
-from structure.Team import Team
+
 from structure.get_information import get_tournament_id
 from utils.databaseManager import DatabaseManager
 from utils.permissions import admin_only
@@ -148,25 +147,6 @@ def add_admin_pages(app):
             200,
         )
 
-    @app.get("/signup/admin")
-    @admin_only
-    def admin_sign_up():
-        teams = []
-        with open("./config/signups/teams.json") as fp:
-            teams_raw = json.load(fp)
-        for k, v in teams_raw.items():
-            t = Team(k, [Player(j) for j in v["players"]])
-            t.primary_color = v["colors"][0]
-            t.secondary_color = v["colors"][1]
-            teams.append(t)
-        with open("config/signups/officials.json") as fp:
-            umpires = json.load(fp)
-        return render_template_sidebar(
-            "sign_up/admin.html",
-            tournament="Fifth S.U.S.S. Championship",
-            teams=teams,
-            umpires=umpires,
-        )
 
     @app.get("/games/<game_id>/admin")
     @admin_only

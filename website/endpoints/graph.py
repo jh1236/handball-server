@@ -5,12 +5,10 @@ from flask import request, Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
-from matplotlib.pyplot import yticks
 from werkzeug.datastructures import MultiDict
 
 from database import db
 from database.models import Games, Tournaments, PlayerGameStats, People
-from structure.AllTournament import get_all_players, get_all_games
 from structure.GameUtils import filter_games, get_query_descriptor
 
 
