@@ -1,3 +1,4 @@
+import datetime
 import time
 from collections import defaultdict
 from dataclasses import dataclass
@@ -22,7 +23,6 @@ from utils.permissions import (
 from utils.sidebar_wrapper import render_template_sidebar, link
 from utils.util import fixture_sorter
 from website.website import numbers
-
 
 
 def priority_to_classname(p):
@@ -694,7 +694,8 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
     @app.get("/games/<true_game_id>/display")
     def scoreboard(true_game_id):
         if int(true_game_id) <= 0:
-            game_id = Games.query.filter(Games.started, Games.court == abs(true_game_id)).order_by(Games.id.desc()).first().id
+            game_id = Games.query.filter(Games.started, Games.court == abs(true_game_id)).order_by(
+                Games.id.desc()).first().id
         else:
             game_id = int(true_game_id)
         with DatabaseManager() as c:
@@ -734,7 +735,10 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
               (SELECT MAX(id)
                FROM gameEvents inn2
                WHERE games.id = inn2.game_id
-                 AND (inn2.notes is null or inn2.notes <> 'Penalty'))) --20
+                 AND (inn2.notes is null or inn2.notes <> 'Penalty'))), --20
+        games.start_time,
+        games.length,
+        games.started
 FROM games
          LEFT JOIN gameEvents lastGE ON games.id = lastGE.game_id AND lastGE.id =
                                                                      (SELECT MAX(id)
@@ -805,6 +809,9 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             faulted: bool = False
             serverSide: str = "Left"
             event_type: str = "Start"
+            start_time: float = 0.0
+            length: float = 0.0
+            started: bool = False
 
         if not players:
             left_player = Player(name="Left Player")
@@ -818,6 +825,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
                     update_count=manage_game.change_code(game_id),
                     timeout_time=0,
                     serve_time=0,
+                    time_elapsed="0:00",
                     game=game,
                     teams=[team_one, team_two],
                     players=[left_player, right_player] * 2,
@@ -849,13 +857,14 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             teams = list(reversed(teams))
 
         game.id = int(true_game_id)
-
+        sec = -int(game.length) if game.length and game.length > 0 else (game.start_time if game.started else -0)
         return (
             render_template_sidebar(
                 "tournament_specific/scoreboard.html",
                 game=game,
                 players=player_stats,
                 teams=teams,
+                time_elapsed=sec,
                 update_count=manage_game.change_code(game_id),
                 timeout_time=manage_game.get_timeout_time(game_id) * 1000,
                 serve_time=manage_game.get_serve_timer(game_id) * 1000,
@@ -1948,8 +1957,10 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
             teams = list(reversed(teams))
         key = fetch_user()
         is_admin = key in [i.key for i in get_all_officials() if i.admin]
-        team_one_players = sorted([((1 - i), v) for i, v in enumerate(teams[0].players[:2])], key=lambda a: a[1].searchable_name)
-        team_two_players = sorted([((1 - i), v) for i, v in enumerate(teams[1].players[:2])], key=lambda a: a[1].searchable_name)
+        team_one_players = sorted([((1 - i), v) for i, v in enumerate(teams[0].players[:2])],
+                                  key=lambda a: a[1].searchable_name)
+        team_two_players = sorted([((1 - i), v) for i, v in enumerate(teams[1].players[:2])],
+                                  key=lambda a: a[1].searchable_name)
 
         # TODO: Write a permissions decorator for scorers and primary officials
         # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:

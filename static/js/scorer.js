@@ -21,14 +21,16 @@ if (greenCardsUsed && warningsUsed) {
             "dissent": "Disrespect Towards Officials",
             "danger": "Dangerous Play (James)",
             "badTimeWasting": "Deliberate Delay of Game",
+            "hindrance" : "Deliberately Hindering another Player",
+            "uniform" : "Not Meeting the Uniform Requirements"
         },
         Yellow: {
-            "directedSwearing": "Swearing Towards Players or Officials",
             "badDissent": "Continuous or Egregious Disrespect Towards Officials",
             "equipmentAbuse": "Equipment Abuse",
             "danger": "Aggressively Dangerous Play (James)",
             "misconduct": "Misconduct Whilst Carded",
-            "aggression": "Displays of Aggression towards Officials or Players"
+            "aggression": "Displays of Aggression towards Officials or Players",
+            "bypass": "Attempting to Get Around the restrictions on swearing"
         },
         Red: {
             "violence": "Violence Towards Any Player, Official Or Spectator",
@@ -245,8 +247,18 @@ function openCardModal(colorIn, firstTeam, teamName) {
     document.getElementById("cardHeader").textContent = `${colorIn} Card for ${teamName}`;
     firstTeamSelected = firstTeam
     console.log(players)
+    console.log(players.length)
     document.getElementById("nameOne").textContent = playerLookup[players[0]]
-    document.getElementById("nameTwo").textContent = playerLookup[players[1]]
+    if (players.length > 1) {
+        document.getElementById("nameTwo").textContent = playerLookup[players[1]]
+        document.getElementById("nameTwo").style.display = "block"
+        document.getElementById("playerTwo").style.display = "block"
+    } else {
+        document.getElementById("nameTwo").style.display = "none"
+        document.getElementById("playerTwo").style.display = "none"
+    }
+
+
     if (colorIn === "Yellow") {
         document.getElementById("duration").style.display = "block"
         minYellowTime = 3 * warningsUsed + 3 * greenCardsUsed

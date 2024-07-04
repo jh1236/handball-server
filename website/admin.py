@@ -1,3 +1,4 @@
+import datetime
 import json
 import time
 from collections import defaultdict
@@ -360,6 +361,7 @@ def add_admin_pages(app):
             notes: str
             iga_side: Team
             cards: list
+
         cards = [Card(*i) for i in cards_query]
         player_stats = []
         teams = {}
@@ -392,7 +394,8 @@ def add_admin_pages(app):
             ] = f"{i.elo} [{i.elo_delta if i.elo_delta < 0 else '+' + str(i.elo_delta)}]"
 
         time_float = float(players[0][28])
-        print(players[1][38])
+        length = str(datetime.timedelta(seconds=int(players[0][38])))[2:]
+
         game = Game(
             player_stats,
             list(teams.values()),
@@ -410,7 +413,7 @@ def add_admin_pages(app):
             players[0][27],
             players[0][28],
             "?" if players[0][38] < 0
-            else f"{floor(players[0][38]) / 60: 2.0f}:{'0' if floor(players[0][38]) % 60 < 10 else ''}{floor(players[0][38]) % 60:.0f}",
+            else length,
             "?"
             if time_float < 0
             else time.strftime("%d/%m/%y (%H:%M)", time.localtime(time_float)),
@@ -420,7 +423,6 @@ def add_admin_pages(app):
             cards
         )
         teams = list(teams.values())
-
 
         best = game.bestSearchableName if game.bestSearchableName else "TBD"
 
@@ -743,7 +745,7 @@ WHERE teams.searchable_name = ?
             200,
         )
 
-    #TODO: complete
+    # TODO: complete
     @app.get("/<tournament>/players/admin")
     @admin_only
     def admin_players_site(tournament):
@@ -1091,7 +1093,7 @@ WHERE people.searchable_name = ?
                 name=players[0],
                 player=player_name,
                 team=players[1],
-                cards = cards,
+                cards=cards,
                 key_games=key_games
 
             ),
@@ -1131,7 +1133,7 @@ WHERE people.searchable_name = ?
             teams: list[str]
             score_string: str
             id: int
-            requires_action_string:str = ""
+            requires_action_string: str = ""
 
         @dataclass
         class Player:
@@ -1208,7 +1210,7 @@ WHERE people.searchable_name = ?
                                         round = (SELECT max(round) FROM games WHERE tournament_id = ?) 
                                 END;""",
                 (tournament_id,) * 3,
-                ).fetchall()
+            ).fetchall()
             current_round = [
                 Game(game[:2], f"{game[2]} - {game[3]}", game[4]) for game in games
             ]

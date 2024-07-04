@@ -418,6 +418,8 @@ def card(game_id, first_team, left_player, color, duration, reason):
 
 
 def undo(game_id):
+    if game_is_ended(game_id):
+        raise ValueError("Game is Already Over!")
     delete_after = GameEvents.query.filter(GameEvents.game_id == game_id,
                                            (GameEvents.notes == None) | (GameEvents.notes != 'Penalty'),
                                            GameEvents.event_type != 'Protest').order_by(GameEvents.id.desc()).first().id
@@ -682,6 +684,8 @@ def get_timeout_caller(game_id):
 
 
 def delete(game_id):
+    if game_is_ended(game_id):
+        raise ValueError("Game is Already Over!")
     GameEvents.query.filter(GameEvents.game_id == game_id).delete()
     PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).delete()
     Games.query.filter(Games.id == game_id).delete()

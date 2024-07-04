@@ -12,7 +12,6 @@
     setup({{game.id}}, {{ update_count }})
     setTournament("{{tournamentLink}}")
 </script>
-<script>main("{{tournamentLink}}")</script>
 {% if timeout_time > 0 %}
     <div class="overlay"><h1 class="big" style="top: 50%" id="timeout">30</h1></div>
     <script>timeout({{ timeout_time }})</script>
@@ -60,6 +59,7 @@
                 <a class="hide" href="/{{ tournamentLink }}officials/{{ game.umpireSearchableName }}">
                     <i>{{ game.umpire }}</i>
                 </a></p>
+            <p><b>Time Elapsed:</b> <i id="elapsed">{{ time_elapsed }}</i></p>
             {% if game.scorerSearchableName != 'none_one' %}
                 <p><b>Scorer:</b>
                     <a class="hide" href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}">
@@ -229,5 +229,8 @@
     |
     <a href="/games/{{ game.id + 1 }}/display" class="hide">Next Game</a>
 </p>
+<script>main({{ time_elapsed }})</script>
+
 </body>
+
 </html>
