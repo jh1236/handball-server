@@ -2,6 +2,7 @@
 import time
 
 from database import db
+from database.models import Games
 
 
 # create table main.playerGameStats
@@ -88,6 +89,11 @@ class PlayerGameStats(db.Model):
         "Red Cards": red_cards,
         "Cards": green_cards + yellow_cards + red_cards,
         "Elo": None,
+        "Elo Delta": None,
+        "Result": Games.winning_team_id == team_id,
+        "IGA Side": Games.iga_side_id == team_id,
+        "Ranked": Games.ranked,
+        "Return Rate": serves_returned / serves_received
     }
 
     def reset_stats(self):
@@ -109,8 +115,11 @@ class PlayerGameStats(db.Model):
         self.card_time_remaining = 0
 
     def stats(self):
+        from database.models import GameEvents
+        first_ge = GameEvents.query.filter(GameEvents.game_id == self.game_id).first()
         return {
             "Rounds on Court": self.rounds_on_court,
+            "Ranked": self.game.ranked,
             "Rounds Carded": self.rounds_carded,
             "Points Scored": self.points_scored,
             "Aces Scored": self.aces_scored,
@@ -125,8 +134,14 @@ class PlayerGameStats(db.Model):
             "Yellow Cards": self.yellow_cards,
             "Red Cards": self.red_cards,
             "Cards": self.red_cards + self.yellow_cards + self.green_cards,
-            "Elo": self.player.elo(self.game_id)
-        }
+            "Elo": self.player.elo(self.game_id),
+            "Elo Delta": self.player.elo(self.game_id) - self.player.elo(self.game_id - 1),
+            "Result": int(self.team_id == self.game.winning_team_id),
+            "IGA Side": int(self.team_id == self.game.iga_side_id),
+            "Served First": int(self.team_id == first_ge.team_to_serve_id),
+            "Return Rate": self.serves_returned / (self.serves_received or 1),
+            "Timeout Used": (self.game.team_one_timeouts if self.game.team_one_id == self.team_id else self.game.team_two_timeouts),
+        } | self.game.stats()
 
     @classmethod
     def row_by_name(cls, name):

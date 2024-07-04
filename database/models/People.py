@@ -23,7 +23,8 @@ PERCENTAGES = [
     "Percentage of Points Scored",
     "Percentage of Points Scored For Team",
     "Percentage of Games Starting Left",
-    "Percentage of Points Served Won"
+    "Percentage of Points Served Won",
+    "Serve Return Rate"
 ]
 
 

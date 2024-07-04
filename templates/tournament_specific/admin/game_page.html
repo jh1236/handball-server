@@ -30,6 +30,9 @@
             <p><b>Court:</b> <a class="hide"
                                 href="/{{ tournamentLink }}fixtures/admin?court={{ game.court }}"><i>{{ game.courtName }}</i></a>
             </p>
+            <p><b>IGA Side Team:</b> <a class="hide"
+                                href="/{{ tournamentLink }}teams/{{ game.iga_side.searchableName }}/admin"><i>{{ game.iga_side.name }}</i></a>
+            </p>
             <p><b>Match Official:</b>{% if not game.bye %}
                 <a class="hide" href="/{{ tournamentLink }}officials/{{ game.umpireSearchableName }}">{% endif %}
                 <i>{{ game.umpire }}</i>

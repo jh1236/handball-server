@@ -58,7 +58,7 @@ def sync_all_games():
 
 
 def interpolate_start_times():
-    games = Games.query.filter(Games.tournament_id == 1).all()
+    games = Games.query.filter(Games.tournament_id == 1, Games.id <= 342).all()
     first_ever_game = 1690887600
     last_time_stamp = 1709901482.6885524
     time_per_event = 29.718165623703534
@@ -66,12 +66,10 @@ def interpolate_start_times():
     prev_round = 0
     for i in games:
         print(i.id)
-        if i.start_time and i.start_time > 0:
-            continue
         if i.round != prev_round:
             prev_round = i.round
             # linearly interpolate the two start times
-            current_start_time = first_ever_game + ((i.round - 1) / 32) * last_time_stamp
+            current_start_time = first_ever_game + ((i.round - 1) / 32) * (last_time_stamp - first_ever_game)
         length = len(GameEvents.query.filter(GameEvents.game_id == i.id).all()) * time_per_event
         i.start_time = current_start_time
         i.length = length

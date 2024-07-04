@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block headBlock %}
-    <title>Statistics for {{ player.name }}</title>
+    <title>Statistics for {{ name }}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
 {% endblock %}
 
@@ -60,7 +60,7 @@
             <br>
             <br>
             <iframe id="graph"
-                    src="/graphs/game_player?x=Points Scored&y=Aces&player={{ player.searchable_name }}&tournament={{ tournamentLink.replace('/','') }}"
+                    src="/graphs/game_player?x=Points Scored&y=Aces Scored&player={{ player }}&tournament={{ tournamentLink.replace('/','') }}"
                     width="400" height="300" title="Embedded Page"></iframe>
             <div style="min-height: 400px">
                 <h2><a class="hide" href="/{{ tournamentLink }}fixtures/detailed?player={{ player }}">Recent Matches</a>

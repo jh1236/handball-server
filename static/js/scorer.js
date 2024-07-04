@@ -5,35 +5,114 @@ let teamName = ""
 let startTime = -1
 
 let waiting = false
+let greenCardsUsed = document.currentScript.getAttribute('greens') === 'True'
+let warningsUsed = document.currentScript.getAttribute('warnings') === 'True'
 
-const CARDS = {
-    Warning: {
-        "swearing": "Audible Swearing",
-        "dissent": "Disrespect Towards Officials",
-        "timeWasting": "Delay of Game",
-        "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
-        "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
-    },
-    Yellow: {
-        "directedSwearing": "Swearing Towards Players or Officials",
-        "badDissent": "Continuous or Egregious Disrespect Towards Officials",
-        "badTimeWasting": "Deliberate Delay of Game",
-        "equipmentAbuse": "Equipment Abuse",
-        "danger": "Dangerous Play (James)",
-        "misconduct": "Misconduct Whilst Carded",
-        "aggression": "Displays of Aggression towards Officials or Players"
-    },
-    Red: {
-        "violence": "Violence Towards Any Player, Official Or Spectator",
-        "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
-        "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
-        "cheatingAccusation": "Accusations Of Cheating",
-        "discrimination": "Any Form of Discrimination"
-    },
+let CARDS = {}
+
+if (greenCardsUsed && warningsUsed) {
+    CARDS = {
+        Warning: {
+            "swearing": "Audible Swearing",
+            "timeWasting": "Delay of Game",
+            "endOfGameProcess": "Did not follow the end of game process"
+        },
+        Green: {
+            "dissent": "Disrespect Towards Officials",
+            "danger": "Dangerous Play (James)",
+            "badTimeWasting": "Deliberate Delay of Game",
+        },
+        Yellow: {
+            "directedSwearing": "Swearing Towards Players or Officials",
+            "badDissent": "Continuous or Egregious Disrespect Towards Officials",
+            "equipmentAbuse": "Equipment Abuse",
+            "danger": "Aggressively Dangerous Play (James)",
+            "misconduct": "Misconduct Whilst Carded",
+            "aggression": "Displays of Aggression towards Officials or Players"
+        },
+        Red: {
+            "violence": "Violence Towards Any Player, Official Or Spectator",
+            "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+            "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+            "cheatingAccusation": "Accusations Of Cheating",
+            "discrimination": "Any Form of Discrimination"
+        }
+    }
+} else if (greenCardsUsed) {
+    CARDS = {
+        Green: {
+            "swearing": "Audible Swearing",
+            "dissent": "Disrespect Towards Officials",
+            "timeWasting": "Delay of Game",
+            "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
+            "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
+        },
+        Yellow: {
+            "directedSwearing": "Swearing Towards Players or Officials",
+            "badDissent": "Continuous or Egregious Disrespect Towards Officials",
+            "badTimeWasting": "Deliberate Delay of Game",
+            "equipmentAbuse": "Equipment Abuse",
+            "danger": "Dangerous Play (James)",
+            "misconduct": "Misconduct Whilst Carded",
+            "aggression": "Displays of Aggression towards Officials or Players"
+        },
+        Red: {
+            "violence": "Violence Towards Any Player, Official Or Spectator",
+            "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+            "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+            "cheatingAccusation": "Accusations Of Cheating",
+            "discrimination": "Any Form of Discrimination"
+        }
+    }
+} else if (warningsUsed) {
+    CARDS = {
+        Warning: {
+            "swearing": "Audible Swearing",
+            "dissent": "Disrespect Towards Officials",
+            "timeWasting": "Delay of Game",
+            "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
+            "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
+        },
+        Yellow: {
+            "directedSwearing": "Swearing Towards Players or Officials",
+            "badDissent": "Continuous or Egregious Disrespect Towards Officials",
+            "badTimeWasting": "Deliberate Delay of Game",
+            "equipmentAbuse": "Equipment Abuse",
+            "danger": "Dangerous Play (James)",
+            "misconduct": "Misconduct Whilst Carded",
+            "aggression": "Displays of Aggression towards Officials or Players"
+        },
+        Red: {
+            "violence": "Violence Towards Any Player, Official Or Spectator",
+            "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+            "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+            "cheatingAccusation": "Accusations Of Cheating",
+            "discrimination": "Any Form of Discrimination"
+        },
+    }
+} else {
+    CARDS = {
+        Yellow: {
+            "swearing": "Audible Swearing",
+            "dissent": "Disrespect Towards Officials",
+            "timeWasting": "Delay of Game",
+            "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
+            "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
+            "directedSwearing": "Swearing Towards Players or Officials",
+            "equipmentAbuse": "Equipment Abuse",
+            "danger": "Dangerous Play (James)",
+            "misconduct": "Misconduct Whilst Carded",
+            "aggression": "Displays of Aggression towards Officials or Players"
+        },
+        Red: {
+            "violence": "Violence Towards Any Player, Official Or Spectator",
+            "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+            "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+            "cheatingAccusation": "Accusations Of Cheating",
+            "discrimination": "Any Form of Discrimination"
+        },
+    }
 }
-
-CARDS.Green = CARDS.Warning
-
 let setup = (newId, newSwapped) => {
     id = newId
     teamsSwapped = newSwapped
@@ -51,6 +130,8 @@ function swap() {
 let teamOnePlayers = document.currentScript.getAttribute('teamOne').split(",")
 let teamTwoPlayers = document.currentScript.getAttribute('teamTwo').split(",")
 
+
+
 let playerLookup = {}
 for (let i of teamOnePlayers.concat(teamTwoPlayers)) {
     playerLookup[i.split(":")[0]] = i.split(":")[1]
@@ -66,6 +147,29 @@ function score(firstTeam, leftPlayer) {
     if (waiting) return
     waiting = true
     fetch("/api/games/update/score", {
+        method: "POST", body: JSON.stringify({
+            id: id,
+            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
+            leftPlayer: leftPlayer
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
+}
+
+function pardon(firstTeam, leftPlayer) {
+    if (waiting) return
+    waiting = true
+    fetch("/api/games/update/pardon", {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
@@ -145,9 +249,12 @@ function openCardModal(colorIn, firstTeam, teamName) {
     document.getElementById("nameTwo").textContent = playerLookup[players[1]]
     if (colorIn === "Yellow") {
         document.getElementById("duration").style.display = "block"
+        minYellowTime = 3 * warningsUsed + 3 * greenCardsUsed
+        document.getElementById("duration").value = `${minYellowTime}`
+        document.getElementById("duration").min = `${minYellowTime}`
+        document.getElementById("duration").value = `${minYellowTime}`
         document.getElementById("durationText").style.display = "block"
-        document.getElementById("duration").value = "3"
-        document.getElementById("durationText").textContent = "Duration (3)"
+        document.getElementById("durationText").textContent = `Duration (${minYellowTime})`
     } else {
         document.getElementById("duration").style.display = "none"
         document.getElementById("durationText").style.display = "none"
@@ -156,25 +263,32 @@ function openCardModal(colorIn, firstTeam, teamName) {
     reasons.replaceChildren()
     for (const k in CARDS[colorIn]) {
         const v = CARDS[colorIn][k]
-        reasons.insertAdjacentHTML( 'beforeend',`<input type="radio" name="reason" id="${k}" value="${k}"><label for="${k}">${v}</label><br>`)
+        reasons.insertAdjacentHTML('beforeend', `<input type="radio" name="reason" id="${k}" value="${k}"><label for="${k}">${v}</label><br>`)
     }
-    if (colorIn !== "Green" && colorIn !== "Warning") {
-        reasons.insertAdjacentHTML( 'beforeend',`<input type="radio" name="reason" id="repeated" value="repeated"><label for="repeat">Repeated :`)
+    if (colorIn === "Red" || (colorIn === "Yellow" && (warningsUsed || greenCardsUsed)) || (colorIn === "Green" && warningsUsed)) {
+        reasons.insertAdjacentHTML('beforeend', `<input type="radio" name="reason" id="repeated" value="repeated"><label for="repeat">Repeated :`)
         let sel = "<select id='repeatedSelect'>"
-        for (const k in CARDS.Warning) {
-            const v = CARDS.Warning[k]
-            sel += `<option id="${k}" name="${k}">${v}</option>`
+        if (warningsUsed) {
+            for (const k in CARDS.Warning) {
+                const v = CARDS.Warning[k]
+                sel += `<option id="${k}" name="${k}">${v}</option>`
+            }
         }
-        if (colorIn === "Red") {
+        if (colorIn !== "Green" && greenCardsUsed) {
+            for (const k in CARDS.Green) {
+                const v = CARDS.Green[k]
+                sel += `<option id="${k}" name="${k}">${v}</option>`
+            }
+        } else if (colorIn === "Red") {
             for (const k in CARDS.Yellow) {
                 const v = CARDS.Yellow[k]
                 sel += `<option id="${k}" name="${k}">${v}</option>`
             }
         }
         sel += "</select></label><br>"
-        reasons.insertAdjacentHTML( 'beforeend',sel)
+        reasons.insertAdjacentHTML('beforeend', sel)
     }
-    reasons.insertAdjacentHTML( 'beforeend',`<input type="radio" name="reason" id="other" value="other"><input type="text" id="otherText"><br>`)
+    reasons.insertAdjacentHTML('beforeend', `<input type="radio" name="reason" id="other" value="other"><input type="text" id="otherText"><br>`)
 }
 
 function sendCustomCard() {
@@ -209,7 +323,9 @@ function sendCustomCard() {
         duration = -1
     } else if (color === 'Yellow') {
         duration = document.getElementById("duration").value
-    } else if (color === 'Green' || color === 'Warning') {
+    } else if (color === 'Green' && warningsUsed) {
+        duration = 2
+    } else {
         duration = 0
     }
 

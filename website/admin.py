@@ -2,6 +2,7 @@ import json
 import time
 from collections import defaultdict
 from dataclasses import dataclass
+from math import floor
 
 from flask import render_template
 
@@ -9,15 +10,12 @@ from FixtureGenerators.FixturesGenerator import get_type_from_name
 from structure.GameUtils import game_string_to_events
 from structure.Player import Player
 from structure.Team import Team
-from structure.Tournament import Tournament
 from structure.get_information import get_tournament_id
 from utils.databaseManager import DatabaseManager
 from utils.permissions import admin_only
 from utils.sidebar_wrapper import render_template_sidebar
-from utils.statistics import get_player_stats
-from utils.util import fixture_sorter
 from website.tournament_specific import priority_to_classname
-from website.website import sign, numbers
+from website.website import numbers
 
 
 def add_admin_pages(app):
@@ -214,8 +212,9 @@ def add_admin_pages(app):
                                        best.name,
                                        best.searchable_name,
                                        coalesce(games.start_time, -1),
-                                       tournaments.searchable_name,
-                                       teams.name, --30
+                                       iga.name,
+                                       tournaments.searchable_name, --30
+                                       teams.name, 
                                        teams.searchable_name,
                                        case 
                                         when teams.image_url is null 
@@ -224,8 +223,8 @@ def add_admin_pages(app):
                                             teams.image_url
                                         end,
                                        people.searchable_name,
-                                       games.admin_status,
-                                       games.team_one_timeouts, --35
+                                       games.admin_status, --35
+                                       games.team_one_timeouts, 
                                        games.team_two_timeouts,
                                        coalesce(games.length, -1),
                                        coalesce(games.notes, '')
@@ -240,6 +239,7 @@ def add_admin_pages(app):
                                          LEFT JOIN people on people.id = playerGameStats.player_id
                                          LEFT JOIN people best on best.id = games.best_player_id
                                          LEFT JOIN teams on teams.id = playerGameStats.team_id
+                                         LEFT JOIN teams iga on iga.id = games.iga_side_id
                                          LEFT JOIN eloChange on games.id >= eloChange.game_id and eloChange.player_id = playerGameStats.player_id
                                 WHERE games.id = ?
                                 GROUP BY people.name
@@ -321,7 +321,7 @@ def add_admin_pages(app):
             stats += list(row[3:12])
             return Player(
                 name,
-                row[33],
+                row[34],
                 {k: v for k, v in zip(player_headers, stats)},
                 elo,
                 elo_delta,
@@ -358,6 +358,7 @@ def add_admin_pages(app):
             startTimeStr: str
             status: str
             notes: str
+            iga_side: Team
             cards: list
         cards = [Card(*i) for i in cards_query]
         player_stats = []
@@ -365,23 +366,23 @@ def add_admin_pages(app):
         for i in players:
             pl = make_player(i)
             player_stats.append(pl)
-            if i[30] not in teams:
-                teams[i[30]] = Team([], i[32] if i[32] else "", i[30], i[31], {})
-            teams[i[30]].players.append(pl)
-            teams[i[30]].stats["Green Cards"] = (
-                    teams[i[30]].stats.get("Green Cards", 0) + i[9]
+            if i[31] not in teams:
+                teams[i[31]] = Team([], i[33] if i[33] else "", i[31], i[32], {})
+            teams[i[31]].players.append(pl)
+            teams[i[31]].stats["Green Cards"] = (
+                    teams[i[31]].stats.get("Green Cards", 0) + i[9]
             )
-            teams[i[30]].stats["Yellow Cards"] = (
-                    teams[i[30]].stats.get("Yellow Cards", 0) + i[10]
+            teams[i[31]].stats["Yellow Cards"] = (
+                    teams[i[31]].stats.get("Yellow Cards", 0) + i[10]
             )
-            teams[i[30]].stats["Red Cards"] = (
-                    teams[i[30]].stats.get("Red Cards", 0) + i[11]
+            teams[i[31]].stats["Red Cards"] = (
+                    teams[i[31]].stats.get("Red Cards", 0) + i[11]
             )
         for i, team in enumerate(teams.values()):
             if i:
-                team.stats["Timeouts Remaining"] = 1 - players[0][36]
+                team.stats["Timeouts Remaining"] = 1 - players[0][37]
             else:
-                team.stats["Timeouts Remaining"] = 1 - players[0][35]
+                team.stats["Timeouts Remaining"] = 1 - players[0][36]
 
         for i in teams.values():
             i.elo = round(sum(j.elo for j in i.players) / len(i.players), 2)
@@ -390,12 +391,11 @@ def add_admin_pages(app):
                 "Elo"
             ] = f"{i.elo} [{i.elo_delta if i.elo_delta < 0 else '+' + str(i.elo_delta)}]"
 
-        teams = list(teams.values())
         time_float = float(players[0][28])
-
+        print(players[1][38])
         game = Game(
             player_stats,
-            teams,
+            list(teams.values()),
             f"{players[0][18]} - {players[0][19]}",
             game_id,
             players[0][20],
@@ -409,15 +409,18 @@ def add_admin_pages(app):
             players[0][26],
             players[0][27],
             players[0][28],
-            "?" if players[0][37] < 0
-            else time.strftime("%d/%m/%y (%H:%M)", time.localtime(players[0][37])),
+            "?" if players[0][38] < 0
+            else f"{floor(players[0][38]) / 60: 2.0f}:{'0' if floor(players[0][38]) % 60 < 10 else ''}{floor(players[0][38]) % 60:.0f}",
             "?"
             if time_float < 0
             else time.strftime("%d/%m/%y (%H:%M)", time.localtime(time_float)),
-            players[0][34],
-            players[0][38],
+            players[0][35],
+            players[0][39],
+            teams[players[0][29]] if players[0][29] else None,
             cards
         )
+        teams = list(teams.values())
+
 
         best = game.bestSearchableName if game.bestSearchableName else "TBD"
 

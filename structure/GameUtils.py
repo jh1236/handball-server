@@ -104,7 +104,7 @@ GROUP BY gameEvents.id""", (game,)).fetchall()
 
 
 def filter_games(args, get_details=False):
-    games = db.session.query(Games).join(PlayerGameStats)
+    games = db.session.query(Games).join(PlayerGameStats).filter(Games.is_bye == False, Games.started)
     details = MultiDict((k, v) for k, v in args.items(multi=True) if not v.startswith("$"))
     sort = ([k for k, v in args.items(multi=True) if v.startswith("^")] + [None])[0]
     for k, v in args.items(multi=True):
@@ -126,7 +126,7 @@ def filter_games(args, get_details=False):
             comparer = lambda i: True
         else:
             v = v.strip("=")
-            comparer = lambda i: str(i) == str(v)
+            comparer = lambda i: i == float(v)
         match k:
             case _:
                 games = games.filter(comparer(PlayerGameStats.row_by_name(k)))
@@ -135,7 +135,6 @@ def filter_games(args, get_details=False):
         games.order_by(PlayerGameStats.row_by_name(sort))
     games = games.all()
     games = [(i, PlayerGameStats.query.filter(PlayerGameStats.game_id == i.id).all()) for i in games]
-    print(games)
     if get_details:
         return games, details
     return games

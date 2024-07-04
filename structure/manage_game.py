@@ -18,6 +18,10 @@ def searchable_of(name: str):
     return re.sub("[^a-zA-Z0-9_]", "", s)
 
 
+def pgs_from_game_and_player(game_id, person_id):
+    return PlayerGameStats.query.filter_by(game_id=game_id, player_id=person_id).first()
+
+
 def sync(game_id):
     game: Games = Games.query.filter(Games.id == game_id).first()
     game.reset()
@@ -39,14 +43,15 @@ def sync(game_id):
         i.card_time = i.card_time_remaining
     i = None
     for c, i in enumerate(events):
-        players_on_court = on_court_for_game(game_id, None, event = i)
+        players_on_court = on_court_for_game(game_id, None, event=i)
         is_team_one = i.team_id == game.team_one_id
         player: PlayerGameStats = ([j for j in all_players if j.player_id == i.player_id] + [None])[0]
         left_served = i.side_to_serve == 'Left'
-        non_serving_team = [i.team_one_left, i.team_one_right] if i.team_who_served_id != game.team_one_id else [i.team_two_left, i.team_two_right]
+        non_serving_team = [i.team_one_left, i.team_one_right] if i.team_who_served_id != game.team_one_id else [
+            i.team_two_left, i.team_two_right]
         match i.event_type:
             case "Score":
-                prev_event = events[c-1].event_type
+                prev_event = events[c - 1].event_type
                 fault = False
                 if player is not None:
                     player.points_scored += 1
@@ -65,11 +70,21 @@ def sync(game_id):
                         j.rounds_carded += 1
                         if j.card_time_remaining > 0:
                             j.card_time_remaining -= 1
-                    if non_serving_team[left_served].id == j.player_id and (i.notes != 'Penalty' or prev_event == 'Ace'):
+                    receiving_player = non_serving_team[not left_served]
+                    if not receiving_player:
+                        receiving_player = [i for i in non_serving_team if i][0]
+                    elif pgs_from_game_and_player(game_id, receiving_player.id).card_time_remaining != 0:
+                        receiving_player = ([i for i in non_serving_team if
+                                             pgs_from_game_and_player(game_id, i.id).card_time_remaining == 0] + [
+                                                None])[0]
+                    if receiving_player and receiving_player.id == j.player_id and (
+                            i.notes != 'Penalty' or prev_event == 'Ace'):
                         j.serves_received += 1
                         if prev_event != 'Ace':
                             j.serves_returned += 1
 
+            case "Pardon":
+                player.card_time_remaining = 0
             case "Ace":
                 player.aces_scored += 1
             case "Fault":
@@ -82,6 +97,9 @@ def sync(game_id):
                     fault = True
             case "Green Card":
                 player.green_cards += 1
+                if player.card_time_remaining >= 0:
+                    player.card_time_remaining += i.details
+                    player.card_time = player.card_time_remaining
             case "Warning":
                 player.warnings += 1
             case "Yellow Card":
@@ -183,7 +201,7 @@ def _score_point(game_id, first_team, left_player, penalty=False, points=1):
 
 def get_serve_details(game, team_one, team_two, team_who_served, player_who_served, next_team_to_serve, serve_side):
     serve_team = team_one if next_team_to_serve == game.team_one_id else team_two
-    if not Config().badminton_style_serves:
+    if not game.tournament.badminton_serves:
         if team_who_served != next_team_to_serve:
             last_time_served = GameEvents.query.filter(
                 (GameEvents.game_id == game.id) & (GameEvents.team_who_served_id == next_team_to_serve)).order_by(
@@ -212,7 +230,10 @@ def get_serve_details(game, team_one, team_two, team_who_served, player_who_serv
                 GameEvents.id.desc()).first()
             if last_time_served:
                 next_serve_side = 'Right' if last_time_served.side_served == 'Left' else 'Left'
-                next_player_to_serve = [i for i in serve_team if i.id != last_time_served.player_who_served_id][0]
+                next_player_to_serve = \
+                    ([i for i in serve_team if i and i.id != last_time_served.player_who_served_id] + [None])[0]
+                if next_player_to_serve == None:
+                    next_player_to_serve = [i for i in serve_team if i][0]
             else:
                 next_serve_side = 'Left'
                 next_player_to_serve = serve_team[0]
@@ -254,6 +275,10 @@ def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None
     if char == 'Score':
         next_player_to_serve, next_serve_side = get_serve_details(game, team_one, team_two, team_who_served,
                                                                   player_who_served, next_team_to_serve, serve_side)
+        if next_player_to_serve is None:
+            next_player_to_serve = \
+                [i for i in (team_one if next_team_to_serve == game.team_one_id else team_two) if i and
+                 pgs_from_game_and_player(game_id, i.id).card_time_remaining == 0][0]
     else:
         next_serve_side = serve_side
         serve_team = team_one if next_team_to_serve == game.team_one_id else team_two
@@ -261,17 +286,19 @@ def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None
 
     team_id = team.id if team is not None else None
     player_id = player.id if player is not None else None
-
+    player_who_served_id = player_who_served.id if player_who_served is not None else None
+    next_player_to_serve_id = next_player_to_serve.id if next_player_to_serve is not None else None
+    team_ids = [i.id if i else None for i in team_one + team_two]
     to_add = GameEvents(game_id=game.id, tournament_id=game.tournament_id, event_type=char,
                         details=details, notes=notes, team_id=team_id, player_id=player_id,
-                        team_who_served_id=team_who_served, player_who_served_id=player_who_served.id,
+                        team_who_served_id=team_who_served, player_who_served_id=player_who_served_id,
                         side_served=serve_side,
-                        team_to_serve_id=next_team_to_serve, player_to_serve_id=next_player_to_serve.id,
+                        team_to_serve_id=next_team_to_serve, player_to_serve_id=next_player_to_serve_id,
                         side_to_serve=next_serve_side,
-                        team_one_left_id=team_one[0].id,
-                        team_one_right_id=team_one[1].id,
-                        team_two_left_id=team_two[0].id,
-                        team_two_right_id=team_two[1].id)
+                        team_one_left_id=team_ids[0],
+                        team_one_right_id=team_ids[1],
+                        team_two_left_id=team_ids[2],
+                        team_two_right_id=team_ids[3])
     db.session.add(to_add)
 
     sync(game_id)
@@ -279,7 +306,7 @@ def _add_to_game(game_id, char: str, first_team, left_player, team_to_serve=None
                                           PlayerGameStats.game_id == game.id).first()
     server_team_players_on_court = [i.player_id for i in players if
                                     i.team_id == to_add.team_to_serve_id and i.card_time_remaining == 0]
-    if server.card_time_remaining != 0 and server_team_players_on_court:
+    if server and server.card_time_remaining != 0 and server_team_players_on_court:
         to_add.player_to_serve_id = server_team_players_on_court[0]
         sync(game_id)
     db.session.commit()
@@ -329,6 +356,8 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
                         team_one_right_id=team_one[1], team_two_right_id=team_two[1])
     db.session.add(to_add)
     sync(game_id)
+    if pgs_from_game_and_player(game_id, to_add.player_to_serve_id).card_time_remaining != 0:
+        to_add.player_to_serve_id = team_two[1] if swap_service else team_one[1]
     db.session.commit()
 
 
@@ -430,16 +459,16 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
     if best is None:
         forfeit = GameEvents.query.filter(GameEvents.event_type == 'Forfeit', GameEvents.game_id == game_id).first()
         teams = [game.team_one, game.team_two]
-        if forfeit is None and not [i for i in teams if i.non_captain]:
+        if forfeit is None and [i for i in teams if i.non_captain_id]:
             raise ValueError("Best Player was not provided")
 
     if protest_team_one:
         _add_to_game(game_id, "Protest", True, None, notes=protest_team_one)
     if protest_team_two:
         _add_to_game(game_id, "Protest", False, None, notes=protest_team_two)
-    _add_to_game(game_id, "End Game", None, None, notes=notes, details=best)
+    _add_to_game(game_id, "End Game", None, None, notes=notes, details=best.id if best else None)
 
-    if any(i.yellow_cards for i in players):
+    if any(i.red_cards for i in players):
         game.admin_status = 'Red Card Awarded'
     elif protest_team_one or protest_team_two:
         game.admin_status = 'Protested'
@@ -453,7 +482,7 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
 
     game.status = 'Official'
     game.length = time.time() - game.start_time
-    game.best_player_id = best.id
+    game.best_player_id = best.id if best else None
     game.notes = notes.strip()
 
     if game.ranked and not game.is_final:  # the game is unranked, so doing elo stuff is silly
@@ -671,3 +700,7 @@ def get_serve_timer(game_id):
     if not game:
         return -1
     return game.serve_timer if (game.serve_timer or -1) + 3 > time.time() else -1
+
+
+def pardon(game_id, first_team, left_player):
+    _add_to_game(game_id, "Pardon", first_team, left_player)

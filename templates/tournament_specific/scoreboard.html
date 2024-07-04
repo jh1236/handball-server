@@ -91,15 +91,22 @@
     </tr>
     <tr>
         <td>
-            {% if teams[0].cardTimeRemaining > 0 %}
-                <div class="rectangle {% if game.type == "Yellow Card" %}yellow_card{% endif %}"
-                     style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardTime }}%">
-                    Yellow Card
-                </div>
-            {% elif teams[0].cardTimeRemaining < 0 %}
+            {% if teams[0].cardTimeRemaining < 0 %}
                 <div class="rectangle {% if game.type == "Red Card" %}red_card{% endif %}"
                      style="background-color: #EC4A4A; color:#EC4A4A; width:100%">Red Card
                 </div>
+            {% elif teams[0].cardTimeRemaining > 0 %}
+                {% if teams[0].cardTime > 2 %}
+                    <div class="rectangle {% if game.type == "Yellow Card" %}yellow_card{% endif %}"
+                         style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardTime }}%">
+                        Yellow Card
+                    </div>
+                {% else %}
+                    <div class="rectangle {% if game.type == "Green Card" %}green_card{% endif %}"
+                         style="background-color: #84AA63; color: #84AA63;width:{{ 100*(teams[0].cardTimeRemaining) / teams[0].cardTime }}%">
+                        Green Card
+                    </div>
+                {% endif %}
             {% elif teams[0].green_carded %}
                 <div class="rectangle {% if game.type == "Green Card" %}green_card{% endif %}"
                      style="background-color: #84AA63; color:#84AA63; width:100%">Green Card
@@ -108,15 +115,22 @@
         </td>
         <td></td>
         <td>
-            {% if teams[1].cardTimeRemaining > 0 %}
-                <div class="rectangle {% if game.type == "Yellow Card" %}yellow_card{% endif %}"
-                     style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(teams[1].cardTimeRemaining) / teams[1].cardTime }}%">
-                    Yellow Card
-                </div>
-            {% elif teams[1].cardTimeRemaining < 0 %}
+            {% if teams[1].cardTimeRemaining < 0 %}
                 <div class="rectangle {% if game.type == "Red Card" %}red_card{% endif %}"
                      style="background-color: #EC4A4A; color:#EC4A4A; width:100%">Red Card
                 </div>
+            {% elif teams[1].cardTimeRemaining > 0 %}
+                {% if teams[1].cardTime > 2 %}
+                    <div class="rectangle {% if game.type == "Yellow Card" %}yellow_card{% endif %}"
+                         style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(teams[1].cardTimeRemaining) / teams[1].cardTime }}%">
+                        Yellow Card
+                    </div>
+                {% else %}
+                    <div class="rectangle {% if game.type == "Green Card" %}green_card{% endif %}"
+                         style="background-color: #84AA63; color: #84AA63;width:{{ 100*(teams[1].cardTimeRemaining) / teams[1].cardTime }}%">
+                        Green Card
+                    </div>
+                {% endif %}
             {% elif teams[1].green_carded %}
                 <div class="rectangle {% if game.type == "Green Card" %}green_card{% endif %}"
                      style="background-color: #84AA63; color:#84AA63; width:100%">Green Card

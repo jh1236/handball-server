@@ -41,3 +41,4 @@ class Tournaments(db.Model):
     is_pooled = db.Column(db.Boolean(), nullable=False)
     notes = db.Column(db.Text(), nullable=False)
     image_url = db.Column(db.Text(), nullable=False)
+    badminton_serves = db.Column(db.Boolean(), nullable=False)

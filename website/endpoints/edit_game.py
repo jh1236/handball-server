@@ -41,8 +41,8 @@ def add_game_endpoints(app, comps):
         umpire = request.json.get("official", None)
         scorer = request.json.get("scorer", None)
         manage_game.start_game(game_id, swap_serve, team_one, team_two,
-                              first_is_iga,
-                              umpire, scorer)
+                               first_is_iga,
+                               umpire, scorer)
         return "", 204
 
     @app.post("/api/games/update/score")
@@ -92,6 +92,22 @@ def add_game_endpoints(app, comps):
         manage_game.substitute(game_id, first_team, first_player)
         return "", 204
 
+    @app.post("/api/games/update/pardon")
+    def pardon():
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+                firstTeam: <bool> = if the team listed first is being pardoned
+                leftPlayer: <bool> = if the player listed as left is being pardoned
+            }
+        """
+        logger.info(f"Request for substitute: {request.json}")
+        game_id = request.json["id"]
+        first_team = request.json["firstTeam"]
+        first_player = request.json["leftPlayer"]
+        manage_game.pardon(game_id, first_team, first_player)
+        return "", 204
 
     @app.post("/api/games/update/end")
     def end():
@@ -108,10 +124,9 @@ def add_game_endpoints(app, comps):
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
         best = request.json.get("bestPlayer", None)
-        manage_game.end_game(game_id,  best, request.json.get("notes", None), request.json["protestTeamOne"], request.json["protestTeamTwo"])
+        manage_game.end_game(game_id, best, request.json.get("notes", None), request.json["protestTeamOne"],
+                             request.json["protestTeamTwo"])
         return "", 204
-
-
 
     @app.post("/api/games/update/timeout")
     def timeout():
@@ -209,7 +224,6 @@ def add_game_endpoints(app, comps):
         manage_game.delete(game_id)
         return "", 204
 
-
     @app.post("/api/games/update/card")
     def card():
         """
@@ -228,7 +242,7 @@ def add_game_endpoints(app, comps):
         first_team = request.json["firstTeam"]
         left_player = request.json["leftPlayer"]
         game_id = request.json["id"]
-        duration = -1 if color == "Red" else request.json.get("duration", 3) if color == "Yellow" else 0
+        duration = request.json["duration"]
         reason = request.json["reason"]
         manage_game.card(game_id, first_team, left_player, color, duration, reason)
         return "", 204

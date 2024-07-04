@@ -824,7 +824,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
                 teams[i[7]].cardTime = max(pl.cardTime or 0, teams[i[7]].cardTime)
                 if pl.cardTime and pl.cardTimeRemaining < 0: teams[i[7]].cardTimeRemaining = -1
                 teams[i[7]].cardTimeRemaining = max(pl.cardTimeRemaining or 0, teams[i[7]].cardTimeRemaining)
-                if pl.green_carded: teams[i[7]].green_carded = True
+                if pl.green_carded: teams[i[7]].green_carded = not Config().use_warnings
         visual_swap = request.args.get("swap", "false") == "true"
         teams = list(teams.values())
         game = Game(player_stats,
@@ -1306,7 +1306,7 @@ FROM tournamentTeams
                       tournaments.id = games.tournament_id
          LEFT JOIN playerGameStats on games.id = playerGameStats.game_id AND player_id = people.id
          
-WHERE IIF(? is NULL, 1, tournaments.id = ?)
+WHERE IIF(? is NULL, 1, tournaments.id = ?) and games.is_final = 0
 GROUP BY people.id""",
                 (tournament_id, tournament_id, tournament_id), ).fetchall()
 
@@ -1336,7 +1336,7 @@ GROUP BY people.id""",
         return (
             render_template_sidebar(
                 "tournament_specific/players_detailed.html",
-                headers=[(i - 1, k) for i, k in enumerate(["Name"] + players[0][1].keys())],
+                headers=[(i - 1, k) for i, k in enumerate(["Name"] + list(players[0][1].keys()))],
                 players=players,
                 tournament=link(tournament),
             ),
@@ -1773,7 +1773,8 @@ SELECT games.tournament_id,
        lastGe.side_to_serve,
        ended,
        tournaments.has_scorer,
-       team_one_score + team_two_score
+       team_one_score + team_two_score,
+       tournaments.id
 FROM games
          INNER JOIN tournaments ON games.tournament_id = tournaments.id
          LEFT JOIN officials o ON games.official_id = o.id
@@ -1903,6 +1904,7 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
             ended: bool
             has_scorer: bool
             round: int
+            tournament_id: int
             deletable: bool
 
         teams = {}
@@ -1942,8 +1944,6 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
         # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
         #     return _no_permissions()
         # el
-        if visual_swap:
-            team_one_players, team_two_players = team_two_players, team_one_players
         if game.bye:
             return (
                 render_template(
@@ -1985,7 +1985,8 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
                     timeout_first=manage_game.get_timeout_caller(game_id),
                     match_points=0 if (max([i.score for i in teams]) < 10 or game.someone_has_won) else abs(
                         teams[0].score - teams[1].score),
-                    VERBAL_WARNINGS=Config().use_warnings
+                    VERBAL_WARNINGS=Config().use_warnings,
+                    GREEN_CARDS=Config().use_green_cards
                 ),
                 200,
             )

@@ -109,7 +109,11 @@ class Games(db.Model):
                   "Faults",
                   "Fault Percentage",
                   "Start Time",
-                  "Court"
+                  "Court",
+                  "Timeline",
+                  "Umpire",
+                  "Format",
+                  "Tournament"
                   ]
 
     def reset(self):
@@ -139,7 +143,6 @@ class Games(db.Model):
             "Green Cards": sum(i.green_cards for i in pgs),
             "Yellow Cards": sum(i.yellow_cards for i in pgs),
             "Red Cards": sum(i.red_cards for i in pgs),
-            "Timeouts Used": self.team_one_timeouts + self.team_two_timeouts,
             "Aces Scored": sum(i.aces_scored for i in pgs),
             "Ace Percentage": sum(i.aces_scored for i in pgs) / ((self.team_one_score + self.team_two_score) or 1),
             "Faults": sum(i.faults for i in pgs),
@@ -147,4 +150,8 @@ class Games(db.Model):
             "Start Time": 0 if not self.start_time or self.start_time <= 0 else (self.start_time - Games.query.filter(Games.start_time > 0).order_by(Games.start_time).first().start_time) / (24.0 * 60 * 60 * 60),
             "Court": self.court,
             "Ranked": self.ranked,
+            "Timeline": self.id,
+            "Umpire": self.official.person.name if self.official else "None",
+            "Format": "Practice" if self.tournament_id == 1 else "Championship",
+            "Tournament": self.tournament.name,
         }

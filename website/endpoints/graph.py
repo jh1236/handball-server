@@ -129,12 +129,11 @@ def add_graph_endpoints(app):
     def games_per_player_graph(x_stat, y_stat, player, tournament):
         player_id = People.query.filter(People.searchable_name == player).first().id
 
-        players = db.session.query(Games, PlayerGameStats).filter(Games.id == PlayerGameStats.id,
+        players = db.session.query(Games, PlayerGameStats).filter(Games.id == PlayerGameStats.game_id,
                                                                   PlayerGameStats.player_id == player_id)
         if tournament:
             tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id
-
-            players = players.filter(PlayerGameStats.tournament_id == tournament_id)
+            players = players.filter(Games.tournament_id == tournament_id)
         players = players.all()
         xs = np.array(
             [
@@ -183,23 +182,20 @@ def add_graph_endpoints(app):
         else:
             games = Games.query.all()
         xs = np.array(
-            [to_number(i.stats().get(x_stat, 0)) for i in games if not i.bye]
+            [to_number(i.stats().get(x_stat, 0)) for i in games if not i.is_bye]
         )
         ys = np.array(
-            [to_number(i.stats().get(y_stat, 0)) for i in games if not i.bye]
+            [to_number(i.stats().get(y_stat, 0)) for i in games if not i.is_bye]
         )
         return make_graph(xs, ys, x_stat, y_stat)
 
     def games_per_player_by(x_stat, y_stat, args):
         games, details = filter_games(args, get_details=True)
-        players = games[1]
-        player = (
-                [i.strip("~") for i in args.getlist("Player") if i.startswith("~")] + [None]
-        )[0]
         out = {}
-        for i in players:
-            out[i.get_game_details()[x_stat]] = out.get(i.get_game_details()[x_stat], []) + [
-                to_number(i.get_stats_detailed()[y_stat])]
+        for game, players in games:
+            for i in players:
+                out[i.stats()[x_stat]] = out.get(i.stats()[x_stat], []) + [
+                    to_number(i.stats()[y_stat])]
         xs = [to_number(i) for i in sorted(out.keys())]
         if any(i is None for i in xs):
             xs = [str(i) for i in sorted(out.keys())]
@@ -242,8 +238,8 @@ def add_graph_endpoints(app):
         fig.suptitle(
             y_stat
             + " by "
-            + x_stat
-            + (f" for {(player).replace('_', ' ').title()}" if player else ""),
+            + x_stat,
+            # + (f" for {(player).replace('_', ' ').title()}" if player else ""),
             fontsize=15
         )
         return fig

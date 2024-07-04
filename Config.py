@@ -10,4 +10,5 @@ class Config(object):
 
     def _setup(self):
         self.use_warnings = True
+        self.use_green_cards = True
         self.badminton_style_serves = True
