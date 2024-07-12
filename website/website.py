@@ -1,12 +1,10 @@
 import random
-from dataclasses import dataclass
 
 from flask import send_file, request
 
 import utils.permissions
-from database.models import PlayerGameStats, People
+from database.models import PlayerGameStats, People, Tournaments
 from structure.GameUtils import filter_games, get_query_descriptor
-from utils.databaseManager import DatabaseManager
 from utils.permissions import fetch_user, officials_only
 from utils.sidebar_wrapper import render_template_sidebar
 from website.endpoints.endpoints import add_endpoints
@@ -20,20 +18,7 @@ def init_api(app):
 
     @app.get("/")
     def root():
-        with DatabaseManager() as c:
-            comps = c.execute(
-                """
-                SELECT name, searchable_name, image_url
-                FROM tournaments
-                """,
-            ).fetchall()
-        @dataclass
-        class Tournament:
-            name: str
-            searchableName: str
-            image: str
-        comps = [Tournament(*i) for i in comps]
-
+        comps = Tournaments.query.all()
         return (
             render_template_sidebar(
                 "all_tournaments.html",

@@ -57,7 +57,7 @@ class People(db.Model):
             elo_deltas = elo_deltas.filter(EloChange.game_id <= last_game)
         return 1500.0 + sum(i.elo_delta for i in elo_deltas)
 
-    def stats(self, games_filter=None, make_nice=True, include_unranked=False, include_solo=False):
+    def stats(self, games_filter=None, make_nice=True, include_unranked=False, include_solo=False) -> dict[str, str | float]:
         from database.models import PlayerGameStats, Games
         from database.models import EloChange
         from database.models import Teams

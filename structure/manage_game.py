@@ -76,10 +76,12 @@ def sync(game_id):
                     receiving_player = non_serving_team[not left_served]
                     if not receiving_player:
                         receiving_player = [i for i in non_serving_team if i][0]
-                    elif pgs_from_game_and_player(game_id, receiving_player.id).card_time_remaining != 0:
-                        receiving_player = ([i for i in non_serving_team if
-                                             pgs_from_game_and_player(game_id, i.id).card_time_remaining == 0] + [
-                                                None])[0]
+                    else:
+                        receiving_pgs = pgs_from_game_and_player(game_id, receiving_player.id)
+                        if receiving_pgs and receiving_pgs.card_time_remaining != 0:
+                            receiving_player = ([i for i in non_serving_team if i and
+                                                 pgs_from_game_and_player(game_id, i.id).card_time_remaining == 0] + [
+                                                    None])[0]
                     if receiving_player and receiving_player.id == j.player_id and (
                             i.notes != 'Penalty' or prev_event == 'Ace'):
                         j.serves_received += 1
@@ -132,6 +134,8 @@ def sync(game_id):
                 game.protested = True
             case "End Game":
                 game.best_player_id = i.details
+                if i.details:
+                    PlayerGameStats.query.filter(PlayerGameStats.player_id == i.details, PlayerGameStats.game_id == game_id).first().is_best_player = 1
                 game.notes = i.notes
                 game.ended = True
             case "Start":

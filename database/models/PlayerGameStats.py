@@ -52,6 +52,7 @@ class PlayerGameStats(db.Model):
     rounds_carded = db.Column(db.Integer(), default=0, nullable=False)
     points_scored = db.Column(db.Integer(), default=0, nullable=False)
     aces_scored = db.Column(db.Integer(), default=0, nullable=False)
+    is_best_player = db.Column(db.Boolean(), default=0, nullable=False)
     faults = db.Column(db.Integer(), default=0, nullable=False)
     double_faults = db.Column(db.Integer(), default=0, nullable=False)
     served_points = db.Column(db.Integer(), default=0, nullable=False)
@@ -113,6 +114,7 @@ class PlayerGameStats(db.Model):
         self.red_cards = 0
         self.card_time = 0
         self.card_time_remaining = 0
+        self.is_best_player = 0
 
     def stats(self):
         from database.models import GameEvents

@@ -52,7 +52,8 @@ def sync_all_games():
             print(f"Syncing Game {i.id}")
         try:
             manage_game.sync(i.id)
-        except Exception:
+        except Exception as e:
+            print(e.args)
             print(f"Game {i.id} failed to sync")
     db.session.commit()
 
@@ -76,8 +77,10 @@ def interpolate_start_times():
         current_start_time += length + 300
     db.session.commit()
 
+
 if __name__ == '__main__':
     # with app.app_context():
     #     regen_elo()
     with app.app_context():
-        interpolate_start_times()
+        sync_all_games()
+        # manage_game.sync(395)
