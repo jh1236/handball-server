@@ -19,35 +19,47 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <style>
-        .jh-nav {
-            color: #5f725f !important;
-        }
-        .topbar-color {
-            background: #293330
-        }
+
     </style>
     {% block headBlock %}{% endblock %}
 </head>
 <body>
 
 <div class="wrapper" style="margin-bottom: 70px">
-    <nav class="topbar-color navbar fixed-top navbar-expand-md" aria-label="Fourth navbar example">
+    <nav class="topbar-color navbar fixed-top navbar-expand-lg" aria-label="Fourth navbar example">
         <div class="container-fluid">
-            <a href="/" style="margin-right: 20px"><img src="/api/image?name=SUSS" width="40px" height="40px"></a>
+            {% if tournamentLink %}
+                <a href="/" style="margin-right: 20px" class="d-none d-lg-block"><img src="/api/image?name=SUSS"
+                                                                                      width="40px" height="40px"></a>
+                <a href="/" style="margin-right: 20px" class="d-block d-lg-none"><img src="/api/tournaments/image?name={{ tournamentLink[:-1] }}"
+                                                                                      width="40px" height="40px"></a>
+            {% else %}
+                <a href="/" style="margin-right: 20px"><img src="/api/image?name=SUSS"
+                                                                                      width="40px" height="40px"></a>
+            {% endif %}
             <a class="navbar-brand" href="/"><img src="/api/image?name=SUSS_2" height="40px"></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample04"
-                    aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse"
+                    data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"></path>
+                </svg>
             </button>
 
-            <div class="d-flex collapse navbar-collapse" id="navbarsExample04">
-                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <div class="collapse navbar-collapse" id="navbarsExample04">
+                <ul class="navbar-nav mr-auto">
                     <li class="nav-item jh-nav">
                         <a class="hide nav-link " aria-current="page" href="/">Home</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="hide nav-link jh-nav" href="#" id="dropdown04" data-toggle="dropdown"
-                           aria-expanded="false">Tournament ⏷</a>
+                           aria-expanded="false">Tournament
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"></path>
+                            </svg>
+                        </a>
                         <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdown04">
                             {% for i in tournaments %}
                                 <li><a class="hide dropdown-item" href="/{{ i[0] }}"><i>{{ i[1] }}</i></a></li>
@@ -56,13 +68,37 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="hide nav-link jh-nav" href="#" id="dropdown04" data-toggle="dropdown"
-                           aria-expanded="false">Lifetime Stats ⏷</a>
+                           aria-expanded="false">Lifetime Stats
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"></path>
+                            </svg>
+                        </a>
                         <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdown04">
                             <li><a class="hide dropdown-item" href="/ladder"><i>Ladder</i></a></li>
                             <li><a class="hide dropdown-item" href="/teams"><i>Teams</i></a></li>
                             <li><a class="hide dropdown-item" href="/players"><i>Players</i></a></li>
                         </ul>
                     </li>
+                    {% if tournamentLink %}
+                        <li class="nav-item dropdown d-block d-lg-none">
+                            <a class="hide nav-link jh-nav" href="#" id="dropdown04" data-toggle="dropdown"
+                               aria-expanded="false">Current Tournament
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"></path>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdown04">
+                                <li><a class="hide dropdown-item" href="/{{ tournamentLink }}ladder"><i>Ladder</i></a>
+                                </li>
+                                <li><a class="hide dropdown-item" href="/{{ tournamentLink }}teams"><i>Teams</i></a>
+                                </li>
+                                <li><a class="hide dropdown-item" href="/{{ tournamentLink }}players"><i>Players</i></a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="hide nav-link jh-nav" href="/suss_practice/create">New Practice Game</a>
                     </li>
@@ -73,11 +109,16 @@
                         <a class="hide nav-link jh-nav" href="/documents">Documents</a>
                     </li>
                 </ul>
-            </div>
-            <div class="float-right">
-                <form>
-                    <input class="form-control " type="text" placeholder="Search" aria-label="Search">
-                </form>
+                <div> {# IDK why but this makes it work so ¯\_(ツ)_/¯ #}
+                    <ul class="my-2 my-md-0 navbar-nav mr-auto">
+                        <li class="nav-item jh-nav">
+                            <a class="hide nav-link " aria-current="page" href="/">Login</a>
+                        </li>
+                        <li class="nav-item jh-nav">
+                            <a class="hide nav-link " aria-current="page" href="/">Register</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -86,15 +127,16 @@
     <!-- Sidebar  -->
 
     {% if tournamentLink %}
-        <nav id="sidebar" style="top:0px">
+        <nav id="sidebar" style="top:0" class="d-none d-lg-block">
             <div style="top:70px; position:sticky;">
                 <div class="sidebar-header">
-                    <a class="sidebar-link" href="/"><img src="/api/tournaments/image?name={{ tournamentLink[:-1] }}" class="logo"></a>
+                    <a class="sidebar-link" href="/"><img src="/api/tournaments/image?name={{ tournamentLink[:-1] }}"
+                                                          class="logo"></a>
                 </div>
 
                 <ul class="list-unstyled components">
                     <li class="active"><a href="/{{ tournamentLink }}"
-                                                  class="hide tournament-name">{{ tournament }}</a></li>
+                                          class="hide tournament-name">{{ tournament }}</a></li>
 
                     <li>
                         <a class="sidebar-link" href="/{{ tournamentLink }}fixtures">Fixtures</a>
@@ -121,7 +163,7 @@
     <!-- Page Content  -->
     <div id="content">
         {% if tournamentLink %}
-            <div class="container" style="position: fixed; z-index: 1000;width:fit-content">
+            <div class="container d-none d-lg-block" style="position: fixed; z-index: 1000;width:fit-content">
 
                 <button type="button" id="sidebarCollapse" class="float-left btn btn-info">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"

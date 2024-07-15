@@ -13,6 +13,11 @@
                 <img src="{{ team.image }}" class="team_logo" style="width: 200px;height: 200px"></a>
             <h1><a href="/{{ tournamentLink }}teams/{{ team.searchableName }}" class="hide">Statistics
                 for {{ team.name }}</a></h1>
+            {% if tournamentLink %}
+                <i><a class="hide" href="/teams/{{ team.searchableName }}">Go to All-Time Stats</a></i>
+                <br>
+                <br>
+            {% endif %}
             <table class="jaredTable">
                 <tbody>
                 {% for stat in stats %}
