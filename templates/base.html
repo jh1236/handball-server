@@ -18,89 +18,122 @@
             crossorigin="anonymous"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        .jh-nav {
+            color: #5f725f !important;
+        }
+        .topbar-color {
+            background: #293330
+        }
+    </style>
     {% block headBlock %}{% endblock %}
 </head>
 <body>
+
+<div class="wrapper" style="margin-bottom: 70px">
+    <nav class="topbar-color navbar fixed-top navbar-expand-md" aria-label="Fourth navbar example">
+        <div class="container-fluid">
+            <a href="/" style="margin-right: 20px"><img src="/api/image?name=SUSS" width="40px" height="40px"></a>
+            <a class="navbar-brand" href="/"><img src="/api/image?name=SUSS_2" height="40px"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample04"
+                    aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="d-flex collapse navbar-collapse" id="navbarsExample04">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item jh-nav">
+                        <a class="hide nav-link " aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="hide nav-link jh-nav" href="#" id="dropdown04" data-toggle="dropdown"
+                           aria-expanded="false">Tournament ⏷</a>
+                        <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdown04">
+                            {% for i in tournaments %}
+                                <li><a class="hide dropdown-item" href="/{{ i[0] }}"><i>{{ i[1] }}</i></a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="hide nav-link jh-nav" href="#" id="dropdown04" data-toggle="dropdown"
+                           aria-expanded="false">Lifetime Stats ⏷</a>
+                        <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdown04">
+                            <li><a class="hide dropdown-item" href="/ladder"><i>Ladder</i></a></li>
+                            <li><a class="hide dropdown-item" href="/teams"><i>Teams</i></a></li>
+                            <li><a class="hide dropdown-item" href="/players"><i>Players</i></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="hide nav-link jh-nav" href="/suss_practice/create">New Practice Game</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="hide nav-link jh-nav" href="/signup">Sign Up</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="hide nav-link jh-nav" href="/documents">Documents</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="float-right">
+                <form>
+                    <input class="form-control " type="text" placeholder="Search" aria-label="Search">
+                </form>
+            </div>
+        </div>
+    </nav>
+</div>
 <div class="wrapper">
     <!-- Sidebar  -->
 
-    <nav id="sidebar" style="top:0">
-        <div style="top:0; position:sticky;">
-            <div class="sidebar-header">
-                {% if tournamentLink %}
-                    <a class="sidebar-link" href="/{{ tournamentLink }}"><img
-                            src="/api/tournaments/image?name={{ tournamentLink[:-1] }}" class="logo"></a>
-                {% else %}
-                    <a class="sidebar-link" href="/"><img src="/api/image?name=SUSS" class="logo"></a>
-                {% endif %}
-            </div>
+    {% if tournamentLink %}
+        <nav id="sidebar" style="top:0px">
+            <div style="top:70px; position:sticky;">
+                <div class="sidebar-header">
+                    <a class="sidebar-link" href="/"><img src="/api/tournaments/image?name={{ tournamentLink[:-1] }}" class="logo"></a>
+                </div>
 
-            <ul class="list-unstyled components">
-                <p class="tournament-name"><a href="/{{ tournamentLink }}"
-                                              class="hide">{{ tournament }}</a></p>
-                <li class="active">
-                    <a class="sidebar-link dropdown-toggle" href="#homeSubmenu" data-toggle="collapse"
-                       aria-expanded="false">Tournament</a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu">
-                        {% for i in tournaments %}
-                            <li><a class="sidebar-link" href="/{{ i[0] }}"><i>{{ i[1] }}</i></a></li>
-                        {% endfor %}
-                    </ul>
-                </li>
-                <li>
-                    {% if tournamentLink %}
+                <ul class="list-unstyled components">
+                    <li class="active"><a href="/{{ tournamentLink }}"
+                                                  class="hide tournament-name">{{ tournament }}</a></li>
+
+                    <li>
                         <a class="sidebar-link" href="/{{ tournamentLink }}fixtures">Fixtures</a>
-                    {% else %}
-                        <a class="sidebar-link" href="/signup">Sign-Up</a>
-                    {% endif %}
-                </li>
-                <li>
-                    <a class="sidebar-link" href="/{{ tournamentLink }}teams">Teams</a>
-                </li>
-                <li>
-                    <a class="sidebar-link" href="/{{ tournamentLink }}ladder">Ladder</a>
-                </li>
-                <li>
-                    <a class="sidebar-link" href="/{{ tournamentLink }}players">Players</a>
-                </li>
-                <li>
-                    <a class="sidebar-link" href="/{{ tournamentLink }}officials">Officials</a>
-                </li>
-                <li>
-                    <a class="sidebar-link" href="/documents">Documents</a>
-                </li>
-                <li>
-                    <a class="sidebar-link" href="/find">Game Lookup</a>
-                </li>
-                {% if username %}
-                    <li>
-                        <a class="sidebar-link" href="/user">{{ username }}</a>
                     </li>
-                {% else %}
                     <li>
-                        <a class="sidebar-link" href="/user">Log in</a>
+                        <a class="sidebar-link" href="/{{ tournamentLink }}teams">Teams</a>
                     </li>
-                {% endif %}
-                {% if tournamentLink %}
-                    <li><i><a class="sidebar-link" href="/" style="color: #728f78">Back to all Tournaments</a></i></li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
-
+                    <li>
+                        <a class="sidebar-link" href="/{{ tournamentLink }}ladder">Ladder</a>
+                    </li>
+                    <li>
+                        <a class="sidebar-link" href="/{{ tournamentLink }}players">Players</a>
+                    </li>
+                    <li>
+                        <a class="sidebar-link" href="/{{ tournamentLink }}officials">Officials</a>
+                    </li>
+                    <li>
+                        <a class="sidebar-link" href="/find">Game Lookup</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    {% endif %}
     <!-- Page Content  -->
     <div id="content">
-        <div class="container" style="position: fixed; z-index: 1000;width:fit-content">
+        {% if tournamentLink %}
+            <div class="container" style="position: fixed; z-index: 1000;width:fit-content">
 
-            <button type="button" id="sidebarCollapse" class="float-left btn btn-info">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list"
-                     viewBox="0 0 16 16">
-                    <path fill-rule="evenodd"
-                          d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"></path>
-                </svg>
-            </button>
-        </div>
-{#    <img style="z-index: -100;left:0;top: 0;width: 100%;height: 100%;position: fixed" src="https://wallpaperswide.com/download/steve___minecraft-wallpaper-1280x800.jpg">#}
+                <button type="button" id="sidebarCollapse" class="float-left btn btn-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-list"
+                         viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                              d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"></path>
+                    </svg>
+                </button>
+            </div>
+        {% endif %}
+        {#    <img style="z-index: -100;left:0;top: 0;width: 100%;height: 100%;position: fixed" src="https://wallpaperswide.com/download/steve___minecraft-wallpaper-1280x800.jpg">#}
         {% block bodyBlock %}{% endblock %}
     </div>
 </div>
