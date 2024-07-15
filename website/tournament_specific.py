@@ -7,7 +7,7 @@ from flask import render_template, request
 from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
-from database.models import People, PlayerGameStats, Games, Tournaments, TournamentTeams, Teams
+from database.models import People, PlayerGameStats, Games, Tournaments, TournamentTeams, Teams, TournamentOfficials
 from structure import manage_game
 from structure.GameUtils import game_string_to_commentary
 from structure.get_information import get_tournament_id
@@ -42,12 +42,6 @@ def add_tournament_specific(app):
                 400,
             )
         tournament_id = tourney.id
-
-        @dataclass
-        class Tourney:
-            name: str
-            searchableName: str
-            editable: str
 
         # ladder
         @dataclass
@@ -102,7 +96,7 @@ def add_tournament_specific(app):
             ongoing_games = [i for i in games if i.round == rounds and not i.ended and not i.is_bye]
             current_round = [i for i in games if (i.round == rounds or i.is_final) and not i.is_bye]
 
-            players = PlayerGameStats.query.filter()
+            players = [(i, i.stats()) for i in People.query.order_by().all() if i.played_in_tournament(tournament)]
 
             playerList = c.execute(
                 """
@@ -151,7 +145,7 @@ def add_tournament_specific(app):
                 200,
             )
 
-    @app.get("/<tournament>/fixtures/")
+    @app.get("/<tournament>/fixtures/")  # TODO: update to orm
     def fixtures(tournament):
         tournament_id = get_tournament_id(tournament)
         with DatabaseManager() as c:
@@ -181,8 +175,9 @@ def add_tournament_specific(app):
             # me when i criticize Jareds code then write this abomination
             fixtures = defaultdict(list)
             for game in games:
+                names = [i if len(i) < 30 else i[:28] + "..." for i in game[3:5]]
                 fixtures[game[-1]].append(
-                    Game(game[3:5], f"{game[5]} - {game[6]}", game[0], game[1], game[2])
+                    Game(names, f"{game[5]} - {game[6]}", game[0], game[1], game[2])
                 )
             new_fixtures = {}
             for k, v in fixtures.items():
@@ -205,8 +200,9 @@ def add_tournament_specific(app):
             # idk something about glass houses?
             finals = defaultdict(list)
             for game in games:
+                names = [i if len(i) < 30 else i[:28] + "..." for i in game[3:5]]
                 finals[game[-1]].append(
-                    Game(game[3:5], f"{game[5]} - {game[6]}", game[0], game[1], game[2])
+                    Game(names, f"{game[5]} - {game[6]}", game[0], game[1], game[2])
                 )
         return (
             render_template_sidebar(
@@ -217,7 +213,7 @@ def add_tournament_specific(app):
             200,
         )
 
-    @app.get("/<tournament>/fixtures/detailed")
+    @app.get("/<tournament>/fixtures/detailed")  # TODO: update to orm
     def detailed_fixtures(tournament):
         # TODO: jared said he wanted to do this, Thanks :)
 
@@ -364,7 +360,7 @@ def add_tournament_specific(app):
             200,
         )
 
-    @app.get("/<tournament>/teams/<team_name>/")
+    @app.get("/<tournament>/teams/<team_name>/")  # TODO: update to orm
     def team_site(tournament, team_name):
         tournament_id = get_tournament_id(tournament)
 
@@ -631,7 +627,7 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
             200,
         )
 
-    @app.get("/games/<true_game_id>/display")
+    @app.get("/games/<true_game_id>/display") # TODO: update to orm
     def scoreboard(true_game_id):
         if int(true_game_id) <= 0:
             game_id = Games.query.filter(Games.started, Games.court == abs(true_game_id)).order_by(
@@ -812,12 +808,12 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             200,
         )
 
-    @app.get("/games/display")
+    @app.get("/games/display") # TODO: update to orm
     def court_scoreboard():
         court = int(request.args.get("court"))
         return scoreboard(-court)
 
-    @app.get("/games/<game_id>/")
+    @app.get("/games/<game_id>/") # TODO: update to orm
     def game_site(game_id):
         with DatabaseManager() as c:
             players = c.execute(
@@ -1069,7 +1065,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             200,
         )
 
-    @app.get("/<tournament>/ladder/")
+    @app.get("/<tournament>/ladder/") # TODO: update to orm
     def ladder_site(tournament):
         priority = {
             "Team Names": 1,
@@ -1172,7 +1168,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
                 (tournament_id, tournament_id, tournament_id),
             ).fetchall()
         ladder = [
-            Team(i[2], i[1], i[4], i[3], {k: v for k, v in zip(priority, i[5:])})
+            Team(i[2] if len(i[2]) < 30 else i[2][:28] + "...", i[1], i[4], i[3], {k: v for k, v in zip(priority, i[5:])})
             for i in teams
         ]
         if teams[0][0]:  # this tournament is pooled
@@ -1199,8 +1195,8 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
             200,
         )
 
-    @app.get("/<tournament>/players/")
-    def players_site(tournament):
+    @app.get("/<tournament_searchable>/players/")
+    def players_site(tournament_searchable):
         priority = {
             "Name": 1,
             "B&F Votes": 1,
@@ -1212,98 +1208,72 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
             "Green Cards": 4,
             "Yellow Cards": 3,
             "Red Cards": 3,
-            "Rounds Played": 5,
+            "Rounds on Court": 5,
             "Points Served": 5,
             "Rounds Carded": 5,
             "Games Played": 5,
             "Games Won": 4,
         }
-        player_headers = ["Name",
-                          "B&F Votes",
-                          "Elo",
-                          "Games Won",
-                          "Games Played",
-                          "Points Scored",
-                          "Aces Scored",
-                          "Faults",
-                          "Double Faults",
-                          "Green Cards",
-                          "Yellow Cards",
-                          "Red Cards",
-                          "Rounds Played",
-                          "Points Served",
-                          ]
-        tournament_id = get_tournament_id(tournament)
-        # TODO (LACHIE): please help me make this less queries...
-        with DatabaseManager() as c:
-            players_query = c.execute(
-                """SELECT coalesce(min(teams.image_url) FILTER ( WHERE teams.image_url Like '/api/teams/image?%'),teams.image_url),
-       people.searchable_name,
-       people.name,
-       coalesce(SUM(games.best_player_id = player_id), 0),
-       ROUND(1500.0 + coalesce((SELECT SUM(elo_delta)
-                       from eloChange
-                       where eloChange.player_id = people.id AND eloChange.game_id <= MAX(games.id)), 0), 2)  as elo,
-       coalesce(SUM(games.winning_team_id = playerGameStats.team_id), 0),
-       COUNT(DISTINCT games.id),
-       coalesce(SUM(playerGameStats.points_scored), 0),
-       coalesce(SUM(playerGameStats.aces_scored), 0),
-       coalesce(SUM(playerGameStats.faults), 0),
-       coalesce(SUM(playerGameStats.double_faults), 0),
-       coalesce(SUM(playerGameStats.green_cards), 0),
-       coalesce(SUM(playerGameStats.yellow_cards), 0),
-       coalesce(SUM(playerGameStats.red_cards), 0),
-       coalesce(SUM(playerGameStats.rounds_on_court), 0),
-       coalesce(SUM(playerGameStats.served_points), 0)
+        player_headers = [
+            "B&F Votes",
+            "Elo",
+            "Games Won",
+            "Games Played",
+            "Points Scored",
+            "Aces Scored",
+            "Faults",
+            "Double Faults",
+            "Green Cards",
+            "Yellow Cards",
+            "Red Cards",
+            "Rounds on Court",
+            "Rounds Carded",
+            "Points Served",
+        ]
 
-FROM tournamentTeams
-         INNER JOIN teams ON teams.id = tournamentTeams.team_id
-         INNER JOIN people
-                    ON (people.id = teams.captain_id OR people.id = teams.non_captain_id OR teams.substitute_id = people.id)
-         INNER JOIN tournaments on tournaments.id = tournamentTeams.tournament_id
-         LEFT JOIN games
-                   on (teams.id = games.team_one_id OR teams.id = team_two_id)  AND games.is_bye = 0 and games.is_final = 0 and IIF(? is NULL, games.ranked, 1) and
-                      tournaments.id = games.tournament_id
-         LEFT JOIN playerGameStats on games.id = playerGameStats.game_id AND player_id = people.id
-         
-WHERE IIF(? is NULL, 1, tournaments.id = ?) and games.is_final = 0
-GROUP BY people.id""",
-                (tournament_id, tournament_id, tournament_id), ).fetchall()
-
-        players = []
+        players = People.query.all()
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
+        game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament.id)) if tournament else None
+        unranked = tournament is not None
+        players_in = [(i, i.stats(games_filter=game_filter, include_unranked=unranked)) for i in players if
+                      i.played_in_tournament(tournament_searchable)]
         # Im so fucking lazy so im not gonna use a dataclass.  Fucking fight me idec
-        for i in players_query:
+        players = []
+        for i in players_in:
             players.append(
-                (i[2], i[0], i[1], [(v, (priority_to_classname(priority[k]))) for k, v in zip(player_headers, i[3:])]))
-        print(players[1])
+                (i[0].name, i[0].image(), i[0].searchable_name,
+                 [(i[1][k], (priority_to_classname(priority[k]))) for k in player_headers]))
         return (
             render_template_sidebar(
                 "tournament_specific/players.html",
                 headers=[
                     (i - 1, k, priority_to_classname(priority[k]))
-                    for i, k in enumerate(player_headers)
+                    for i, k in enumerate(["Name"] + player_headers)
                 ],
-                players=sorted(players, key=lambda a: a[3][1][0]),
+                players=sorted(players, key=lambda a: a[0]),
             ),
             200,
         )
 
-    @app.get("/<tournament>/players/detailed")
-    def detailed_players_site(tournament):
+    @app.get("/<tournament_searchable>/players/detailed")
+    def detailed_players_site(tournament_searchable):
         players = People.query.all()
-        game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament)) if tournament else None
-        players = [(i, i.stats(games_filter=game_filter)) for i in players]
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
+        game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament.id)) if tournament else None
+        unranked = tournament is not None
+        players = [(i, i.stats(games_filter=game_filter, include_unranked=unranked)) for i in players if
+                   i.played_in_tournament(tournament_searchable)]
         return (
             render_template_sidebar(
                 "tournament_specific/players_detailed.html",
                 headers=[(i - 1, k) for i, k in enumerate(["Name"] + list(players[0][1].keys()))],
                 players=players,
-                tournament=link(tournament),
+                tournament=link(tournament_searchable),
             ),
             200,
         )
 
-    @app.get("/<tournament>/players/<player_name>/")
+    @app.get("/<tournament>/players/<player_name>/") # TODO: update to orm
     def player_stats(tournament, player_name):
         tournament_id = get_tournament_id(tournament)
         # TODO (LACHIE): please help me make this less queries...
@@ -1393,7 +1363,7 @@ GROUP BY people.id""",
                 200,
             )
 
-    @app.get("/<tournament>/officials/<nice_name>/")
+    @app.get("/<tournament>/officials/<nice_name>/")  # TODO: update to orm
     def official_site(tournament, nice_name):
 
         recent_games = []
@@ -1493,13 +1463,11 @@ GROUP BY people.id""",
 
     @app.get("/<tournament>/officials/")
     def official_directory_site(tournament):
-        tournament_id = get_tournament_id(tournament)
-        with DatabaseManager() as c:
-            official = c.execute(
-                """
-            SELECT name, searchable_name from officials INNER JOIN people on people.id = officials.person_id INNER JOIN tournamentOfficials ON officials.id = tournamentOfficials.official_id 
-            WHERE IIF(? is NULL, 1, tournamentOfficials.tournament_id = ?)""", (tournament_id, tournament_id)
-            ).fetchall()
+        tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament).first()
+        official = TournamentOfficials.query
+        if tournament_id:
+            official = official.filter(TournamentOfficials.tournament_id == tournament_id.id)
+        official = [i.official.person for i in official.all()]
         return (
 
             render_template_sidebar(
@@ -1509,7 +1477,7 @@ GROUP BY people.id""",
             200,
         )
 
-    @app.get("/games/<game_id>/edit/")
+    @app.get("/games/<game_id>/edit/")  # TODO: update to orm
     @officials_only
     def game_editor(game_id):
         visual_swap = request.args.get("swap", "false") == "true"
@@ -1752,7 +1720,7 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
             )
 
     @officials_only
-    @app.get("/games/<game_id>/finalise")
+    @app.get("/games/<game_id>/finalise") # TODO: update to orm
     def finalise_game(game_id):
         visual_swap = request.args.get("swap", "false") == "true"
         visual_str = "true" if visual_swap else "false"

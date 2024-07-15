@@ -47,7 +47,8 @@ class People(db.Model):
     def image(self):
         from database.models import Teams
         t = Teams.query.filter((Teams.captain_id == self.id) | (Teams.non_captain_id == self.id) | (
-                    Teams.substitute_id == self.id)).order_by(Teams.image_url.like('/api/teams/image?%').desc()).first()
+                Teams.substitute_id == self.id)).order_by(Teams.image_url.like('/api/teams/image?%').desc(),
+                                                          Teams.id).first()
         return t.image_url
 
     def elo(self, last_game=None):
@@ -57,7 +58,8 @@ class People(db.Model):
             elo_deltas = elo_deltas.filter(EloChange.game_id <= last_game)
         return 1500.0 + sum(i.elo_delta for i in elo_deltas)
 
-    def stats(self, games_filter=None, make_nice=True, include_unranked=False, include_solo=False) -> dict[str, str | float]:
+    def stats(self, games_filter=None, make_nice=True, include_unranked=False, include_solo=False) -> dict[
+        str, str | float]:
         from database.models import PlayerGameStats, Games
         from database.models import EloChange
         from database.models import Teams
@@ -98,7 +100,7 @@ class People(db.Model):
             "Yellow Cards": sum(i.yellow_cards for i in players),
             "Red Cards": sum(i.red_cards for i in players),
             "Rounds on Court": sum(i.rounds_on_court for i in players if i),
-            "Rounds Carded": sum(i.red_cards for i in players),
+            "Rounds Carded": sum(i.rounds_carded for i in players),
             "Net Elo Delta": sum(i.elo_delta for i in elo_delta if i),
             "Average Elo Delta": sum(i.elo_delta for i in elo_delta if i) / games_played,
             "Points per Game": sum(i.points_scored for i in players) / games_played,
@@ -138,3 +140,12 @@ class People(db.Model):
                 elif isinstance(v, float):
                     ret[k] = round(v, 2)
         return ret
+
+    def played_in_tournament(self, tournament_searchable_name):
+        if not tournament_searchable_name:
+            return True
+        from database.models import PlayerGameStats
+        from database.models import Tournaments
+        tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable_name).first().id
+        return bool(PlayerGameStats.query.filter(PlayerGameStats.player_id == self.id,
+                                                 PlayerGameStats.tournament_id == tournament_id).first())

@@ -6,21 +6,18 @@
 {% endblock %}
 
 {% block bodyBlock %}
-
-<h1><a href="/officials/" class="hide">Officials</a></h1>
-{% for official in officials %}
-<table class="jaredTable">
-    <tr>
-        <td style="width:100px;"><a href="/{{tournamentLink}}officials/{{official[1]}}"
-                                    class="hide"><img
-                src="/api/image?name=umpire" class="team_logo"
-                style="width:75px; height: 75px;"
-        ></a></td>
-
-
-        <td style="width:200px;"><a href="/{{tournamentLink}}officials/{{official[1]}}" class="hide"><h3>{{official[0]}}</h3></a></td>
-    </tr>
-</table>
-
-{% endfor %}
+    <h1><a href="/officials/" class="hide">Officials</a></h1>
+    {% for i in officials %}
+        <table class="jaredTable">
+            <tr>
+                <td style="width:100px;"><a href="/{{ tournamentLink }}officials/{{ i.searchable_name }}"
+                                            class="hide"><img
+                        src="/api/image?name=umpire" class="team_logo"
+                        style="width:75px; height: 75px;"
+                ></a></td>
+                <td style="width:200px;"><a href="/{{ tournamentLink }}officials/{{ i.searchable_name }}"
+                                            class="hide"><h3>{{ i.name }}</h3></a></td>
+            </tr>
+        </table>
+    {% endfor %}
 {% endblock %}

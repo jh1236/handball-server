@@ -72,7 +72,7 @@ def admin_only(func):
             return resp
 
         key = request.cookies.get("userKey", None)
-        if key in [i.key for i in People.query.filter(People.is_admin).all()]:
+        if key in [i.password  for i in People.query.filter(People.is_admin).all()]:
             return func(*args, **kwargs)
 
         return _no_permissions()
