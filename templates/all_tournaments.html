@@ -10,14 +10,14 @@
 {% for tournament in comps %}
 <table class="jaredTable">
     <tr>
-        <td style="width:100px;"><a href="/{{tournament.searchableName}}/"
+        <td style="width:100px;"><a href="/{{tournament.searchable_name}}/"
                                     class="hide"><img
-                src="{{tournament.image}}" class="team_logo"
+                src="{{tournament.image_url}}" class="team_logo"
                 style="width: 75px; height: 75px;"
         ></a></td>
 
 
-        <td style="width:200px;"><a href="/{{tournament.searchableName}}/" class="hide"><p>{{tournament.name}}</p></a></td>
+        <td style="width:200px;"><a href="/{{tournament.searchable_name}}/" class="hide"><p>{{tournament.name}}</p></a></td>
     </tr>
 </table>
 

@@ -1,13 +1,10 @@
 import random
-from dataclasses import dataclass
 
 from flask import send_file, request
 
 import utils.permissions
-from structure.AllTournament import get_all_officials, get_all_players, get_all_games
+from database.models import PlayerGameStats, People, Tournaments
 from structure.GameUtils import filter_games, get_query_descriptor
-from structure.Tournament import Tournament
-from utils.databaseManager import DatabaseManager
 from utils.permissions import fetch_user, officials_only
 from utils.sidebar_wrapper import render_template_sidebar
 from website.endpoints.endpoints import add_endpoints
@@ -15,26 +12,13 @@ from website.endpoints.endpoints import add_endpoints
 numbers = ["Zero", "One", "Two", "Three", "Four", "Five", "Six"]
 
 
-def init_api(app, comps: dict[str, Tournament]):
+def init_api(app):
 
-    add_endpoints(app, comps)
+    add_endpoints(app)
 
     @app.get("/")
     def root():
-        with DatabaseManager() as c:
-            comps = c.execute(
-                """
-                SELECT name, searchableName, imageURL
-                FROM tournaments
-                """,
-            ).fetchall()
-        @dataclass
-        class Tournament:
-            name: str
-            searchableName: str
-            image: str
-        comps = [Tournament(*i) for i in comps]
-
+        comps = Tournaments.query.all()
         return (
             render_template_sidebar(
                 "all_tournaments.html",
@@ -82,50 +66,15 @@ def init_api(app, comps: dict[str, Tournament]):
     @officials_only
     def user_page():
         key = fetch_user()
-        user = next(i for i in get_all_officials() if i.key == key)
-        player = (
-            [i for i in get_all_players() if i.nice_name() == user.nice_name()]
-            + ["This will never match!"]
-        )[0]
-        with open("./clips/required.txt") as fp:
-            reqd = [i.strip() for i in fp.readlines()]
-        from website.clips import answers
+        user = People.query.filter(People.password == key).first()
 
-        seen_videos = [str(j["id"]) for j in answers if j["name"] == user.nice_name()]
-        reqd = [i for i in reqd if i not in seen_videos]
-        all_games = get_all_games()
-        to_officiate = []
-        to_play = []
-        for i in all_games:
-            if i.best_player:
-                continue
-            if user.nice_name() in [
-                i.primary_official.nice_name(),
-                i.scorer.nice_name(),
-            ]:
-                to_officiate.append(i)
-            if user.nice_name() in [k.nice_name() for k in i.all_players]:
-                to_play.append(i)
-        if len(reqd) > 4:
-            reqd = reqd[:4]
-        if len(to_officiate) > 4:
-            to_officiate = to_officiate[:4]
-        if len(to_play) > 4:
-            to_play = to_play[:4]
-        return render_template_sidebar(
-            "user_file.html",
-            user=user,
-            player=player,
-            reqd=reqd,
-            to_play=to_play,
-            to_officiate=to_officiate,
-        )
+        return "Todo", 500
 
     @app.get("/find")
     def game_finder():
         details: set[str]
         games: list[tuple[object, set]]
-        games, details = filter_games(get_all_games(), request.args, get_details=True)
+        games, details = filter_games(request.args, get_details=True)
         print("\n".join(f"'{k}': '{v}'" for k, v in request.args.items(multi=True)))
         if not games and any("," in i for i in request.args.values()):
             return (
@@ -139,24 +88,18 @@ def init_api(app, comps: dict[str, Tournament]):
             details=[i for i in details if i and i not in ["Count", "Player"]],
             headings=sorted(
                 (
-                    (p := get_all_games()[0].all_players[0]).get_stats_detailed()
-                    | p.get_game_details()
-                    | {"Count": 1}
+                    PlayerGameStats.rows
                 )
             ),
         )
 
     from website.tournament_specific import add_tournament_specific
-    from website.old_tournament import add_old_tournament_specific
     from website.admin import add_admin_pages
     from website.universal_stats import add_universal_tournament
-    from website.clips import add_video_player
 
-    # add_video_player(app)
     add_tournament_specific(app)
-    add_old_tournament_specific(app, comps)
-    add_universal_tournament(app, comps)
-    add_admin_pages(app, comps)
+    add_universal_tournament(app)
+    add_admin_pages(app)
 
 
 def sign(elo_delta):

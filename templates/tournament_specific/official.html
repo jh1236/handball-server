@@ -6,18 +6,23 @@
 {% endblock %}
 
 {% block bodyBlock %}
-<a href="/{{ tournamentLink }}officials/">
-    <img src="/api/image?name=umpire" class="team_logo"></a>
-<h1><a href="/{{ tournamentLink }}officials/{{link}}" class="hide">Statistics for {{name}}</a></h1>
-{% for stat in stats %}
-<p><b>{{ stat[0] }}:</b> {{ stat[1] }}</p>
-{% endfor %}
+    <a href="/{{ tournamentLink }}officials/">
+        <img src="/api/image?name=umpire" class="team_logo"></a>
+    <h1><a href="/{{ tournamentLink }}officials/{{ link }}" class="hide">Statistics for {{ name }}</a></h1>
+    {% if tournamentLink %}
+        <i><a class="hide" href="/officials/{{ link }}">Go to All-Time Stats</a></i>
+        <br>
+        <br>
+    {% endif %}
+    {% for stat in stats %}
+        <p><b>{{ stat[0] }}:</b> {{ stat[1] }}</p>
+    {% endfor %}
 
-<br>
-<br>
-<br>
-<h2><a class="hide" href="/{{ tournamentLink }}fixtures/detailed?umpire={{ link }}">Matches</a></h2>
-{% for line in games %}
-<p style="color: black;"><a class="hide" href="/games/{{line[1]}}">{{line[0]}}</a></p>
-{% endfor %}
+    <br>
+    <br>
+    <br>
+    <h2><a class="hide" href="/{{ tournamentLink }}fixtures/detailed?umpire={{ link }}">Matches</a></h2>
+    {% for line in games %}
+        <p style="color: black;"><a class="hide" href="/games/{{ line[1] }}">{{ line[0] }}</a></p>
+    {% endfor %}
 {% endblock %}

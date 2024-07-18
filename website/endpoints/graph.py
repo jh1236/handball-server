@@ -5,10 +5,10 @@ from flask import request, Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
-from matplotlib.pyplot import yticks
 from werkzeug.datastructures import MultiDict
 
-from structure.AllTournament import get_all_players, get_all_games
+from database import db
+from database.models import Games, Tournaments, PlayerGameStats, People
 from structure.GameUtils import filter_games, get_query_descriptor
 
 
@@ -80,7 +80,7 @@ def make_graph(xs, ys, xLabel, yLabel):
     return fig
 
 
-def add_graph_endpoints(app, comps):
+def add_graph_endpoints(app):
     @app.get("/graphs/player")
     def plot_png():
         x = request.args.get("x", type=str)
@@ -125,85 +125,75 @@ def add_graph_endpoints(app, comps):
         return Response(output.getvalue(), mimetype="image/png")
 
     def games_per_player_graph(x_stat, y_stat, player, tournament):
+        player_id = People.query.filter(People.searchable_name == player).first().id
+
+        players = db.session.query(Games, PlayerGameStats).filter(Games.id == PlayerGameStats.game_id,
+                                                                  PlayerGameStats.player_id == player_id)
         if tournament:
-            players = [
-                next(k for k in i.playing_players if k.nice_name() == player)
-                for i in comps[tournament].games_to_list()
-                if (not player or player in [j.nice_name() for j in i.playing_players])
-                and (i.ranked or not (comps[tournament].details.get("ranked", True)))
-                and not i.bye
-            ]
-        else:
-            players = [
-                next(k for k in i.playing_players if k.nice_name() == player)
-                for i in get_all_games()
-                if (not player or player in [j.nice_name() for j in i.playing_players])
-                and (i.ranked)
-                and not i.bye
-            ]
+            tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id
+            players = players.filter(Games.tournament_id == tournament_id)
+        players = players.all()
         xs = np.array(
             [
-                to_number(i.get_stats_detailed().get(x_stat, 0))
+                to_number((i[0].stats() | i[1].stats()).get(x_stat, 0))
                 for i in players
-                if i.get_stats()["Rounds Played"]
+                if i[1].rounds_on_court
             ]
         )
         ys = np.array(
             [
-                to_number(i.get_stats_detailed().get(y_stat, 0))
+                to_number((i[0].stats() | i[1].stats()).get(y_stat, 0))
                 for i in players
-                if i.get_stats()["Rounds Played"]
+                if i[1].rounds_on_court
             ]
         )
         return make_graph(xs, ys, x_stat, y_stat)
 
     def players_per_tournament_graph(x_stat, y_stat, tournament):
+        players = People.query.all()
         if tournament:
-            players = [i for i in comps[tournament].players]
+            tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id
+            players = [(i, i.stats(games_filter=lambda a: a.filter(Games.tournament_id == tournament_id))) for i in
+                       players]
         else:
-            players = [i for i in get_all_players()]
+            players = [(i, i.stats()) for i in players]
         xs = np.array(
             [
-                to_number(i.get_stats_detailed().get(x_stat, 0))
+                to_number(i[1].get(x_stat, 0))
                 for i in players
-                if i.get_stats()["Rounds Played"]
+                if i[1]["Rounds on Court"]
             ]
         )
         ys = np.array(
             [
-                to_number(i.get_stats_detailed().get(y_stat, 0))
+                to_number(i[1].get(y_stat, 0))
                 for i in players
-                if i.get_stats()["Rounds Played"]
+                if i[1]["Rounds on Court"]
             ]
         )
         return make_graph(xs, ys, x_stat, y_stat)
 
     def games_per_tournament_graph(x_stat, y_stat, tournament):
         if tournament:
-            games = comps[tournament].games_to_list()
+            tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id
+            games = Games.query.filter(Games.tournament_id == tournament_id).all()
         else:
-            games = get_all_games()
+            games = Games.query.all()
         xs = np.array(
-            [to_number(i.get_stats().get(x_stat, 0)) for i in games if not i.bye]
+            [to_number(i.stats().get(x_stat, 0)) for i in games if not i.is_bye]
         )
         ys = np.array(
-            [to_number(i.get_stats().get(y_stat, 0)) for i in games if not i.bye]
+            [to_number(i.stats().get(y_stat, 0)) for i in games if not i.is_bye]
         )
         return make_graph(xs, ys, x_stat, y_stat)
 
     def games_per_player_by(x_stat, y_stat, args):
-        players = []
-        games, details = filter_games(get_all_games(), args, get_details=True)
-        for game, game_players in games:
-            players += [i for i in game.all_players if i.nice_name() in game_players]
-        player = (
-            [i.strip("~") for i in args.getlist("Player") if i.startswith("~")] + [None]
-        )[0]
+        games, details = filter_games(args, get_details=True)
         out = {}
-        for i in players:
-            out[i.get_game_details()[x_stat]] = out.get(
-                i.get_game_details()[x_stat], []
-            ) + [to_number(i.get_stats_detailed()[y_stat])]
+        for game, players in games:
+            for i in players:
+                out[i.stats()[x_stat]] = out.get(i.stats()[x_stat], []) + [
+                    to_number(i.stats()[y_stat])]
         xs = [to_number(i) for i in sorted(out.keys())]
         if any(i is None for i in xs):
             xs = [str(i) for i in sorted(out.keys())]
@@ -242,12 +232,12 @@ def add_graph_endpoints(app, comps):
         ax.set_ylabel(y_stat + " Per Game")
         sub_title = get_query_descriptor(details)
         if sub_title:
-            ax.set_title(sub_title,fontsize = 7, style = "italic")
+            ax.set_title(sub_title, fontsize=7, style="italic")
         fig.suptitle(
             y_stat
             + " by "
-            + x_stat
-            + (f" for {(player).replace('_',' ').title()}" if player else ""),
-            fontsize = 15
+            + x_stat,
+            # + (f" for {(player).replace('_', ' ').title()}" if player else ""),
+            fontsize=15
         )
         return fig

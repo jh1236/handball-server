@@ -1,6 +1,4 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
-from structure import manageGame
-from utils.databaseManager import DatabaseManager
 
 
 class OneRound(FixturesGenerator):

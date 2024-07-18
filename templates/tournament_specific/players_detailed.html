@@ -17,13 +17,13 @@
     </tr>
     </thead>
     <tbody>
-    {% for i, image, link, player in players %}
+    {% for player, stats in players %}
     <tr>
-                <th style="text-align: left;"><a href="/{{tournament}}players/{{link}}"
-                                         class="hide">{{i}}</a>
+                <th style="text-align: left;"><a href="/{{tournament}}players/{{player.searchable_name}}"
+                                         class="hide">{{player.name}}</a>
         </th>
-        {% for stat in player %}
-                <td>{{ stat }}</td>
+        {% for _, h in headers[1:] %}
+                <td>{{ stats[h] }}</td>
         {% endfor %}
     </tr>
     {% endfor %}

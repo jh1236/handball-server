@@ -23,6 +23,8 @@ function rotate(obj, angle) {
     obj.style.transform = s;
 }
 
+let time = null
+
 function deleteFireworks() {
     function a() {
         let l = Array.from(document.getElementsByClassName("bigger"))
@@ -50,8 +52,12 @@ function deleteFireworks() {
     }, 5000)
 }
 
-function main() {
-    fetch(`/api/games/change_code?id=${id}&tournament=${tournament.replace("/", "")}`, {
+function main(timeIn = null) {
+    if (timeIn !== null) {
+        time = timeIn
+        console.log(time)
+    }
+    fetch(`/api/games/change_code?id=${id}`, {
         method: "GET"
     }).then((res) => {
         res.json().then(
@@ -62,6 +68,19 @@ function main() {
             }
         )
     });
+    if (time > 0) {
+        let date = new Date(0)
+        date.setSeconds((Date.now() / 1000 - time))
+        document.getElementById("elapsed").textContent = date.toISOString().substring(14, 19)
+        console.log(Date.now() - time)
+    } else if (time < 0) {
+        let date = new Date(0)
+        date.setSeconds(Math.abs(time))
+        document.getElementById("elapsed").textContent = date.toISOString().substring(14, 19)
+    } else {
+        document.getElementById("elapsed").textContent = "00:00"
+    }
+
     if (updateCount >= 0) {
         setTimeout(main, 1000)
     }

@@ -2,11 +2,11 @@ import time
 
 from flask import request, jsonify
 
-from structure import manageGame
+from structure import manage_game
 from utils.logging_handler import logger
 
 
-def add_game_endpoints(app, comps):
+def add_game_endpoints(app):
     @app.get("/api/games/change_code")
     def change_code():
         """
@@ -16,7 +16,7 @@ def add_game_endpoints(app, comps):
             }
         """
         game_id = int(request.args["id"])
-        return jsonify({"code": manageGame.change_code(game_id)})
+        return jsonify({"code": manage_game.change_code(game_id)})
 
     @app.post("/api/games/update/start")
     def start():
@@ -32,7 +32,7 @@ def add_game_endpoints(app, comps):
                 scorer: <str> (OPTIONAL) = the scorer who is actually scoring the game
             }
         """
-        logger.info(f"Request for score: {request.json}")
+        logger.info(f"Request for start: {request.json}")
         game_id = int(request.json["id"])
         swap_serve = request.json["swapService"]
         team_one = request.json.get("teamOne", None)
@@ -40,9 +40,9 @@ def add_game_endpoints(app, comps):
         first_is_iga = request.json["teamOneIGA"]
         umpire = request.json.get("official", None)
         scorer = request.json.get("scorer", None)
-        manageGame.start_game(game_id, swap_serve, team_one, team_two,
-                              first_is_iga,
-                              umpire, scorer)
+        manage_game.start_game(game_id, swap_serve, team_one, team_two,
+                               first_is_iga,
+                               umpire, scorer)
         return "", 204
 
     @app.post("/api/games/update/score")
@@ -59,7 +59,7 @@ def add_game_endpoints(app, comps):
         game_id = int(request.json["id"])
         first_team = request.json["firstTeam"]
         left_player = request.json["leftPlayer"]
-        manageGame.score_point(game_id, first_team, left_player)
+        manage_game.score_point(game_id, first_team, left_player)
         return "", 204
 
     @app.post("/api/games/update/ace")
@@ -72,7 +72,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for ace: {request.json}")
         game_id = request.json["id"]
-        manageGame.ace(game_id)
+        manage_game.ace(game_id)
         return "", 204
 
     @app.post("/api/games/update/substitute")
@@ -89,16 +89,25 @@ def add_game_endpoints(app, comps):
         game_id = request.json["id"]
         first_team = request.json["firstTeam"]
         first_player = request.json["leftPlayer"]
-        manageGame.substitute(game_id, first_team, first_player)
+        manage_game.substitute(game_id, first_team, first_player)
         return "", 204
 
-    @app.post("/api/games/update/round")
-    def new_round():
-        tournament = comps[request.json["tournament"]]
-        tournament.update_games(True)
-        tournament.update_games()
-        tournament.save()
-        return "", 200
+    @app.post("/api/games/update/pardon")
+    def pardon():
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+                firstTeam: <bool> = if the team listed first is being pardoned
+                leftPlayer: <bool> = if the player listed as left is being pardoned
+            }
+        """
+        logger.info(f"Request for substitute: {request.json}")
+        game_id = request.json["id"]
+        first_team = request.json["firstTeam"]
+        first_player = request.json["leftPlayer"]
+        manage_game.pardon(game_id, first_team, first_player)
+        return "", 204
 
     @app.post("/api/games/update/end")
     def end():
@@ -115,10 +124,9 @@ def add_game_endpoints(app, comps):
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
         best = request.json.get("bestPlayer", None)
-        manageGame.end_game(game_id,  best, request.json.get("notes", None), request.json["protestTeamOne"], request.json["protestTeamTwo"])
+        manage_game.end_game(game_id, best, request.json.get("notes", None), request.json["protestTeamOne"],
+                             request.json["protestTeamTwo"])
         return "", 204
-
-
 
     @app.post("/api/games/update/timeout")
     def timeout():
@@ -132,7 +140,7 @@ def add_game_endpoints(app, comps):
         logger.info(f"Request for timeout: {request.json}")
         first_team = request.json["firstTeam"]
         game_id = request.json["id"]
-        manageGame.time_out(game_id, first_team)
+        manage_game.time_out(game_id, first_team)
         return "", 204
 
     @app.post("/api/games/update/forfeit")
@@ -147,10 +155,10 @@ def add_game_endpoints(app, comps):
         logger.info(f"Request for forfeit: {request.json}")
         first_team = request.json["firstTeam"]
         game_id = request.json["id"]
-        manageGame.forfeit(game_id, first_team)
+        manage_game.forfeit(game_id, first_team)
         return "", 204
 
-    @app.post("/api/games/update/endTimeout")
+    @app.post("/api/games/update/end_timeout")
     def end_timeout():
         """
         SCHEMA:
@@ -158,22 +166,23 @@ def add_game_endpoints(app, comps):
                 id: <int> = id of the current game
             }
         """
-        logger.info(f"Request for endTimeout: {request.json}")
+        logger.info(f"Request for end_timeout: {request.json}")
         game_id = request.json["id"]
-        manageGame.end_timeout(game_id)
+        manage_game.end_timeout(game_id)
         return "", 204
 
     @app.post("/api/games/update/serve_clock")
     def serve_timer():
-        tournament = request.json["tournament"]
-        logger.info(f"Request for timeout: {request.json}")
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+                start: <bool> = if the serve timer is starting or ending
+            }
+        """
+        logger.info(f"Request for serve_clock: {request.json}")
         game_id = request.json["id"]
-        if request.json["start"]:
-            comps[tournament].get_game(game_id)._serve_clock = time.time()
-        else:
-            comps[tournament].get_game(game_id)._serve_clock = -1
-        comps[tournament].get_game(game_id).update_count += 1
-        comps[tournament].save()
+        manage_game.serve_timer(game_id, request.json['start'])
         return "", 204
 
     @app.post("/api/games/update/fault")
@@ -186,7 +195,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for fault: {request.json}")
         game_id = request.json["id"]
-        manageGame.fault(game_id)
+        manage_game.fault(game_id)
         return "", 204
 
     @app.post("/api/games/update/undo")
@@ -199,7 +208,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for undo: {request.json}")
         game_id = request.json["id"]
-        manageGame.undo(game_id)
+        manage_game.undo(game_id)
         return "", 204
 
     @app.post("/api/games/update/delete")
@@ -212,35 +221,7 @@ def add_game_endpoints(app, comps):
         """
         logger.info(f"Request for delete: {request.json}")
         game_id = request.json["id"]
-        manageGame.delete(game_id)
-        return "", 204
-
-    @app.post("/api/games/update/swapServe")
-    def swap_serve():
-        tournament = request.json["tournament"]
-        logger.info(f"Request for swap: {request.json}")
-        game_id = request.json["id"]
-        comps[tournament].get_game(game_id).swap_serve()
-        comps[tournament].save()
-        return "", 204
-
-    @app.post("/api/games/update/swapServeTeam")
-    def swap_serve_team():
-        tournament = request.json["tournament"]
-        logger.info(f"Request for swap: {request.json}")
-        game_id = request.json["id"]
-        comps[tournament].get_game(game_id).swap_serve_team()
-        comps[tournament].save()
-        return "", 204
-
-    @app.post("/api/games/update/swapPlayerSides")
-    def swap_player_sides():
-        first_team = request.json.get("firstTeam", None)
-        tournament = request.json["tournament"]
-        logger.info(f"Request for swap: {request.json}")
-        game_id = request.json["id"]
-        comps[tournament].get_game(game_id).teams[not first_team].swap_players()
-        comps[tournament].save()
+        manage_game.delete(game_id)
         return "", 204
 
     @app.post("/api/games/update/card")
@@ -261,8 +242,7 @@ def add_game_endpoints(app, comps):
         first_team = request.json["firstTeam"]
         left_player = request.json["leftPlayer"]
         game_id = request.json["id"]
-        duration = -1 if color == "Red" else request.json.get("duration", 3) if color == "Yellow" else 0
+        duration = request.json["duration"]
         reason = request.json["reason"]
-
-        manageGame.card(game_id, first_team, left_player, color, duration, reason)
+        manage_game.card(game_id, first_team, left_player, color, duration, reason)
         return "", 204

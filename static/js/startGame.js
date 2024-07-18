@@ -22,7 +22,6 @@ function swap() {
 }
 
 
-
 let firstServes = true
 let firstIga = true
 
@@ -46,116 +45,70 @@ for (let i of teamOnePlayers.concat(teamTwoPlayers)) {
 }
 teamOnePlayers = teamOnePlayers.map(i => i.split(":")[0])
 teamTwoPlayers = teamTwoPlayers.map(i => i.split(":")[0])
+
 function setTeamOneLeftPlayer(i) {
-    if (teamsSwapped) {
-        for (const j in teamTwoPlayers) {
-            console.log(`${j} === ${i}`)
-            if (teamTwoPlayers[j] === i) {
-                [teamTwoPlayers[0], teamTwoPlayers[j]] = [teamTwoPlayers[j], teamTwoPlayers[0]]
-                break
-            }
-        }
-        document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
-        if (teamTwoPlayers.length > 2) {
-            document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
-        }
-    } else {
-        for (const j in teamOnePlayers) {
-            console.log(`${j} === ${i}`)
-            if (teamOnePlayers[j] === i) {
-                [teamOnePlayers[0], teamOnePlayers[j]] = [teamOnePlayers[j], teamOnePlayers[0]]
-                break
-            }
-        }
-        document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
-        if (teamOnePlayers.length > 2) {
-            document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
+
+    for (const j in teamOnePlayers) {
+        console.log(`${j} === ${i}`)
+        if (teamOnePlayers[j] === i) {
+            [teamOnePlayers[0], teamOnePlayers[j]] = [teamOnePlayers[j], teamOnePlayers[0]]
+            break
         }
     }
+    document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
+    if (teamOnePlayers.length > 2) {
+        document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
+    }
+
     console.log(teamOnePlayers)
     console.log(teamTwoPlayers)
 }
 
 function setTeamTwoLeftPlayer(i, s) {
-    if (teamsSwapped) {
-        for (const j in teamOnePlayers) {
-            if (teamOnePlayers[j] === i) {
-                [teamOnePlayers[0], teamOnePlayers[j]] = [teamOnePlayers[j], teamOnePlayers[0]]
-                break
-            }
-        }
-        document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
-        if (teamOnePlayers.length > 2) {
-            document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
-        }
-    } else {
-        for (const j in teamTwoPlayers) {
-            if (teamTwoPlayers[j] === i) {
-                [teamTwoPlayers[0], teamTwoPlayers[j]] = [teamTwoPlayers[j], teamTwoPlayers[0]]
-                break
-            }
-        }
-        document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
-        if (teamTwoPlayers.length > 2) {
-            document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
+
+    for (const j in teamTwoPlayers) {
+        if (teamTwoPlayers[j] === i) {
+            [teamTwoPlayers[0], teamTwoPlayers[j]] = [teamTwoPlayers[j], teamTwoPlayers[0]]
+            break
         }
     }
+    document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
+    if (teamTwoPlayers.length > 2) {
+        document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
+    }
+
     console.log(teamOnePlayers)
     console.log(teamTwoPlayers)
 }
 
 function setTeamOneRightPlayer(i, s) {
-    if (teamsSwapped) {
-        for (const j in teamTwoPlayers) {
-            if (teamTwoPlayers[j] === i) {
-                [teamTwoPlayers[1], teamTwoPlayers[j]] = [teamTwoPlayers[j], teamTwoPlayers[1]]
-                break
-            }
-        }
-        document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
-        if (teamTwoPlayers.length > 2) {
-            document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
-        }
-    } else {
-        for (const j in teamOnePlayers) {
-            if (teamOnePlayers[j] === i) {
-                [teamOnePlayers[1], teamOnePlayers[j]] = [teamOnePlayers[j], teamOnePlayers[1]]
-                break
-            }
-        }
-        document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
-        if (teamOnePlayers.length > 2) {
-            document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
+
+    for (const j in teamOnePlayers) {
+        if (teamOnePlayers[j] === i) {
+            [teamOnePlayers[1], teamOnePlayers[j]] = [teamOnePlayers[j], teamOnePlayers[1]]
+            break
         }
     }
+    document.getElementById("teamOneLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
+    if (teamOnePlayers.length > 2) {
+        document.getElementById("teamOneRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
+    }
+
     console.log(teamOnePlayers)
     console.log(teamTwoPlayers)
 
 }
 
 function setTeamTwoRightPlayer(i, s) {
-    if (teamsSwapped) {
-        for (const j in teamOnePlayers) {
-            if (teamOnePlayers[j] === i) {
-                [teamOnePlayers[1], teamOnePlayers[j]] = [teamOnePlayers[j], teamOnePlayers[1]]
-                break
-            }
+    for (const j in teamTwoPlayers) {
+        if (teamTwoPlayers[j] === i) {
+            [teamTwoPlayers[1], teamTwoPlayers[j]] = [teamTwoPlayers[j], teamTwoPlayers[1]]
+            break
         }
-        document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamOnePlayers[0]]
-        if (teamOnePlayers.length > 2) {
-            document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamOnePlayers[1]]
-        }
-    } else {
-        for (const j in teamTwoPlayers) {
-            if (teamTwoPlayers[j] === i) {
-                [teamTwoPlayers[1], teamTwoPlayers[j]] = [teamTwoPlayers[j], teamTwoPlayers[1]]
-                break
-            }
-        }
-        document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
-        if (teamTwoPlayers.length > 2) {
-            document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
-        }
+    }
+    document.getElementById("teamTwoLeft").textContent = "Left Player: " + playerLookup[teamTwoPlayers[0]]
+    if (teamTwoPlayers.length > 2) {
+        document.getElementById("teamTwoRight").textContent = "Right Player: " + playerLookup[teamTwoPlayers[1]]
     }
     console.log(teamOnePlayers)
     console.log(teamTwoPlayers)
@@ -179,8 +132,8 @@ function start() {
                 id: id,
                 swapService: !lxor(firstServes, teamsSwapped),
                 teamOneIGA: firstIga,
-                teamOne: teamOnePlayers,
-                teamTwo: teamTwoPlayers,
+                teamOne: teamsSwapped ? teamTwoPlayers : teamOnePlayers,
+                teamTwo: teamsSwapped ? teamOnePlayers : teamTwoPlayers,
                 official: official,
                 scorer: scorer,
             }),
@@ -196,8 +149,8 @@ function start() {
             id: id,
             swapService: !lxor(firstServes, teamsSwapped),
             teamOneIGA: firstIga,
-            teamOne: teamOnePlayers,
-            teamTwo: teamTwoPlayers,
+            teamOne: teamsSwapped ? teamTwoPlayers : teamOnePlayers,
+            teamTwo: teamsSwapped ? teamOnePlayers : teamTwoPlayers,
         }),
         headers: {
             "Content-type": "application/json; charset=UTF-8"

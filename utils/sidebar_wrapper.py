@@ -10,7 +10,7 @@ def link(tournament):
 
 def render_template_sidebar(template: str, **kwargs):
     with DatabaseManager() as c:
-        tournaments = c.execute("""SELECT searchableName, name FROM tournaments""").fetchall()
+        tournaments = c.execute("""SELECT searchable_name, name FROM tournaments""").fetchall()
     current = None
     for i in tournaments:
         if i[0] in request.path:

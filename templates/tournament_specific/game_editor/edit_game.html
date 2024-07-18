@@ -8,7 +8,7 @@
 </head>
 <body>
 <script src="{{ url_for('static', filename='js/scorer.js') }}" teamOne='{{ ','.join(teamOneNames) }}'
-        teamTwo='{{ ','.join(teamTwoNames) }}'></script>
+        teamTwo='{{ ','.join(teamTwoNames) }}' warnings="{{ VERBAL_WARNINGS }}" greens="{{ GREEN_CARDS }}"></script>
 <script>
     setup({{game.id}}, {{ swap }})
 </script>
@@ -64,9 +64,14 @@
                 {% if teams[0].card_time_remaining < 0 %}
                     <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
                 {% elif teams[0].card_time_remaining > 0 %}
-                    <div class="rectangle"
-                         style="background-color: #FCCE6E;width:{{ 100*(teams[0].card_time_remaining) / teams[0].card_time }}%"></div>
-                {% elif teams[0].green_carded %}
+                    {% if teams[0].card_time > 2 %}
+                        <div class="rectangle"
+                             style="background-color: #FCCE6E;width:{{ 100*(teams[0].card_time_remaining) / teams[0].card_time }}%"></div>
+                    {% else %}
+                        <div class="rectangle"
+                             style="background-color: #84AA63;width:{{ 100*(teams[0].card_time_remaining) / teams[0].card_time }}%"></div>
+                    {% endif %}
+                {% elif teams[0].green_carded and not VERBAL_WARNINGS %}
                     <div class="rectangle"
                          style="background-color: #84AA63;width:100%"></div>
                 {% endif %}
@@ -77,9 +82,14 @@
                 {% if teams[1].card_time_remaining < 0 %}
                     <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
                 {% elif teams[1].card_time_remaining > 0 %}
-                    <div class="rectangle"
-                         style="background-color: #FCCE6E;width:{{ 100*(teams[1].card_time_remaining) / teams[1].card_time }}%"></div>
-                {% elif teams[1].green_carded %}
+                    {% if teams[1].card_time > 2 %}
+                        <div class="rectangle"
+                             style="background-color: #FCCE6E;width:{{ 100*(teams[1].card_time_remaining) / teams[1].card_time }}%"></div>
+                    {% else %}
+                        <div class="rectangle"
+                             style="background-color: #84AA63;width:{{ 100*(teams[1].card_time_remaining) / teams[1].card_time }}%"></div>
+                    {% endif %}
+                {% elif teams[1].green_carded and not VERBAL_WARNINGS %}
                     <div class="rectangle"
                          style="background-color: #84AA63;width:100%"></div>
                 {% endif %}
@@ -201,8 +211,10 @@
         <tr>
             <td><br></td>
         </tr>
-        <tr>
-            {% if VERBAL_WARNINGS %}
+
+
+        {% if VERBAL_WARNINGS %}
+            <tr>
                 <td>
                     <button onclick="openCardModal('Warning', true, '{{ teams[0].name }}')" class="gray_button">
                         Warning {{ teams[0].name }}</button>
@@ -212,7 +224,13 @@
                     <button onclick="openCardModal('Warning', false, '{{ teams[1].name }}')" class="gray_button">
                         Warning {{ teams[1].name }}</button>
                 </td>
-            {% else %}
+            </tr>
+            <tr>
+                <td><br></td>
+            </tr>
+        {% endif %}
+        {% if GREEN_CARDS %}
+            <tr>
                 <td>
                     <button onclick="openCardModal('Green', true, '{{ teams[0].name }}')" class="green_button">
                         Green
@@ -224,11 +242,11 @@
                         Green
                         Card {{ teams[1].name }}</button>
                 </td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td><br></td>
-        </tr>
+            </tr>
+            <tr>
+                <td><br></td>
+            </tr>
+        {% endif %}
         <tr>
             <td>
                 <button onclick="openCardModal('Yellow', true, '{{ teams[0].name }}')" class="yellow_button">
@@ -259,6 +277,7 @@
                     Card {{ teams[1].name }}</button>
             </td>
         </tr>
+
     </table>
 
     <br>
@@ -275,6 +294,20 @@
     <button class="button" id="serveBtn" onclick="startServeClock()">Start Serve Timer</button>
     <button class="button" id="serveBtn" onclick="ace()">Ace</button>
     <br><br>
+    {% if teams[0].card_time_remaining or teams[1].card_time_remaining %}
+        <div class="dropdown">
+            <button onclick="myFunction(this)" class="gray_button dropbtn">
+                Pardon</button>
+            <div class="dropdown-content">
+                {% for i, p in teamOnePlayers %}
+                    {% if p.is_carded %}<p onclick="pardon(true, {{ i }})"> {{ p.name }}</p> {% endif %}
+                {% endfor %}
+                {% for i, p in teamTwoPlayers %}
+                    {% if p.is_carded %}<p onclick="pardon(false, {{ i }})">{{ p.name }}</p> {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
     <div class="dropdown">
         <button onclick="myFunction(this)" class="red_button dropbtn" style="color:#9C1A1C"><b>Forfeit</b></button>
         <div class="dropdown-content">

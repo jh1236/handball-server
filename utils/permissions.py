@@ -1,5 +1,6 @@
-from flask import redirect, request, render_template, make_response
-from structure.AllTournament import get_all_officials
+from flask import redirect, request, render_template
+
+from database.models import People
 
 
 def _requires_password():
@@ -43,13 +44,13 @@ def login():
     key = request.args.get("key", None)
     if key is None:  # this is done so if you want to change your password you can do it easily live
         stored_key = request.cookies.get("userKey", None)
-        if stored_key in [i.key for i in get_all_officials()]:
+        if stored_key in [i.password for i in People.query.all()]:
             return False  # if the key already exists then we don't need to get the password
         return _requires_password()
-    if key in [i.key for i in get_all_officials()]:
+    if key in [i.key for i in People.query.all()]:
         resp = redirect(request.base_url)  # TODO: find a nice way to do this that doesnt look so cancer
         resp.set_cookie("userKey", key)
-        resp.set_cookie("userName", next(i for i in get_all_officials() if i.key == key).name)
+        resp.set_cookie("userName", People.query.filter(People.password == key).first().name)
         return resp
     else:
         return _incorrect_password()
@@ -71,7 +72,7 @@ def admin_only(func):
             return resp
 
         key = request.cookies.get("userKey", None)
-        if key in [i.key for i in get_all_officials() if i.admin]:
+        if key in [i.password  for i in People.query.filter(People.is_admin).all()]:
             return func(*args, **kwargs)
 
         return _no_permissions()

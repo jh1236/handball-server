@@ -1,35 +1,41 @@
-import io
 import json
 import os
-import time
 
-from flask import request, send_file, jsonify
+from flask import jsonify, send_file
+from flask import request
 
-from structure import manageGame
-from structure.AllTournament import get_all_players
-from structure.Game import Game
-from structure.Team import Team
+from database import db
+from database.models import Tournaments
+from structure import manage_game
 from utils.logging_handler import logger
-import numpy as np
-from flask import request, send_file, Response
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
 
 
-def add_tourney_endpoints(app, comps):
+def add_tourney_endpoints(app):
     @app.post("/api/note")
     def note():
+        """
+        SCHEMA:
+            {
+                tournament: str = the searchable name of the tournament
+                note: str = the note for the tournament
+            }
+        """
+        logger.info(f"Request for notes: {request.json}")
         tournament = request.json["tournament"]
         note = request.json["note"]
-        if note == "del":
-            comps[tournament].notes = ""
-        else:
-            comps[tournament].notes = note
-        comps[tournament].save()
+        t = Tournaments.query.filter(Tournaments.searchable_name == tournament).first()
+        t.notes = note
+        db.session.commit()
         return "", 204
 
     @app.get("/api/tournaments/image")
     def tourney_image():
+        """
+        SCHEMA:
+            {
+                name: str = the searchable name of the tournament
+            }
+        """
         tournament = request.args.get("name", type=str)
         if os.path.isfile(f"./resources/images/tournaments/{tournament}.png"):
             return send_file(
@@ -40,95 +46,22 @@ def add_tourney_endpoints(app, comps):
                 f"./resources/images/teams/blank.png", mimetype="image/png"
             )
 
-    @app.get("/api/teams/stats")
-    def stats():
-        tournament = request.args.get("tournament", type=str)
-        team_name = request.args.get("name", type=str)
-        team = [i for i in comps[tournament].teams if team_name == i.nice_name()][0]
-        return team.get_stats(include_players=True)
-
-    @app.get("/api/games/current_round")
-    def current_round():
-        tournament = request.args.get("tournament", type=str)
-        return [
-            i.as_map() for i in comps[tournament].games_to_list() if not i.best_player
-        ]
-
-    @app.get("/api/games/fixtures")
-    def all_fixtures():
-        tournament = request.args.get("tournament", type=str)
-        return [i.as_map() for i in comps[tournament].games_to_list()]
-
-    @app.get("/api/games/display")
-    def display():
-        tournament = request.args.get("tournament", type=str)
-        game_id = int(request.args["id"])
-        try:
-            return comps[tournament].get_game(game_id).display_map()
-        except ValueError:
-            return {
-                "leftTeam": {
-                    "team": "TBD",
-                    "score": 0,
-                    "timeout": 0,
-                    "players": ["None", "None"],
-                    "captain": {
-                        "name": "None",
-                        "green": False,
-                        "yellow": False,
-                        "receivedYellow": False,
-                        "red": False,
-                        "serving": False,
-                        "fault": False,
-                        "cardPercent": 1,
-                    },
-                    "notCaptain": {
-                        "name": "None",
-                        "green": False,
-                        "yellow": False,
-                        "receivedYellow": False,
-                        "red": False,
-                        "serving": False,
-                        "fault": False,
-                        "cardPercent": 1,
-                    },
-                },
-                "rightTeam": {
-                    "team": "TBD",
-                    "score": 0,
-                    "timeout": 0,
-                    "players": ["None", "None"],
-                    "captain": {
-                        "name": "None",
-                        "green": False,
-                        "yellow": False,
-                        "receivedYellow": False,
-                        "red": False,
-                        "serving": False,
-                        "fault": False,
-                        "cardPercent": 1,
-                    },
-                    "notCaptain": {
-                        "name": "None",
-                        "green": False,
-                        "yellow": False,
-                        "receivedYellow": False,
-                        "red": False,
-                        "serving": False,
-                        "fault": False,
-                        "cardPercent": 1,
-                    },
-                },
-                "rounds": 0,
-                "umpire": "TBD",
-                "court": "TBD",
+    @app.post("/api/tournaments/serve_style")
+    def serve_style():
+        """
+        WARNING: DO NOT CHANGE WHILE A GAME IS IN PROGRESS
+        SCHEMA:
+            {
+                tournament: str = the searchable name of the tournament
+                badminton_serves: bool = if the tournament should use badminton serving
             }
-
-    @app.get("/api/games/game")
-    def game():
-        tournament = request.args.get("tournament", type=str)
-        game_id = int(request.args["id"])
-        return comps[tournament].get_game(game_id).as_map()
+        """
+        logger.info(f"Request for serve_style: {request.json}")
+        tournament = request.json["tournament"]
+        t = Tournaments.query.filter(Tournaments.searchable_name == tournament).first()
+        t.badminton_serves = request.json.get("badminton_serves", not t.badminton_serves)
+        db.session.commit()
+        return "", 204
 
     @app.post("/api/games/update/create")
     def create():
@@ -145,9 +78,9 @@ def add_tourney_endpoints(app, comps):
             }
         """
         print(request.json)
-        gid = manageGame.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"],
-                                     request.json["official"], request.json.get("playersOne", None),
-                                     request.json.get("playersTwo", None))
+        gid = manage_game.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"],
+                                      request.json["official"], request.json.get("playersOne", None),
+                                      request.json.get("playersTwo", None))
         return jsonify({"id": gid})
 
     @app.post("/api/games/update/resolve")
@@ -160,11 +93,21 @@ def add_tourney_endpoints(app, comps):
         """
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
-        manageGame.resolve_game(game_id)
+        manage_game.resolve_game(game_id)
         return "", 204
 
     @app.post("/api/signup")
     def signup():
+        """
+        SCHEMA:
+            {
+                teamName: str = the name of the team to sign up
+                playerOne: str = the name of the first player
+                playerTwo: str [OPTIONAL] = the name of the second player. If not populated, the team is not added
+                substitute: str [OPTIONAL] = the name of the team to substitute
+                umpires: str = the list of people who wish to umpire for the tournament
+            }
+        """
         if request.json["playerTwo"]:
             with open("./config/signups/teams.json") as fp:
                 teams = json.load(fp)
@@ -190,7 +133,4 @@ def add_tourney_endpoints(app, comps):
         print(request.json["umpires"])
         with open("config/signups/officials.json", "w+") as fp:
             json.dump(umpires, fp)
-        for v in comps.values():
-            v.initial_load()
-            v.load()
         return "", 204

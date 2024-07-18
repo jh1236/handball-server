@@ -35,13 +35,13 @@ class FixturesGenerator:
             games_query = c.execute("""
 SELECT games.id,
        games.round,
-       games.isFinal,
-       coalesce(CAST(SUM(otherGames.winningTeam = teams.id) AS REAL), 0) / max(COUNT(otherGames.id), 1) as o
+       games.is_final,
+       coalesce(CAST(SUM(otherGames.winning_team_id = teams.id) AS REAL), 0) / max(COUNT(otherGames.id), 1) as o
 FROM games
-         INNER JOIN teams ON (teams.id = games.teamOne OR teams.id = games.teamTwo)
-         LEFT JOIN games otherGames ON (teams.id = otherGames.teamOne OR teams.id = otherGames.teamTwo) AND
-                                       games.tournamentId = otherGames.tournamentId AND otherGames.id < games.id
-WHERE games.tournamentId = ?  AND games.started = 0 AND games.isBye = 0 AND games.round = (SELECT MAX(round) FROM games inn WHERE inn.tournamentId = games.tournamentId AND not inn.isFinal)
+         INNER JOIN teams ON (teams.id = games.team_one_id OR teams.id = games.team_two_id)
+         LEFT JOIN games otherGames ON (teams.id = otherGames.team_one_id OR teams.id = otherGames.team_two_id) AND
+                                       games.tournament_id = otherGames.tournament_id AND otherGames.id < games.id
+WHERE games.tournament_id = ?  AND games.started = 0 AND games.is_bye = 0 AND games.round = (SELECT MAX(round) FROM games inn WHERE inn.tournament_id = games.tournament_id AND not inn.is_final)
 GROUP by games.id
 ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
             games = [i for i in games_query if not i[2]]
@@ -59,25 +59,25 @@ ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
     def add_umpires(self):
         with DatabaseManager() as c:
             games_query = c.execute(
-                """SELECT games.id, round, court, official, scorer FROM games WHERE games.tournamentId = ? AND games.isBye = 0 ORDER BY id""",
+                """SELECT games.id, round, court, official_id, scorer_id FROM games WHERE games.tournament_id = ? AND games.is_bye = 0 ORDER BY id""",
                 (self.tournament_id,)).fetchall()
             players = c.execute(
-                """SELECT playerGameStats.playerId, gameId FROM playerGameStats WHERE tournamentId = ?""",
+                """SELECT playerGameStats.player_id, game_id FROM playerGameStats WHERE tournament_id = ?""",
                 (self.tournament_id,)).fetchall()
-            scorer = c.execute("""SELECT hasScorer FROM tournaments WHERE id = ?""",
+            scorer = c.execute("""SELECT has_scorer FROM tournaments WHERE id = ?""",
                                (self.tournament_id,)).fetchone()[0]
             officials = c.execute(
                 """
-SELECT officials.personId,
+SELECT officials.person_id,
        officials.id,
        officials.proficiency,
        COUNT(DISTINCT games.id),
-       COUNT((SELECT games.id FROM games WHERE scorer = officials.id)),
+       COUNT((SELECT games.id FROM games WHERE scorer_id = officials.id)),
        COUNT(DISTINCT IIF(games.court = 0, games.id, null))
 FROM officials
-         INNER JOIN tournamentOfficials ON officials.id = tournamentOfficials.officialId
-         LEFT JOIN games on games.official = officials.id AND games.tournamentId = tournamentOfficials.tournamentId
-WHERE tournamentOfficials.tournamentId = ?
+         INNER JOIN tournamentOfficials ON officials.id = tournamentOfficials.official_id
+         LEFT JOIN games on games.official_id = officials.id AND games.tournament_id = tournamentOfficials.tournament_id
+WHERE tournamentOfficials.tournament_id = ?
 GROUP BY officials.id""",
                 (self.tournament_id,)
             ).fetchall()
@@ -138,7 +138,7 @@ GROUP BY officials.id""",
                             # the official is playing this round
                             continue
                         with DatabaseManager() as c:
-                            c.execute("""UPDATE games SET official = ? WHERE id = ?""", (o.official_id, g[0]))
+                            c.execute("""UPDATE games SET official_id = ? WHERE id = ?""", (o.official_id, g[0]))
                         o.games_umpired += 1
                         o.court_one_games += g[2] == 0
                         g[3] = o.official_id
@@ -171,14 +171,14 @@ GROUP BY officials.id""",
                             # the official is playing this round
                             continue
                         with DatabaseManager() as c:
-                            c.execute("""UPDATE games SET scorer = ? WHERE id = ?""", (o.official_id, g[0]))
+                            c.execute("""UPDATE games SET scorer_id = ? WHERE id = ?""", (o.official_id, g[0]))
                         g[4] = o.official_id
                         o.games_scored += 1
                         break
                     if not g[4]:
                         # there was no scorer found, set the scorer to be equal to the umpire
                         with DatabaseManager() as c:
-                            c.execute("""UPDATE games SET scorer = official WHERE id = ?""", (g[0],))
+                            c.execute("""UPDATE games SET scorer_id = official_id WHERE id = ?""", (g[0],))
 
 
 def get_type_from_name(name: str, tournament: int) -> FixturesGenerator:
