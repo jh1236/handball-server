@@ -1,66 +1,66 @@
 @import "style.css";
 
-.table tr {
+.jaredTable tr {
     height: 50px;
 }
 
-.table tr td:first-child {
+.jaredTable tr td:first-child {
     width: 140px;
     float: left;
 }
 
-.table tr td:nth-child(2) {
+.jaredTable tr td:nth-child(2) {
     width: 120px;
 }
 
-.table tr td:nth-child(3) {
+.jaredTable tr td:nth-child(3) {
     width: 100px;
 }
 
-.table tr td:nth-child(4) {
+.jaredTable tr td:nth-child(4) {
     width: 100px;
 }
 
-.table tr td:nth-child(5) {
+.jaredTable tr td:nth-child(5) {
     width: 100px;
 }
 
-.table tr td:nth-child(6) {
+.jaredTable tr td:nth-child(6) {
     width: 100px;
 }
 
-.table tr td:nth-child(7) {
+.jaredTable tr td:nth-child(7) {
     width: 100px;
 }
 
-.table tr td:nth-child(8) {
+.jaredTable tr td:nth-child(8) {
     width: 100px;
 }
 
-.table tr td:nth-child(9) {
+.jaredTable tr td:nth-child(9) {
     width: 100px;
 }
 
-.table tr td:nth-child(10) {
+.jaredTable tr td:nth-child(10) {
     width: 100px;
 }
 
-.table tr td:nth-child(11) {
+.jaredTable tr td:nth-child(11) {
     width: 100px;
 }
 
-.table tr td:nth-child(12) {
+.jaredTable tr td:nth-child(12) {
     width: 100px;
 }
 
-.table tr td:nth-child(13) {
+.jaredTable tr td:nth-child(13) {
     width: 100px;
 }
 
-.table tr td:nth-child(14) {
+.jaredTable tr td:nth-child(14) {
     width: 100px;
 }
-.table tr td:nth-child(15) {
+.jaredTable tr td:nth-child(15) {
     width: 100px;
 }
 

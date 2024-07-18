@@ -1,16 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "base.html" %}
+
+{% block headBlock %}
     <title>Documents</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
+{% endblock %}
+
+{% block bodyBlock %}
+
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script>load("")</script>
 <h1><a href="/documents/" class="hide">Documents</a></h1>
-<table class="table">
+<table class="jaredTable">
     <tr>
         <td style="width:100px;"><a href="/rules/simple"
                                     class="hide"><img
@@ -19,7 +19,7 @@
         ></a></td>
 
 
-        <td style="width:200px;"><a href="/rules/simple" class="hide"><h3>Rules Cheat Sheet</h3></a></td>
+        <td style="width:200px;"><a href="/rules/simple" class="hide"><p>Rules Cheat Sheet</p></a></td>
     </tr>
     <tr>
         <td style="width:100px;"><a href="/rules/current"
@@ -29,7 +29,7 @@
         ></a></td>
 
 
-        <td style="width:200px;"><a href="/rules/current" class="hide"><h3>Current Rules</h3></a></td>
+        <td style="width:200px;"><a href="/rules/current" class="hide"><p>Current Rules</p></a></td>
     </tr>
     <tr>
         <td style="width:100px;"><a href="/code_of_conduct/"
@@ -39,7 +39,7 @@
         ></a></td>
 
 
-        <td style="width:200px;"><a href="/code_of_conduct/" class="hide"><h3>Code Of Conduct</h3></a></td>
+        <td style="width:200px;"><a href="/code_of_conduct/" class="hide"><p>Code Of Conduct</p></a></td>
     </tr>
     <tr>
         <td style="width:100px;"><a href="/rules/proposed"
@@ -47,7 +47,7 @@
                 src="/api/image?name=SUSS" class="team_logo"
                 style="width: 75px; height: 75px;"
         ></a></td>
-        <td style="width:200px;"><a href="/rules/proposed" class="hide"><h3>Proposed Rule Changes</h3></a></td>
+        <td style="width:200px;"><a href="/rules/proposed" class="hide"><p>Proposed Rule Changes</p></a></td>
     </tr>
     <tr>
         <td style="width:100px;"><a href="https://docs.google.com/presentation/d/1fdU4IBZbUu-rkhlRBs0GpmuXwU4BX3ISFPdtTDjlPtM/edit?usp=sharing"
@@ -55,7 +55,7 @@
                 src="/api/image?name=SUSS" class="team_logo"
                 style="width: 75px; height: 75px;"
         ></a></td>
-        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/1fdU4IBZbUu-rkhlRBs0GpmuXwU4BX3ISFPdtTDjlPtM/edit?usp=sharing" class="hide"><h3>Captain's Briefing</h3></a></td>
+        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/1fdU4IBZbUu-rkhlRBs0GpmuXwU4BX3ISFPdtTDjlPtM/edit?usp=sharing" class="hide"><p>Captain's Briefing</p></a></td>
     </tr>
     <tr>
         <td style="width:100px;"><a href="https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing"
@@ -63,7 +63,7 @@
                 src="/api/image?name=umpire" class="team_logo"
                 style="width: 75px; height: 75px;"
         ></a></td>
-        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing" class="hide"><h3>Third Umpire Qualification Program</h3></a></td>
+        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing" class="hide"><p>Third Umpire Qualification Program</p></a></td>
     </tr>
     <tr>
         <td style="width:100px;"><a href="https://docs.google.com/presentation/d/19f1aP1ucWNLmslApekfMef_Lu1qsh8ckf3zTYA2P-VE/edit?usp=sharing"
@@ -71,7 +71,7 @@
                 src="/api/image?name=umpire" class="team_logo"
                 style="width: 75px; height: 75px;"
         ></a></td>
-        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/19f1aP1ucWNLmslApekfMef_Lu1qsh8ckf3zTYA2P-VE/edit?usp=sharing" class="hide"><h3>Fourth Umpire Qualification Program</h3></a></td>
+        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/19f1aP1ucWNLmslApekfMef_Lu1qsh8ckf3zTYA2P-VE/edit?usp=sharing" class="hide"><p>Fourth Umpire Qualification Program</p></a></td>
     </tr>
     <tr>
         <td style="width:100px;"><a href="https://docs.google.com/presentation/d/1VkYuVcabr1jVMfTHc7EyL6Q0DGcPTJmXHYd2NUz3pFA/edit?usp=sharing"
@@ -79,8 +79,7 @@
                 src="/api/image?name=umpire" class="team_logo"
                 style="width: 75px; height: 75px;"
         ></a></td>
-        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/1VkYuVcabr1jVMfTHc7EyL6Q0DGcPTJmXHYd2NUz3pFA/edit?usp=sharing" class="hide"><h3>Fifth Umpire Qualification Program</h3></a></td>
+        <td style="width:200px;"><a href="https://docs.google.com/presentation/d/1VkYuVcabr1jVMfTHc7EyL6Q0DGcPTJmXHYd2NUz3pFA/edit?usp=sharing" class="hide"><p>Fifth Umpire Qualification Program</p></a></td>
     </tr>
 </table>
-</body>
-</html>
+{% endblock %}

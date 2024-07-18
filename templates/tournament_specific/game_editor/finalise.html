@@ -10,7 +10,7 @@
 <nav id="navBar"></nav>
 <script>load("{{tournament}}")</script>
 
-<script src="{{ url_for('static', filename='js/start_game.js') }}"></script>
+<script src="{{ url_for('static', filename='js/startGame.js') }}"></script>
 <script>
     setup({{game.id}}, {{ swap }})
     setTournament("{{tournament}}")
@@ -25,7 +25,7 @@
 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
 <br>
 
-<table class="table">
+<table class="jaredTable">
     <tr>
         <th><img
                 src="{{ teams[0].image() }}"
@@ -46,7 +46,7 @@
 <br>
 {% if game.cards %}
     <h1>Card Reasons</h1>
-    <table class="table">
+    <table class="jaredTable">
 {% endif %}
 {% for i, v in cards %}
     <tr>
@@ -64,23 +64,7 @@
     <br>
     <br>
 {% endif %}
-<h1>Notes</h1>
-<textarea style="width: 330px; height: 100px" id="notes"> </textarea>
-<br>
-<br>
-<div class="dropdown">
-    {% if game.best_player %}
-        <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And
-            Best: {{ game.best_player.tidy_name() }}</button>
-    {% else %}
-        <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And Best</button>
-    {% endif %}
-    <div class="dropdown-content">
-        {% for i in game.playing_players %}
-            <p onclick="setBest('{{ i.name }}', '{{ i.tidy_name() }}')">{{ i.tidy_name() }}</p>
-        {% endfor %}
-    </div>
-</div>
+
 <br>
 <br>
 

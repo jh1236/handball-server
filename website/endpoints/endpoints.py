@@ -1,29 +1,14 @@
-import io
 import os
 
-import numpy as np
-from flask import request, send_file, Response
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
+from flask import request, send_file
 
-from structure.AllTournament import get_all_players, get_all_games
 from utils.logging_handler import logger
-from website.endpoints.clips import add_clip_endpoints
 from website.endpoints.edit_game import add_game_endpoints
 from website.endpoints.graph import add_graph_endpoints
 from website.endpoints.tournament import add_tourney_endpoints
 
 
-def add_endpoints(app, comps):
-    @app.get("/api/teams")
-    def teams():
-        tournament = request.args.get("tournament", type=str)
-        return {i.name: [j.name for j in i.players] for i in comps[tournament].teams}
-
-    @app.get("/api/tournaments")
-    def tournaments():
-        return list(comps.values())
-
+def add_endpoints(app):
     @app.get("/api/teams/image")
     def team_image():
         team = request.args.get("name", type=str)
@@ -51,7 +36,6 @@ def add_endpoints(app, comps):
         else:
             return send_file(f"./resources/images/umpire.png", mimetype="image/png")
 
-
     # testing related endpoints
     @app.get("/api/mirror")
     def mirror():
@@ -65,7 +49,6 @@ def add_endpoints(app, comps):
             }
         return str(d), 200
 
-    add_tourney_endpoints(app, comps)
-    add_graph_endpoints(app, comps)
-    add_game_endpoints(app, comps)
-    add_clip_endpoints(app, comps)
+    add_tourney_endpoints(app)
+    add_graph_endpoints(app)
+    add_game_endpoints(app)

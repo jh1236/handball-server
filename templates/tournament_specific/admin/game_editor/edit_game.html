@@ -47,7 +47,7 @@
     {% endif %}
 
     <br>
-    <table class="table">
+    <table class="jaredTable">
 
         <tr>
             {% if teams[1].serving %}
@@ -226,8 +226,8 @@
                 {% if teams[0].carded %}
                     {% for i, p in teamOnePlayers %}
                         {% if not p.card_time_remaining != 0 %}
-                            <button onclick="score(true, {{ i }})" class="button">
-                                Score {{ teams[0].short_name }}</button>
+                            <button onclick="card(true, {{ i }}, 'green')" class="green_button">
+                                Green Card {{ teams[0].short_name }}</button>
                         {% endif %}
                     {% endfor %}
                 {% else %}

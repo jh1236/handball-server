@@ -3,6 +3,118 @@ let tournament = ""
 let teamsSwapped = false
 let teamName = ""
 let startTime = -1
+
+let waiting = false
+let greenCardsUsed = document.currentScript.getAttribute('greens') === 'True'
+let warningsUsed = document.currentScript.getAttribute('warnings') === 'True'
+
+let CARDS = {}
+
+if (greenCardsUsed && warningsUsed) {
+    CARDS = {
+        Warning: {
+            "swearing": "Audible Swearing",
+            "timeWasting": "Delay of Game",
+            "endOfGameProcess": "Did not follow the end of game process"
+        },
+        Green: {
+            "dissent": "Disrespect Towards Officials",
+            "danger": "Dangerous Play (James)",
+            "badTimeWasting": "Deliberate Delay of Game",
+            "hindrance" : "Deliberately Hindering another Player",
+            "uniform" : "Not Meeting the Uniform Requirements"
+        },
+        Yellow: {
+            "badDissent": "Continuous or Egregious Disrespect Towards Officials",
+            "equipmentAbuse": "Equipment Abuse",
+            "danger": "Aggressively Dangerous Play (James)",
+            "misconduct": "Misconduct Whilst Carded",
+            "aggression": "Displays of Aggression towards Officials or Players",
+            "bypass": "Attempting to Get Around the restrictions on swearing"
+        },
+        Red: {
+            "violence": "Violence Towards Any Player, Official Or Spectator",
+            "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+            "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+            "cheatingAccusation": "Accusations Of Cheating",
+            "discrimination": "Any Form of Discrimination"
+        }
+    }
+} else if (greenCardsUsed) {
+    CARDS = {
+        Green: {
+            "swearing": "Audible Swearing",
+            "dissent": "Disrespect Towards Officials",
+            "timeWasting": "Delay of Game",
+            "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
+            "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
+        },
+        Yellow: {
+            "directedSwearing": "Swearing Towards Players or Officials",
+            "badDissent": "Continuous or Egregious Disrespect Towards Officials",
+            "badTimeWasting": "Deliberate Delay of Game",
+            "equipmentAbuse": "Equipment Abuse",
+            "danger": "Dangerous Play (James)",
+            "misconduct": "Misconduct Whilst Carded",
+            "aggression": "Displays of Aggression towards Officials or Players"
+        },
+        Red: {
+            "violence": "Violence Towards Any Player, Official Or Spectator",
+            "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+            "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+            "cheatingAccusation": "Accusations Of Cheating",
+            "discrimination": "Any Form of Discrimination"
+        }
+    }
+} else if (warningsUsed) {
+    CARDS = {
+        Warning: {
+            "swearing": "Audible Swearing",
+            "dissent": "Disrespect Towards Officials",
+            "timeWasting": "Delay of Game",
+            "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
+            "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
+        },
+        Yellow: {
+            "directedSwearing": "Swearing Towards Players or Officials",
+            "badDissent": "Continuous or Egregious Disrespect Towards Officials",
+            "badTimeWasting": "Deliberate Delay of Game",
+            "equipmentAbuse": "Equipment Abuse",
+            "danger": "Dangerous Play (James)",
+            "misconduct": "Misconduct Whilst Carded",
+            "aggression": "Displays of Aggression towards Officials or Players"
+        },
+        Red: {
+            "violence": "Violence Towards Any Player, Official Or Spectator",
+            "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+            "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+            "cheatingAccusation": "Accusations Of Cheating",
+            "discrimination": "Any Form of Discrimination"
+        },
+    }
+} else {
+    CARDS = {
+        Yellow: {
+            "swearing": "Audible Swearing",
+            "dissent": "Disrespect Towards Officials",
+            "timeWasting": "Delay of Game",
+            "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
+            "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
+            "directedSwearing": "Swearing Towards Players or Officials",
+            "equipmentAbuse": "Equipment Abuse",
+            "danger": "Dangerous Play (James)",
+            "misconduct": "Misconduct Whilst Carded",
+            "aggression": "Displays of Aggression towards Officials or Players"
+        },
+        Red: {
+            "violence": "Violence Towards Any Player, Official Or Spectator",
+            "veryBadDissent": "Disruptive or Unrelenting Disrespect Towards Officials",
+            "badEquipmentAbuse": "Equipment Abuse in a Deliberately Violent Manner",
+            "cheatingAccusation": "Accusations Of Cheating",
+            "discrimination": "Any Form of Discrimination"
+        },
+    }
+}
 let setup = (newId, newSwapped) => {
     id = newId
     teamsSwapped = newSwapped
@@ -17,117 +129,245 @@ function swap() {
     }
 }
 
+let teamOnePlayers = document.currentScript.getAttribute('teamOne').split(",")
+let teamTwoPlayers = document.currentScript.getAttribute('teamTwo').split(",")
+
+
+
+let playerLookup = {}
+for (let i of teamOnePlayers.concat(teamTwoPlayers)) {
+    playerLookup[i.split(":")[0]] = i.split(":")[1]
+}
+teamOnePlayers = teamOnePlayers.map(i => i.split(":")[0])
+teamTwoPlayers = teamTwoPlayers.map(i => i.split(":")[0])
 
 let lxor = (a, b) => a ? !b : b
 
 let timeoutTime = -1
 
-function score(firstTeam, firstPlayer) {
+function score(firstTeam, leftPlayer) {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/score", {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            tournament: tournament.replace("/", ""),
-            firstPlayer: firstPlayer,
-            ace: false
+            leftPlayer: leftPlayer
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
+}
+
+function pardon(firstTeam, leftPlayer) {
+    if (waiting) return
+    waiting = true
+    fetch("/api/games/update/pardon", {
+        method: "POST", body: JSON.stringify({
+            id: id,
+            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
+            leftPlayer: leftPlayer
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function sub(firstTeam, firstPlayer) {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/substitute", {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            tournament: tournament.replace("/", ""),
-            firstPlayer: firstPlayer,
+            leftPlayer: firstPlayer,
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function ace() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/ace", {
         method: "POST", body: JSON.stringify({
             id: id,
-            tournament: tournament.replace("/", "")
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
-}
-
-
-function card(firstTeam, firstPlayer, color) {
-    fetch("/api/games/update/card", {
-        method: "POST", body: JSON.stringify({
-            id: id,
-            tournament: tournament.replace("/", ""),
-            firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            firstPlayer: firstPlayer,
-            color: color, time: 3
-        }), headers: {
-            "Content-type": "application/json; charset=UTF-8"
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
         }
-    }).then(() => location.reload());
+    );
 }
 
 
-let firstPlayerSelected = true
-let firstTeamSelected = true
+let first = null
+let color = null
 
-function selectTwo() {
-    firstPlayerSelected = false
-    document.getElementById("nameTwo").style = "color:green;"
-    document.getElementById("nameOne").style = "color:white;"
-}
-
-function selectOne() {
-    firstPlayerSelected = true
-    document.getElementById("nameTwo").style = "color:white;"
-    document.getElementById("nameOne").style = "color:green;"
-}
-
-
-let added = false
-
-function openCustomCard(firstTeam, playerOne, playerTwo) {
+function openCardModal(colorIn, firstTeam, teamName) {
+    first = firstTeam
+    color = colorIn
+    players = firstTeam ? teamOnePlayers : teamTwoPlayers
+    document.getElementById("myModal").style.display = "block";
+    document.getElementById("cardHeader").textContent = `${colorIn} Card for ${teamName}`;
     firstTeamSelected = firstTeam
-    document.getElementById("nameOne").textContent = playerOne
-    document.getElementById("nameTwo").textContent = playerTwo
-    document.getElementById("cardSelect").style.width = "100%";
-    document.getElementById("duration").value = "4"
-    document.getElementById("durationText").textContent = "Duration (4)"
-    window.scrollTo(0, 0);
-    window.onscroll = function () {
-        window.scrollTo(0, 0);
-    };
-    if (!added) {
-        added = true
-        console.warn("found!")
-        document.getElementById("duration").addEventListener("input", (event) => {
-            document.getElementById("durationText").textContent = `Duration (${event.target.value})`;
-        });
+    console.log(players)
+    console.log(players.length)
+    document.getElementById("nameOne").textContent = playerLookup[players[0]]
+    if (players.length > 1) {
+        document.getElementById("nameTwo").textContent = playerLookup[players[1]]
+        document.getElementById("nameTwo").style.display = "block"
+        document.getElementById("playerTwo").style.display = "block"
+    } else {
+        document.getElementById("nameTwo").style.display = "none"
+        document.getElementById("playerTwo").style.display = "none"
     }
+
+
+    if (colorIn === "Yellow") {
+        document.getElementById("duration").style.display = "block"
+        minYellowTime = 3 * warningsUsed + 3 * greenCardsUsed
+        document.getElementById("duration").value = `${minYellowTime}`
+        document.getElementById("duration").min = `${minYellowTime}`
+        document.getElementById("duration").value = `${minYellowTime}`
+        document.getElementById("durationText").style.display = "block"
+        document.getElementById("durationText").textContent = `Duration (${minYellowTime})`
+    } else {
+        document.getElementById("duration").style.display = "none"
+        document.getElementById("durationText").style.display = "none"
+    }
+    const reasons = document.getElementById("reason")
+    reasons.replaceChildren()
+    for (const k in CARDS[colorIn]) {
+        const v = CARDS[colorIn][k]
+        reasons.insertAdjacentHTML('beforeend', `<input type="radio" name="reason" id="${k}" value="${k}"><label for="${k}">${v}</label><br>`)
+    }
+    if (colorIn === "Red" || (colorIn === "Yellow" && (warningsUsed || greenCardsUsed)) || (colorIn === "Green" && warningsUsed)) {
+        reasons.insertAdjacentHTML('beforeend', `<input type="radio" name="reason" id="repeated" value="repeated"><label for="repeat">Repeated :`)
+        let sel = "<select id='repeatedSelect'>"
+        if (warningsUsed) {
+            for (const k in CARDS.Warning) {
+                const v = CARDS.Warning[k]
+                sel += `<option id="${k}" name="${k}">${v}</option>`
+            }
+        }
+        if (colorIn !== "Green" && greenCardsUsed) {
+            for (const k in CARDS.Green) {
+                const v = CARDS.Green[k]
+                sel += `<option id="${k}" name="${k}">${v}</option>`
+            }
+        } else if (colorIn === "Red") {
+            for (const k in CARDS.Yellow) {
+                const v = CARDS.Yellow[k]
+                sel += `<option id="${k}" name="${k}">${v}</option>`
+            }
+        }
+        sel += "</select></label><br>"
+        reasons.insertAdjacentHTML('beforeend', sel)
+    }
+    reasons.insertAdjacentHTML('beforeend', `<input type="radio" name="reason" id="other" value="other"><input type="text" id="otherText"><br>`)
 }
 
 function sendCustomCard() {
+    if (waiting) return
+    let selectedReason = document.querySelector('input[name="reason"]:checked')
+    const selectedPlayer = document.getElementById('playerOne').checked
+    if (!selectedReason) {
+        alert("Please Select A Reason!")
+        return
+    }
+    selectedReason = selectedReason.value
+    if (!selectedPlayer && !document.getElementById('playerTwo').checked) {
+        alert("Please Select A Player!")
+        return
+    }
+    let reason
+    console.log(selectedReason)
+    if (selectedReason === "other") {
+        reason = document.getElementById("otherText").value
+    } else if (selectedReason === "repeated") {
+        reason = "Repeated " + document.getElementById("repeatedSelect").value
+    } else {
+        reason = CARDS[color][selectedReason]
+    }
+    if (!reason) {
+        alert("Please Select A Reason!")
+        return
+    }
+    waiting = true
+    let duration;
+    if (color === 'Red') {
+        duration = -1
+    } else if (color === 'Yellow') {
+        duration = document.getElementById("duration").value
+    } else if (color === 'Green' && warningsUsed) {
+        duration = 2
+    } else {
+        duration = 0
+    }
+
     fetch("/api/games/update/card", {
         method: "POST", body: JSON.stringify({
             id: id,
-            tournament: tournament.replace("/", ""),
-            firstTeam: lxor(firstTeamSelected, teamsSwapped),
-            firstPlayer: firstPlayerSelected,
-            color: "yellow",
-            time: +(document.getElementById("duration").value) % 10
+            firstTeam: lxor(first, teamsSwapped),
+            leftPlayer: selectedPlayer,
+            color: color,
+            duration: duration,
+            reason: reason
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
+
+function next() {
+    document.location = `/games/${id}/finalise`
+}
+
 
 function timeoutOverlayOld(timeIn = Date.now() + 30000) {
     document.getElementById("myNav").style.width = "100%";
@@ -175,6 +415,8 @@ function timeoutOverlay(timeIn = 0, firstTeam) {
 
 
 function startServeClock() {
+    if (waiting) return
+    waiting = true
     if (startTime > 0) {
         stopServeClock()
         return
@@ -184,26 +426,41 @@ function startServeClock() {
         method: "POST", body: JSON.stringify({
             id: id,
             start: true,
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    });
+    }).then(
+        () => {
+            waiting = false
+        }
+    );
 }
 
 function forfeit(firstTeam) {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/forfeit", {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then( () => document.location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function stopServeClock() {
+    if (waiting) return
+    waiting = true
     startTime = -1
     document.getElementById("serveBtn").style = ""
     document.getElementById("serveBtn").textContent = "Start Serve Timer"
@@ -211,11 +468,19 @@ function stopServeClock() {
         method: "POST", body: JSON.stringify({
             id: id,
             start: false,
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    });
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function serveClock(timeIn = 0) {
@@ -235,6 +500,8 @@ function serveClock(timeIn = 0) {
 }
 
 function timeout(firstTeam) {
+    if (waiting) return
+    waiting = true
     if (timeoutTime > 0) {
         endTimeout(firstTeam)
         return
@@ -244,11 +511,17 @@ function timeout(firstTeam) {
         method: "POST", body: JSON.stringify({
             id: id,
             firstTeam: lxor(Boolean(firstTeam), teamsSwapped),
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    });
+    }).then(
+        (res) => {
+            waiting = false
+            if (!res.ok) {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function endTimeout(firstTeam) {
@@ -260,72 +533,130 @@ function endTimeout(firstTeam) {
     }
     element.style = ""
     element.innerHTML = `<s>Timeout ${teamName}</s>`
-    fetch("/api/games/update/endTimeout", {
+    fetch("/api/games/update/end_timeout", {
         method: "POST", body: JSON.stringify({
             id: id,
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => document.location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 
 function fault() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/fault", {
         method: "POST", body: JSON.stringify({
             id: id,
-            tournament: tournament.replace("/", ""),
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 
 function undo() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/undo", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function swapServe() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/swapServe", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function swapServeTeam() {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/swapServeTeam", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function swapPlayerSides(first) {
+    if (waiting) return
+    waiting = true
     fetch("/api/games/update/swapPlayerSides", {
         method: "POST", body: JSON.stringify({
-            tournament: tournament.replace("/", ""),
             id: id,
             firstTeam: first
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(() => location.reload());
+    }).then(
+        (res) => {
+            waiting = false
+            if (res.ok) {
+                location.reload()
+            } else {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function myFunction(button) {
@@ -344,4 +675,15 @@ window.onclick = function (event) {
             }
         }
     }
+    if (event.target.matches('.modal')) {
+        document.getElementById("myModal").style.display = "none";
+    }
+}
+window.onload = () => {
+    document.getElementsByClassName("close")[0].onclick = function () {
+        document.getElementById("myModal").style.display = "none";
+    };
+    document.getElementById("duration").addEventListener("input", (event) => {
+        document.getElementById("durationText").textContent = `Duration (${event.target.value})`;
+    });
 }

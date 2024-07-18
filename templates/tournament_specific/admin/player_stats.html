@@ -1,59 +1,63 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Statistics for {{player.name}}</title>
+{% extends "admin.html" %}
+
+{% block headBlock %}
+    <title>Statistics for {{ player.name }}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_stats.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-<nav id="navBar"></nav>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script>load("{{tournament}}", true)</script>
+{% endblock %}
 
-<div style="top:0;left:0;bottom: 100%;width: 66%">
-    <a href="/{{tournament}}teams/{{player.team.nice_name()}}/admin">
-        <img src="/api/teams/image?name={{player.team.nice_name()}}" class="team_logo"></a>
-    <h1><a href="/{{tournament}}players/{{player.nice_name()}}/admin" class="hide">Statistics for {{player.name}}</a></h1>
-    <table class="table">
-        <tbody>
-        {% for stat in stats %}
-            {% if stat[1].__str__().startswith("{") %}
-                <tr><td colspan="10" style="text-align: center"><h2>{{ stat[0] }}</h2></td></tr>
-                {% for stat2 in stat[1].items() %}
-                    <tr>
-                        <th>{{ stat2[0] }}:</th>
-                        <td></td>
-                        <td>{{ stat2[1] }}</td>
-                    </tr>
+{% block bodyBlock %}
+    <div class="row">
+        <div class="col-sm-8">
+            <a href="/{{ tournamentLink }}teams/{{ team }}">
+                <img src="/api/teams/image?name={{ team }}" class="team_logo"></a>
+            <h1><a href="/{{ tournamentLink }}players/{{ player }}" class="hide">Statistics for {{ name }}</a></h1>
+            <table class="jaredTable">
+                <tbody>
+                {% for k, v in stats.items() %}
+                    {% if v.__str__().startswith("{") %}
+                        <tr>
+                            <td colspan="10" style="text-align: center"><h2>{{ k }}</h2></td>
+                        </tr>
+                        {% for stat2 in v.items() %}
+                            <tr>
+                                <th>{{ stat2[0] }}:</th>
+                                <td></td>
+                                <td>{{ stat2[1] }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <th>{{ k }}:</th>
+                            <td></td>
+                            <td>{{ v }}</td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
-            {% else %}
-                <tr>
-                    <th>{{ stat[0] }}:</th>
-                    <td></td>
-                    <td>{{ stat[1] }}</td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div style="top:70px;left:66% ; position: absolute;width: 33%">
-    <div style="min-height: 400px">
-    <h2><a class = "hide" href="/{{tournament}}fixtures/admin?player={{ player.nice_name() }}">Cards</a></h2>
-    {% for line in cards %}
-        <p style="color: black;"><a class = "hide" href="/{{tournament}}games/{{line[1]}}/admin"><b>[{{line[2]}}]:</b> {{ line[3] }} <i>(vs {{line[0] }})</i></a></p>
-    {% endfor %}
-</div>
-<div>
-    <h2><a class = "hide" href="/{{tournament}}fixtures/admin?player={{ player.nice_name() }}">Noteable Matches</a></h2>
-    {% for line in noteable_games %}
-        <p style="color: black;"><a class = "hide" href="/{{line[3]}}/games/{{line[2]}}/admin"><b>[{{ line[0] }}]: </b>{{line[1]}}</a></p>
-    {% endfor %}
-</div>
-</div>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-4">
+            <div style="min-height: 400px">
+                <h2><a class="hide" href="/{{ tournamentLink }}fixtures/admin?team={{ team.searchableName }}">Cards</a>
+                </h2>
+                {% for type, reason, hex, game, name in cards %}
+                    <p><a href="/games/{{ game }}/admin" class="hide"><b>[<span
+                            style="color: {{ hex }}">{{ type }}</span>]:
+                    </b> <i>{{ name }}</i> for <i>{{ reason }}</i></a></p>
 
-
-
-</body>
-</html>
+                {% endfor %}
+            </div>
+            <div>
+                <h2><a class="hide" href="/{{ tournamentLink }}fixtures/admin?team={{ team.searchableName }}">Noteable
+                    Matches</a></h2>
+                {% for line in key_games %}
+                    <p style="color: black;"><a class="hide"
+                                                href="/games/{{ line[2] }}/admin"><b>[{{ line[0] }}]: </b>{{ line[1] }}
+                    </a>
+                    </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
