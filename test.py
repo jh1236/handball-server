@@ -1,10 +1,7 @@
-from werkzeug.datastructures import MultiDict
-
 from database import db
 from database.models import *
 from start import app
 from structure import manage_game
-from structure.GameUtils import filter_games
 from utils.statistics import calc_elo
 
 
@@ -83,4 +80,4 @@ if __name__ == '__main__':
     #     regen_elo()
     with app.app_context():
         sync_all_games()
-        # manage_game.sync(395)
+        db.session.commit()

@@ -28,6 +28,8 @@ def sync(game_id):
     events: list[GameEvents] = GameEvents.query.filter_by(game_id=game_id).order_by(GameEvents.id).all()
     all_players: list[PlayerGameStats] = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).all()
     fault = False
+    streak = 1
+    ace_streak = 0
 
     for i in all_players:
         i.reset_stats()
@@ -62,6 +64,30 @@ def sync(game_id):
                     player_who_served.served_points += 1
                     if player_who_served.team_id == i.team_id:
                         player_who_served.served_points_won += 1
+                    receiving_player = non_serving_team[not left_served]
+                    if not receiving_player:
+                        receiving_player = [i for i in non_serving_team if i][0]
+                    else:
+                        receiving_pgs = pgs_from_game_and_player(game_id, receiving_player.id)
+                        if receiving_pgs and receiving_pgs.card_time_remaining != 0:
+                            receiving_player = ([i for i in non_serving_team if i and
+                                                 pgs_from_game_and_player(game_id, i.id).card_time_remaining == 0] + [
+                                                    None])[0]
+                    if receiving_player:
+                        receiving_pgs = pgs_from_game_and_player(game_id, receiving_player.id)
+                        if receiving_pgs and receiving_pgs.player_id and (
+                                i.notes != 'Penalty' or prev_event == 'Ace'):
+                            receiving_pgs.serves_received += 1
+                            if prev_event != 'Ace':
+                                receiving_pgs.serves_returned += 1
+                    if player_who_served.player_id == i.player_to_serve_id:
+                        streak += 1
+                        if player_who_served.serve_streak < streak:
+                            player_who_served.serve_streak = streak
+                    else:
+                        streak = 1
+                else:
+                    ace_streak = 0
                 if is_team_one:
                     game.team_one_score += 1
                 else:
@@ -73,25 +99,18 @@ def sync(game_id):
                         j.rounds_carded += 1
                         if j.card_time_remaining > 0:
                             j.card_time_remaining -= 1
-                    receiving_player = non_serving_team[not left_served]
-                    if not receiving_player:
-                        receiving_player = [i for i in non_serving_team if i][0]
-                    else:
-                        receiving_pgs = pgs_from_game_and_player(game_id, receiving_player.id)
-                        if receiving_pgs and receiving_pgs.card_time_remaining != 0:
-                            receiving_player = ([i for i in non_serving_team if i and
-                                                 pgs_from_game_and_player(game_id, i.id).card_time_remaining == 0] + [
-                                                    None])[0]
-                    if receiving_player and receiving_player.id == j.player_id and (
-                            i.notes != 'Penalty' or prev_event == 'Ace'):
-                        j.serves_received += 1
-                        if prev_event != 'Ace':
-                            j.serves_returned += 1
 
             case "Pardon":
                 player.card_time_remaining = 0
             case "Ace":
                 player.aces_scored += 1
+                player_who_served = [j for j in all_players if j.player_id == i.player_who_served_id][0]
+                if player_who_served.player_id == i.player_to_serve_id:
+                    ace_streak += 1
+                    if player_who_served.ace_streak < ace_streak:
+                        player_who_served.ace_streak = ace_streak
+                else:
+                    ace_streak = 0
             case "Fault":
                 player.faults += 1
                 player.served_points += 1
@@ -135,7 +154,8 @@ def sync(game_id):
             case "End Game":
                 game.best_player_id = i.details
                 if i.details:
-                    PlayerGameStats.query.filter(PlayerGameStats.player_id == i.details, PlayerGameStats.game_id == game_id).first().is_best_player = 1
+                    PlayerGameStats.query.filter(PlayerGameStats.player_id == i.details,
+                                                 PlayerGameStats.game_id == game_id).first().is_best_player = 1
                 game.notes = i.notes
                 game.ended = True
             case "Start":
@@ -380,7 +400,9 @@ def ace(game_id):
         raise ValueError("Game is Already Over!")
     game = Games.query.filter(game_id == Games.id).first()
     first_team = bool(game.team_one == game.team_to_serve)
-    left_player = bool(game.side_to_serve == 'Left')
+    last_game_event = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
+    left_player = bool(
+        last_game_event.player_to_serve_id == last_game_event.team_one_left_id if first_team else last_game_event.team_two_left_id)
     _add_to_game(game_id, "Ace", first_team, left_player)
     _score_point(game_id, first_team, left_player, penalty=True)
     db.session.commit()
@@ -391,10 +413,13 @@ def fault(game_id):
         raise ValueError("Game is Already Over!")
     game = Games.query.filter(game_id == Games.id).first()
     first_team = bool(game.team_one == game.team_to_serve)
-    left_player = bool(game.side_to_serve == 'Left')
+    last_game_event = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
+    left_player = bool(
+        last_game_event.player_to_serve_id == last_game_event.team_one_left_id if first_team else last_game_event.team_two_left_id)
     prev_event = GameEvents.query.filter(GameEvents.game_id == game_id, (GameEvents.event_type == 'Fault') | (
-            GameEvents.event_type == 'Score')).order_by(GameEvents.id.desc()).first().event_type
-    print(prev_event)
+            GameEvents.event_type == 'Score')).order_by(GameEvents.id.desc()).first()
+    if prev_event:
+        prev_event = prev_event.event_type
     _add_to_game(game_id, "Fault", first_team, left_player)
     if prev_event == "Fault":
         _score_point(game_id, not first_team, None, penalty=True)
@@ -442,7 +467,7 @@ def change_code(game_id):
         return 1
     ge = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
     return (game_id if not ge else ge.id +
-                             (get_serve_timer(game_id) > 0))
+                                   (get_serve_timer(game_id) > 0))
 
 
 def time_out(game_id, first_team):

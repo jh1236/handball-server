@@ -59,6 +59,8 @@ class PlayerGameStats(db.Model):
     served_points_won = db.Column(db.Integer(), default=0, nullable=False)
     serves_received = db.Column(db.Integer(), default=0, nullable=False)
     serves_returned = db.Column(db.Integer(), default=0, nullable=False)
+    ace_streak = db.Column(db.Integer(), default=0, nullable=False)
+    serve_streak = db.Column(db.Integer(), default=0, nullable=False)
     warnings = db.Column(db.Integer(), default=0, nullable=False)
     green_cards = db.Column(db.Integer(), default=0, nullable=False)
     yellow_cards = db.Column(db.Integer(), default=0, nullable=False)

@@ -175,7 +175,7 @@ def add_tournament_specific(app):
             # me when i criticize Jareds code then write this abomination
             fixtures = defaultdict(list)
             for game in games:
-                names = [i if len(i) < 30 else i[:28] + "..." for i in game[3:5]]
+                names = [i if len(i) < 20 else i[:18] + "..." for i in game[3:5]]
                 fixtures[game[-1]].append(
                     Game(names, f"{game[5]} - {game[6]}", game[0], game[1], game[2])
                 )
@@ -200,7 +200,7 @@ def add_tournament_specific(app):
             # idk something about glass houses?
             finals = defaultdict(list)
             for game in games:
-                names = [i if len(i) < 30 else i[:28] + "..." for i in game[3:5]]
+                names = [i if len(i) < 20 else i[:18] + "..." for i in game[3:5]]
                 finals[game[-1]].append(
                     Game(names, f"{game[5]} - {game[6]}", game[0], game[1], game[2])
                 )
@@ -627,7 +627,7 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
             200,
         )
 
-    @app.get("/games/<true_game_id>/display") # TODO: update to orm
+    @app.get("/games/<true_game_id>/display")  # TODO: update to orm
     def scoreboard(true_game_id):
         if int(true_game_id) <= 0:
             game_id = Games.query.filter(Games.started, Games.court == abs(true_game_id)).order_by(
@@ -808,12 +808,12 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             200,
         )
 
-    @app.get("/games/display") # TODO: update to orm
+    @app.get("/games/display")  # TODO: update to orm
     def court_scoreboard():
         court = int(request.args.get("court"))
         return scoreboard(-court)
 
-    @app.get("/games/<game_id>/") # TODO: update to orm
+    @app.get("/games/<game_id>/")  # TODO: update to orm
     def game_site(game_id):
         with DatabaseManager() as c:
             players = c.execute(
@@ -1065,7 +1065,7 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
             200,
         )
 
-    @app.get("/<tournament>/ladder/") # TODO: update to orm
+    @app.get("/<tournament>/ladder/")  # TODO: update to orm
     def ladder_site(tournament):
         priority = {
             "Team Names": 1,
@@ -1168,7 +1168,8 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
                 (tournament_id, tournament_id, tournament_id),
             ).fetchall()
         ladder = [
-            Team(i[2] if len(i[2]) < 30 else i[2][:28] + "...", i[1], i[4], i[3], {k: v for k, v in zip(priority, i[5:])})
+            Team(i[2] if len(i[2]) < 20 else i[2][:18] + "...", i[1], i[4], i[3],
+                 {k: v for k, v in zip(priority, i[5:])})
             for i in teams
         ]
         if teams[0][0]:  # this tournament is pooled
@@ -1273,7 +1274,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
             200,
         )
 
-    @app.get("/<tournament>/players/<player_name>/") # TODO: update to orm
+    @app.get("/<tournament>/players/<player_name>/")  # TODO: update to orm
     def player_stats(tournament, player_name):
         tournament_id = get_tournament_id(tournament)
         # TODO (LACHIE): please help me make this less queries...
@@ -1342,7 +1343,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
                     stats=stats,
                     name=player.name,
                     player=player_name,
-                    team=team.searchable_name,
+                    team=team,
                     recent_games=recent,
                     upcoming_games=upcoming,
                 ),
@@ -1355,7 +1356,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
                     stats=stats,
                     name=player.name,
                     player=player_name,
-                    team=team.searchable_name,
+                    team=team,
                     recent_games=recent,
                     upcoming_games=upcoming,
                     insights=sorted(list(set(PlayerGameStats.rows.keys()) | set(Games.row_titles)))
@@ -1720,7 +1721,7 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
             )
 
     @officials_only
-    @app.get("/games/<game_id>/finalise") # TODO: update to orm
+    @app.get("/games/<game_id>/finalise")  # TODO: update to orm
     def finalise_game(game_id):
         visual_swap = request.args.get("swap", "false") == "true"
         visual_str = "true" if visual_swap else "false"

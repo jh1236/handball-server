@@ -8,8 +8,8 @@
 {% block bodyBlock %}
     <div class="row">
         <div class="col-sm-8">
-            <a href="/{{ tournamentLink }}teams/{{ team }}">
-                <img src="{{ team_image }}" class="team_logo"></a>
+            <a href="/{{ tournamentLink }}teams/{{ team.searchable_name }}">
+                <img src="{{ team.image_url }}" class="team_logo"></a>
             <h1><a href="/{{ tournamentLink }}players/{{ player }}" class="hide">Statistics for {{ name }}</a></h1>
             {% if tournamentLink %}
                 <i><a class="hide" href="/players/{{ player }}">Go To All-Time Stats</a></i>

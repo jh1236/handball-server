@@ -129,6 +129,10 @@ class People(db.Model):
                     sum(i.served_points for i in players) or 1),
             "Serves Received": sum(i.serves_received for i in players),
             "Serves Returned": sum(i.serves_returned for i in players),
+            "Max Serve Streak": max([i.serve_streak for i in players] + [0]),
+            "Average Serve Streak": sum(i.serve_streak for i in players) / games_played,
+            "Max Ace Streak": max([i.ace_streak for i in players] + [0]),
+            "Average Ace Streak": sum(i.ace_streak for i in players) / games_played,
             "Serve Return Rate": sum(i.serves_returned for i in players) / (
                     sum(i.serves_received for i in players) or 1),
             "Votes per 100 games": 100 * len([i for i in games if i.best_player_id == self.id]) / games_played,

@@ -24,7 +24,7 @@
         <th style="width: 100px;"><b>Umpire</b></th>
         {% if t.scorer %}
             <th style="width: 100px;"><b>Scorer</b></th> {% endif %}
-        {% if t.twoCourts %}
+        {% if t.two_courts %}
             <th  style="width: 100px;"><b>Court</b></th> {% endif %}
 
         <th><b>Result</b></th>
@@ -48,7 +48,7 @@
                 {% if t.scorer %}
                     <td><i><a href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}"
                               class="hide">{{ game.scorer }}</a></i></td> {% endif %}
-                {% if t.twoCourts %}
+                {% if t.two_courts %}
                     <td><a href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"
                            class="hide">{{ game.court_name }}</a></td> {% endif %}
                 <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
@@ -79,7 +79,7 @@
                     {% if t.scorer %}
                         <td><i><a href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}"
                                   class="hide">{{ game.scorer }}</a></i></td> {% endif %}
-                    {% if t.twoCourts %}
+                    {% if t.two_courts %}
                         <td><a href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"
                                class="hide">{{ game.court_name }}</a></td> {% endif %}
                     <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
