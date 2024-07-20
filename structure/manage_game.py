@@ -30,7 +30,8 @@ def sync(game_id):
     fault = False
     streak = 1
     ace_streak = 0
-
+    #HACK: make this not hardcoded
+    carry_over_cards = game.tournament_id >= 8
     for i in all_players:
         i.reset_stats()
         prev_game_player = PlayerGameStats.query.filter(PlayerGameStats.player_id == i.player_id,
@@ -38,7 +39,7 @@ def sync(game_id):
                                                         PlayerGameStats.team_id == i.team_id,
                                                         PlayerGameStats.game_id < i.game_id).order_by(
             PlayerGameStats.game_id.desc()).first()
-        if prev_game_player:
+        if prev_game_player and carry_over_cards:
             card_time_left = max(prev_game_player.card_time_remaining, 0) if not prev_game_player.red_cards else -1
             card_time = max(prev_game_player.card_time, 0) if not prev_game_player.red_cards else -1
         else:

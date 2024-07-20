@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2f902ea6-c380-48f3-9c04-7a97b6657219" name="Changes" comment="immediate post tournament push" />
+    <list default="true" id="2f902ea6-c380-48f3-9c04-7a97b6657219" name="Changes" comment="fix rounds carded over old_tournaments">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Changes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Changes.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/structure/manage_game.py" beforeDir="false" afterPath="$PROJECT_DIR$/structure/manage_game.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -69,48 +73,49 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Node.js.testing.js.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fix_images.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.matchmaking.executor&quot;: &quot;Run&quot;,
-    &quot;Python.start.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;database.data.extractors.current.export.id&quot;: &quot;Comma-separated (CSV)_id&quot;,
-    &quot;database.data.extractors.current.id&quot;: &quot;Comma-separated (CSV)_id&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;import_schema_mapping&quot;: &quot;&lt;schema-mapping&gt;\n  &lt;databases&gt;\n    &lt;list&gt;\n      &lt;schema-mapping-item&gt;\n        &lt;source-data-source-id&gt;51f55f59-2696-4c6a-baec-1058125aca22&lt;/source-data-source-id&gt;\n        &lt;source-path&gt;schema/&amp;quot;main&amp;quot;&lt;/source-path&gt;\n        &lt;target-data-source-id&gt;51f55f59-2696-4c6a-baec-1058125aca22&lt;/target-data-source-id&gt;\n        &lt;target-path&gt;schema/&amp;quot;main&amp;quot;&lt;/target-path&gt;\n      &lt;/schema-mapping-item&gt;\n    &lt;/list&gt;\n  &lt;/databases&gt;\n&lt;/schema-mapping&gt;&quot;,
-    &quot;last_opened_file_path&quot;: &quot;G:/Programming/python/matchmaking/FixtureGenerators&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;database.query.execution&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Node.js.testing.js.executor": "Run",
+    "Python.fix_images.executor": "Debug",
+    "Python.matchmaking.executor": "Run",
+    "Python.start.executor": "Run",
+    "Python.test.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "database.data.extractors.current.export.id": "Comma-separated (CSV)_id",
+    "database.data.extractors.current.id": "Comma-separated (CSV)_id",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "import_schema_mapping": "<schema-mapping>\n  <databases>\n    <list>\n      <schema-mapping-item>\n        <source-data-source-id>51f55f59-2696-4c6a-baec-1058125aca22</source-data-source-id>\n        <source-path>schema/&quot;main&quot;</source-path>\n        <target-data-source-id>51f55f59-2696-4c6a-baec-1058125aca22</target-data-source-id>\n        <target-path>schema/&quot;main&quot;</target-path>\n      </schema-mapping-item>\n    </list>\n  </databases>\n</schema-mapping>",
+    "last_opened_file_path": "G:/Programming/python/matchmaking/FixtureGenerators",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "database.query.execution",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;ChangesTree.GroupingKeys&quot;: [],
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [],
+    "DatabaseDriversLRU": [
+      "sqlite"
     ],
-    &quot;RunConfigurationTargetLRU&quot;: [
-      &quot;5687f4f8-64b7-4531-a5ef-c955b79eb667&quot;
+    "RunConfigurationTargetLRU": [
+      "5687f4f8-64b7-4531-a5ef-c955b79eb667"
     ],
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;Python&quot;,
-      &quot;SQLite&quot;,
-      &quot;TEXT&quot;,
-      &quot;GenericSQL&quot;
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Python",
+      "SQLite",
+      "TEXT",
+      "GenericSQL"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="G:\Programming\python\matchmaking\FixtureGenerators" />
@@ -127,7 +132,7 @@
       <recent name="G:\Programming\python\matchmaking\clips\videos\raw" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.matchmaking">
+  <component name="RunManager" selected="Python.test">
     <configuration name="sql drafting.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
       <script-file value="$PROJECT_DIR$/utils/sql drafting.sql" />
       <script-mode>FILE</script-mode>
@@ -189,12 +194,13 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.10 (matchmaking)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/api.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/start.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -295,9 +301,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.constructDatabase" />
         <item itemvalue="Python.util" />
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.ForceOutcome" />
         <item itemvalue="Database Script.sql drafting.sql" />
       </list>
@@ -400,22 +406,6 @@
       <workItem from="1719040258177" duration="9447000" />
       <workItem from="1719119415285" duration="2165000" />
       <workItem from="1719210547891" duration="97000" />
-    </task>
-    <task id="LOCAL-00042" summary="add end of game">
-      <option name="closed" value="true" />
-      <created>1717136303970</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1717136303970</updated>
-    </task>
-    <task id="LOCAL-00043" summary="begin frontend">
-      <option name="closed" value="true" />
-      <created>1717137130725</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1717137130725</updated>
     </task>
     <task id="LOCAL-00044" summary="GAME SCORING IS SEMI-FUNCITONAL!!!">
       <option name="closed" value="true" />
@@ -793,7 +783,23 @@
       <option name="project" value="LOCAL" />
       <updated>1719072654763</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="commit db">
+      <option name="closed" value="true" />
+      <created>1721316272216</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1721316272216</updated>
+    </task>
+    <task id="LOCAL-00092" summary="fix rounds carded over old_tournaments">
+      <option name="closed" value="true" />
+      <created>1721318337782</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1721318337782</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -835,8 +841,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="holy fuck ive added subs but its grim..." />
-    <MESSAGE value="fix sum bugs..." />
     <MESSAGE value="IT ALL WORKS FIRST TIME ACTUALLY FOR REAL" />
     <MESSAGE value="bug fixes and co" />
     <MESSAGE value="gwsrljukm" />
@@ -854,13 +858,15 @@
     <MESSAGE value="add image" />
     <MESSAGE value="commit all" />
     <MESSAGE value="fixes" />
-    <MESSAGE value="commit db" />
     <MESSAGE value="remove that lol" />
     <MESSAGE value="Fix sub not defaulting off" />
     <MESSAGE value="add chase ridley image" />
     <MESSAGE value="Mid tournament push" />
     <MESSAGE value="immediate post tournament push" />
-    <option name="LAST_COMMIT_MESSAGE" value="immediate post tournament push" />
+    <MESSAGE value="65etuhyehd" />
+    <MESSAGE value="commit db" />
+    <MESSAGE value="fix rounds carded over old_tournaments" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix rounds carded over old_tournaments" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -874,18 +880,18 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/matchmaking$Flask__start_py_.coverage" NAME="Flask (start.py) Coverage Results" MODIFIED="1717758589244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/matchmaking$Flask__start_py_.coverage" NAME="Flask (start.py) Coverage Results" MODIFIED="1720884758463" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/matchmaking$ForceOutcome.coverage" NAME="ForceOutcome Coverage Results" MODIFIED="1698670456989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/matchmaking$start.coverage" NAME="start Coverage Results" MODIFIED="1721186570340" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/matchmaking$scratch_1.coverage" NAME="scratch_1 Coverage Results" MODIFIED="1717761633325" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
-    <SUITE FILE_PATH="coverage/matchmaking$start.coverage" NAME="start Coverage Results" MODIFIED="1718435335702" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/matchmaking$Flask__api_py_.coverage" NAME="Flask (api.py) Coverage Results" MODIFIED="1706503930210" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/matchmaking$constructDatabase.coverage" NAME="constructDatabase Coverage Results" MODIFIED="1718174716098" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/matchmaking$databaseManager.coverage" NAME="databaseManager Coverage Results" MODIFIED="1717758508753" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
     <SUITE FILE_PATH="coverage/matchmaking$fix_images.coverage" NAME="fix_images Coverage Results" MODIFIED="1719144746102" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/matchmaking$scratch_1__1_.coverage" NAME="scratch_1 (1) Coverage Results" MODIFIED="1717761999882" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/matchmaking$test.coverage" NAME="test Coverage Results" MODIFIED="1719053596101" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/matchmaking$test.coverage" NAME="test Coverage Results" MODIFIED="1721318296531" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/matchmaking$fix_images__1_.coverage" NAME="fix_images (1) Coverage Results" MODIFIED="1718174844471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/matchmaking$util.coverage" NAME="util Coverage Results" MODIFIED="1704783033548" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
-    <SUITE FILE_PATH="coverage/matchmaking$matchmaking.coverage" NAME="matchmaking Coverage Results" MODIFIED="1719119415293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/matchmaking$matchmaking.coverage" NAME="matchmaking Coverage Results" MODIFIED="1721317879231" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
