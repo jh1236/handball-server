@@ -149,62 +149,22 @@ def add_tournament_specific(app):
     @app.get("/<tournament>/fixtures/")  # TODO: update to orm
     def fixtures(tournament):
         tournament_id = get_tournament_id(tournament)
-        with DatabaseManager() as c:
-            games = c.execute(
-                """
-                            SELECT 
-                                games.id, court, is_bye, serving.name, receiving.name, team_one_score, team_two_score, round
-                                FROM games 
-                                INNER JOIN teams serving ON games.team_one_id = serving.id
-                                INNER JOIN teams receiving ON games.team_two_id = receiving.id
-                                -- INNER JOIN people ON games.bestPlayer = people.id 
-                                WHERE 
-                                    tournament_id = ? AND
-                                    is_final = 0;""", (tournament_id,)
-            ).fetchall()
+        games = Games.query.filter(Games.tournament_id == tournament_id, Games.is_final == False).all()
 
-            # me when i criticize Jareds code then write this abomination
+        # me when i criticize Jareds code then write this abomination
+        fixtures = defaultdict(list)
+        for game in games:
+            fixtures[game.round].append(game)
+        new_fixtures = {}
+        for k, v in fixtures.items():
+            new_fixtures[k] = [j for j in fixture_sorter(v)]
+        fixtures = new_fixtures
 
-            @dataclass
-            class Game:
-                teams: list[str]
-                score_string: str
-                id: int
-                court: int
-                bye: bool
-
-            # me when i criticize Jareds code then write this abomination
-            fixtures = defaultdict(list)
-            for game in games:
-                names = [i if len(i) < 20 else i[:18] + "..." for i in game[3:5]]
-                fixtures[game[-1]].append(
-                    Game(names, f"{game[5]} - {game[6]}", game[0], game[1], game[2])
-                )
-            new_fixtures = {}
-            for k, v in fixtures.items():
-                new_fixtures[k] = [j[3] for j in fixture_sorter([(i.id, i.court, i.bye, i) for i in v])]
-            fixtures = new_fixtures
-
-            games = c.execute(
-                """
-                            SELECT 
-                                games.id, court, is_bye, serving.name, receiving.name, team_one_score, team_two_score, round
-                                FROM games 
-                                INNER JOIN teams serving ON games.team_one_id = serving.id
-                                INNER JOIN teams receiving ON games.team_two_id = receiving.id
-                                -- INNER JOIN people ON games.bestPlayer = people.id 
-                                WHERE 
-                                        tournament_id = ? AND
-                                        is_final = 1;""",
-                (tournament_id,),
-            ).fetchall()
-            # idk something about glass houses?
-            finals = defaultdict(list)
-            for game in games:
-                names = [i if len(i) < 20 else i[:18] + "..." for i in game[3:5]]
-                finals[game[-1]].append(
-                    Game(names, f"{game[5]} - {game[6]}", game[0], game[1], game[2])
-                )
+        games = Games.query.filter(Games.tournament_id == tournament_id, Games.is_final == True).all()
+        # idk something about glass houses?
+        finals = defaultdict(list)
+        for game in games:
+            finals[game.round].append(game)
         return (
             render_template_sidebar(
                 "tournament_specific/site.html",
@@ -223,118 +183,29 @@ def add_tournament_specific(app):
         # umpire = request.args.get("umpire", None, type=str)
         # team = request.args.get("team", None, type=str)
         # player = request.args.get("player", None, type=str)
-        @dataclass
-        class GameDetailed:
-            teams: list[str]
-            score_string: str
-            id: int
-            bye: bool
-            umpire: str
-            umpireSearchableName: str
-            scorer: str
-            scorerSearchableName: str
-            court: int
-            court_name: str
+        tournament_id = get_tournament_id(tournament)
+        games = Games.query.filter(Games.tournament_id == tournament_id, Games.is_final == False).all()
 
-        @dataclass
-        class Tourney:
-            two_courts: bool
-            scorer: bool
+        # me when i criticize Jareds code then write this abomination
+        fixtures = defaultdict(list)
+        for game in games:
+            fixtures[game.round].append(game)
+        new_fixtures = {}
+        for k, v in fixtures.items():
+            new_fixtures[k] = [j for j in fixture_sorter(v)]
+        fixtures = new_fixtures
 
-        with DatabaseManager() as c:
-            tournament_id = get_tournament_id(tournament)
-
-            games = c.execute(
-                """SELECT 
-                        games.id, court, is_bye, serving.name, receiving.name, team_one_score, team_two_score, 
-                        umpire.name, umpire.searchable_name, scorer.name, scorer.searchable_name, 
-                        round
-                        FROM games 
-                        INNER JOIN teams AS serving ON games.team_one_id = serving.id 
-                        INNER JOIN teams AS receiving ON games.team_two_id = receiving.id
-                        LEFT JOIN officials AS u ON games.official_id = u.id
-                            LEFT JOIN people AS umpire ON u.person_id = umpire.id
-                        LEFT JOIN officials AS s ON games.scorer_id = s.id
-                            LEFT JOIN people AS scorer ON s.person_id = scorer.id
-                        WHERE
-                            tournament_id = ? AND
-                            is_final = 0;
-                            """,
-                (tournament_id,),
-            )
-            fixtures = defaultdict(list)
-            for game in games:
-                fixtures[game[-1]].append(
-                    GameDetailed(
-                        game[3:5],
-                        f"{game[5]} - {game[6]}",
-                        game[0],
-                        game[2],
-                        game[7],
-                        game[8],
-                        game[9],
-                        game[10],
-                        game[1],
-                        {-1: "-", 0: "Court 1", 1: "Court 2"}.get(game[1]),
-                    )
-                )
-
-            new_fixtures = {}
-            for k, v in fixtures.items():
-                new_fixtures[k] = [j[3] for j in fixture_sorter([(i.id, i.court, i.bye, i) for i in v])]
-            fixtures = new_fixtures
-
-            games = c.execute(
-                """SELECT 
-                        games.id, court, is_bye, serving.name, receiving.name, team_one_score, team_two_score, 
-                        umpire.name, umpire.searchable_name, scorer.name, scorer.searchable_name, 
-                        round
-                        FROM games 
-                        INNER JOIN teams AS serving ON games.team_one_id = serving.id 
-                        INNER JOIN teams AS receiving ON games.team_two_id = receiving.id
-                        LEFT JOIN officials AS u ON games.official_id = u.id
-                            LEFT JOIN people AS umpire ON u.person_id = umpire.id
-                        LEFT JOIN officials AS s ON games.scorer_id = s.id
-                            LEFT JOIN people AS scorer ON s.person_id = scorer.id
-                        WHERE
-                            tournament_id = ? AND
-                            is_final = 1;""",
-                (tournament_id,),
-            )
-            finals = defaultdict(list)
-            for game in games:
-                finals[game[-1]].append(
-                    GameDetailed(
-                        game[3:5],
-                        f"{game[5]} - {game[6]}",
-                        game[0],
-                        game[2],
-                        game[7],
-                        game[8],
-                        game[9],
-                        game[10],
-                        game[1],
-                        {-1: "-", 0: "Court 1", 1: "Court 2"}.get(game[1]),
-                    )
-                )
-
-            t = Tourney(
-                *c.execute(
-                    """SELECT
-                                two_courts, has_scorer
-                                FROM tournaments
-                                INNER JOIN games ON games.tournament_id = tournaments.id
-                                WHERE tournaments.id = ?;""",
-                    (tournament_id,),
-                ).fetchone()
-            )
-
+        games = Games.query.filter(Games.tournament_id == tournament_id, Games.is_final == True).all()
+        # idk something about glass houses?
+        finals = defaultdict(list)
+        for game in games:
+            finals[game.round].append(game)
         return (
             render_template_sidebar(
                 "tournament_specific/site_detailed.html",
                 fixtures=fixtures.items(),
                 finals=finals.items(),
-                t=t,
+                t=Tournaments.query.filter(Tournaments.searchable_name == tournament).first(),
                 reset=False  # TODO: see todo above
                 # reset=court is not None
                 # or round is not None
@@ -1872,7 +1743,6 @@ FROM games
                 200,
             )
 
-    # TODO: UPDATE
     @app.get("/<tournament_name>/create")
     @officials_only
     def create_game(tournament_name):
@@ -1892,9 +1762,7 @@ FROM games
 
         key = fetch_user()
         official = [i for i in officials if i.person.password == key]
-        print(official)
         officials = official + [i for i in officials if i.person.password != key]
-        print(officials)
 
         return (
             render_template(
