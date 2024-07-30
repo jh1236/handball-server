@@ -94,6 +94,8 @@ class Games(db.Model):
     iga_side = db.relationship("Teams", foreign_keys=[iga_side_id])
     player_to_serve = db.relationship("People", foreign_keys=[player_to_serve_id])
     team_to_serve = db.relationship("Teams", foreign_keys=[team_to_serve_id])
+    elo_delta = db.relationship("EloChange")
+
     row_titles = ["Rounds",
                   "Score Difference",
                   "Elo Gap",

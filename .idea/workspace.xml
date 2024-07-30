@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2f902ea6-c380-48f3-9c04-7a97b6657219" name="Changes" comment="Get distracted and add searching to the create games screens (also delink them both from the DatabaseManager class)">
+    <list default="true" id="2f902ea6-c380-48f3-9c04-7a97b6657219" name="Changes" comment="decouple Fixtures from old db Manager site">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tournament_specific/site.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tournament_specific/site.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tournament_specific/site_detailed.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tournament_specific/site_detailed.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/models/Games.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/models/Games.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/instance/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/instance/database.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/structure/get_information.py" beforeDir="false" afterPath="$PROJECT_DIR$/structure/get_information.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/permissions.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/permissions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/tournament_specific.py" beforeDir="false" afterPath="$PROJECT_DIR$/website/tournament_specific.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -99,7 +100,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "database.query.execution",
+    "settings.editor.selected.configurable": "settings.sync",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -409,22 +410,6 @@
       <workItem from="1719210547891" duration="97000" />
       <workItem from="1722088716148" duration="940000" />
       <workItem from="1722335480878" duration="141000" />
-    </task>
-    <task id="LOCAL-00046" summary="IT ALL WORKS!! (almost)">
-      <option name="closed" value="true" />
-      <created>1717660299200</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1717660299200</updated>
-    </task>
-    <task id="LOCAL-00047" summary="IT ALL WORKS!! (almost)">
-      <option name="closed" value="true" />
-      <created>1717752688050</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1717752688050</updated>
     </task>
     <task id="LOCAL-00048" summary="IT ALL WORKS!! (almost)">
       <option name="closed" value="true" />
@@ -802,7 +787,23 @@
       <option name="project" value="LOCAL" />
       <updated>1722339112977</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="decouple Fixtures from old db Manager site">
+      <option name="closed" value="true" />
+      <created>1722340233270</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1722340233270</updated>
+    </task>
+    <task id="LOCAL-00096" summary="decouple Fixtures from old db Manager site">
+      <option name="closed" value="true" />
+      <created>1722340251556</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1722340251556</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -844,7 +845,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="add card animations" />
     <MESSAGE value="dodgy db - ELO values are wrong" />
     <MESSAGE value="new signup" />
     <MESSAGE value="few bugfixes, commit DB" />
@@ -869,7 +869,8 @@
     <MESSAGE value="remove config files" />
     <MESSAGE value="begin updating the create_game_players page" />
     <MESSAGE value="Get distracted and add searching to the create games screens (also delink them both from the DatabaseManager class)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Get distracted and add searching to the create games screens (also delink them both from the DatabaseManager class)" />
+    <MESSAGE value="decouple Fixtures from old db Manager site" />
+    <option name="LAST_COMMIT_MESSAGE" value="decouple Fixtures from old db Manager site" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -885,7 +886,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/matchmaking$scratch_1.coverage" NAME="scratch_1 Coverage Results" MODIFIED="1717761633325" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/matchmaking$Flask__start_py_.coverage" NAME="Flask (start.py) Coverage Results" MODIFIED="1720884758463" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/matchmaking$matchmaking.coverage" NAME="matchmaking Coverage Results" MODIFIED="1722339843221" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/matchmaking$matchmaking.coverage" NAME="matchmaking Coverage Results" MODIFIED="1722343428138" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/matchmaking$test.coverage" NAME="test Coverage Results" MODIFIED="1721318296531" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/matchmaking$start.coverage" NAME="start Coverage Results" MODIFIED="1721186570340" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/matchmaking$util.coverage" NAME="util Coverage Results" MODIFIED="1704783033548" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
