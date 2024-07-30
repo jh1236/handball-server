@@ -8,7 +8,7 @@ from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.models import People, PlayerGameStats, Games, Tournaments, TournamentTeams, Teams, TournamentOfficials, \
-    Officials
+    Officials, EloChange
 from structure import manage_game
 from structure.GameUtils import game_string_to_commentary
 from structure.get_information import get_tournament_id
@@ -146,7 +146,7 @@ def add_tournament_specific(app):
                 200,
             )
 
-    @app.get("/<tournament>/fixtures/")  # TODO: update to orm
+    @app.get("/<tournament>/fixtures/")
     def fixtures(tournament):
         tournament_id = get_tournament_id(tournament)
         games = Games.query.filter(Games.tournament_id == tournament_id, Games.is_final == False).all()
@@ -174,7 +174,7 @@ def add_tournament_specific(app):
             200,
         )
 
-    @app.get("/<tournament>/fixtures/detailed")  # TODO: update to orm
+    @app.get("/<tournament>/fixtures/detailed")
     def detailed_fixtures(tournament):
         # TODO: jared said he wanted to do this, Thanks :)
 
@@ -1146,11 +1146,8 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
             200,
         )
 
-    @app.get("/<tournament>/players/<player_name>/")  # TODO: update to orm
+    @app.get("/<tournament>/players/<player_name>/")
     def player_stats(tournament, player_name):
-        tournament_id = get_tournament_id(tournament)
-        # TODO (LACHIE): please help me make this less queries...
-
         tournament = Tournaments.query.filter(
             Tournaments.searchable_name == tournament).first().id if tournament else None
         player = People.query.filter(People.searchable_name == player_name).first()
@@ -1164,31 +1161,20 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
         team = team.order_by(Teams.image_url.like("/api/teams/image%").desc(),
                              Teams.id).first()
         courts = [player.stats(games_filter=lambda a: game_filter(a).filter(Games.court == i)) for i in range(2)]
-        with DatabaseManager() as c:
-            recent = c.execute(
-                """ SELECT s.name, r.name, g1.team_one_score, g1.team_two_score, g1.id, tournaments.searchable_name, 
-                round(coalesce(elo_delta, 0), 2)
-                    FROM games g1
-                             INNER JOIN tournaments on g1.tournament_id = tournaments.id
-                             INNER JOIN teams r on g1.team_two_id = r.id
-                             INNER JOIN teams s on g1.team_one_id = s.id
-                             INNER JOIN playerGameStats on g1.id = playerGameStats.game_id
-                             INNER JOIN people on playerGameStats.player_id = people.id
-                             LEFT JOIN eloChange on eloChange.game_id = g1.id AND eloChange.player_id = people.id
-                    WHERE (people.searchable_name = ?) and IIF(? is NULL, 1, tournaments.id = ?) and g1.started = 1
-                    ORDER BY g1.id DESC 
-                    LIMIT 20""", (player_name, tournament_id, tournament_id)).fetchall()
-            upcoming = c.execute(
-                """ SELECT s.name, r.name, g1.team_one_score, g1.team_two_score, g1.id, tournaments.searchable_name
-                    FROM games g1
-                             INNER JOIN tournaments on g1.tournament_id = tournaments.id
-                             INNER JOIN teams r on g1.team_two_id = r.id
-                             INNER JOIN teams s on g1.team_one_id = s.id
-                             INNER JOIN playerGameStats on g1.id = playerGameStats.game_id
-                             INNER JOIN people on playerGameStats.player_id = people.id
-                    WHERE people.searchable_name = ? and IIF(? is NULL, 1, tournaments.id = ?) and g1.started = 0 and g1.is_bye = 0
-                    ORDER BY g1.id DESC 
-                    LIMIT 20""", (player_name, tournament_id, tournament_id)).fetchall()
+        recent = db.session.query(Games, EloChange).join(PlayerGameStats,
+                                                         PlayerGameStats.game_id == Games.id).outerjoin(EloChange,
+                                                                                                        EloChange.game_id == Games.id).filter(
+            Games.ended, PlayerGameStats.player_id == player.id, EloChange.player_id == PlayerGameStats.player_id)
+        upcoming = db.session.query(Games).join(PlayerGameStats,
+                                                PlayerGameStats.game_id == Games.id).filter(Games.ended == False,
+                                                                                            Games.is_bye == False,
+                                                                                            PlayerGameStats.player_id == player.id)
+        if tournament:
+            recent = recent.filter(Games.tournament_id == tournament)
+            upcoming = upcoming.filter(Games.tournament_id == tournament)
+        recent = recent.order_by(Games.id.desc()).limit(20).all()
+        upcoming = upcoming.order_by(Games.id.desc()).limit(20).all()
+
         if not player:
             return (
                 render_template(
@@ -1198,10 +1184,14 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
                 400,
             )
         recent = [
-            (f"{i[0]} vs {i[1]} [{i[2]} - {i[3]}] <{'' if i[6] < 0 else '+'}{i[6]}>", i[4], i[5]) for i in recent
+            (
+                f"{i.team_one.name} vs {i.team_two.name} [{i.team_one_score} - {i.team_two_score}] <{'' if e and e.elo_delta < 0 else '+'}{round(e.elo_delta, 2) if e else 0}>",
+                i.id, i.tournament.searchable_name) for i, e in recent
         ]
         upcoming = [
-            (f"{i[0]} vs {i[1]} [{i[2]} - {i[3]}]", i[4], i[5]) for i in upcoming
+            (
+                f"{i.team_one.name} vs {i.team_two.name} [{i.team_one_score} - {i.team_two_score}]",
+                i.id, i.tournament.searchable_name) for i in upcoming
         ]
 
         stats |= {
@@ -1236,99 +1226,64 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
                 200,
             )
 
-    @app.get("/<tournament>/officials/<nice_name>/")  # TODO: update to orm
+    @app.get("/<tournament>/officials/<nice_name>/")
     def official_site(tournament, nice_name):
 
         recent_games = []
-        titles = [
-            "Green Cards Given",
-            "Yellow Cards Given",
-            "Red Cards Given",
-            "Cards Given",
-            "Cards Per Game",
-            "Faults Called",
-            "Faults Per Game",
-            "Games Umpired",
-            "Games Scored",
-            "Rounds Umpired",
-        ]
+        stats = {
+            "Green Cards Given": 0,
+            "Yellow Cards Given": 0,
+            "Red Cards Given": 0,
+            "Cards Given": 0,
+            "Cards Per Game": 0,
+            "Faults Called": 0,
+            "Faults Per Game": 0,
+            "Games Umpired": 0,
+            "Games Scored": 0,
+            "Rounds Umpired": 0
+        }
         tournament_id = get_tournament_id(tournament)
-        with DatabaseManager() as c:
-            values = c.execute(
-                """SELECT
-                                   people.name,
-                                   SUM(punishments.type = 'Green'),
-                                   SUM(punishments.type = 'Yellow'),
-                                   SUM(punishments.type = 'Red'),
-                                   COUNT(punishments.reason),
-                                   ROUND(CAST(COUNT(punishments.reason) AS REAL) / COUNT(DISTINCT games.id), 2),
-                                   (SELECT SUM(faults)
-                                    FROM games
-                                             INNER JOIN playerGameStats on games.id = playerGameStats.game_id
-                                    WHERE games.official_id = officials.id),
-                                   ROUND(CAST((SELECT SUM(faults)
-                                         FROM games
-                                                  INNER JOIN playerGameStats on games.id = playerGameStats.game_id
-                                         WHERE games.official_id = officials.id) AS REAL) / COUNT(DISTINCT games.id), 2),
-                                   COUNT(DISTINCT games.id),
-                                   COUNT((SELECT games.id FROM games WHERE games.scorer_id = officials.id)),
-                                   SUM((SELECT team_one_score + team_two_score FROM games WHERE games.official_id = officials.id))
-                            
-                                    FROM officials
-                                             INNER JOIN people on people.id = officials.person_id
-                                             INNER JOIN games on games.official_id = officials.id
-                                             LEFT JOIN punishments on games.id = punishments.game_id
-                                             INNER JOIN tournaments ON tournaments.id = games.tournament_id
-                                    WHERE people.searchable_name = ? and IIF(? is NULL, 1, tournaments.id = ?)
-            """,
-                (nice_name, tournament_id, tournament_id,),
-            ).fetchone()
-            games = c.execute(
-                """SELECT DISTINCT games.id,
-                tournaments.searchable_name,
-                po.searchable_name = ?,
-                round,
-                st.name,
-                rt.name,
-                team_one_score,
-                team_two_score
-            FROM games
-                     INNER JOIN officials o on games.official_id = o.id
-                     INNER JOIN tournaments on games.tournament_id = tournaments.id
-                     LEFT JOIN teams st on st.id = games.team_one_id
-                     LEFT JOIN teams rt on rt.id = games.team_two_id
-                     LEFT JOIN officials s on games.scorer_id = s.id
-                     LEFT JOIN main.people po on po.id = o.person_id
-                     LEFT JOIN main.people ps on ps.id = s.person_id
-            WHERE (po.searchable_name = ? or ps.searchable_name = ?) AND IIF(? is NULL, 1, tournaments.id = ?) 
-            ORDER BY games.id;
-            """,
-                (nice_name, nice_name, nice_name, tournament_id, tournament_id),
-            ).fetchall()
-        for (
-                game_id,
-                tournament_nice_name,
-                umpire,
-                game_round,
-                team_one,
-                team_two,
-                score_one,
-                score_two,
-        ) in games:
+        official = Officials.query.join(People).filter(People.searchable_name == nice_name).first()
+        q = db.session.query(PlayerGameStats).join(Games, Games.id == PlayerGameStats.game_id).filter(
+            Games.official_id == official.id)
+        if tournament:
+            q = q.filter(Games.tournament_id == tournament_id)
+        prev_game_id = -1
+        for pgs in q.all():
+            stats["Green Cards Given"] += pgs.green_cards
+            stats["Yellow Cards Given"] += pgs.yellow_cards
+            stats["Red Cards Given"] += pgs.red_cards
+            stats["Cards Given"] += pgs.green_cards + pgs.yellow_cards + pgs.red_cards
+            stats["Faults Called"] += pgs.faults
+            if pgs.game_id > prev_game_id:
+                stats["Games Umpired"] += 1
+                stats["Rounds Umpired"] += pgs.game.team_one_score + pgs.game.team_two_score
+
+        q = Games.query.filter(Games.scorer_id == official.id)
+        games = Games.query.filter((Games.official_id == official.id) | (Games.scorer_id == official.id))
+
+        if tournament:
+            q = q.filter(Games.tournament_id == tournament_id)
+            games = games.filter(Games.tournament_id == tournament_id)
+        games = games.all()
+        stats["Games Scored"] = len(q.all())
+        stats["Cards Per Game"] = round(stats["Cards Given"] / (stats["Games Umpired"] or 1), 2)
+        stats["Faults Per Game"] = round(stats["Faults Called"] / (stats["Games Umpired"] or 1), 2)
+
+        for g in games:
             recent_games.append(
                 (
-                    f"{'Umpire ' if umpire else 'Scorer'} Round {game_round + 1}: {team_one} - {team_two} ({score_one} - {score_two})",
-                    game_id,
-                    tournament_nice_name,
+                    f"{'Umpire ' if g.official_id == official.id  else 'Scorer'} Round {g.round + 1}: {g.team_one.name} - {g.team_two.name} ({g.team_one_score} - {g.team_two_score})",
+                    g.id,
+                    g.tournament.searchable_name,
                 )
             )
-
         return (
             render_template_sidebar(
                 "tournament_specific/official.html",
-                name=values[0],
+                name=official.person.name,
                 link=nice_name,
-                stats=zip(titles, values[1:]),
+                stats=[(k, v) for k, v in stats.items()],
                 games=recent_games,
             ),
             200,
@@ -1767,13 +1722,14 @@ FROM games
         return (
             render_template(
                 "tournament_specific/game_editor/create_game_teams.html",
-                tournamentLink=link(tournament),
+                tournamentLink=link(tournament.searchable_name),
                 officials=officials,
                 teams=teams,
             ),
             200,
         )
 
+    @officials_only
     @app.get("/<tournament_name>/create_players")
     def create_game_players(tournament_name):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
