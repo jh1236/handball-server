@@ -36,6 +36,7 @@ class Tournaments(db.Model):
     finals_type = db.Column(db.Text())
     ranked = db.Column(db.Boolean(), nullable=False)
     two_courts = db.Column(db.Boolean(), nullable=False)
+    has_scorer = db.Column(db.Boolean(), nullable=False)
     finished = db.Column(db.Boolean(), nullable=False)
     in_finals = db.Column(db.Boolean(), nullable=False)
     is_pooled = db.Column(db.Boolean(), nullable=False)

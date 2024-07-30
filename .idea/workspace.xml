@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2f902ea6-c380-48f3-9c04-7a97b6657219" name="Changes" comment="begin updating the create_game_players page">
+    <list default="true" id="2f902ea6-c380-48f3-9c04-7a97b6657219" name="Changes" comment="Get distracted and add searching to the create games screens (also delink them both from the DatabaseManager class)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/instance/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/instance/database.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/createGame.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/createGame.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/structure/manage_game.py" beforeDir="false" afterPath="$PROJECT_DIR$/structure/manage_game.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tournament_specific/game_editor/create_game_players.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tournament_specific/game_editor/create_game_players.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tournament_specific/game_editor/create_game_teams.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tournament_specific/game_editor/create_game_teams.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tournament_specific/site.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tournament_specific/site.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tournament_specific/site_detailed.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tournament_specific/site_detailed.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/util.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/tournament_specific.py" beforeDir="false" afterPath="$PROJECT_DIR$/website/tournament_specific.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -412,14 +410,6 @@
       <workItem from="1722088716148" duration="940000" />
       <workItem from="1722335480878" duration="141000" />
     </task>
-    <task id="LOCAL-00045" summary="im drunk heres the commit">
-      <option name="closed" value="true" />
-      <created>1717352565774</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1717352565774</updated>
-    </task>
     <task id="LOCAL-00046" summary="IT ALL WORKS!! (almost)">
       <option name="closed" value="true" />
       <created>1717660299200</created>
@@ -804,7 +794,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722336033586</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <task id="LOCAL-00094" summary="Get distracted and add searching to the create games screens (also delink them both from the DatabaseManager class)">
+      <option name="closed" value="true" />
+      <created>1722339112977</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1722339112977</updated>
+    </task>
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -846,7 +844,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="gwsrljukm" />
     <MESSAGE value="add card animations" />
     <MESSAGE value="dodgy db - ELO values are wrong" />
     <MESSAGE value="new signup" />
@@ -871,7 +868,8 @@
     <MESSAGE value="fix rounds carded over old_tournaments" />
     <MESSAGE value="remove config files" />
     <MESSAGE value="begin updating the create_game_players page" />
-    <option name="LAST_COMMIT_MESSAGE" value="begin updating the create_game_players page" />
+    <MESSAGE value="Get distracted and add searching to the create games screens (also delink them both from the DatabaseManager class)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Get distracted and add searching to the create games screens (also delink them both from the DatabaseManager class)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -887,7 +885,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/matchmaking$scratch_1.coverage" NAME="scratch_1 Coverage Results" MODIFIED="1717761633325" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/matchmaking$Flask__start_py_.coverage" NAME="Flask (start.py) Coverage Results" MODIFIED="1720884758463" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/matchmaking$matchmaking.coverage" NAME="matchmaking Coverage Results" MODIFIED="1722338987379" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/matchmaking$matchmaking.coverage" NAME="matchmaking Coverage Results" MODIFIED="1722339843221" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/matchmaking$test.coverage" NAME="test Coverage Results" MODIFIED="1721318296531" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/matchmaking$start.coverage" NAME="start Coverage Results" MODIFIED="1721186570340" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/matchmaking$util.coverage" NAME="util Coverage Results" MODIFIED="1704783033548" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />

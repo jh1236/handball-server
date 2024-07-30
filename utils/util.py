@@ -5,6 +5,7 @@ from urllib.request import urlopen, Request
 
 from bs4 import BeautifulSoup
 
+from database.models import Games
 from utils.databaseManager import DatabaseManager
 
 T = TypeVar("T")
@@ -27,12 +28,12 @@ def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
         yield l[i::n]
 
 
-def fixture_sorter(games: list[list[Any]]) -> list[list[Any]]:
+def fixture_sorter(games: list[Games]) -> list[list[Any]]:
     """INPUT: any object where id is list index 0 and court is list index 1 and isBye is list index 2"""
 
-    court_one = [i for i in games if i[1] == 0 and not i[2]]
-    court_two = [i for i in games if i[1] == 1 and not i[2]]
-    byes = [i for i in games if i[2]]
+    court_one = [i for i in games if i.court == 0 and not i.is_bye]
+    court_two = [i for i in games if i.court == 1 and not i.is_bye]
+    byes = [i for i in games if i.is_bye]
     if not court_two:
         return court_one + byes
     this_round = []
