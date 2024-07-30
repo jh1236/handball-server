@@ -27,9 +27,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne0">Player One</button>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="P1T1">
+                    <input id="searchP1T1" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p[0]}}', '{{p[1]}}', 0)">{{p[1]}}</p>
+                    <p onclick="setTeamListOne('{{p.searchable_name}}', '{{p.name}}', 0)">{{p.name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -38,9 +39,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo0">Player One</button>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="P1T2">
+                    <input id="searchP1T2" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p[0]}}', '{{p[1]}}', 0)">{{p[1]}}</p>
+                    <p onclick="setTeamListTwo('{{p.searchable_name}}', '{{p.name}}', 0)">{{p.name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -50,9 +52,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne1">Player Two</button>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="P2T1">
+                    <input id="searchP2T1" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p[0]}}', '{{p[1]}}', 1)">{{p[1]}}</p>
+                    <p onclick="setTeamListOne('{{p.searchable_name}}', '{{p.name}}', 1)">{{p.name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -61,9 +64,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo1">Player Two</button>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="P2T2">
+                    <input id="searchP2T2" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p[0]}}', '{{p[1]}}', 1)">{{p[1]}}</p>
+                    <p onclick="setTeamListTwo('{{p.searchable_name}}', '{{p.name}}', 1)">{{p.name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -76,9 +80,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne2">Add Substitute</button>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="P3T1">
+                    <input id="searchP3T1" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p[0]}}', '{{p[1]}}', 2)">{{p[1]}}</p>
+                    <p onclick="setTeamListOne('{{p.searchable_name}}', '{{p.name}}', 2)">{{p.name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -87,9 +92,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo2">Add Substitute</button>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="P3T2">
+                    <input id="searchP3T2" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p[0]}}', '{{p[1]}}', 2)">{{p[1]}}</p>
+                    <p onclick="setTeamListTwo('{{p.searchable_name}}', '{{p.name}}', 2)">{{p.name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -105,12 +111,12 @@
         <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
         <div class="dropdown-content">
             {% for i in officials %}
-                <p onclick="setOfficial('{{i[0]}}', '{{i[1]}}')">{{i[1]}}</p>
+                <p onclick="setOfficial('{{i.person.searchable_name}}', '{{i.person.name}}')">{{i.person.name}}</p>
             {% endfor %}
         </div>
     </div>
 {% endif %}
-<script>setOfficial('{{officials[0][0]}}', '{{officials[0][1]}}')</script>
+<script>setOfficial('{{officials[0].person.searchable_name}}', '{{officials[0].person.name}}')</script>
 <br>
 <br>
 <button onclick="createPlayers()" class="button">Start</button>

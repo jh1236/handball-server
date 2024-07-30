@@ -1873,21 +1873,15 @@ FROM games
             )
 
     # TODO: UPDATE
-    @app.get("/<tournament>/create")
+    @app.get("/<tournament_name>/create")
     @officials_only
-    def create_game(tournament):
-        tournament_id = get_tournament_id(tournament)
-        with DatabaseManager() as c:
-            editable = c.execute(
-                "SELECT fixtures_type from tournaments where id = ?",
-                (tournament_id,),
-            ).fetchone()
-            teams = c.execute(
-                """SELECT searchable_name, name FROM teams INNER JOIN tournamentTeams ON teams.id = tournamentTeams.team_id and tournamentTeams.tournament_id = ? order by searchable_name""",
-                (tournament_id,)).fetchall()
-            officials = c.execute(
-                """SELECT searchable_name, name, password FROM officials INNER JOIN main.people on officials.person_id = people.id""").fetchall()
-        if not get_type_from_name(editable[0], tournament_id).manual_allowed():
+    def create_game(tournament_name):
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
+        teams = Teams.query.order_by(Teams.searchable_name).all()
+        officials = Officials.query.join(People).order_by(People.searchable_name).all()
+        print(officials)
+
+        if not get_type_from_name(tournament.fixtures_type, tournament.id).manual_allowed():
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -1895,12 +1889,12 @@ FROM games
                 ),
                 400,
             )
+
         key = fetch_user()
-        # if key not in [i[2] for i in officials if i.admin]:
-        #     officials = [i for i in officials if i.key == key]
-        # else:
-        official = [i for i in officials if i[2] == key]
-        officials = official + [i for i in officials if i[2] != key]
+        official = [i for i in officials if i.person.password == key]
+        print(official)
+        officials = official + [i for i in officials if i.person.password != key]
+        print(officials)
 
         return (
             render_template(
@@ -1912,12 +1906,11 @@ FROM games
             200,
         )
 
-    # TODO: UPDATE
-    @app.get("/<tournament>/create_players")
-    def create_game_players(tournament):
-        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament).fetchone()
-        players = People.query.order_by(People.searchable_name).fetchall()
-        officials = Officials.query.join(People).order_by(People.searchable_name).fetchall()
+    @app.get("/<tournament_name>/create_players")
+    def create_game_players(tournament_name):
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
+        players = People.query.order_by(People.searchable_name).all()
+        officials = Officials.query.join(People).order_by(People.searchable_name).all()
         if not get_type_from_name(tournament.fixtures_type, tournament.id).manual_allowed():
             return (
                 render_template(
@@ -1928,14 +1921,13 @@ FROM games
             )
 
         key = fetch_user()
-        # if key not in [i.key for i in get_all_officials() if i.admin]:
-        #     officials = [i for i in officials if i.key == key]
-        official = [i for i in officials if i[2] == key]
-        officials = official + [i for i in officials if i[2] != key]
+
+        official = [i for i in officials if i.person.password == key]
+        officials = official + [i for i in officials if i.person.password != key]
         return (
             render_template(
                 "tournament_specific/game_editor/create_game_players.html",
-                tournamentLink=link(tournament),
+                tournamentLink=link(tournament_name),
                 officials=officials,
                 players=players,
             ),
