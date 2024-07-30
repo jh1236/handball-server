@@ -7,7 +7,8 @@ from flask import render_template, request
 from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
-from database.models import People, PlayerGameStats, Games, Tournaments, TournamentTeams, Teams, TournamentOfficials
+from database.models import People, PlayerGameStats, Games, Tournaments, TournamentTeams, Teams, TournamentOfficials, \
+    Officials
 from structure import manage_game
 from structure.GameUtils import game_string_to_commentary
 from structure.get_information import get_tournament_id
@@ -1914,17 +1915,10 @@ FROM games
     # TODO: UPDATE
     @app.get("/<tournament>/create_players")
     def create_game_players(tournament):
-        tournament_id = get_tournament_id(tournament)
-        with DatabaseManager() as c:
-            editable = c.execute(
-                "SELECT fixtures_type from tournaments where id = ?",
-                (tournament_id,),
-            ).fetchone()
-            players = c.execute(
-                """SELECT searchable_name, name FROM people order by searchable_name""").fetchall()
-            officials = c.execute(
-                """SELECT searchable_name, name, password FROM officials INNER JOIN main.people on officials.person_id = people.id""").fetchall()
-        if not get_type_from_name(editable[0], tournament_id).manual_allowed():
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament).fetchone()
+        players = People.query.order_by(People.searchable_name).fetchall()
+        officials = Officials.query.join(People).order_by(People.searchable_name).fetchall()
+        if not get_type_from_name(tournament.fixtures_type, tournament.id).manual_allowed():
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
