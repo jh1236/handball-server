@@ -30,7 +30,7 @@ def sync(game_id):
     fault = False
     streak = 1
     ace_streak = 0
-    #HACK: make this not hardcoded
+    # HACK: make this not hardcoded
     carry_over_cards = game.tournament_id >= 8
     for i in all_players:
         i.reset_stats()
@@ -577,17 +577,22 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
     if isinstance(tournament_id, str):
         tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament_id).first().id
     if players_one is not None:
-        players = [None, None, None]
+        players = [-1, -1, -1]
         for i, v in enumerate(players_one):
-            players[i] = People.query.filter(People.searchable_name == v).first()
-        print(players)
+            players[i] = People.query.filter(People.searchable_name == v).first().id
         teams = Teams.query.all()
         first_team = None
-        for i in teams:
-            if sorted([i.non_captain_id, i.captain_id, i.substitute_id]) == sorted(players):
+        for i in teams[1:]:
+            if not i.captain_id:
+                continue  # this is most likely the bye team, or it's so fucked up in the db that we probs wanna skip it anyway
+            print(players)
+            if sorted([i.non_captain_id or -1, i.captain_id, i.substitute_id or -1]) == sorted(players):
                 first_team = i
                 break
         if not first_team:
+            if not team_one:
+                raise NameError("You need to give a new team a name!")
+            players = [i if i > 0 else None for i in players]
             add = Teams(name=team_one, searchable_name=searchable_of(team_one), captain_id=players[0],
                         non_captain_id=players[1], substitute_id=players[2])
             db.session.add(add)
@@ -598,17 +603,22 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
         else:
             first_team = Teams.query.filter(Teams.searchable_name == team_one).first()
     if players_two is not None:
-        players = [None, None, None]
+        players = [-1, -1, -1]
         for i, v in enumerate(players_two):
-            players[i] = People.query.filter(People.searchable_name == v).first()
-        print(players)
+            players[i] = People.query.filter(People.searchable_name == v).first().id
         teams = Teams.query.all()
         second_team = None
-        for i in teams:
-            if sorted([i.non_captain_id, i.captain_id, i.substitute_id]) == sorted(players):
+        for i in teams[1:]:
+            if not i.captain_id:
+                continue  # this is most likely the bye team, or it's so fucked up in the db that we probs wanna skip it anyway
+            print(players)
+            if sorted([i.non_captain_id or -1, i.captain_id, i.substitute_id or -1]) == sorted(players):
                 second_team = i
                 break
         if not second_team:
+            if not team_two:
+                raise NameError("You need to give a new team a name!")
+            players = [i if i > 0 else None for i in players]
             add = Teams(name=team_two, searchable_name=searchable_of(team_two), captain_id=players[0],
                         non_captain_id=players[1], substitute_id=players[2])
             db.session.add(add)

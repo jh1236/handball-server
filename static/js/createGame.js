@@ -131,3 +131,35 @@ window.onclick = function (event) {
         }
     }
 }
+
+window.onload = () => {
+    if (window.location.href.includes("create_players")) {
+        for (let t = 1; t <= 2; t++) {
+            for (let p = 1; p <= 3; p++) {
+                console.log(`searchP${p}T${t}`)
+                let elem = document.getElementById(`searchP${p}T${t}`)
+                elem.onkeyup = (e) => {
+                    for (let i of document.getElementById(`P${p}T${t}`).children) {
+                        if (i.id.startsWith("search")) continue
+                        let value = e.target.value.toLowerCase()
+                        i.style.display = !value || i.textContent.toLowerCase().includes(value) ? "block" : "none"
+                    }
+                }
+            }
+        }
+    } else {
+        for (let t = 1; t <= 2; t++) {
+            let elem = document.getElementById(`searchT${t}`)
+            elem.onkeyup = (e) => {
+                for (let i of document.getElementById(`T${t}`).children) {
+                    if (i.id.startsWith("search")) continue
+                    let value = e.target.value.toLowerCase()
+                    i.style.display = !value || i.textContent.toLowerCase().includes(value) ? "block" : "none"
+                }
+            }
+
+        }
+    }
+
+
+}
