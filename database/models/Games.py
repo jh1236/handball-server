@@ -118,6 +118,16 @@ class Games(db.Model):
                   "Tournament"
                   ]
 
+    @property
+    def formatted_start_time(self):
+        if self.start_time < 0: return "??"
+        return time.strftime("%d/%m/%y (%H:%M)", time.localtime(self.start_time))
+
+    @property
+    def formatted_length(self):
+        if self.start_time < 0: return "??"
+        return time.strftime("(%H:%M:%S)", time.localtime(self.length))
+
     def reset(self):
         self.started = False
         self.someone_has_won = False
@@ -149,7 +159,8 @@ class Games(db.Model):
             "Ace Percentage": sum(i.aces_scored for i in pgs) / ((self.team_one_score + self.team_two_score) or 1),
             "Faults": sum(i.faults for i in pgs),
             "Fault Percentage": sum(i.faults for i in pgs) / ((self.team_one_score + self.team_two_score) or 1),
-            "Start Time": 0 if not self.start_time or self.start_time <= 0 else (self.start_time - Games.query.filter(Games.start_time > 0).order_by(Games.start_time).first().start_time) / (24.0 * 60 * 60 * 60),
+            "Start Time": 0 if not self.start_time or self.start_time <= 0 else (self.start_time - Games.query.filter(
+                Games.start_time > 0).order_by(Games.start_time).first().start_time) / (24.0 * 60 * 60 * 60),
             "Court": self.court,
             "Ranked": self.ranked,
             "Timeline": self.id,
