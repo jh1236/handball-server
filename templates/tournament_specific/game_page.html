@@ -12,84 +12,97 @@
             <h1><a href="/games/{{ game.id }}" class="hide">{{ teams[0].name }}
                 vs {{ teams[1].name }}</a></h1>
             <h1 class="big"><a class="hide"
-                               href="/games/{{ game.id }}/display">{{ game.score_string }}</a>
+                               href="/games/{{ game.id }}/display">{{ game.team_one_score }}
+                - {{ game.team_two_score }}</a>
             </h1>
             <p><b>Round:</b> <a class="hide"
                                 href="/{{ tournamentLink }}fixtures/detailed?round={{ game.round }}"><i>{{ game.round }}</i></a>
             </p>
             <p><b>Court:</b> <a class="hide"
-                                href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"><i>{{ game.courtName }}</i></a>
+                                href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"><i>Court {{ game.court + 1 }}</i></a>
             </p>
-            <p><b>Match Official:</b>{% if not game.bye %}
-                <a class="hide" href="/{{ tournamentLink }}officials/{{ game.umpireSearchableName }}">{% endif %}
-                <i>{{ game.umpire }}</i>
-                {% if not game.bye %}</a> {% endif %}</p>
-            {% if game.scorerSearchableName != 'no_one' %}
+            <p><b>Match Official:</b>{% if not game.is_bye %}
+                <a class="hide"
+                   href="/{{ tournamentLink }}officials/{{ game.official.person.searchable_name }}">{% endif %}
+                <i>{{ game.official.person.name }}</i>
+                {% if not game.is_bye %}</a> {% endif %}</p>
+            {% if game.scorer != 'no_one' %}
                 <p><b>Match Scorer:</b>
-                    <a class="hide" href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}">
-                        <i>{{ game.scorer }}</i>
+                    <a class="hide" href="/{{ tournamentLink }}officials/{{ game.scorer.person.searchable_name }}">
+                        <i>{{ game.scorer.person.name }}</i>
                     </a></p>
             {% endif %}
-            <p>{% if not game.bye %}<a href="/games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
-                {% if not game.bye %}</a>{% endif %} <i>{{ game.status }}</i></p>
-            {% if game.startTime > 0 %}
-                <p><b>Match Time:</b> <i>{{ game.startTimeStr }}</i></p>
+            <p>{% if not game.is_bye %}<a href="/games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
+                {% if not game.is_bye %}</a>{% endif %} <i>{{ game.status }}</i></p>
+            {% if game.start_time > 0 %}
+                <p><b>Match Time:</b> <i>{{ game.formatted_start_time }}</i></p>
             {% endif %}
-            {% if game.bestName %}
+            {% if game.best_player_id %}
                 <p><b>Best on Court:</b> <a class="hide"
-                                            href="/{{ tournamentLink }}players/{{ game.bestSearchableName }}"><i>{{ game.bestName }}</i></a>
+                                            href="/{{ tournamentLink }}players/{{ game.best_player.searchable_name }}"><i>{{ game.best_player.name }}</i></a>
                 </p>
             {% endif %}
             <br>
             <table class="jaredTable">
                 <tr>
                     <th></th>
-                    <th colspan="{{ teams[0].players.__len__() }}"><a
-                            href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"
+                    <th colspan="{{ players[0].__len__() }}"><a
+                            href="/{{ tournamentLink }}teams/{{ teams[0].searchable_name }}"
                             class="hide"><img
-                            src="{{ teams[0].image }}"
+                            src="{{ teams[0].image_url }}"
                             class="team_logo"
                             style="display: inline;left:70%;vertical-align:middle;"></a></th>
-                    <th colspan="{{ teams[1].players.__len__() }}">
-                        {% if not game.bye %}<a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"
-                                                class="hide">{% endif %}<img
-                            src="{{ teams[1].image }}"
+                    <th colspan="{{ players[1].__len__() }}">
+                        {% if not game.is_bye %}<a href="/{{ tournamentLink }}teams/{{ teams[1].searchable_name }}"
+                                                   class="hide">{% endif %}<img
+                            src="{{ teams[1].image_url }}"
                             class="team_logo"
-                            style="display: inline;left:70%;vertical-align:middle;">{% if not game.bye %}</a>{% endif %}
+                            style="display: inline;left:70%;vertical-align:middle;">{% if not game.is_bye %}
+                        </a>{% endif %}
                     </th>
                 </tr>
 
                 <tr>
                     <td></td>
-                    <th style="min-width: 150px" colspan="{{ teams[0].players.__len__() }}"><b><a
-                            href="/{{ tournamentLink }}teams/{{ teams[0].searchableName }}"
+                    <th style="min-width: 150px" colspan="{{ players[0].__len__() }}"><b><a
+                            href="/{{ tournamentLink }}teams/{{ teams[0].searchable_name }}"
                             class="hide">{{ teams[0].name }}</a></b></th>
-                    <th style="min-width: 150px" colspan="{{ teams[1].players.__len__() }}"><b>{% if not game.bye %}
-                        <a href="/{{ tournamentLink }}teams/{{ teams[1].searchableName }}"
-                           class="hide">{% endif %}{{ teams[1].name }}{% if not game.bye %}
+                    <th style="min-width: 150px" colspan="{{ players[0].__len__() }}"><b>{% if not game.is_bye %}
+                        <a href="/{{ tournamentLink }}teams/{{ teams[1].searchable_name }}"
+                           class="hide">{% endif %}{{ teams[1].name }}{% if not game.is_bye %}
                         </a>{% endif %}</b></th>
                     <th class="invisible">Spacerrrrrrr</th>
                 </tr>
-                {% for i in team_headings %}
+                {% for i in team_stats[0].keys() %}
                     <tr>
                         <th>{{ i }}:</th>
-                        <td colspan="{{ teams[0].players.__len__() }}">{{ teams[0].stats[i] }}</td>
-                        <td colspan="{{ teams[1].players.__len__() }}">{{ teams[1].stats[i] }}</td>
+                        <td colspan="{{ players[0].__len__() }}">{{ team_stats[0][i] }}</td>
+                        <td colspan="{{ players[1].__len__() }}">{{ team_stats[1][i] }}</td>
                     </tr>
 
 
                 {% endfor %}
                 <tr>
-                <td></td>
-                    {% for i in game.players %}
-                        <th><b><a class = "hide" href="/{{ tournamentLink }}/players/{{ i.searchableName }}">{{ i.name }}</a></b></th>
+                    <td></td>
+                    {% for t in players %}
+                        {% for i in t %}
+                            <th><b><a class="hide"
+                                      href="/{{ tournamentLink }}/players/{{ i.player.searchable_name }}">{{ i.player.name }}</a></b>
+                            </th>
+                        {% endfor %}
                     {% endfor %}
                 </tr>
                 {% for i in player_headings %}
                     <tr>
                         <th>{{ i }}:</th>
-                        {% for j in game.players %}
-                            <td>{{ j.stats[i] }}</td>
+                        {% for t in players %}
+                            {% for j in t %}
+                                {% if i == 'Elo' and game.ended %}
+                                    <td>{{ j.stats()[i] }} [{{ '+' if j.stats()["Elo Delta"]>=0 else '' }}{{ j.stats()["Elo Delta"] }}]</td>
+                                {% else %}
+                                    <td>{{ j.stats()[i] }}</td>
+                                {% endif %}
+                            {% endfor %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -98,7 +111,7 @@
         <div class="col-sm-3">
             <div style="min-height: 200px">
                 <h2><a class="hide"
-                       href="/{{ tournamentLink }}fixtures/detailed?team={{ game.teams[0].searchableName }}&team={{ teams[1].searchableName }}">Other
+                       href="/{{ tournamentLink }}fixtures/detailed?team={{ teams[0].searchable_name }}&team={{ teams[1].searchable_name }}">Other
                     Matches</a></h2>
                 {% for line in prev_matches %}
                     <p style="color: black;">{% if line[1] > -1 %}
