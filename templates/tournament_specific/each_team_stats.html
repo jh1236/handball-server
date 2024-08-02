@@ -9,22 +9,21 @@
 
     <div class="row">
         <div class="col-sm-8">
-            <a href="/{{ tournamentLink }}teams/{{ team.searchableName }}">
-                <img src="{{ team.image }}" class="team_logo" style="width: 200px;height: 200px"></a>
-            <h1><a href="/{{ tournamentLink }}teams/{{ team.searchableName }}" class="hide">Statistics
+            <a href="/{{ tournamentLink }}teams/{{ team.searchable_name }}">
+                <img src="{{ team.image_url }}" class="team_logo" style="width: 200px;height: 200px"></a>
+            <h1><a href="/{{ tournamentLink }}teams/{{ team.searchable_name }}" class="hide">Statistics
                 for {{ team.name }}</a></h1>
             {% if tournamentLink %}
-                <i><a class="hide" href="/teams/{{ team.searchableName }}">Go to All-Time Stats</a></i>
-                <br>
+                <i><a class="hide" href="/teams/{{ team.searchable_name }}">Go To All-Time Stats</a></i>
                 <br>
             {% endif %}
             <table class="jaredTable">
                 <tbody>
-                {% for stat in stats %}
+                {% for title, stat in team.stats(filter).items() %}
                     <tr>
-                        <th>{{ stat[0] }}:</th>
+                        <th>{{ title }}:</th>
                         <td></td>
-                        <td>{{ stat[1] }}</td>
+                        <td>{{ stat }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -32,11 +31,11 @@
             {% for player in players %}
                 <br>
                 <h3>Statistics for <a class="hide"
-                                      href="/{{ tournamentLink }}players/{{ player.searchableName }}">{{ player.name }}</a>
+                                      href="/{{ tournamentLink }}players/{{ player.searchable_name }}">{{ player.name }}</a>
                 </h3>
                 <table class="jaredTable">
                     <tbody>
-                    {% for header, stat in player.stats.items() %}
+                    {% for header, stat in player.stats(filter).items() %}
                         <tr>
                             <th>{{ header }}:</th>
                             <td></td>

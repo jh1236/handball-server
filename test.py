@@ -77,5 +77,4 @@ def interpolate_start_times():
 
 if __name__ == '__main__':
     with app.app_context():
-        sync_all_games()
-        db.session.commit()
+        print(Teams.query.filter(Teams.searchable_name == "bedwars_besties").first().stats())
