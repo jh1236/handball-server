@@ -76,8 +76,6 @@ def interpolate_start_times():
 
 
 if __name__ == '__main__':
-    # with app.app_context():
-    #     regen_elo()
     with app.app_context():
         sync_all_games()
         db.session.commit()
