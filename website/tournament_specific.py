@@ -8,7 +8,7 @@ from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.models import People, PlayerGameStats, Games, Tournaments, TournamentTeams, Teams, TournamentOfficials, \
-    Officials, EloChange
+    Officials, EloChange, GameEvents
 from structure import manage_game
 from structure.GameUtils import game_string_to_commentary
 from structure.get_information import get_tournament_id
@@ -499,183 +499,63 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
             200,
         )
 
-    @app.get("/games/<true_game_id>/display")  # TODO: update to orm
+    @app.get("/games/<true_game_id>/display")
     def scoreboard(true_game_id):
         if int(true_game_id) <= 0:
             game_id = Games.query.filter(Games.started, Games.court == abs(true_game_id)).order_by(
                 Games.id.desc()).first().id
         else:
             game_id = int(true_game_id)
-        with DatabaseManager() as c:
-            players = c.execute(
-                """SELECT people.name,
-       people.searchable_name,
-       playerGameStats.card_time,
-       playerGameStats.card_time_remaining,
-       playerGameStats.player_id = games.player_to_serve_id,
-       coalesce(punishments.hex, '#000000'),
-       coalesce((SELECT SUM(p.type == 'Green')
-        FROM punishments p
-        WHERE p.game_id = games.id AND p.player_id = people.id), 0),
-       teams.name, -- 6
-       teams.searchable_name,
-       case
-           when teams.image_url is null
-               then '/api/teams/image?name=blank'
-           else
-               teams.image_url
-           end,
-       IIF(teams.id = games.team_one_id, games.team_one_score, games.team_two_score),
-       1 - coalesce(IIF(teams.id = games.team_one_id, games.team_one_timeouts, games.team_two_timeouts), 0),
-       
-       games.id, --11
-       po.name,
-       po.searchable_name,
-       ps.name,
-       ps.searchable_name,
-       games.court,    --16
-       games.round,
-       gameEvents.event_type = 'Fault',
-       lastGE.side_to_serve,
-       (SELECT inn.event_type
-        FROM gameEvents inn
-        WHERE inn.id =
-              (SELECT MAX(id)
-               FROM gameEvents inn2
-               WHERE games.id = inn2.game_id
-                 AND (inn2.notes is null or inn2.notes <> 'Penalty'))), --20
-        games.start_time,
-        games.length,
-        games.started
-FROM games
-         LEFT JOIN gameEvents lastGE ON games.id = lastGE.game_id AND lastGE.id =
-                                                                     (SELECT MAX(id)
-                                                                      FROM gameEvents
-                                                                      WHERE games.id = gameEvents.game_id)
-         LEFT JOIN playerGameStats on(lastGE.team_one_left_id = playerGameStats.player_id OR lastGE.team_one_right_id = playerGameStats.player_id OR
-                                      lastGE.team_two_left_id = playerGameStats.player_id OR lastGE.team_two_right_id = playerGameStats.player_id OR lastGE.event_type is null) AND games.id = playerGameStats.game_id
-         INNER JOIN tournaments on tournaments.id = games.tournament_id
-         LEFT JOIN officials o on o.id = games.official_id
-         LEFT JOIN people po on po.id = o.person_id
-         LEFT JOIN officials s on s.id = games.scorer_id
-         LEFT JOIN people ps on ps.id = s.person_id
-         INNER JOIN people on people.id = playerGameStats.player_id
-         LEFT JOIN people best on best.id = games.best_player_id
-         INNER JOIN teams on teams.id = playerGameStats.team_id
-         INNER JOIN eloChange on games.id >= eloChange.game_id and eloChange.player_id = playerGameStats.player_id
-         LEFT JOIN gameEvents ON games.id = gameEvents.game_id AND gameEvents.id =
-                                                                  (SELECT MAX(id)
-                                                                   FROM gameEvents
-                                                                   WHERE games.id = gameEvents.game_id
-                                                                     AND (gameEvents.event_type = 'Fault' or gameEvents.event_type = 'Score'))
 
-         LEFT JOIN punishments ON punishments.game_id =
-                                  (SELECT MAX(id)
-                                   FROM gameEvents
-                                   WHERE games.id = punishments.game_id AND punishments.player_id = playerGameStats.player_id)
-WHERE games.id = ?
-GROUP BY people.name
-order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.team_one_left_id) AND (playerGameStats.player_id <> lastGE.team_two_left_id);""",
-                (game_id,),
-            ).fetchall()
+        game = Games.query.filter(Games.id == game_id).first()
 
-        @dataclass
-        class Player:
-            name: str = "?"
-            searchableName: str = "?"
-            cardTime: int = 0
-            cardTimeRemaining: int = 0
-            serving: bool = False
-            hex: str = "#ffffff"
-            green_carded: bool = False
+        if not game:
+            game_id = 113 # random placeholder game, this is the one where Tristan & zai beat me and alex 17 - 15
+            game = Games.query.filter(Games.id == 113).first()
 
-        @dataclass
-        class Team:
-            players: list[Player]
-            name: str = "?"
-            searchableName: str = "?"
-            imageUrl: str = "/api/teams/image?name=bye"
-            score: int = 0
-            timeouts: int = 1
-            cardTime: int = 0
-            cardTimeRemaining: int = 0
-            green_carded: bool = False
+        pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).order_by(PlayerGameStats.team_id).all()
 
-        @dataclass
-        class Game:
-            players: list[Player]
-            teams: list[Team]
-            courtName: str = "Court 1"
-            score_string: str = "0 - 0"
-            id: int = int(true_game_id)
-            umpire: str = "?"
-            umpireSearchableName: str = "?"
-            scorer: str = "?"
-            scorerSearchableName: str = "?"
-            court: int = 0
-            round: int = 0
-            faulted: bool = False
-            serverSide: str = "Left"
-            event_type: str = "Start"
-            start_time: float = 0.0
-            length: float = 0.0
-            started: bool = False
+        players = [[i for i in pgs if i.team_id == pgs[0].team_id], [i for i in pgs if i.team_id != pgs[0].team_id]]
 
-        if not players:
-            left_player = Player(name="Left Player")
-            right_player = Player(name="Right Player")
-            team_one = Team([left_player, right_player], name="Team One")
-            team_two = Team([left_player, right_player], name="Team Two")
-            game = Game([left_player, right_player] * 2, [team_one, team_two])
-            return (
-                render_template_sidebar(
-                    "tournament_specific/scoreboard.html",
-                    update_count=manage_game.change_code(game_id),
-                    timeout_time=0,
-                    serve_time=0,
-                    time_elapsed="0:00",
-                    game=game,
-                    teams=[team_one, team_two],
-                    players=[left_player, right_player] * 2,
-                ),
-                404,
-            )
+        teams = [i[0].team for i in players]  # bit cheeky but it works
 
-        teams = {}
-        player_stats = []
+        prev_event = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
 
-        for i in players:
-            pl = Player(*i[:7])
-            player_stats.append(pl)
-            if i[7] not in teams:
-                teams[i[7]] = Team([], *i[7:12])
-            teams[i[7]].players.append(pl)
-            if teams[i[7]].cardTime != -1:
-                if pl.cardTime and pl.cardTime < 0: teams[i[7]].cardTime = -1
-                teams[i[7]].cardTime = max(pl.cardTime or 0, teams[i[7]].cardTime)
-                if pl.cardTime and pl.cardTimeRemaining < 0: teams[i[7]].cardTimeRemaining = -1
-                teams[i[7]].cardTimeRemaining = max(pl.cardTimeRemaining or 0, teams[i[7]].cardTimeRemaining)
-                if pl.green_carded: teams[i[7]].green_carded = not Config().use_warnings
         visual_swap = request.args.get("swap", "false") == "true"
-        teams = list(teams.values())
-        game = Game(player_stats,
-                    teams, f"Court {players[0][16]}",
-                    f"{teams[0].score} - {teams[1].score}", *players[0][12:])
+
+        faulted = GameEvents.query.filter(GameEvents.game_id == game_id, (GameEvents.event_type == "Score") | (
+                GameEvents.event_type == "Score")).order_by(GameEvents.id.desc()).first()
+        if faulted:
+            faulted = faulted.event_type == "Fault"
+        else:
+            faulted = False
+
+        team_card_times = [
+            (max(i, key=lambda
+                a: 9999999 if a.card_time_remaining < 0 else a.card_time_remaining).card_time_remaining,
+             max(i, key=lambda a: 9999999 if a.card_time < 0 else a.card_time).card_time)
+            for i in players]
+
         if visual_swap:
             teams = list(reversed(teams))
+            players = list(reversed(players))
 
-        game.id = int(true_game_id)
         sec = -int(game.length) if game.length and game.length > 0 else (game.start_time if game.started else -0)
         return (
             render_template_sidebar(
                 "tournament_specific/scoreboard.html",
                 game=game,
-                players=player_stats,
+                players=players,
+                faulted=faulted,
                 teams=teams,
+                team_card_times=team_card_times,
+                visual_swap=visual_swap,
+                prev_event=prev_event.event_type,
                 time_elapsed=sec,
-                update_count=manage_game.change_code(game_id),
+                update_count=manage_game.change_code(int(true_game_id)),
                 timeout_time=manage_game.get_timeout_time(game_id) * 1000,
                 serve_time=manage_game.get_serve_timer(game_id) * 1000,
+                id=int(true_game_id)
             ),
             200,
         )
@@ -750,7 +630,8 @@ order by teams.id <> games.team_one_id, (playerGameStats.player_id <> lastGE.tea
                 team_stats[i]["Elo"] = f'{team_stats[i]["Elo"]} [{"+" if elo_delta >= 0 else ""}{elo_delta}]'
 
         prev_matches = [
-            (f"{i.team_one.name} vs {i.team_two.name} [{i.team_one_score} - {i.team_two_score}]", i.id, i.tournament.searchable_name) for i in other_games
+            (f"{i.team_one.name} vs {i.team_two.name} [{i.team_one_score} - {i.team_two_score}]", i.id,
+             i.tournament.searchable_name) for i in other_games
         ]
 
         prev_matches = prev_matches or [("No other matches", -1, game.tournament.searchable_name)]
