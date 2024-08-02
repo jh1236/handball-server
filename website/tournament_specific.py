@@ -510,7 +510,7 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
         game = Games.query.filter(Games.id == game_id).first()
 
         if not game:
-            game_id = 113 # random placeholder game, this is the one where Tristan & zai beat me and alex 17 - 15
+            game_id = 113  # random placeholder game, this is the one where Tristan & zai beat me and alex 17 - 15
             game = Games.query.filter(Games.id == 113).first()
 
         pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).order_by(PlayerGameStats.team_id).all()
@@ -524,7 +524,7 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
         visual_swap = request.args.get("swap", "false") == "true"
 
         faulted = GameEvents.query.filter(GameEvents.game_id == game_id, (GameEvents.event_type == "Score") | (
-                GameEvents.event_type == "Score")).order_by(GameEvents.id.desc()).first()
+                GameEvents.event_type == "Fault")).order_by(GameEvents.id.desc()).first()
         if faulted:
             faulted = faulted.event_type == "Fault"
         else:
@@ -550,7 +550,7 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
                 teams=teams,
                 team_card_times=team_card_times,
                 visual_swap=visual_swap,
-                prev_event=prev_event.event_type,
+                prev_event=prev_event.event_type if prev_event else "a string that will not be matched with",
                 time_elapsed=sec,
                 update_count=manage_game.change_code(int(true_game_id)),
                 timeout_time=manage_game.get_timeout_time(game_id) * 1000,
@@ -560,7 +560,7 @@ ORDER BY people.id <> teams.captain_id, people.id <> teams.non_captain_id""",
             200,
         )
 
-    @app.get("/games/display")  # TODO: update to orm
+    @app.get("/games/display")
     def court_scoreboard():
         court = int(request.args.get("court"))
         return scoreboard(-court)
@@ -1019,118 +1019,39 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
             200,
         )
 
-    @app.get("/games/<game_id>/edit/")  # TODO: update to orm
+    @app.get("/games/<game_id>/edit/")
     @officials_only
     def game_editor(game_id):
         visual_swap = request.args.get("swap", "false") == "true"
         visual_str = "true" if visual_swap else "false"
 
-        with DatabaseManager() as c:
-            game_query = c.execute("""
-SELECT games.tournament_id,
-      tournaments.fixtures_type,
-       is_bye,
-       po.name,
-       po.searchable_name,
-       ps.name,
-       ps.searchable_name,
-       started,
-       someone_has_won,
-       tournaments.image_url,
-       gameEvents.event_type = 'Fault',
-       server.name,
-       lastGe.side_to_serve,
-       ended,
-       tournaments.has_scorer,
-       team_one_score + team_two_score,
-       tournaments.id
-FROM games
-         INNER JOIN tournaments ON games.tournament_id = tournaments.id
-         LEFT JOIN officials o ON games.official_id = o.id
-         LEFT JOIN people po ON o.person_id = po.id
-         LEFT JOIN officials s ON games.scorer_id = o.id
-         LEFT JOIN people ps ON s.person_id = ps.id
-         LEFT JOIN gameEvents ON games.id = gameEvents.game_id AND gameEvents.id =
-                                                                  (SELECT MAX(id)
-                                                                   FROM gameEvents
-                                                                   WHERE games.id = gameEvents.game_id
-                                                                     AND (gameEvents.event_type = 'Fault' or gameEvents.event_type = 'Score'))
-         LEFT JOIN gameEvents lastGE ON games.id = lastGE.game_id AND lastGE.id =
-                                                                     (SELECT MAX(id)
-                                                                      FROM gameEvents
-                                                                      WHERE games.id = gameEvents.game_id)
-         LEFT JOIN people server on lastGE.player_to_serve_id = server.id
-WHERE games.id = ?
-            """, (game_id,)).fetchone()
+        game = Games.query.filter(Games.id == game_id).first()
 
-            teams_query = c.execute("""SELECT teams.id, teams.name,
-       teams.searchable_name,
-       teams.id <> games.team_one_id,
-       Case
-           WHEN games.team_two_id = teams.id THEN
-               games.team_two_score
-           ELSE
-               games.team_one_score END,
-       case
-           when teams.image_url is null
-               then '/api/teams/image?name=blank'
-           else
-               teams.image_url
-           end,
-        teams.id = games.team_to_serve_id,
-        IIF(min(playerGameStats.card_time_remaining) < 0, -1, max(playerGameStats.card_time_remaining)),
-        max(IIF(playerGameStats.card_time is null, 0, playerGameStats.card_time)),
-        max(playerGameStats.green_cards) > 0,
-        Case
-           WHEN games.team_two_id = teams.id THEN
-               games.team_two_timeouts
-           ELSE
-               games.team_one_timeouts END,
-       (coalesce((SELECT SUM(event_type = 'Substitute') FROM gameEvents WHERE gameEvents.game_id = games.id AND gameEvents.team_id = teams.id), 0) = 0) AND teams.substitute_id is not null AND team_one_score + games.team_two_score <= 9
-FROM games
-         INNER JOIN tournaments on games.tournament_id = tournaments.id
-         INNER JOIN teams on (games.team_two_id = teams.id or games.team_one_id = teams.id)
-         INNER JOIN playerGameStats on playerGameStats.team_id = teams.id AND playerGameStats.game_id = games.id 
-                    WHERE games.id = ?
-                    GROUP BY teams.id
-ORDER BY teams.id <> games.team_one_id""", (game_id,)).fetchall()
-            players_query = c.execute("""
-SELECT
-            playerGameStats.team_id, people.name, people.searchable_name, playerGameStats.card_time_remaining <> 0,
-            playerGameStats.points_scored,
-            playerGameStats.aces_scored,
-            playerGameStats.faults,      
-            playerGameStats.double_faults,
-            playerGameStats.rounds_on_court,
-            playerGameStats.rounds_carded,
-            playerGameStats.green_cards,
-            playerGameStats.yellow_cards, 
-            playerGameStats.red_cards
-FROM games
-         LEFT JOIN gameEvents on gameEvents.id = (SELECT Max(id) FROM gameEvents WHERE games.id = gameEvents.game_id)
-         INNER JOIN playerGameStats on games.id = playerGameStats.game_id AND (gameEvents.event_type is null or (playerGameStats.player_id = gameEvents.team_one_left_id OR playerGameStats.player_id = gameEvents.team_one_right_id
-            OR playerGameStats.player_id = gameEvents.team_two_left_id OR playerGameStats.player_id = gameEvents.team_two_right_id))
-         INNER JOIN people on people.id = playerGameStats.player_id
-         INNER JOIN teams on playerGameStats.team_id = teams.id
-         WHERE games.id = ? 
-         ORDER BY playerGameStats.team_id, teams.substitute_id = playerGameStats.player_id, (gameEvents.team_one_left_id = playerGameStats.player_id OR gameEvents.team_two_left_id = playerGameStats.player_id) DESC""",
-                                      (game_id,)).fetchall()
+        if not game:
+            return (
+                render_template(
+                    "tournament_specific/game_editor/game_done.html",
+                    error="Game does not exist",
+                ),
+                404,
+            )
 
-            cards_query = c.execute("""SELECT people.name, playerGameStats.team_id, type, reason, hex 
-            FROM punishments 
-            INNER JOIN people on people.id = punishments.player_id
-            INNER JOIN playerGameStats on playerGameStats.player_id = punishments.player_id and playerGameStats.team_id = punishments.team_id and playerGameStats.game_id = ?
-         WHERE playerGameStats.tournament_id = punishments.tournament_id
-         """, (game_id,)).fetchall()
-            officials_query = c.execute("""SELECT searchable_name, name 
-FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall()
+        pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).all()
+        # quick and dirty hack
+        players = [[i for i in pgs if i.team_id == pgs[0].team_id], [i for i in pgs if i.team_id != pgs[0].team_id]]
+        teams = [players[0][0].team, players[1][0].team]  # quicker and dirtier hack
 
-        @dataclass
-        class Player:
-            name: str
-            searchable_name: str
-            is_carded: bool
-            stats: dict[str, object]
+        card_events = GameEvents.query.filter(
+            (GameEvents.event_type == "Warning") | (GameEvents.event_type.like("% Card")),
+            (GameEvents.team_id == game.team_one_id) | (GameEvents.team_id == game.team_two_id),
+            GameEvents.tournament_id == game.tournament_id, GameEvents.game_id <= game.id).all()
+
+        faulted = GameEvents.query.filter(GameEvents.game_id == game_id, (GameEvents.event_type == "Score") | (
+                GameEvents.event_type == "Fault")).order_by(GameEvents.id.desc()).first()
+        if faulted:
+            faulted = faulted.event_type == "Fault"
+        else:
+            faulted = False
 
         @dataclass
         class Card:
@@ -1140,81 +1061,37 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
             reason: str
             hex: str
 
-        @dataclass
-        class Team:
-            name: str
-            searchable_name: str
-            sort: int
-            score: int
-            image_url: str
-            serving: bool
-            card_time_remaining: int
-            card_time: int
-            green_carded: bool
-            timeouts: int
-            has_sub: bool
-            players: list[Player]
-            cards: list[Card]
+        cards = []
 
-        @dataclass
-        class Game:
-            id: int
-            bye: bool
-            official: str
-            official_searchable_name: str
-            scorer: str
-            scorer_searchable_name: str
-            started: bool
-            someone_has_won: bool
-            image: str
-            faulted: bool
-            server: str
-            serve_side: str
-            ended: bool
-            has_scorer: bool
-            round: int
-            tournament_id: int
-            deletable: bool
+        COLORS = {
+            "Warning": "#777777",
+            "Green": "#84AA63",
+            "Yellow": "C96500",
+            "Red": "#EC4A4A"
+        }
 
-        teams = {}
-        cards = [Card(*i) for i in cards_query]
-        game = Game(game_id, *game_query[2:], get_type_from_name(game_query[1], game_query[0]).manual_allowed()
-                    )
-        players = []
-        player_headers = [
-            "Points Scored",
-            "Aces",
-            "Faults",
-            "Double Faults",
-            "Rounds Played",
-            "Rounds Benched",
-            "Green Cards",
-            "Yellow Cards",
-            "Red Cards",
-        ]
-        for i in teams_query:
-            teams[i[0]] = (Team(*i[1:], [], []))
-            teams[i[0]].cards = [j for j in cards if j.team == i[0]]
-        for i in players_query:
-            player = Player(*i[1:4], {k: v for k, v in zip(player_headers, i[4:])})
-            teams[i[0]].players.append(player)
-            players.append(player)
-        all_officials = officials_query
+        for i in card_events:
+            card_type = i.event_type.replace(" Card", "")
+            c = Card(i.player.name, i.team_id, card_type, i.notes, COLORS[card_type])
+            cards.append(c)
+
+        game = Games.query.filter(Games.id == game_id).first()
+
         # teams = sorted(list(teams.values()), key=lambda a: a.sort)
-        teams = list(teams.values())
         if visual_swap:
             teams = list(reversed(teams))
-        key = fetch_user()
-        team_one_players = sorted([((1 - i), v) for i, v in enumerate(teams[0].players[:2])],
-                                  key=lambda a: a[1].searchable_name)
-        team_two_players = sorted([((1 - i), v) for i, v in enumerate(teams[1].players[:2])],
-                                  key=lambda a: a[1].searchable_name)
-
+        team_one_players = sorted([((1 - i), v) for i, v in enumerate(players[0][:2])],
+                                  key=lambda a: a[1].player.searchable_name)
+        team_two_players = sorted([((1 - i), v) for i, v in enumerate(players[1][:2])],
+                                  key=lambda a: a[1].player.searchable_name)
+        all_officials = Officials.query.all()
         # TODO: Write a permissions decorator for scorers and primary officials
         # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
         #     return _no_permissions()
-        # el
-        if game.bye:
+
+        print(cards)
+
+        if game.is_bye:
             return (
                 render_template(
                     "tournament_specific/game_editor/game_done.html",
@@ -1223,15 +1100,15 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
                 400,
             )
         elif not game.started:
-
             return (
                 render_template(
                     "tournament_specific/game_editor/game_start.html",
-                    players=[i.searchable_name for i in players],
+                    players=players,
                     teams=teams,
+                    cards=cards,
                     all_officials=all_officials,
-                    teamOneNames=[f"{i.searchable_name}:{i.name}" for i in teams[0].players],
-                    teamTwoNames=[f"{i.searchable_name}:{i.name}" for i in teams[1].players],
+                    teamOneNames=[f"{i.player.searchable_name}:{i.player.name}" for i in players[0]],
+                    teamTwoNames=[f"{i.player.searchable_name}:{i.player.name}" for i in players[1]],
                     game=game,
                     swap=visual_str,
                     admin=True,  # key in [i.key for i in get_all_officials() if i.admin]
@@ -1239,166 +1116,62 @@ FROM officials INNER JOIN people on officials.person_id = people.id""").fetchall
                 200,
             )
         else:
+            team_card_times = [
+                (max(i, key=lambda
+                    a: 9999999 if a.card_time_remaining < 0 else a.card_time_remaining).card_time_remaining,
+                 max(i, key=lambda a: 9999999 if a.card_time < 0 else a.card_time).card_time)
+                for i in players]
             return (
                 render_template(
                     f"tournament_specific/game_editor/edit_game.html",
-                    players=[i.searchable_name for i in players],
+                    players=players,
                     teamOnePlayers=team_one_players,
                     teamTwoPlayers=team_two_players,
-                    teamOneNames=[f"{i.searchable_name}:{i.name}" for i in teams[0].players],
-                    teamTwoNames=[f"{i.searchable_name}:{i.name}" for i in teams[1].players],
+                    cards=cards,
+                    teamOneNames=[f"{i.player.searchable_name}:{i.player.name}" for i in players[0]],
+                    teamTwoNames=[f"{i.player.searchable_name}:{i.player.name}" for i in players[1]],
                     swap=visual_str,
                     teams=teams,
                     enum_teams=enumerate(teams),
                     game=game,
+                    team_card_times=team_card_times,
                     timeout_time=manage_game.get_timeout_time(game_id) * 1000,
                     timeout_first=manage_game.get_timeout_caller(game_id),
-                    match_points=0 if (max([i.score for i in teams]) < 10 or game.someone_has_won) else abs(
-                        teams[0].score - teams[1].score),
+                    match_points=0 if (
+                                max(game.team_one_score, game.team_two_score) < 10 or game.someone_has_won) else abs(
+                        game.team_one_score - game.team_two_score),
                     VERBAL_WARNINGS=Config().use_warnings,
-                    GREEN_CARDS=Config().use_green_cards
+                    GREEN_CARDS=Config().use_green_cards,
+                    faulted=faulted
                 ),
                 200,
             )
 
     @officials_only
-    @app.get("/games/<game_id>/finalise")  # TODO: update to orm
+    @app.get("/games/<game_id>/finalise")
     def finalise_game(game_id):
         visual_swap = request.args.get("swap", "false") == "true"
         visual_str = "true" if visual_swap else "false"
 
-        with DatabaseManager() as c:
-            game_query = c.execute("""
-SELECT games.tournament_id,
-       is_bye,
-       po.name,
-       po.searchable_name,
-       ps.name,
-       ps.searchable_name,
-       tournaments.image_url,
-       games.someone_has_won
-FROM games
-         INNER JOIN tournaments ON games.tournament_id = tournaments.id
-         LEFT JOIN officials o ON games.official_id = o.id
-         LEFT JOIN people po ON o.person_id = po.id
-         LEFT JOIN officials s ON games.scorer_id = o.id
-         LEFT JOIN people ps ON s.person_id = ps.id
-         LEFT JOIN gameEvents ON games.id = gameEvents.game_id AND gameEvents.id =
-                                                                  (SELECT MAX(id)
-                                                                   FROM gameEvents
-                                                                   WHERE games.id = gameEvents.game_id
-                                                                     AND (gameEvents.event_type = 'Fault' or gameEvents.event_type = 'Score'))
-         LEFT JOIN gameEvents lastGE ON games.id = lastGE.game_id AND lastGE.id =
-                                                                     (SELECT MAX(id)
-                                                                      FROM gameEvents
-                                                                      WHERE games.id = gameEvents.game_id)
-         LEFT JOIN people server on lastGE.player_to_serve_id = server.id
-WHERE games.id = ?
-            """, (game_id,)).fetchone()
+        game = Games.query.filter(Games.id == game_id).first()
 
-            teams_query = c.execute("""SELECT teams.id, teams.name,
-       teams.searchable_name,
-       teams.id <> games.team_one_id,
-       Case
-           WHEN games.team_two_id = teams.id THEN
-               games.team_two_score
-           ELSE
-               games.team_one_score END,
-       case
-           when teams.image_url is null
-               then '/api/teams/image?name=blank'
-           else
-               teams.image_url
-           end,
-        teams.id = games.team_to_serve_id,
-        IIF(sum(playerGameStats.red_cards) > 0, -1, max(playerGameStats.card_time_remaining)),
-        max(IIF(playerGameStats.card_time is null, 0, playerGameStats.card_time)),
-        max(playerGameStats.green_cards) > 0,
-        Case
-           WHEN games.team_two_id = teams.id THEN
-               games.team_two_timeouts
-           ELSE
-               games.team_one_timeouts END
-FROM games
-         INNER JOIN tournaments on games.tournament_id = tournaments.id
-         INNER JOIN teams on (games.team_two_id = teams.id or games.team_one_id = teams.id)
-         INNER JOIN playerGameStats on playerGameStats.team_id = teams.id AND playerGameStats.game_id = games.id 
-                    WHERE games.id = ?
-                    GROUP BY teams.id
-ORDER BY teams.id <> games.team_one_id
-""", (game_id,)).fetchall()
-            players_query = c.execute("""SELECT 
-            playerGameStats.team_id, people.name, people.searchable_name,
-            playerGameStats.points_scored,
-            playerGameStats.aces_scored,
-            playerGameStats.faults,      
-            playerGameStats.double_faults,
-            playerGameStats.rounds_on_court,
-            playerGameStats.rounds_carded,
-            playerGameStats.green_cards,
-            playerGameStats.yellow_cards, 
-            playerGameStats.red_cards
-FROM games
-         INNER JOIN playerGameStats on games.id = playerGameStats.game_id
-         INNER JOIN people on people.id = playerGameStats.player_id
-         WHERE game_id = ?
-""", (game_id,)).fetchall()
-
-        @dataclass
-        class Player:
-            name: str
-            searchable_name: str
-            stats: dict[str, object]
-
-        @dataclass
-        class Team:
-            name: str
-            searchable_name: str
-            sort: int
-            score: int
-            image_url: str
-            serving: bool
-            card_time_remaining: int
-            card_time: int
-            green_carded: bool
-            timeouts: int
-            players: list[Player]
-
-        @dataclass
-        class Game:
-            id: int
-            bye: bool
-            official: str
-            official_searchable_name: str
-            scorer: str
-            scorer_searchable_name: str
-            image: str
-            someone_has_won: bool
-            has_scorer: bool
-
-        teams = {}
-        game = Game(game_id, *game_query[1:], True)
-        players = []
         player_headers = [
+            "Elo",
             "Points Scored",
-            "Aces",
+            "Aces Scored",
             "Faults",
             "Double Faults",
-            "Rounds Played",
-            "Rounds Benched",
+            "Rounds on Court",
+            "Rounds Carded",
             "Green Cards",
             "Yellow Cards",
             "Red Cards",
         ]
-        for i in teams_query:
-            teams[i[0]] = (Team(*i[1:], []))
-        for i in players_query:
-            player = Player(*i[1:3], {k: v for k, v in zip(player_headers, i[3:])})
-            teams[i[0]].players.append(player)
-            players.append(player)
-        teams = list(teams.values())
-        if visual_swap:
-            teams = list(reversed(teams))
+
+        pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).all()
+        # quick and dirty hack
+        players = [[i for i in pgs if i.team_id == pgs[0].team_id], [i for i in pgs if i.team_id != pgs[0].team_id]]
+        teams = [players[0][0].team, players[1][0].team]  # quicker and dirtier hack
 
         if game.someone_has_won:
             return (
@@ -1406,6 +1179,7 @@ FROM games
                     "tournament_specific/game_editor/team_signatures.html",
                     swap=visual_str,
                     teams=teams,
+                    players=players,
                     game=game,
                     headers=player_headers
                 ),

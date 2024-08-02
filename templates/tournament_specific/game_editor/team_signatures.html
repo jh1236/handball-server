@@ -12,43 +12,36 @@
     setup({{game.id}}, {{ swap }})
 </script>
 <h1>{{ teams[0].name }} vs {{ teams[1].name }} </h1>
-<h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
-<p><b>Round:</b> <i>{{ game.rounds }}</i></p>
-<p><b>Match Official:</b><i>{{ game.primary_official }}</i>
+<h1 class="big">{{ game.team_one_score }} - {{ game.team_two_score }}</h1>
+<p><b>Round:</b> <i>{{ game.round }}</i></p>
+<p><b>Match Official:</b><i> {{ game.official.person.name }}</i>
     {% if game.scorer %}
-        <p><b>Match Scorer:</b> <i>{{ game.scorer }}</i></p>
+        <p><b>Match Scorer:</b> <i>{{ game.scorer.person.name }}</i></p>
     {% endif %}
 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
 <br>
 <table class="jaredTable">
     <tr>
         <td></td>
-        <th colspan="{{ teams[0].players.__len__() }}"><b>{{ teams[0].name }}</b></th>
-        <th colspan="{{ teams[1].players.__len__() }}"><b>
-            {{ teams[1].name }}</b></th>
+        <th colspan="{{ players[0].__len__() }}"><b>{{ teams[0].name }}</b></th>
+        <th colspan="{{ players[1].__len__() }}"><b>{{ teams[1].name }}</b></th>
         <th class="invisible">Spacerrrrrrr</th>
     </tr>
-    {#    {% for stat in stats %}#}
-    {#        <tr>#}
-    {#            <th>{{ stat[0] }}:</th>#}
-    {#            <td colspan="{{ teams[0].all_players.__len__() }}">{{ stat[1] }}</td>#}
-    {#            <td colspan="{{ teams[1].all_players.__len__() }}">{{ stat[2] }}</td>#}
-    {#        </tr>#}
-    {##}
-    {##}
-    {#    {% endfor %}#}
-
     <tr>
         <td></td>
-        {% for i in teams[0].players + teams[1].players %}
-            <th>{{ i.name }}</th>
+        {% for t in players %}
+            {% for i in t %}
+                <th>{{ i.player.name }}</th>
+            {% endfor %}
         {% endfor %}
     </tr>
     {% for stat in headers %}
         <tr>
             <th>{{ stat }}:</th>
-            {% for i in teams[0].players + teams[1].players %}
-                <td>{{ i.stats[stat] }}</td>
+            {% for t in players %}
+                {% for i in t %}
+                    <td>{{ i.stats()[stat] }}</td>
+                {% endfor %}
             {% endfor %}
         </tr>
     {% endfor %}
@@ -67,8 +60,10 @@
 
     <button onclick="myFunction(this)" class="button dropbtn" id="rename">Fairest And Best</button>
     <div class="dropdown-content">
-        {% for i in teams[0].players + teams[1].players %}
-            <p onclick="setBest('{{ i.searchable_name }}', '{{ i.name }}')">{{ i.name }}</p>
+        {% for t in players %}
+            {% for i in t %}
+                <p onclick="setBest('{{ i.player.searchable_name }}', '{{ i.player.name }}')">{{ i.player.name }}</p>
+            {% endfor %}
         {% endfor %}
     </div>
 </div>

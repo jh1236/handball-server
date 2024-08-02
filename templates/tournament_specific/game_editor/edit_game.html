@@ -20,8 +20,11 @@
 
 <div style="width: 100%">
     <h1>{{ teams[0].name }} vs {{ teams[1].name }}</h1>
-    <h1 class="big">{{ teams[0].score }} - {{ teams[1].score }}</h1>
-
+    {% if swap %}
+    <h1 class="big">{{ game.team_one_score }} - {{ game.team_two_score }}</h1>
+    {% else %}
+    <h1 class="big">{{ game.team_two_score }} - {{ game.team_one_score }}</h1>
+    {% endif %}
     {% if match_points > 0 %}
         <p style="font-size: 30px"><b>{{ match_points }} Match Points</b></p>
     {% endif %}
@@ -29,18 +32,20 @@
     <br>
     <table class="jaredTable">
 
+        {# PLAYER SERVING AND SERVING SIDE #}
         <tr>
-            {% if teams[1].serving %}
+            {% if game.team_to_serve_id == game.team_two_id %}
                 <td></td>
                 <td></td>
             {% endif %}
-            {% if game.faulted %}
-                <td style="color: #ff0000"><i>{{ game.server }} ({{ game.serve_side }})</i></td>
+            {% if faulted %}
+                <td style="color: #ff0000"><i>{{ game.player_to_serve.name }} ({{ game.side_to_serve }})</i></td>
             {% else %}
-                <td><i>{{ game.server }} ({{ game.serve_side }})</i></td>
+                <td><i>{{ game.player_to_serve.name }} ({{ game.side_to_serve }})</i></td>
             {% endif %}
         </tr>
 
+        {# Team imgs and match details #}
         <tr>
             <th><img
                     src="{{ teams[0].image_url }}"
@@ -48,7 +53,7 @@
                     style="display: inline;left:70%;vertical-align:middle;"></th>
             <td style="width: 150px;"><p><b>Round:</b> <i>{{ game.round }}</i></p>
                 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
-                <p><b>Official:</b> <i>{{ game.official }}</i></p>
+                <p><b>Official:</b> <i>{{ game.official.person.name }}</i></p>
                 {% if game.scorer %}
                     <p><b>Scorer:</b> <i>{{ game.scorer }}</i></p>
                 {% endif %}
@@ -59,45 +64,44 @@
                     class="team_logo"
                     style="display: inline;left:70%;vertical-align:middle;"></th>
         </tr>
+
+        {# Card time progress bars #}
         <tr>
             <td>
-                {% if teams[0].card_time_remaining < 0 %}
+                {% if team_card_times[0][0] < 0 %}
                     <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
-                {% elif teams[0].card_time_remaining > 0 %}
-                    {% if teams[0].card_time > 2 %}
+                {% elif team_card_times[0][0] > 0 %}
+                    {% if team_card_times[0][1] > 2 %}
                         <div class="rectangle"
-                             style="background-color: #FCCE6E;width:{{ 100*(teams[0].card_time_remaining) / teams[0].card_time }}%"></div>
+                             style="background-color: #FCCE6E;width:{{ 100*(team_card_times[0][0]) / team_card_times[0][1] }}%"></div>
                     {% else %}
                         <div class="rectangle"
-                             style="background-color: #84AA63;width:{{ 100*(teams[0].card_time_remaining) / teams[0].card_time }}%"></div>
+                             style="background-color: #84AA63;width:{{ 100*(team_card_times[0][0]) / team_card_times[0][1] }}%"></div>
                     {% endif %}
-                {% elif teams[0].green_carded and not VERBAL_WARNINGS %}
-                    <div class="rectangle"
-                         style="background-color: #84AA63;width:100%"></div>
                 {% endif %}
 
             </td>
             <td></td>
             <td>
-                {% if teams[1].card_time_remaining < 0 %}
+                {% if team_card_times[1][0] < 0 %}
                     <div class="rectangle" style="background-color: #EC4A4A; width:100%"></div>
-                {% elif teams[1].card_time_remaining > 0 %}
-                    {% if teams[1].card_time > 2 %}
+                {% elif team_card_times[1][0] > 0 %}
+                    {% if team_card_times[1][1] > 2 %}
                         <div class="rectangle"
-                             style="background-color: #FCCE6E;width:{{ 100*(teams[1].card_time_remaining) / teams[1].card_time }}%"></div>
+                             style="background-color: #FCCE6E;width:{{ 100*(team_card_times[1][0]) / team_card_times[1][1] }}%"></div>
                     {% else %}
                         <div class="rectangle"
-                             style="background-color: #84AA63;width:{{ 100*(teams[1].card_time_remaining) / teams[1].card_time }}%"></div>
+                             style="background-color: #84AA63;width:{{ 100*(team_card_times[1][0]) / team_card_times[1][1] }}%"></div>
                     {% endif %}
-                {% elif teams[1].green_carded and not VERBAL_WARNINGS %}
-                    <div class="rectangle"
-                         style="background-color: #84AA63;width:100%"></div>
                 {% endif %}
+
             </td>
         </tr>
+
+        {# Substitutes #}
         <tr>
             <td>
-                {% if teams[0].has_sub and game.round <= 9 %}
+                {% if players[0].__len__() > 2 and game.round <= 9 %}
                     <div class="dropdown">
                         <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
                             Substitute {{ teams[0].name }}</button>
@@ -112,7 +116,7 @@
                 {% endif %}</td>
             <td></td>
             <td>
-                {% if teams[1].has_sub and game.round <= 9 %}
+                {% if players[1].__len__() > 2 and game.round <= 9 %}
                     <div class="dropdown" style="background-color: #2a5d88;">
                         <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
                             Substitute {{ teams[1].name }}</button>
@@ -129,9 +133,11 @@
         <tr>
             <td><br></td>
         </tr>
+
+        {# Score button #}
         <tr>
             <td>
-                {% if teams[0].carded %}
+                {% if team_card_times[0][0] %}
                     {% for i, p in teamOnePlayers %}
                         {% if not p.card_time_remaining != 0 %}
                             <button onclick="score(true, {{ i }})" class="button">
@@ -145,9 +151,9 @@
                         <div class="dropdown-content">
                             {% for i, p in teamOnePlayers %}
                                 <p onclick="score(true, {{ i }})">
-                                    {% if p.is_carded %} <s><i> {% endif %}
-                                    {{ p.name }}
-                                    {% if p.is_carded %} </i></s> {% endif %}
+                                    {% if p.card_time_remaining %} <s><i> {% endif %}
+                                    {{ p.player.name }}
+                                    {% if p.card_time_remaining %} </i></s> {% endif %}
                                 </p>
                             {% endfor %}
                         </div>
@@ -156,12 +162,13 @@
             </td>
             <td><br></td>
             <td>
-                {% if teams[1].carded %}
+                {% if team_card_times[1][0] %}
                     {% for i, p in teamTwoPlayers %}
-                        {% if not p.is_carded() %}
-                            <button onclick="score(false, {{ i }})" class="button">
-                                Score {{ teams[1].name }}</button>
-                        {% endif %}
+                        <p onclick="score(false, {{ i }})">
+                            {% if p.card_time_remaining %} <s><i> {% endif %}
+                            {{ p.player.name }}
+                            {% if p.card_time_remaining %} </i></s> {% endif %}
+                        </p>
                     {% endfor %}
                 {% else %}
                     <div class="dropdown">
@@ -170,9 +177,9 @@
                         <div class="dropdown-content">
                             {% for i, p in teamTwoPlayers %}
                                 <p onclick="score(false, {{ i }})">
-                                    {% if p.is_carded %} <s><i> {% endif %}
-                                    {{ p.name }}
-                                    {% if p.is_carded %} </i></s> {% endif %}
+                                    {% if p.card_time_remaining %} <s><i> {% endif %}
+                                    {{ p.player.name }}
+                                    {% if p.card_time_remaining %} </i></s> {% endif %}
                                 </p>
                             {% endfor %}
                         </div>
@@ -189,21 +196,23 @@
         <tr>
             <td><br></td>
         </tr>
+
+        {# Timeouts #}
         <tr>
             <td>
                 <button onclick="timeout(true)" class="button" id="timeoutOne">
-                    {% if teams[0].timeouts > 0 %} <s> {% endif %}
+                    {% if (game.team_two_timeouts if swap == "true" else game.team_one_timeouts) > 0 %} <s> {% endif %}
                     Timeout {{ teams[0].name }}
-                    {% if teams[0].timeouts > 0 %} </s> {% endif %}
+                    {% if (game.team_two_timeouts if swap == "true" else game.team_one_timeouts) > 0 %} </s> {% endif %}
                 </button>
             </td>
             <td></td>
             <td>
 
                 <button onclick="timeout(false)" class="button" id="timeoutTwo">
-                    {% if teams[1].timeouts > 0 %} <s> {% endif %}
-                    Timeout {{ teams[1].name }}
-                    {% if teams[1].timeouts > 0 %} </s> {% endif %}
+                    {% if (game.team_one_timeouts if swap == "true" else game.team_two_timeouts) > 0 %} <s> {% endif %}
+                    Timeout {{ teams[0].name }}
+                    {% if (game.team_one_timeouts if swap == "true" else game.team_two_timeouts) > 0 %} </s> {% endif %}
                 </button>
 
             </td>
@@ -214,6 +223,7 @@
 
 
         {% if VERBAL_WARNINGS %}
+            {#  Warnings #}
             <tr>
                 <td>
                     <button onclick="openCardModal('Warning', true, '{{ teams[0].name }}')" class="gray_button">
@@ -230,6 +240,7 @@
             </tr>
         {% endif %}
         {% if GREEN_CARDS %}
+            {# Green Cards #}
             <tr>
                 <td>
                     <button onclick="openCardModal('Green', true, '{{ teams[0].name }}')" class="green_button">
@@ -247,6 +258,7 @@
                 <td><br></td>
             </tr>
         {% endif %}
+        {# Yellow Cards #}
         <tr>
             <td>
                 <button onclick="openCardModal('Yellow', true, '{{ teams[0].name }}')" class="yellow_button">
@@ -264,6 +276,7 @@
         <tr>
             <td><br></td>
         </tr>
+        {# Red Cards #}
         <tr>
             <td>
                 <button onclick="openCardModal('Red', true, '{{ teams[0].name }}')" class="red_button">
@@ -283,11 +296,11 @@
     <br>
     <br>
     <button class="button" onclick="fault()">
-        {% if game.faulted %}
+        {% if faulted %}
             <b style="font-size:18px">
         {% endif %}
         Fault
-        {% if game.faulted %}
+        {% if faulted %}
             </b>
         {% endif %}
     </button>
@@ -327,10 +340,7 @@
 </div>
 <div style="position:absolute; top: 10%;left: 0; width: 20%">
     <h3>Cards for {{ teams[0].name }}</h3>
-    {% if not teams[0].cards %}
-        <i>None Received</i>
-    {% endif %}
-    {% for i in teams[0].cards %}
+    {% for i in cards if i.team == game.team_one_id %}
         <i>{{ i.player }} has received a <a style="color: {{ i.hex }}">{{ i.type }}</a> card
             for</i> <b>{{ i.reason }}</b>
         <br>
@@ -339,10 +349,7 @@
 </div>
 <div style="position:absolute; top: 10%;left: 80%; width: 20%">
     <h3>Cards for {{ teams[1].name }}</h3>
-    {% if not teams[1].cards %}
-        <i>None Received</i>
-    {% endif %}
-    {% for i in teams[1].cards %}
+    {% for i in cards if i.team == game.team_two_id %}
         <i>{{ i.player }} has received a <a style="color: {{ i.hex }}">{{ i.type }}</a> card
             for</i> <b>{{ i.reason }}</b>
         <br>

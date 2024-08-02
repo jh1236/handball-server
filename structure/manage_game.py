@@ -356,7 +356,6 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
             (PlayerGameStats.game_id == game.id) & (PlayerGameStats.team_id == team_two_id)).all()]
     else:
         team_two = [People.query.filter(People.searchable_name == i).first().id for i in team_two]
-    get_information.game_and_side[game_id] = (team_one_id, team_two_id)
 
     team_one += [None]
     team_two += [None]
@@ -705,9 +704,12 @@ def get_timeout_time(game_id):
     """Returns the time which the timeout expires"""
     most_recent_end = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'End Timeout')
                        .order_by(GameEvents.id.desc()).first())
-    if not most_recent_end: return 0
+    if most_recent_end:
+        most_recent_end = most_recent_end.id
+    else:
+        most_recent_end = -1
     last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout',
-                                            GameEvents.id > most_recent_end.id).order_by(GameEvents.id.desc()).first()
+                                            GameEvents.id > most_recent_end).order_by(GameEvents.id.desc()).first()
     if not last_time_out: return 0
     time_out_time = last_time_out.created_at
     return time_out_time + 30 if (time_out_time > 0) else 0
