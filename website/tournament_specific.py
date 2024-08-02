@@ -1089,8 +1089,6 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
         # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
         #     return _no_permissions()
 
-        print(cards)
-
         if game.is_bye:
             return (
                 render_template(
