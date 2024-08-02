@@ -144,7 +144,7 @@ class PlayerGameStats(db.Model):
             "IGA Side": int(self.team_id == self.game.iga_side_id),
             "Served First": int(self.team_id == first_ge.team_to_serve_id),
             "Return Rate": self.serves_returned / (self.serves_received or 1),
-            "Timeout Used": (self.game.team_one_timeouts if self.game.team_one_id == self.team_id else self.game.team_two_timeouts),
+            "Timeouts Used": (self.game.team_one_timeouts if self.game.team_one_id == self.team_id else self.game.team_two_timeouts),
         }
 
     @classmethod

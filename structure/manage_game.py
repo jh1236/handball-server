@@ -707,7 +707,8 @@ def get_timeout_time(game_id):
                        .order_by(GameEvents.id.desc()).first())
     if not most_recent_end: return 0
     last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout',
-                                            GameEvents.id < most_recent_end.id).order_by(GameEvents.id.desc()).first()
+                                            GameEvents.id > most_recent_end.id).order_by(GameEvents.id.desc()).first()
+    if not last_time_out: return 0
     time_out_time = last_time_out.created_at
     return time_out_time + 30 if (time_out_time > 0) else 0
 

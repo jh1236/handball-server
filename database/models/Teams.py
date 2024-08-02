@@ -50,3 +50,8 @@ class Teams(db.Model):
         for i in players:
             elos.append(i.elo(last_game))
         return sum(elos) / len(elos)
+
+    @classmethod
+    @property
+    def BYE(cls):
+        return cls.query.filter(cls.id == 1).first()
