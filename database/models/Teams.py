@@ -91,6 +91,7 @@ class Teams(db.Model):
             "Green Cards": sum(i.green_cards for i in pgs),
             "Yellow Cards": sum(i.yellow_cards for i in pgs),
             "Red Cards": sum(i.red_cards for i in pgs),
+            "Double Faults": sum(i.double_faults for i in pgs),
             "Faults": sum(i.faults for i in pgs),
             "Timeouts Called": sum(
                 (i.team_one_timeouts if i.team_one_id == self.id else i.team_two_timeouts) for i in games),
