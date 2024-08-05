@@ -27,9 +27,9 @@
         </tr>
         {% for game in round %}
             <tr>
-                <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one.name }}</a></td>
+                <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one.short_name }}</a></td>
                 <td><a href="/games/{{ game.id }}" class="hide"> vs</a></td>
-                <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_two.name }}</a></td>
+                <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_two.short_name }}</a></td>
                 <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one_score }} - {{ game.team_two_score }}</a></td>
             </tr>
         {% endfor %}
@@ -47,9 +47,9 @@
             </tr>
             {% for game in round %}
                 <tr>
-                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one.name }}</a></td>
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one.short_name }}</a></td>
                     <td><a href="/games/{{ game.id }}" class="hide"> vs</a></td>
-                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_two.name }}</a></td>
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_two.short_name }}</a></td>
                     <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one_score }} - {{ game.team_two_score }}</a></td>
                 </tr>
             {% endfor %}

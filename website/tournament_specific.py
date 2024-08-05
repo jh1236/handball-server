@@ -438,10 +438,10 @@ def add_tournament_specific(app):
             200,
         )
 
-    @app.get("/<tournament>/ladder/")  # TODO: update to orm
-    def ladder_site(tournament):
+    @app.get("/<tournament_name>/ladder/")
+    def ladder_site(tournament_name):
         priority = {
-            "Team Names": 1,
+            # "Team Names": 1,
             "Games Played": 2,
             "Games Won": 1,
             "Percentage": 1,
@@ -451,108 +451,24 @@ def add_tournament_specific(app):
             "Red Cards": 4,
             "Faults": 5,
             "Timeouts Called": 5,
-            "Points For": 5,
+            "Points Scored": 5,
             "Points Against": 5,
             "Point Difference": 2,
             "Elo": 3,
         }
-
-        @dataclass
-        class Team:
-            name: str
-            searchableName: str
-            pool: int
-            image: str
-            stats: dict[str, object]
-
-        with DatabaseManager() as c:
-            tournament_id = get_tournament_id(tournament, c)
-            teams = c.execute(
-                """SELECT tournaments.is_pooled,
-       teams.searchable_name,
-       teams.name,
-       case
-           when teams.image_url is null
-               then '/api/teams/image?name=blank'
-           else
-               teams.image_url
-           end,
-       tournamentTeams.pool,
-       COUNT(DISTINCT IIF(g.someone_has_won, g.id, null)) as played,
-       SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g.winning_team_id,
-               0))                                      as wins,
-       ROUND(100.0 * coalesce(
-               Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g.winning_team_id, 0)) AS REAL) /
-               COUNT(DISTINCT IIF(g.someone_has_won, g.id, null)), 0),
-             2) ||
-       '%'                                              as percentage,
-       COUNT(DISTINCT IIF(g.someone_has_won, g.id, null)) - SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g.winning_team_id,
-                                      0))               as losses,
-       coalesce(SUM(playerGameStats.green_cards), 0)     as green_cards,
-       coalesce(SUM(playerGameStats.yellow_cards), 0)    as yellow_cards,
-       coalesce(SUM(playerGameStats.red_cards), 0)       as red_cards,
-       coalesce(SUM(playerGameStats.faults), 0)         as faults,
-       SUM(IIF(playerGameStats.player_id = teams.captain_id,
-               IIF(g.team_one_id = teams.id, team_one_timeouts, team_two_timeouts), 0)),
-       coalesce(SUM(playerGameStats.points_scored), 0)         as pointsScored,
-       coalesce((SELECT SUM(playerGameStats.points_scored)
-                 FROM playerGameStats
-                 where playerGameStats.opponent_id = teams.id
-                   and playerGameStats.tournament_id = tournaments.id),
-                0)                                      as pointsConceded,
-       coalesce(SUM(playerGameStats.points_scored) - (SELECT SUM(playerGameStats.points_scored)
-                                               FROM playerGameStats
-                                               where playerGameStats.opponent_id = teams.id
-                                                 and playerGameStats.tournament_id = tournaments.id),
-                0)                                      as difference,
-       ROUND(1500.0 + coalesce((SELECT SUM(elo_delta)
-                                from eloChange
-                                         INNER JOIN teams inside ON inside.id = teams.id
-                                         INNER JOIN people captain ON captain.id = inside.captain_id
-                                         LEFT JOIN people non_captain ON non_captain.id = inside.non_captain_id
-                                         LEFT JOIN people sub ON sub.id = inside.substitute_id
-                                where eloChange.player_id = sub.id
-                                   or eloChange.player_id = captain.id
-                                   or eloChange.player_id = non_captain.id AND eloChange.game_id <=MAX(g.id)),
-                               0)
-           /
-                      COUNT(teams.captain_id is not null + teams.non_captain_id is not null + teams.substitute_id is not null),
-             2)                                         as elo
-
-FROM teams
-         INNER JOIN tournamentTeams on teams.id = tournamentTeams.team_id
-         LEFT JOIN games g ON (g.team_one_id = teams.id OR g.team_two_id = teams.id) AND g.is_final = 0 AND
-                              g.is_bye = 0 AND (IIF(? is null, g.ranked, 1) OR teams.non_captain_id is null) AND
-                              g.tournament_id = tournamentTeams.tournament_id
-         LEFT JOIN playerGameStats ON teams.id = playerGameStats.team_id AND g.id = playerGameStats.game_id
-         LEFT JOIN tournaments on tournaments.id = tournamentTeams.tournament_id
-
-where IIF(? is NULL, 1, tournaments.id = ?)
-GROUP BY teams.name
-ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g.winning_team_id, 0)) AS REAL) /
-         COUNT(DISTINCT g.id) DESC,
-         difference DESC,
-         pointsScored DESC,
-         green_cards + yellow_cards + red_cards ASC,
-         red_cards ASC,
-         yellow_cards ASC,
-         faults ASC,
-         SUM(IIF(team_one_id = teams.id, team_one_timeouts, team_two_timeouts)) ASC""",
-                (tournament_id, tournament_id, tournament_id),
-            ).fetchall()
-        ladder = [
-            Team(i[2] if len(i[2]) < 20 else i[2][:18] + "...", i[1], i[4], i[3],
-                 {k: v for k, v in zip(priority, i[5:])})
-            for i in teams
-        ]
-        if teams[0][0]:  # this tournament is pooled
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
+        if tournament:
+            ladder = tournament.ladder()
+        else:
+            ladder = [Tournaments.all_time_ladder()]
+        if tournament and tournament.is_pooled:  # this tournament is pooled
             ladder = [
                 (
                     f"Pool {numbers[i]}",
                     i,
-                    list(enumerate((j for j in ladder if j.pool == i), start=1)),
+                    list(enumerate(v, start=1)),
                 )
-                for i in range(1, 3)
+                for i, v in enumerate(ladder)
             ]
         else:
             ladder = [("", 0, list(enumerate(ladder, start=1)))]
@@ -562,7 +478,7 @@ ORDER BY Cast(SUM(IIF(playerGameStats.player_id = teams.captain_id, teams.id = g
         return (
             render_template_sidebar(
                 "tournament_specific/ladder.html",
-                headers=[(i - 1, k, v) for i, (k, v) in enumerate(headers)],
+                headers=[(i, k, v) for i, (k, v) in enumerate(headers)],
                 priority={k: priority_to_classname(v) for k, v in priority.items()},
                 ladder=ladder,
             ),
