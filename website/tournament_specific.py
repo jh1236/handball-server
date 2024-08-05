@@ -44,107 +44,54 @@ def add_tournament_specific(app):
             )
         tournament_id = tourney.id
 
-        # ladder
-        @dataclass
-        class LadderTeam:
-            name: str
-            searchableName: str
-            games_won: int
-            games_played: int
-            pool: int
+        editable = get_type_from_name(tourney.fixtures_type, tournament_id).manual_allowed()
+        last_game = Games.query.filter(Games.tournament_id == tournament_id).order_by(Games.id.desc()).first()
+        if last_game.is_final:
+            current_round = Games.query.filter(Games.tournament_id == tournament_id, Games.is_final).all()
+        else:
+            current_round = Games.query.filter(Games.tournament_id == tournament_id,
+                                               Games.round == last_game.round).all()
 
-        @dataclass
-        class Player:
-            name: str
-            searchableName: str
-            best: int
-            points: int
-            aces: int
-            cards: int
+        ladder = tourney.ladder()
+        if len(ladder) > 10:  # note, I can forsee what is technically a bug in that if there is an 11 pool tournament, this will fail
+            ladder = ladder[:10]
 
-        with DatabaseManager() as c:
+        if tourney and tourney.is_pooled:  # this tournament is pooled
+            ladder = [
+                (
+                    f"Pool {numbers[i + 1]}",
+                    i,
+                    list(enumerate(v, start=1)),
+                )
+                for i, v in enumerate(ladder)
+            ]
+        else:
+            ladder = [("", 0, list(enumerate(ladder, start=1)))]
 
-            teams = c.execute(
-                """
-                            SELECT 
-                                name, teams.searchable_name, SUM(games.winning_team_id = teams.id) as gamesWon, COUNT(games.id) as gamesPlayed, pool 
-                                FROM tournamentTeams 
-                                INNER JOIN teams ON tournamentTeams.team_id = teams.id
-                                INNER JOIN games ON (teams.id = games.team_one_id OR teams.id = games.team_two_id) AND tournamentTeams.tournament_id = games.tournament_id 
-                                WHERE games.tournament_id = ? AND NOT games.is_final AND NOT games.is_bye
-                                group by teams.id 
-                                ORDER BY 
-                                    CAST(gamesWon AS REAL) / gamesPlayed DESC, gamesPlayed DESC  
-                                LIMIT 10;""",
-                (tourney.id,),
-            ).fetchall()
+        players = People.query.all()
+        game_filter = lambda a: a.filter(PlayerGameStats.tournament_id == tourney.id)
+        players = [(i, i.stats(games_filter=game_filter, include_unranked=False)) for i in players if
+                   i.played_in_tournament(tournament)]
 
-            ladder = [LadderTeam(*team) for team in teams]
+        players.sort(key=lambda a: -a[1]["B&F Votes"])
+        if len(players) > 10:
+            players = players[:10]
 
-            if tourney.is_pooled:  # this tournament is pooled
-                ladder = [
-                    (
-                        f"Pool {numbers[i]}",
-                        list(enumerate((j for j in ladder if j.pool == i), start=1)),
-                    )
-                    for i in range(1, 3)
-                ]
-            else:
-                ladder = [("", list(enumerate(ladder, start=1)))]
 
-            games = Games.query.filter(Games.tournament_id == tourney.id).all()
-            rounds = max(i.round for i in games)
-            ongoing_games = [i for i in games if i.round == rounds and not i.ended and not i.is_bye]
-            current_round = [i for i in games if (i.round == rounds or i.is_final) and not i.is_bye]
-
-            players = [(i, i.stats()) for i in People.query.order_by().all() if i.played_in_tournament(tournament)]
-
-            playerList = c.execute(
-                """
-                                SELECT 
-                                    people.name, searchable_name, coalesce(sum(games.best_player_id = people.id), 0) as isBestPlayer, coalesce(sum(points_scored), 0), coalesce(sum(aces_scored), 0), coalesce(sum(red_cards+yellow_cards), 0) 
-                                    FROM people 
-                                    LEFT JOIN playerGameStats ON player_id = people.id
-                                    LEFT JOIN games ON playerGameStats.game_id = games.id 
-                                    WHERE 
-                                        playerGameStats.tournament_id = ? AND
-                                        (is_final = 0 OR is_final is null) AND searchable_name <> 'null'
-                                    GROUP BY player_id 
-                                    ORDER BY 
-                                        isBestPlayer DESC, 
-                                        sum(points_scored) DESC, 
-                                        sum(aces_scored) DESC, 
-                                        sum(red_cards+yellow_cards+green_cards)  
-                                    LIMIT 10;""",
-                (tournament_id,),
-            ).fetchall()
-            players = [Player(*player) for player in playerList]
-
-            notes = (
-                    c.execute(
-                        "SELECT notes FROM tournaments WHERE id = ?", (tournament_id,)
-                    ).fetchone()[0]
-                    or "Notices will appear here when posted"
-            )
-            in_progress = c.execute(
-                "SELECT not(finished) FROM tournaments WHERE id=?", (tournament_id,)
-            ).fetchone()[0]
-            editable = get_type_from_name(tourney.fixtures_type, tournament_id).manual_allowed()
-
-            return (
-                render_template_sidebar(
-                    "tournament_specific/tournament_home.html",
-                    tourney=tourney,
-                    editable=editable,
-                    ongoing=ongoing_games,
-                    current_round=current_round,
-                    players=players,
-                    notes=notes,
-                    in_progress=in_progress,
-                    ladder=ladder,
-                ),
-                200,
-            )
+        return (
+            render_template_sidebar(
+                "tournament_specific/tournament_home.html",
+                tourney=tourney,
+                editable=editable,
+                ongoing=Games.query.filter(Games.tournament_id == tournament_id, Games.started == True,
+                                           Games.ended == False).all(),
+                current_round=current_round,
+                players=players,
+                notes=tourney.notes.strip() or "Notices will appear here when posted.",
+                ladder=ladder,
+            ),
+            200,
+        )
 
     @app.get("/<tournament>/fixtures/")
     def fixtures(tournament):
@@ -246,7 +193,9 @@ def add_tournament_specific(app):
                 400,
             )
         players = team.players()
-        game_filter = (lambda a: a.filter(Games.tournament_id == tournament, PlayerGameStats.team_id == team.id)) if tournament else lambda a: a.filter(PlayerGameStats.team_id == team.id)
+        game_filter = (lambda a: a.filter(Games.tournament_id == tournament,
+                                          PlayerGameStats.team_id == team.id)) if tournament else lambda a: a.filter(
+            PlayerGameStats.team_id == team.id)
         recent = db.session.query(Games, EloChange).join(PlayerGameStats,
                                                          PlayerGameStats.game_id == Games.id).outerjoin(EloChange,
                                                                                                         EloChange.game_id == Games.id).filter(
@@ -261,7 +210,6 @@ def add_tournament_specific(app):
         recent = recent.order_by(Games.id.desc()).limit(20).all()
         upcoming = upcoming.order_by(Games.id.desc()).limit(20).all()
 
-
         recent = [
             (
                 f"{i.team_one.name} vs {i.team_two.name} [{i.team_one_score} - {i.team_two_score}] <{'' if e and e.elo_delta < 0 else '+'}{round(e.elo_delta, 2) if e else 0}>",
@@ -272,7 +220,6 @@ def add_tournament_specific(app):
                 f"{i.team_one.name} vs {i.team_two.name} [{i.team_one_score} - {i.team_two_score}]",
                 i.id, i.tournament.searchable_name) for i in upcoming
         ]
-
 
         return (
             render_template_sidebar(
@@ -464,7 +411,7 @@ def add_tournament_specific(app):
         if tournament and tournament.is_pooled:  # this tournament is pooled
             ladder = [
                 (
-                    f"Pool {numbers[i]}",
+                    f"Pool {numbers[i + 1]}",
                     i,
                     list(enumerate(v, start=1)),
                 )
@@ -838,7 +785,7 @@ def add_tournament_specific(app):
                     timeout_time=manage_game.get_timeout_time(game_id) * 1000,
                     timeout_first=manage_game.get_timeout_caller(game_id),
                     match_points=0 if (
-                                max(game.team_one_score, game.team_two_score) < 10 or game.someone_has_won) else abs(
+                            max(game.team_one_score, game.team_two_score) < 10 or game.someone_has_won) else abs(
                         game.team_one_score - game.team_two_score),
                     VERBAL_WARNINGS=Config().use_warnings,
                     GREEN_CARDS=Config().use_green_cards,
