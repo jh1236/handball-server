@@ -1,41 +1,70 @@
- {% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block headBlock %}
     <title>Ladder</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_ladder.css') }}">
 {% endblock %}
 
 {% block bodyBlock %}
-<script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
-<h1><a href="/{{tournamentLink}}ladder/" class="hide">Ladder</a></h1>
-{% for pool_name, pool_number, teams in ladder %}
-<table class="jaredTable" id="sort{{ pool_number }}">
-    <h2>{{ pool_name }}</h2>
-    <thead>
-    <tr>
-        <th class="invisible">This is an image</th>
-        {% for i, header, priority in headers %}
-        <th onclick="sortTable({{ pool_number }}, {{i}})" class="{{priority}}" ><b>{{header}}</b></th>
-        {% endfor %}
-    </tr>
-    </thead>
-    <tbody>
+    <script src="{{ url_for('static', filename='js/sortTable.js') }}"></script>
+    <h1><a href="/{{ tournamentLink }}ladder/" class="hide">Ladder</a></h1>
+    <i onclick="openModal()">Learn More</i>
 
-    {% for position, team in teams %}
-    <tr>
-        <th><a href="/{{tournamentLink}}teams/{{team.searchableName}}" class="hide"
-               style="left: 30%;"><img
-                src="{{team.image}}" class="team_logo"
-                style="display: inline;left:70%;width: 50px;height: 50px;vertical-align:middle;"></a></th>
-        <th style="text-align: left;"><a href="/{{tournamentLink}}teams/{{team.searchableName}}"
-                                         class="hide">{{team.name}}</a>
-        </th>
-        {% for _, k, _ in headers %}
-        <td class="{{priority[k]}}">{{ team.stats[k] }}</td>
-        {% endfor %}
-    </tr>
+    {% for pool_name, pool_number, teams in ladder %}
+        <table class="jaredTable" id="sort{{ pool_number }}">
+            <h2>{{ pool_name }}</h2>
+            <thead>
+            <tr>
+                <th class="invisible">This is an image</th>
+                <th onclick="sortTable({{ pool_number }}, -1)">Team Name</th>
+                {% for i, header, priority in headers %}
+                    <th onclick="sortTable({{ pool_number }}, {{ i }})" class="{{ priority }}"><b>{{ header }}</b></th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for position, team in teams %}
+                <tr>
+                    <th><a href="/{{ tournamentLink }}teams/{{ team[0].searchable_name }}" class="hide"
+                           style="left: 30%;"><img
+                            src="{{ team[0].image_url }}" class="team_logo"
+                            style="display: inline;left:70%;width: 50px;height: 50px;vertical-align:middle;"></a></th>
+                    <th style="text-align: left;"><a href="/{{ tournamentLink }}teams/{{ team[0].searchable_name }}"
+                                                     class="hide">{{ team[0].short_name }}</a>
+                    </th>
+                    {% for _, k, _ in headers %}
+                        <td class="{{ priority[k] }}">{{ team[1][k] }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     {% endfor %}
-    </tbody>
-</table>
-{% endfor %}
+
+
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close" style="text-align: right">&times;</span>
+            <h2 id="cardHeader">The Formula to decide ladder position.</h2>
+            <p>The formula that we at the Squarers' United Sporting Syndicate is designed to most accurately represent
+                the performance of each team. It goes as follows: </p>
+            <ol style="text-align: left;">
+                <li>Percentage (Desc)</li>
+                <li>Point Difference (Desc)</li>
+                <li>Result of each drawn team when playing each other (Desc)</li>
+                <li>Amount of Points Scored (Desc)</li>
+                <li>Amount of Red Cards received (Asc)</li>
+                <li>Amount of Yellow Cards received (Asc)</li>
+                <li>Amount of Green Cards received (Asc)</li>
+                <li>Amount of Double Faults (Asc)</li>
+                <li>Amount of Faults (Asc)</li>
+                <li>Timeouts Called (Asc)</li>
+            </ol>
+        </div>
+
+    </div>
 {% endblock %}

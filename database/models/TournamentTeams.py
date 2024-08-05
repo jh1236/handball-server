@@ -28,3 +28,8 @@ class TournamentTeams(db.Model):
 
     tournament = db.relationship("Tournaments")
     team = db.relationship("Teams")
+
+    def stats(self, *args, **kwargs):
+        from database.models import Games
+        return self.team.stats(*args, games_filter=lambda a: a.filter(Games.tournament_id == self.tournament_id),
+                               ranked=self.tournament.ranked, **kwargs)

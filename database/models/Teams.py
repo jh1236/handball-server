@@ -55,10 +55,14 @@ class Teams(db.Model):
             elos.append(i.elo(last_game))
         return sum(elos) / len(elos)
 
+    @property
+    def short_name(self):
+        return self.name if len(self.name) < 30 else self.name[:27] + "..."
+
     def players(self):
         return [i for i in [self.captain, self.non_captain, self.substitute] if i]
 
-    def stats(self, games_filter=None, make_nice=True):
+    def stats(self, games_filter=None, make_nice=True, ranked=True):
 
         from database.models import PlayerGameStats, Games
         games = Games.query.filter((Games.team_one_id == self.id) | (Games.team_two_id == self.id),
@@ -67,7 +71,7 @@ class Teams(db.Model):
             Games.is_bye == False, Games.is_final == False,
             PlayerGameStats.team_id == self.id)
         # '== False' is not an error here, as Model overrides __eq__, so using a not operator provides a different result
-        if self.non_captain_id is not None:
+        if self.non_captain_id is not None and ranked:
             games = games.filter(Games.ranked)
             pgs = pgs.filter(Games.ranked)
 
@@ -79,7 +83,7 @@ class Teams(db.Model):
         pgs = pgs.all()
 
         ret = {
-            "Elo": self.elo(games[-1].id),
+            "Elo": self.elo(games[-1].id if games else 9999999),
             "Games Played": len(games),
             "Games Won": sum(i.winning_team_id == self.id for i in games),
             "Games Lost": sum(i.winning_team_id != self.id for i in games),
