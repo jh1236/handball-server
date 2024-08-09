@@ -477,7 +477,7 @@ def add_tournament_specific(app):
         players = []
         for i in players_in:
             players.append(
-                (i[0].name, i[0].image(), i[0].searchable_name,
+                (i[0].name, i[0].image(tournament), i[0].searchable_name,
                  [(i[1][k], (priority_to_classname(priority[k]))) for k in player_headers]))
         return (
             render_template_sidebar(

@@ -44,12 +44,20 @@ class People(db.Model):
     token_timeout = db.Column(db.Integer())
     is_admin = db.Column(db.Boolean(), nullable=False)
 
-    def image(self):
+    def image(self, tournament=None):
         from database.models import Teams
-        t = Teams.query.filter((Teams.captain_id == self.id) | (Teams.non_captain_id == self.id) | (
-                Teams.substitute_id == self.id)).order_by(Teams.image_url.like('/api/teams/image?%').desc(),
-                                                          Teams.id).first()
-        return t.image_url
+        from database.models import TournamentTeams
+        if tournament:
+            t = Teams.query.join(TournamentTeams, TournamentTeams.team_id == Teams.id).filter(
+                (Teams.captain_id == self.id) | (Teams.non_captain_id == self.id) | (
+                        Teams.substitute_id == self.id), TournamentTeams.tournament_id == tournament.id).order_by(
+                Teams.image_url.like('/api/teams/image?%').desc(),
+                Teams.id).first()
+        else:
+            t = Teams.query.filter((Teams.captain_id == self.id) | (Teams.non_captain_id == self.id) | (
+                    Teams.substitute_id == self.id)).order_by(Teams.image_url.like('/api/teams/image?%').desc(),
+                                                              Teams.id).first()
+        return t.image_url if t else "/api/teams/image?name=bye"
 
     def elo(self, last_game=None):
         from database.models import EloChange
