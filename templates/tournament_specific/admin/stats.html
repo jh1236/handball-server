@@ -8,20 +8,23 @@
 
 {% block bodyBlock %}
 
-<h1><a href="/{{tournamentLink}}teams/" class="hide">Teams</a></h1>
-{% for i in teams %}
-<table class="jaredTable">
-    <tr>
-        <td style="width:100px;"><a href="/{{tournamentLink}}teams/{{i.searchableName}}/admin"
-                                    class="hide"><img
-                src="{{i.image}}" class="team_logo"
-                style="width: 75px; height: 75px;"
-        ></a></td>
+    <h1><a href="/{{ tournamentLink }}teams/" class="hide">Teams</a></h1>
+    <table class="jaredTable">
+        {% for i in teams %}
+
+            <tr>
+                <td style="width:100px;"><a href="/{{ tournamentLink }}teams/{{ i.searchable_name }}/admin"
+                                            class="hide"><img
+                        src="{{ i.image_url }}" class="team_logo"
+                        style="width: 75px; height: 75px;"
+                ></a></td>
 
 
-        <td style="width:200px;"><a href="/{{tournamentLink}}teams/{{i.searchableName}}/admin" class="hide"><h3>{{i.name}}</h3></a></td>
-    </tr>
-</table>
+                <td style="width:200px;"><a href="/{{ tournamentLink }}teams/{{ i.searchable_name }}/admin" class="hide">
+                    <h3>{{ i.name }}</h3></a></td>
+            </tr>
 
-{% endfor %}
+
+        {% endfor %}
+    </table>
 {% endblock %}

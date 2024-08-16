@@ -1,7 +1,11 @@
 """Defines the comments object and provides functions to get and manipulate one"""
 import time
+import typing
 
 from database import db
+
+if typing.TYPE_CHECKING:
+    pass
 
 
 # create table main.games
@@ -117,6 +121,12 @@ class Games(db.Model):
                   "Format",
                   "Tournament"
                   ]
+
+    @property
+    def teams_protested(self):
+        from database.models import GameEvents
+        events = GameEvents.query.filter(GameEvents.game_id == self.id, GameEvents.event_type == 'Protest').all()
+        return events
 
     @property
     def formatted_start_time(self):

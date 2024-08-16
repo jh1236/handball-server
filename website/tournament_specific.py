@@ -31,7 +31,7 @@ def priority_to_classname(p):
 
 
 def add_tournament_specific(app):
-    @app.get("/<tournament>/")  # TODO: update to use ORM
+    @app.get("/<tournament>/")
     def home_page(tournament: str):
         tourney = Tournaments.query.filter(Tournaments.searchable_name == tournament).first()
         if tourney is None:

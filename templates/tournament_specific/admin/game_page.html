@@ -58,8 +58,9 @@
                             class="team_logo"
                             style="display: inline;left:70%;vertical-align:middle;"></a></th>
                     <th colspan="{{ players[1].__len__() }}">
-                        {% if not game.is_bye %}<a href="/{{ tournamentLink }}teams/{{ teams[1].searchable_name }}/admin"
-                                                   class="hide">{% endif %}<img
+                        {% if not game.is_bye %}
+                            <a href="/{{ tournamentLink }}teams/{{ teams[1].searchable_name }}/admin"
+                               class="hide">{% endif %}<img
                             src="{{ teams[1].image_url }}"
                             class="team_logo"
                             style="display: inline;left:70%;vertical-align:middle;">{% if not game.is_bye %}
@@ -103,7 +104,9 @@
                         {% for t in players %}
                             {% for j in t %}
                                 {% if i == 'Elo' and game.ended %}
-                                    <td>{{ j.stats()[i] }} [{{ '+' if j.stats()["Elo Delta"]>=0 else '' }}{{ j.stats()["Elo Delta"] }}]</td>
+                                    <td>{{ j.stats()[i] }}
+                                        [{{ '+' if j.stats()["Elo Delta"]>=0 else '' }}{{ j.stats()["Elo Delta"] }}]
+                                    </td>
                                 {% else %}
                                     <td>{{ j.stats()[i] }}</td>
                                 {% endif %}
@@ -139,18 +142,18 @@
             <div style="min-height: 150px">
                 <h2>Protests</h2>
                 <br>
-                {% if game.protested == 3 %}
-                    <b>Both Teams</b><i> have protested!</i>
-                {% elif not game.protested %}
-                    <i>No Teams have protested</i>
+                {% if game.teams_protested %}
+                    {% for i in game.teams_protested %}
+                        <b>{{ i.team.name }}</b> has protest for <i>{{ i.notes }}</i>.
+                    {% endfor %}
                 {% else %}
-                    <b>{{ game.teams[game.protested - 1] }}</b><i> have protested!</i>
+                    <i>No Teams have protested</i>
                 {% endif %}
             </div>
             <div style="min-height: 150px">
                 <h2>Resolve</h2>
                 <br>
-                {% if not game.status not in ['Official', 'Resolved', 'Bye']  %}
+                {% if not game.status not in ['Official', 'Resolved', 'Bye'] %}
                     <i>This game does not need resolution</i>
                 {% else %}
                     <button onclick="resolveGame()" class="button">Resolve</button>
