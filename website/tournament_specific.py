@@ -77,7 +77,6 @@ def add_tournament_specific(app):
         if len(players) > 10:
             players = players[:10]
 
-
         return (
             render_template_sidebar(
                 "tournament_specific/tournament_home.html",
@@ -715,7 +714,7 @@ def add_tournament_specific(app):
         COLORS = {
             "Warning": "#777777",
             "Green": "#84AA63",
-            "Yellow": "C96500",
+            "Yellow": "#C96500",
             "Red": "#EC4A4A"
         }
 
@@ -729,6 +728,7 @@ def add_tournament_specific(app):
         # teams = sorted(list(teams.values()), key=lambda a: a.sort)
         if visual_swap:
             teams = list(reversed(teams))
+            players = list(reversed(players))
         team_one_players = sorted([((1 - i), v) for i, v in enumerate(players[0][:2])],
                                   key=lambda a: a[1].player.searchable_name)
         team_two_players = sorted([((1 - i), v) for i, v in enumerate(players[1][:2])],
@@ -783,7 +783,8 @@ def add_tournament_specific(app):
                     game=game,
                     team_card_times=team_card_times,
                     timeout_time=manage_game.get_timeout_time(game_id) * 1000,
-                    timeout_first=manage_game.get_timeout_caller(game_id),
+                    # making this an int lets me put it straight into the js function without worrying about 'true' vs 'True' shenanigans
+                    timeout_first=int(manage_game.get_timeout_caller(game_id) == teams[0].id),
                     match_points=0 if (
                             max(game.team_one_score, game.team_two_score) < 10 or game.someone_has_won) else abs(
                         game.team_one_score - game.team_two_score),

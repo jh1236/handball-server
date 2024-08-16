@@ -1,62 +1,53 @@
 {
-    "Aesthetic GFs": {
+    "International Waters": {
         "colors": [
-            "None/Unknown",
-            "None/Unknown"
+            "Blue",
+            "Pink"
         ],
         "players": [
-            "Kiara",
-            "Florencia (Flo)"
+            "Jared Healy",
+            "William Prozerska"
         ]
     },
-    "But t Buddies": {
+    "Mozambique": {
         "colors": [
-            "None/Unknown",
-            "None/Unknown"
+            "Black",
+            "White"
+        ],
+        "players": [
+            "Lachlan Banks",
+            "Digby Ross"
+        ]
+    },
+    "Saint Vincent and the Grenadines": {
+        "colors": [
+            "Green",
+            "Yellow"
+        ],
+        "players": [
+            "Tristan Nel",
+            "Dora Wan"
+        ]
+    },
+    "Transcaucasian Socialist Federative Soviet Republic": {
+        "colors": [
+            "Red",
+            "White"
         ],
         "players": [
             "Alex Soudure",
-            "Liam Cooper"
+            "Eva Hajigabriel"
         ]
     },
-    "Handchester United": {
-        "colors": [
-            "Red",
-            "None/Unknown"
-        ],
-        "players": [
-            "Edward Smith",
-            "Maddie Harvey"
-        ]
-    },
-    "Saelmoa": {
+    "Vatican City": {
         "colors": [
             "Black",
-            "Red"
+            "Blue"
         ],
         "players": [
-            "Brigitte",
-            "Sophie"
-        ]
-    },
-    "The Baes": {
-        "colors": [
-            "Pink",
-            "None/Unknown"
-        ],
-        "players": [
-            "Eva",
-            "Dora"
-        ]
-    },
-    "WWBD": {
-        "colors": [
-            "Pink",
-            "Orange"
-        ],
-        "players": [
-            "Digby Ross",
-            "Jared Healy"
+            "Tomasz Sakowski",
+            "Sharai Rose",
+            "Ethan Dal Molin"
         ]
     }
 }

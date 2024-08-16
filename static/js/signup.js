@@ -44,7 +44,7 @@ function submit() {
             if (res.status === 204) {
                 document.location.href = "/"
             } else {
-                alert("Error!")
+                alert("This country has already been selected!")
             }
         });
 }

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block headBlock %}
+    <title>Sign Up</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_game.css') }}">
+{% endblock %}
+
+{% block bodyBlock %}
+    <img src="/api/tournaments/image?name=seventh_suss_championship" class="title_logo">
+
+    <script src="{{ url_for('static', filename='js/startGame.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+    <script>
+        setTournament("")
+        setup({{id}}, false)
+    </script>
+    <h1>{{ tournament }} sign up</h1>
+    <div style=" margin: auto;width: 37%;color: #809980">
+        <p><i>The Seventh S.U.S.S. Handball Championship is a thrilling event in which all the highest ranking handball
+            teams
+            from across the metropolitan area come to battle it out to bring home the prestigious S.U.S.S. trophy (and a
+            box of
+            chocolates). It will be held on the 31st of August.</i></p>
+    </div>
+    <div><label for="teamName" style="font-size: 16pt;font-weight: bold">Country:</label>
+        <select id="teamName">
+            {% for i in countries %}
+                <option>{{ i }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <br>
+    <label>Captain's <b>FULL</b> Name: <input type="text" id="name1"> </label>
+    <i><label> &nbsp;&nbsp;(Does this player wish to umpire? <input
+            type="checkbox" id="umpire1">)</label></i><br><br>
+    <label>Non-Captain's <b>FULL</b> Name: <input type="text" id="name2"> </label>
+    <i><label> &nbsp;&nbsp;(Does this player wish to umpire? <input
+            type="checkbox" id="umpire2">)</label></i><br><br>
+    <label>Substitute <b>FULL</b> Name: <input type="text" id="name3"> </label>
+    <i><label> &nbsp;&nbsp;(Does this player wish to umpire? <input
+            type="checkbox" id="umpire3">)</label></i><br><br>
+
+
+    Primary Uniform Color:
+    <div class="dropdown">
+        <button onclick="myFunction(this)" class="dropbtn" id="primary">None/Unknown</button>
+        <div class="dropdown-content">
+            <p onclick="setColor('None/Unknown', 'primary')">None/Unknown</p>
+            <p onclick="setColor('Red', 'primary')">Red</p>
+            <p onclick="setColor('Orange', 'primary')">Orange</p>
+            <p onclick="setColor('Yellow', 'primary')">Yellow</p>
+            <p onclick="setColor('Green', 'primary')">Green</p>
+            <p onclick="setColor('Blue', 'primary')">Blue</p>
+            <p onclick="setColor('Purple', 'primary')">Purple</p>
+            <p onclick="setColor('Pink', 'primary')">Pink</p>
+            <p onclick="setColor('Brown', 'primary')">Brown</p>
+            <p onclick="setColor('Gray', 'primary')">Gray</p>
+            <p onclick="setColor('Black', 'primary')">Black</p>
+            <p onclick="setColor('White', 'primary')">White</p>
+        </div>
+    </div>
+    <br><br>
+
+    Secondary Uniform Color:
+    <div class="dropdown">
+        <button onclick="myFunction(this)" class="dropbtn" id="secondary">None/Unknown</button>
+        <div class="dropdown-content">
+            <p onclick="setColor('None/Unknown', 'secondary')">None/Unknown</p>
+            <p onclick="setColor('Red', 'secondary')">Red</p>
+            <p onclick="setColor('Orange', 'secondary')">Orange</p>
+            <p onclick="setColor('Yellow', 'secondary')">Yellow</p>
+            <p onclick="setColor('Green', 'secondary')">Green</p>
+            <p onclick="setColor('Blue', 'secondary')">Blue</p>
+            <p onclick="setColor('Purple', 'secondary')">Purple</p>
+            <p onclick="setColor('Pink', 'secondary')">Pink</p>
+            <p onclick="setColor('Brown', 'secondary')">Brown</p>
+            <p onclick="setColor('Gray', 'secondary')">Gray</p>
+            <p onclick="setColor('Black', 'secondary')">Black</p>
+            <p onclick="setColor('White', 'secondary')">White</p>
+        </div>
+    </div>
+    <br>
+    <br>
+    <label>The entire team has read, understands and agrees to comply with the <a href="/code_of_conduct/">Squarers'
+        United Sporting
+        Syndicate Code of
+        Conduct</a>: <input type="checkbox" id="coc"></label>
+    <br>
+    <br>
+    <button class="button" onclick="submit()">Submit</button>
+{% endblock %}

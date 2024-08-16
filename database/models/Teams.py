@@ -49,7 +49,9 @@ class Teams(db.Model):
     def elo(self, last_game=None):
         from database.models import People
         players = People.query.filter(
-            (People.id == self.captain_id) | (People.id == self.non_captain_id) | (People.id == self.substitute_id))
+            (People.id == self.captain_id) | (People.id == self.non_captain_id) | (People.id == self.substitute_id)).all()
+        if not players:
+            return 1500.0
         elos = []
         for i in players:
             elos.append(i.elo(last_game))

@@ -21,9 +21,9 @@
 <div style="width: 100%">
     <h1>{{ teams[0].name }} vs {{ teams[1].name }}</h1>
     {% if swap %}
-    <h1 class="big">{{ game.team_one_score }} - {{ game.team_two_score }}</h1>
+        <h1 class="big">{{ game.team_one_score }} - {{ game.team_two_score }}</h1>
     {% else %}
-    <h1 class="big">{{ game.team_two_score }} - {{ game.team_one_score }}</h1>
+        <h1 class="big">{{ game.team_two_score }} - {{ game.team_one_score }}</h1>
     {% endif %}
     {% if match_points > 0 %}
         <p style="font-size: 30px"><b>{{ match_points }} Match Points</b></p>
@@ -34,7 +34,7 @@
 
         {# PLAYER SERVING AND SERVING SIDE #}
         <tr>
-            {% if game.team_to_serve_id == game.team_two_id %}
+            {% if game.team_to_serve_id == (game.team_two_id if swap == "false" else game.team_one_id) %}
                 <td></td>
                 <td></td>
             {% endif %}
@@ -211,7 +211,7 @@
 
                 <button onclick="timeout(false)" class="button" id="timeoutTwo">
                     {% if (game.team_one_timeouts if swap == "true" else game.team_two_timeouts) > 0 %} <s> {% endif %}
-                    Timeout {{ teams[0].name }}
+                    Timeout {{ teams[1].name }}
                     {% if (game.team_one_timeouts if swap == "true" else game.team_two_timeouts) > 0 %} </s> {% endif %}
                 </button>
 
@@ -310,7 +310,8 @@
     {% if teams[0].card_time_remaining or teams[1].card_time_remaining %}
         <div class="dropdown">
             <button onclick="myFunction(this)" class="gray_button dropbtn">
-                Pardon</button>
+                Pardon
+            </button>
             <div class="dropdown-content">
                 {% for i, p in teamOnePlayers %}
                     {% if p.is_carded %}<p onclick="pardon(true, {{ i }})"> {{ p.name }}</p> {% endif %}

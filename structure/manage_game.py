@@ -718,12 +718,12 @@ def get_timeout_time(game_id):
 def get_timeout_caller(game_id):
     """Returns if the first team listed called the timeout"""
     game = Games.query.filter(Games.id == game_id).first()
-    most_recent_end = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'End Timeout')
-                       .order_by(GameEvents.id.desc()).first())
-    if not most_recent_end: return 0
-    last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout',
-                                            GameEvents.id < most_recent_end.id).order_by(GameEvents.id.desc()).first()
-    return last_time_out.team_id == game.team_one_id
+    last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout').order_by(
+        GameEvents.id.desc()).first()
+    if last_time_out:
+        return last_time_out.team_id
+    else:
+        return False
 
 
 def delete(game_id):

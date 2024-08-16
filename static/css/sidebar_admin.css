@@ -3,6 +3,7 @@
 */
 
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
 body {
     font-family: 'Poppins', sans-serif;
     background: #fafafa;
@@ -98,7 +99,7 @@ a.sidebar-link:focus {
     background: #fff;
 }
 
-#sidebar ul li.active>a,
+#sidebar ul li.active > a,
 a[aria-expanded="true"] {
     color: #fff;
     background: #3d0a0a;
@@ -136,13 +137,21 @@ ul.CTAs a {
 
 a.download {
     background: #fff;
-    color: #018727;
+    color: #870101;
 }
 
 a.article,
 a.article:hover {
-    background: #053a1b !important;
+    background: #3a0505 !important;
     color: #fff !important;
+}
+
+.jh-nav {
+    color: #e0bdc6 !important;
+}
+
+.topbar-color {
+    background: #5d0113
 }
 
 
@@ -166,9 +175,11 @@ a.article:hover {
     #sidebar {
         margin-left: -250px;
     }
+
     #sidebar.active {
         margin-left: 0;
     }
+
     #sidebarCollapse span {
         display: none;
     }
