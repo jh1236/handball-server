@@ -357,8 +357,9 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
     else:
         team_two = [People.query.filter(People.searchable_name == i).first().id for i in team_two]
 
-    team_one += [None]
-    team_two += [None]
+    #I just wanna see how this works
+    team_one += team_one[0:1]
+    team_two += team_two[0:1]
     iga = team_one_id if team_one_iga else team_two_id
     game.status = 'In Progress'
     game.admin_status = 'In Progress'
