@@ -357,7 +357,7 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
     else:
         team_two = [People.query.filter(People.searchable_name == i).first().id for i in team_two]
 
-    #I just wanna see how this works
+    # I just wanna see how this works
     team_one += team_one[0:1]
     team_two += team_two[0:1]
     iga = team_one_id if team_one_iga else team_two_id
@@ -367,9 +367,11 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
     game.iga_side = iga
     game.start_time = time.time()
     if official:
-        game.official_id = Officials.query.filter(Officials.person.searchable_name == official).first().id
+        person_id = People.query.filter(People.searchable_name == official).first().id
+        game.official_id = Officials.query.filter(Officials.person_id == person_id).first().id
     if scorer:
-        game.official_id = Officials.query.filter(Officials.person.searchable_name == scorer).first().id
+        person_id = People.query.filter(People.searchable_name == scorer).first().id
+        game.official_id = Officials.query.filter(Officials.person.searchable_name == person_id).first().id
     for id, side in zip(team_one, SIDES):
         if not id: continue
         PlayerGameStats.query.filter(PlayerGameStats.id == id).first().start_side = side
@@ -579,7 +581,8 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
     if players_one is not None:
         players = [-1, -1, -1]
         for i, v in enumerate(players_one):
-            players[i] = People.query.filter(People.searchable_name == v).first().id
+            player = People.query.filter(People.searchable_name == v).first()
+            players[i] = player.id if player else -1
         teams = Teams.query.all()
         first_team = None
         for i in teams[1:]:
@@ -590,6 +593,8 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
                 first_team = i
                 break
         if not first_team:
+            if len([i for i in players if i > 0]) == 1:
+                team_one = "(Solo) " + People.query.filter(People.id == players[0]).first().name
             if not team_one:
                 raise NameError("You need to give a new team a name!")
             players = [i if i > 0 else None for i in players]
@@ -605,7 +610,8 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
     if players_two is not None:
         players = [-1, -1, -1]
         for i, v in enumerate(players_two):
-            players[i] = People.query.filter(People.searchable_name == v).first().id
+            player = People.query.filter(People.searchable_name == v).first()
+            players[i] = player.id if player else -1
         teams = Teams.query.all()
         second_team = None
         for i in teams[1:]:
@@ -616,6 +622,8 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
                 second_team = i
                 break
         if not second_team:
+            if len([i for i in players if i > 0]) == 1:
+                team_two = "(Solo) " + People.query.filter(People.id == players[0]).first().name
             if not team_two:
                 raise NameError("You need to give a new team a name!")
             players = [i if i > 0 else None for i in players]
@@ -649,12 +657,10 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
             last_start, round_number = (-1, 0)
         else:
             last_start, round_number = last_start.start_time, last_start.round
-        last_start = last_start or 1
         if (
                 time.time()
                 - last_start
-                > 32400 and
-                round_number < 0
+                > 32400
         ):
             round_number = round_number + 1
     is_bye = 1 in [first_team.id, second_team.id]

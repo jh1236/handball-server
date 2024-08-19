@@ -838,7 +838,7 @@ def add_tournament_specific(app):
     @officials_only
     def create_game(tournament_name):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
-        teams = Teams.query.order_by(Teams.searchable_name).all()
+        teams = Teams.query.filter(Teams.id != 1).order_by(Teams.searchable_name).all()
         officials = Officials.query.join(People).order_by(People.searchable_name).all()
         print(officials)
 

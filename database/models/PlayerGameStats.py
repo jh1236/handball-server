@@ -142,7 +142,7 @@ class PlayerGameStats(db.Model):
             "Elo Delta": round(self.player.elo(self.game_id) - self.player.elo(self.game_id - 1), 2),
             "Result": int(self.team_id == self.game.winning_team_id),
             "IGA Side": int(self.team_id == self.game.iga_side_id),
-            "Served First": int(self.team_id == first_ge.team_to_serve_id),
+            "Served First": first_ge and int(self.team_id == first_ge.team_to_serve_id),
             "Return Rate": self.serves_returned / (self.serves_received or 1),
             "Timeouts Used": (self.game.team_one_timeouts if self.game.team_one_id == self.team_id else self.game.team_two_timeouts),
         }

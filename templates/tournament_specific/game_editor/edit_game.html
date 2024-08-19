@@ -20,7 +20,7 @@
 
 <div style="width: 100%">
     <h1>{{ teams[0].name }} vs {{ teams[1].name }}</h1>
-    {% if swap %}
+    {% if swap == "false" %}
         <h1 class="big">{{ game.team_one_score }} - {{ game.team_two_score }}</h1>
     {% else %}
         <h1 class="big">{{ game.team_two_score }} - {{ game.team_one_score }}</h1>
@@ -145,19 +145,24 @@
                         {% endif %}
                     {% endfor %}
                 {% else %}
-                    <div class="dropdown">
-                        <button onclick="myFunction(this)" class="button dropbtn">
+                    {% if players[0].__len__() == 1 %}
+                        <button onclick="score(true, 0)" class="button dropbtn">
                             Score {{ teams[0].name }}</button>
-                        <div class="dropdown-content">
-                            {% for i, p in teamOnePlayers %}
-                                <p onclick="score(true, {{ i }})">
-                                    {% if p.card_time_remaining %} <s><i> {% endif %}
-                                    {{ p.player.name }}
-                                    {% if p.card_time_remaining %} </i></s> {% endif %}
-                                </p>
-                            {% endfor %}
+                    {% else %}
+                        <div class="dropdown">
+                            <button onclick="myFunction(this)" class="button dropbtn">
+                                Score {{ teams[0].name }}</button>
+                            <div class="dropdown-content">
+                                {% for i, p in teamOnePlayers %}
+                                    <p onclick="score(true, {{ i }})">
+                                        {% if p.card_time_remaining %} <s><i> {% endif %}
+                                        {{ p.player.name }}
+                                        {% if p.card_time_remaining %} </i></s> {% endif %}
+                                    </p>
+                                {% endfor %}
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 {% endif %}
             </td>
             <td><br></td>
@@ -171,19 +176,24 @@
                         </p>
                     {% endfor %}
                 {% else %}
-                    <div class="dropdown">
-                        <button onclick="myFunction(this)" class="button dropbtn">
+                    {% if players[0].__len__() == 1 %}
+                        <button onclick="score(false, 0)" class="button dropbtn">
                             Score {{ teams[1].name }}</button>
-                        <div class="dropdown-content">
-                            {% for i, p in teamTwoPlayers %}
-                                <p onclick="score(false, {{ i }})">
-                                    {% if p.card_time_remaining %} <s><i> {% endif %}
-                                    {{ p.player.name }}
-                                    {% if p.card_time_remaining %} </i></s> {% endif %}
-                                </p>
-                            {% endfor %}
+                    {% else %}
+                        <div class="dropdown">
+                            <button onclick="myFunction(this)" class="button dropbtn">
+                                Score {{ teams[1].name }}</button>
+                            <div class="dropdown-content">
+                                {% for i, p in teamTwoPlayers %}
+                                    <p onclick="score(false, {{ i }})">
+                                        {% if p.card_time_remaining %} <s><i> {% endif %}
+                                        {{ p.player.name }}
+                                        {% if p.card_time_remaining %} </i></s> {% endif %}
+                                    </p>
+                                {% endfor %}
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 {% endif %}
             </td>
         </tr>
