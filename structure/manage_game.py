@@ -1,12 +1,10 @@
 import re
 import time
 
-from Config import Config
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.database_utilities import on_court_for_game
 from database.models import *
-from structure import get_information
 from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
 
