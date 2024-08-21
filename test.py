@@ -1,5 +1,4 @@
 import traceback
-from turtledemo.penrose import start
 
 from database import db
 from database.models import *
@@ -80,4 +79,6 @@ def interpolate_start_times():
 
 if __name__ == '__main__':
     with app.app_context():
-        sync_all_games(start=400)
+        manage_game.create_tournament("The Seventh SUSS Championship", "RoundRobin", "BasicFinals", True, True, True,
+                                      [97, 98, 99, 100, 101, 102, 103],
+                                      [1, 2, 3, 4, 7, 13, 14])

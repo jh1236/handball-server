@@ -47,6 +47,8 @@ class People(db.Model):
     def image(self, tournament=None):
         from database.models import Teams
         from database.models import TournamentTeams
+        if self.image_url:
+            return self.image_url
         if tournament:
             t = Teams.query.join(TournamentTeams, TournamentTeams.team_id == Teams.id).filter(
                 (Teams.captain_id == self.id) | (Teams.non_captain_id == self.id) | (
