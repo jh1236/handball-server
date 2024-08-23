@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Unauthorised Access: {{error}}</title>
+    <title>Sign in</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_admin.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <script src="{{ url_for('static', filename='js/password.js') }}"></script>
-<h1>{{error}}</h1>
-<h2>By using a password you agree to essential cookies</h2>
+<h1>Sign in</h1>
 <br>
-<br>
-<img src="https://static.vecteezy.com/system/resources/previews/009/383/412/non_2x/padlock-clipart-design-illustration-free-png.png" style="width: 300px">
-<br>
-<br>
-<br>
-<label>Enter a password:
-    <input type="password" onkeydown="if (event.keyCode === 13) runPassword()" id="pword">
-</label>
-<br>
-<br>
-<br>
-<button class="button" onclick="runPassword()">Submit</button>
+<h2>{{ error }}</h2>
+<form>
+    <label>Enter your user id:</label>
+    <input type="number" id="user_id">
+    <br>
+    <label>Enter your password:</label>
+    <input type="password" onkeydown="if (event.keyCode === 13) runPassword()" id="password">
+    <br>
+    <br>
+    <label>By signing in i agree to cookies and the S.U.S.S. Handball Code of Conduct:</label>
+    <br>
+    <br>
+    <button class="button" onclick="window.location.href='{{ url_for('root') }}'">Cancel</button>
+    <button class="button" onclick="runPassword()">Submit</button>
+</form>
 </body>
 </html>
