@@ -12,6 +12,7 @@ from database.models import People, PlayerGameStats, Games, Tournaments, Tournam
 from structure import manage_game
 from structure.GameUtils import game_string_to_commentary
 from structure.get_information import get_tournament_id
+from structure.manage_game import substitute
 from utils.databaseManager import DatabaseManager
 from utils.permissions import (
     fetch_user,
@@ -683,10 +684,17 @@ def add_tournament_specific(app):
                 ),
                 404,
             )
-
+        last_game = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
         pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).all()
         # quick and dirty hack
         players = [[i for i in pgs if i.team_id == pgs[0].team_id], [i for i in pgs if i.team_id != pgs[0].team_id]]
+        if last_game:
+            players[0].sort(
+                key=lambda a: (a.player_id == last_game.team_one_left_id, a.player_id == last_game.team_one_right_id),
+                reverse=True)
+            players[1].sort(
+                key=lambda a: (a.player_id == last_game.team_two_left_id, a.player_id == last_game.team_two_right_id),
+                reverse=True)
         teams = [players[0][0].team, players[1][0].team]  # quicker and dirtier hack
 
         card_events = GameEvents.query.filter(
@@ -729,10 +737,14 @@ def add_tournament_specific(app):
         if visual_swap:
             teams = list(reversed(teams))
             players = list(reversed(players))
+        substitutes = [GameEvents.query.filter(GameEvents.game_id == game_id, (GameEvents.event_type == "Substitute"),
+                                               GameEvents.team_id == teams[i].id).first() for i in range(2)]
+        raw_team_one_players = [((1 - i), v) for i, v in enumerate(players[0][:2])]
+        raw_team_two_players = [((1 - i), v) for i, v in enumerate(players[1][:2])]
         team_one_players = sorted([((1 - i), v) for i, v in enumerate(players[0][:2])],
-                                  key=lambda a: a[1].player.searchable_name)
+                                         key=lambda a: a[1].player.searchable_name)
         team_two_players = sorted([((1 - i), v) for i, v in enumerate(players[1][:2])],
-                                  key=lambda a: a[1].player.searchable_name)
+                                         key=lambda a: a[1].player.searchable_name)
         all_officials = Officials.query.all()
         # TODO: Write a permissions decorator for scorers and primary officials
         # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
@@ -772,6 +784,9 @@ def add_tournament_specific(app):
                 render_template(
                     f"tournament_specific/game_editor/edit_game.html",
                     players=players,
+                    rawTeamOnePlayers=raw_team_one_players,
+                    rawTeamTwoPlayers=raw_team_two_players,
+                    sides=["Left", "Right"],
                     teamOnePlayers=team_one_players,
                     teamTwoPlayers=team_two_players,
                     cards=cards,
@@ -781,6 +796,7 @@ def add_tournament_specific(app):
                     teams=teams,
                     enum_teams=enumerate(teams),
                     game=game,
+                    substitutes=substitutes,
                     team_card_times=team_card_times,
                     timeout_time=manage_game.get_timeout_time(game_id) * 1000,
                     # making this an int lets me put it straight into the js function without worrying about 'true' vs 'True' shenanigans
@@ -840,7 +856,6 @@ def add_tournament_specific(app):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
         teams = Teams.query.filter(Teams.id != 1).order_by(Teams.searchable_name).all()
         officials = Officials.query.join(People).order_by(People.searchable_name).all()
-        print(officials)
 
         if not get_type_from_name(tournament.fixtures_type, tournament.id).manual_allowed():
             return (

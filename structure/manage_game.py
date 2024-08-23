@@ -498,8 +498,8 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
     game = Games.query.filter(Games.id == game_id).first()
     best = People.query.filter(People.searchable_name == best_player).first()
     players = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).all()
+    forfeit = GameEvents.query.filter(GameEvents.event_type == 'Forfeit', GameEvents.game_id == game_id).first()
     if best is None:
-        forfeit = GameEvents.query.filter(GameEvents.event_type == 'Forfeit', GameEvents.game_id == game_id).first()
         teams = [game.team_one, game.team_two]
         if forfeit is None and [i for i in teams if i.non_captain_id]:
             raise ValueError("Best Player was not provided")
@@ -518,6 +518,8 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
         game.admin_status = 'Notes to Review'
     elif any(i.yellow_cards for i in players):
         game.admin_status = 'Yellow Card Awarded'
+    elif forfeit:
+        game.admin_status = 'Forfeit'
     else:
         game.admin_status = 'Official'
     game.noteable_status = game.admin_status
@@ -528,19 +530,19 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
     game.notes = notes.strip()
 
     if game.ranked and not game.is_final:  # the game is unranked, so doing elo stuff is silly
-        team_one = PlayerGameStats.query.filter((PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded) > 0,
+        team_one = PlayerGameStats.query.filter((PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded > 0) | (game.admin_status == 'Forfeit'),
                                                 PlayerGameStats.team_id == game.team_one_id,
                                                 PlayerGameStats.game_id == game.id).all()
-        team_two = PlayerGameStats.query.filter((PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded) > 0,
+        team_two = PlayerGameStats.query.filter((PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded > 0) | (game.admin_status == 'Forfeit'),
                                                 PlayerGameStats.team_id == game.team_two_id,
                                                 PlayerGameStats.game_id == game.id).all()
         teams = [team_one, team_two]
         elos = [0, 0]
         for i, v in enumerate(teams):
             elos[i] = sum(j.player.elo() for j in v)
-            elos[i] /= len(v)
+            elos[i] /= len(v) or 1
 
-        print(elos)
+        print(teams)
         for i in teams:
             my_team = i != teams[0]
             win = game.winning_team_id == i[0].team_id
@@ -550,7 +552,7 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
                 add = EloChange(game_id=game.id, player_id=player_id, tournament_id=game.tournament_id,
                                 elo_delta=elo_delta)
                 db.session.add(add)
-    end_of_round = Games.query.filter(Games.tournament_id == game.tournament_id, not Games.is_bye, not Games.is_final)
+    end_of_round = Games.query.filter(Games.tournament_id == game.tournament_id, not Games.is_bye, not Games.ended).all()
     tournament = game.tournament
     sync(game_id)
 
@@ -635,8 +637,6 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
         else:
             second_team = Teams.query.filter(Teams.searchable_name == team_two).first()
     ranked = True
-    print(first_team)
-    print(second_team)
     for i in [first_team, second_team]:
         if i == 1: continue
         if not TournamentTeams.query.filter(TournamentTeams.team_id == i.id,
@@ -667,7 +667,12 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
         first_team, second_team = second_team, first_team
 
     g = Games(tournament_id=tournament_id, team_one_id=first_team.id, team_two_id=second_team.id,
-              official_id=official, court=court, is_final=is_final, round=round_number, ranked=ranked)
+              official_id=official, court=court, is_final=is_final, round=round_number, ranked=ranked, is_bye=is_bye, someone_has_won=is_bye)
+    if is_bye:
+        g.noteable_status = "Bye"
+        g.admin_status = "Bye"
+        g.someone_has_won = True
+        g.winning_team_id = 1
     db.session.add(g)
     db.session.commit()  # this is a risk, but i want this to work so ¯\_(ツ)_/¯
     for i, opp in [(first_team, second_team), (second_team, first_team)]:

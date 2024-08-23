@@ -33,17 +33,32 @@
     <table class="jaredTable">
 
         {# PLAYER SERVING AND SERVING SIDE #}
-        <tr>
-            {% if game.team_to_serve_id == (game.team_two_id if swap == "false" else game.team_one_id) %}
+
+        {% for i in range(2) %}
+            <tr>
+                {% if rawTeamOnePlayers[i][1].player_id == game.player_to_serve_id %}
+                    {% if faulted %}
+                        <td style="color: #ff0000"><b>{{ rawTeamOnePlayers[i][1].player.name }} ({{ sides[i] }})</b></td>
+                    {% else %}
+                        <td><b>{{ rawTeamOnePlayers[i][1].player.name }} ({{ sides[i] }})</b></td>
+                    {% endif %}
+                {% else %}
+                    <td><i>{{ rawTeamOnePlayers[i][1].player.name }} ({{ sides[i][0] }})</i></td>
+                {% endif %}
                 <td></td>
-                <td></td>
-            {% endif %}
-            {% if faulted %}
-                <td style="color: #ff0000"><i>{{ game.player_to_serve.name }} ({{ game.side_to_serve }})</i></td>
-            {% else %}
-                <td><i>{{ game.player_to_serve.name }} ({{ game.side_to_serve }})</i></td>
-            {% endif %}
-        </tr>
+                {% if rawTeamTwoPlayers[i][1].player_id == game.player_to_serve_id %}
+                    {% if faulted %}
+                        <td style="color: #ff0000"><i>{{ rawTeamTwoPlayers[i][1].player.name }} ({{ sides[i] }})</i></td>
+                    {% else %}
+                        <td><b>{{ rawTeamTwoPlayers[i][1].player.name }} ({{ sides[i] }})</b></td>
+                    {% endif %}
+                {% else %}
+                    <td><i>{{ rawTeamTwoPlayers[i][1].player.name }} ({{ sides[i][0] }})</i></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+
+
 
         {# Team imgs and match details #}
         <tr>
@@ -55,7 +70,7 @@
                 <p><b>Match Id:</b> <i>{{ game.id }}</i></p>
                 <p><b>Official:</b> <i>{{ game.official.person.name }}</i></p>
                 {% if game.scorer %}
-                    <p><b>Scorer:</b> <i>{{ game.scorer }}</i></p>
+                    <p><b>Scorer:</b> <i>{{ game.scorer.person.name }}</i></p>
                 {% endif %}
                 <p onclick="swap()"><i>Swap Sides</i></p>
             </td>
@@ -101,14 +116,14 @@
         {# Substitutes #}
         <tr>
             <td>
-                {% if players[0].__len__() > 2 and game.round <= 9 %}
+                {% if players[0].__len__() > 2 and game.round <= 9 and not substitutes[0] %}
                     <div class="dropdown">
                         <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
                             Substitute {{ teams[0].name }}</button>
                         <div class="dropdown-content">
                             {% for i, p in teamOnePlayers %}
                                 <p onclick="sub(true, {{ i }})">
-                                    {{ p.name }}
+                                    {{ p.player.name }}
                                 </p>
                             {% endfor %}
                         </div>
@@ -116,14 +131,14 @@
                 {% endif %}</td>
             <td></td>
             <td>
-                {% if players[1].__len__() > 2 and game.round <= 9 %}
+                {% if players[1].__len__() > 2 and game.round <= 9 and not substitutes[1] %}
                     <div class="dropdown" style="background-color: #2a5d88;">
                         <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
                             Substitute {{ teams[1].name }}</button>
                         <div class="dropdown-content">
                             {% for i, p in teamTwoPlayers %}
                                 <p onclick="sub(false, {{ i }})">
-                                    {{ p.name }}
+                                    {{ p.player.name }}
                                 </p>
                             {% endfor %}
                         </div>

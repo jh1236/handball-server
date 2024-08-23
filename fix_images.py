@@ -11,6 +11,8 @@ last_time = 0
 
 def load_image(id_in, name):
     global active
+    if id_in in range(97, 104):
+        name += " flag"
     images[id_in] = google_image(name)
     active -= 1
 
