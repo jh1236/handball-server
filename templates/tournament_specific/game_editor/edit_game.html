@@ -36,24 +36,34 @@
 
         {% for i in range(2) %}
             <tr>
-                {% if rawTeamOnePlayers[i][1].player_id == game.player_to_serve_id %}
-                    {% if faulted %}
-                        <td style="color: #ff0000"><b>{{ rawTeamOnePlayers[i][1].player.name }} ({{ sides[i] }})</b></td>
+                {% if rawTeamOnePlayers.__len__() <= i %}
+                    {% if rawTeamOnePlayers[i][1].player_id == game.player_to_serve_id %}
+                        {% if faulted %}
+                            <td style="color: #ff0000"><b>{{ rawTeamOnePlayers[i][1].player.name }}
+                                ({{ sides[i] if rawTeamOnePlayers.__len__() > 1 else game.side_to_serve }})</b>
+                            </td>
+                        {% else %}
+                            <td><b>{{ rawTeamOnePlayers[i][1].player.name }}
+                                ({{ sides[i] if rawTeamOnePlayers.__len__() > 1 else game.side_to_serve }})</b></td>
+                        {% endif %}
                     {% else %}
-                        <td><b>{{ rawTeamOnePlayers[i][1].player.name }} ({{ sides[i] }})</b></td>
+                        <td><i>{{ rawTeamOnePlayers[i][1].player.name }}
+                            ({{ (sides[i] if rawTeamOnePlayers.__len__() > 1 else game.side_to_serve)[0] }})</i></td>
                     {% endif %}
-                {% else %}
-                    <td><i>{{ rawTeamOnePlayers[i][1].player.name }} ({{ sides[i][0] }})</i></td>
                 {% endif %}
                 <td></td>
                 {% if rawTeamTwoPlayers[i][1].player_id == game.player_to_serve_id %}
                     {% if faulted %}
-                        <td style="color: #ff0000"><i>{{ rawTeamTwoPlayers[i][1].player.name }} ({{ sides[i] }})</i></td>
+                        <td style="color: #ff0000"><i>{{ rawTeamTwoPlayers[i][1].player.name }}
+                            ({{ sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve }})</i>
+                        </td>
                     {% else %}
-                        <td><b>{{ rawTeamTwoPlayers[i][1].player.name }} ({{ sides[i] }})</b></td>
+                        <td><b>{{ rawTeamTwoPlayers[i][1].player.name }}
+                            ({{ sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve }})</b></td>
                     {% endif %}
                 {% else %}
-                    <td><i>{{ rawTeamTwoPlayers[i][1].player.name }} ({{ sides[i][0] }})</i></td>
+                    <td><i>{{ rawTeamTwoPlayers[i][1].player.name }}
+                        ({{ (sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve)[0] }})</i></td>
                 {% endif %}
             </tr>
         {% endfor %}

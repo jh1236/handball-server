@@ -80,5 +80,5 @@ def interpolate_start_times():
 if __name__ == '__main__':
     with app.app_context():
         manage_game.create_tournament("The Seventh SUSS Championship", "RoundRobin", "BasicFinals", True, True, True,
-                                      [97, 98, 99, 100, 101, 102, 103],
+                                      [97, 99, 100, 101, 102, 103],
                                       [1, 2, 3, 4, 13, 14])

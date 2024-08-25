@@ -1,4 +1,3 @@
-"""Defines the comments object and provides functions to get and manipulate one"""
 import time
 
 from database import db
@@ -93,11 +92,11 @@ class Teams(db.Model):
             "Green Cards": sum(i.green_cards for i in pgs),
             "Yellow Cards": sum(i.yellow_cards for i in pgs),
             "Red Cards": sum(i.red_cards for i in pgs),
-            "Double Faults": sum(i.double_faults for i in pgs),
             "Faults": sum(i.faults for i in pgs),
+            "Double Faults": sum(i.double_faults for i in pgs),
             "Timeouts Called": sum(
                 (i.team_one_timeouts if i.team_one_id == self.id else i.team_two_timeouts) for i in games),
-            # Points for and against are different because points for shouldnt include opponents double faults, but points against should
+            # Points for and against are different because points for shouldn't include opponents double faults, but points against should
             "Points Scored": sum(i.points_scored for i in pgs),
             "Points Against": sum((i.team_two_score if i.team_one_id == self.id else i.team_one_score) for i in games),
             "Point Difference": sum(i.points_scored for i in pgs) - sum(
