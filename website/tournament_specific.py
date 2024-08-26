@@ -655,12 +655,11 @@ def add_tournament_specific(app):
     @app.get("/<tournament>/officials/")
     def official_directory_site(tournament):
         tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament).first()
-        official = TournamentOfficials.query
+        official = TournamentOfficials.query.group_by(TournamentOfficials.official_id)
         if tournament_id:
             official = official.filter(TournamentOfficials.tournament_id == tournament_id.id)
         official = [i.official.person for i in official.all()]
         return (
-
             render_template_sidebar(
                 "tournament_specific/all_officials.html",
                 officials=official,

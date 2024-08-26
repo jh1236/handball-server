@@ -452,6 +452,7 @@ def undo(game_id):
         raise ValueError("Game is Already Over!")
     delete_after = GameEvents.query.filter(GameEvents.game_id == game_id,
                                            (GameEvents.notes == None) | (GameEvents.notes != 'Penalty'),
+                                           GameEvents.event_type != 'End Timeout',
                                            GameEvents.event_type != 'Protest').order_by(GameEvents.id.desc()).first().id
     GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.id >= delete_after).delete()
     sync(game_id)

@@ -36,7 +36,7 @@
 
         {% for i in range(2) %}
             <tr>
-                {% if rawTeamOnePlayers.__len__() <= i %}
+                {% if rawTeamOnePlayers.__len__() > i %}
                     {% if rawTeamOnePlayers[i][1].player_id == game.player_to_serve_id %}
                         {% if faulted %}
                             <td style="color: #ff0000"><b>{{ rawTeamOnePlayers[i][1].player.name }}
@@ -47,23 +47,37 @@
                                 ({{ sides[i] if rawTeamOnePlayers.__len__() > 1 else game.side_to_serve }})</b></td>
                         {% endif %}
                     {% else %}
-                        <td><i>{{ rawTeamOnePlayers[i][1].player.name }}
-                            ({{ (sides[i] if rawTeamOnePlayers.__len__() > 1 else game.side_to_serve)[0] }})</i></td>
-                    {% endif %}
-                {% endif %}
-                <td></td>
-                {% if rawTeamTwoPlayers[i][1].player_id == game.player_to_serve_id %}
-                    {% if faulted %}
-                        <td style="color: #ff0000"><i>{{ rawTeamTwoPlayers[i][1].player.name }}
-                            ({{ sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve }})</i>
-                        </td>
-                    {% else %}
-                        <td><b>{{ rawTeamTwoPlayers[i][1].player.name }}
-                            ({{ sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve }})</b></td>
+                        <td><i>
+                            {% if rawTeamOnePlayers[i][1].card_time_remaining != 0 %}<s>{% endif %}
+                            {{ rawTeamOnePlayers[i][1].player.name }}
+                            ({{ (sides[i] if rawTeamOnePlayers.__len__() > 1 else game.side_to_serve)[0] }})
+                            {% if rawTeamOnePlayers[i][1].card_time_remaining != 0 %}</s>{% endif %}
+                        </i></td>
                     {% endif %}
                 {% else %}
-                    <td><i>{{ rawTeamTwoPlayers[i][1].player.name }}
-                        ({{ (sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve)[0] }})</i></td>
+                    <td></td>
+                {% endif %}
+                <td></td>
+                {% if rawTeamTwoPlayers.__len__() > i %}
+                    {% if rawTeamTwoPlayers[i][1].player_id == game.player_to_serve_id %}
+                        {% if faulted %}
+                            <td style="color: #ff0000"><b>{{ rawTeamTwoPlayers[i][1].player.name }}
+                                ({{ sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve }})</b>
+                            </td>
+                        {% else %}
+                            <td><b>{{ rawTeamTwoPlayers[i][1].player.name }}
+                                ({{ sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve }})</b></td>
+                        {% endif %}
+                    {% else %}
+                        <td><i>
+                            {% if rawTeamTwoPlayers[i][1].card_time_remaining != 0 %}<s>{% endif %}
+                            {{ rawTeamTwoPlayers[i][1].player.name }}
+                            ({{ (sides[i] if rawTeamTwoPlayers.__len__() > 1 else game.side_to_serve)[0] }})
+                            {% if rawTeamTwoPlayers[i][1].card_time_remaining != 0 %}</s>{% endif %}
+                        </i></td>
+                    {% endif %}
+                {% else %}
+                    <td></td>
                 {% endif %}
             </tr>
         {% endfor %}
@@ -162,63 +176,46 @@
         {# Score button #}
         <tr>
             <td>
-                {% if team_card_times[0][0] %}
-                    {% for i, p in teamOnePlayers %}
-                        {% if not p.card_time_remaining != 0 %}
-                            <button onclick="score(true, {{ i }})" class="button">
-                                Score {{ teams[0].name }}</button>
-                        {% endif %}
-                    {% endfor %}
+
+                {% if players[0].__len__() == 1 %}
+                    <button onclick="score(true, 0)" class="button dropbtn">
+                        Score {{ teams[0].name }}</button>
                 {% else %}
-                    {% if players[0].__len__() == 1 %}
-                        <button onclick="score(true, 0)" class="button dropbtn">
+                    <div class="dropdown">
+                        <button onclick="myFunction(this)" class="button dropbtn">
                             Score {{ teams[0].name }}</button>
-                    {% else %}
-                        <div class="dropdown">
-                            <button onclick="myFunction(this)" class="button dropbtn">
-                                Score {{ teams[0].name }}</button>
-                            <div class="dropdown-content">
-                                {% for i, p in teamOnePlayers %}
-                                    <p onclick="score(true, {{ i }})">
-                                        {% if p.card_time_remaining %} <s><i> {% endif %}
-                                        {{ p.player.name }}
-                                        {% if p.card_time_remaining %} </i></s> {% endif %}
-                                    </p>
-                                {% endfor %}
-                            </div>
+                        <div class="dropdown-content">
+                            {% for i, p in teamOnePlayers %}
+                                <p onclick="score(true, {{ i }})">
+                                    {% if p.card_time_remaining %} <s><i> {% endif %}
+                                    {{ p.player.name }}
+                                    {% if p.card_time_remaining %} </i></s> {% endif %}
+                                </p>
+                            {% endfor %}
                         </div>
-                    {% endif %}
+                    </div>
                 {% endif %}
             </td>
             <td><br></td>
             <td>
-                {% if team_card_times[1][0] %}
-                    {% for i, p in teamTwoPlayers %}
-                        <p onclick="score(false, {{ i }})">
-                            {% if p.card_time_remaining %} <s><i> {% endif %}
-                            {{ p.player.name }}
-                            {% if p.card_time_remaining %} </i></s> {% endif %}
-                        </p>
-                    {% endfor %}
+
+                {% if players[1].__len__() == 1 %}
+                    <button onclick="score(false, 0)" class="button dropbtn">
+                        Score {{ teams[1].name }}</button>
                 {% else %}
-                    {% if players[0].__len__() == 1 %}
-                        <button onclick="score(false, 0)" class="button dropbtn">
+                    <div class="dropdown">
+                        <button onclick="myFunction(this)" class="button dropbtn">
                             Score {{ teams[1].name }}</button>
-                    {% else %}
-                        <div class="dropdown">
-                            <button onclick="myFunction(this)" class="button dropbtn">
-                                Score {{ teams[1].name }}</button>
-                            <div class="dropdown-content">
-                                {% for i, p in teamTwoPlayers %}
-                                    <p onclick="score(false, {{ i }})">
-                                        {% if p.card_time_remaining %} <s><i> {% endif %}
-                                        {{ p.player.name }}
-                                        {% if p.card_time_remaining %} </i></s> {% endif %}
-                                    </p>
-                                {% endfor %}
-                            </div>
+                        <div class="dropdown-content">
+                            {% for i, p in teamTwoPlayers %}
+                                <p onclick="score(false, {{ i }})">
+                                    {% if p.card_time_remaining %} <s><i> {% endif %}
+                                    {{ p.player.name }}
+                                    {% if p.card_time_remaining %} </i></s> {% endif %}
+                                </p>
+                            {% endfor %}
                         </div>
-                    {% endif %}
+                    </div>
                 {% endif %}
             </td>
         </tr>
@@ -376,7 +373,7 @@
 </div>
 <div style="position:absolute; top: 10%;left: 0; width: 20%">
     <h3>Cards for {{ teams[0].name }}</h3>
-    {% for i in cards if i.team == game.team_one_id %}
+    {% for i in cards if i.team == (game.team_one_id if swap == "false" else game.team_two_id) %}
         <i>{{ i.player }} has received a <a style="color: {{ i.hex }}">{{ i.type }}</a> card
             for</i> <b>{{ i.reason }}</b>
         <br>
@@ -385,7 +382,7 @@
 </div>
 <div style="position:absolute; top: 10%;left: 80%; width: 20%">
     <h3>Cards for {{ teams[1].name }}</h3>
-    {% for i in cards if i.team == game.team_two_id %}
+    {% for i in cards if i.team == (game.team_two_id if swap == "false" else game.team_one_id) %}
         <i>{{ i.player }} has received a <a style="color: {{ i.hex }}">{{ i.type }}</a> card
             for</i> <b>{{ i.reason }}</b>
         <br>
