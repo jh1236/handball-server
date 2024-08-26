@@ -137,3 +137,16 @@ function sortTable(id, n, fix = true) {
         rows[0].getElementsByTagName("TH")[n + (fix ? 2 : 1)].style.color = "#ac3333"
     }
 }
+
+function openModal() {
+    document.getElementById("myModal").style.display = "block";
+}
+
+window.onload = () => {
+    document.getElementsByClassName("close")[0].onclick = function () {
+        document.getElementById("myModal").style.display = "none";
+    };
+    document.getElementById("duration").addEventListener("input", (event) => {
+        document.getElementById("durationText").textContent = `Duration (${event.target.value})`;
+    });
+}

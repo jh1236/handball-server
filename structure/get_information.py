@@ -1,36 +1,13 @@
-from utils.databaseManager import DatabaseManager
-
-game_and_side = {}
+from database.models import Tournaments
 
 tournament_id = {}
 
 
-def get_team_id_from_game_and_side(game_id, first_team, c=None) -> int:
-    if game_id in game_and_side:
-        return game_and_side[game_id][not first_team]
-
-    with DatabaseManager() as c:
-        if first_team:
-            team = c.execute("""SELECT teamOne FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
-        else:
-            team = c.execute("""SELECT teamTwo FROM games WHERE games.id = ?""", (game_id,)).fetchone()[0]
-        return team
-
-
-
-def get_tournament_id(searchable_name, c=None) -> int:
+def get_tournament_id(searchable_name) -> int:
+    if not searchable_name:
+        return None
     if searchable_name in tournament_id:
         return tournament_id[searchable_name]
-    if not c:
-        with DatabaseManager() as c:
-            out = c.execute("SELECT id FROM tournaments WHERE searchable_name=?", (searchable_name,)).fetchone()
-        if out:
-            out = out[0]
-        tournament_id[searchable_name] = out
-        return out
-    else:
-        out = c.execute("SELECT id FROM tournaments WHERE searchable_name=?", (searchable_name,)).fetchone()
-        if out:
-            out = out[0]
-        tournament_id[searchable_name] = out
-        return out
+    out = Tournaments.query.filter(Tournaments.searchable_name == searchable_name).first().id
+    tournament_id[searchable_name] = out
+    return out

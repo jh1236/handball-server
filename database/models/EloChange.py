@@ -26,8 +26,7 @@ class EloChange(db.Model):
     game_id = db.Column(db.Integer(), db.ForeignKey("games.id"), nullable=False)
     tournament_id = db.Column(db.Integer(), db.ForeignKey("tournaments.id"), nullable=False)
     player_id = db.Column(db.Integer(), db.ForeignKey("people.id"), nullable=False)
-    elo_delta = db.Column(db.Integer(),  nullable=False)
+    elo_delta = db.Column(db.Integer(), nullable=False)
 
     player = db.relationship("People", foreign_keys=[player_id])
-    game = db.relationship("Games", foreign_keys=[game_id])
     tournament = db.relationship("Tournaments", foreign_keys=[tournament_id])

@@ -86,7 +86,7 @@
 
                 <table class="jaredTable">
 
-                    {% for i, l in ladder %}
+                    {% for i, s, l in ladder %}
                         <tr>
                             <th colspan="4"><a class="hide" href="/{{ tournamentLink }}ladder/">{{ i }}</a>
                             </th>
@@ -97,19 +97,19 @@
                             <th>Games Won</th>
                             <th>Games Played</th>
                         </tr>
-                        {% for j, team in l %}
+                        {% for j, (team, stats) in l %}
                             <tr>
                                 <td style="width:30px"><a class="hide"
-                                                          href="/{{ tournamentLink }}teams/{{ team.searchableName }}"><i>{{ j }}</i></a>
+                                                          href="/{{ tournamentLink }}teams/{{ team.searchable_name }}"><i>{{ j }}</i></a>
                                 </td>
                                 <td style="width:200px; text-align: center"><a class="hide"
-                                                                               href="/{{ tournamentLink }}teams/{{ team.searchableName }}">{{ team.name }}</a>
+                                                                               href="/{{ tournamentLink }}teams/{{ team.searchable_name }}">{{ team.name }}</a>
                                 </td>
                                 <td style="width:200px"><a class="hide"
-                                                           href="/{{ tournamentLink }}teams/{{ team.searchableName }}">{{ team.games_won }}</a>
+                                                           href="/{{ tournamentLink }}teams/{{ team.searchableName }}">{{ stats["Games Won"] }}</a>
                                 </td>
                                 <td style="width:200px"><a class="hide"
-                                                           href="/{{ tournamentLink }}teams/{{ team.searchableName }}">{{ team.games_played }}</a>
+                                                           href="/{{ tournamentLink }}teams/{{ team.searchableName }}">{{ stats["Games Played"] }}</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -127,22 +127,22 @@
                         <th>Aces Scored</th>
                         <th>Cards Received</th>
                     </tr>
-                    {% for p in players %}
+                    {% for p, stats in players %}
                         <tr>
                             <td><a class="hide"
-                                   href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.name }}</a>
+                                   href="/{{ tournamentLink }}players/{{ p.searchable_name }}">{{ p.name }}</a>
                             </td>
                             <td style="text-align: center"><a class="hide"
-                                                              href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.best }}</a>
+                                                              href="/{{ tournamentLink }}players/{{ p.searchable_name }}">{{ stats["B&F Votes"] }}</a>
                             </td>
                             <td style="text-align: center"><a class="hide"
-                                                              href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.points }}</a>
+                                                              href="/{{ tournamentLink }}players/{{ p.searchable_name }}">{{ stats["Points Scored"] }}</a>
                             </td>
                             <td><a class="hide"
-                                   href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.aces }}</a>
+                                   href="/{{ tournamentLink }}players/{{ p.searchable_name }}">{{ stats["Aces Scored"] }}</a>
                             </td>
                             <td><a class="hide"
-                                   href="/{{ tournamentLink }}players/{{ p.searchableName }}">{{ p.cards }}</a>
+                                   href="/{{ tournamentLink }}players/{{ p.searchable_name }}">{{ stats["Cards"] }}</a>
                             </td>
                         </tr>
                     {% endfor %}

@@ -1,7 +1,11 @@
 """Defines the comments object and provides functions to get and manipulate one"""
 import time
+import typing
 
 from database import db
+
+if typing.TYPE_CHECKING:
+    pass
 
 
 # create table main.games
@@ -94,6 +98,8 @@ class Games(db.Model):
     iga_side = db.relationship("Teams", foreign_keys=[iga_side_id])
     player_to_serve = db.relationship("People", foreign_keys=[player_to_serve_id])
     team_to_serve = db.relationship("Teams", foreign_keys=[team_to_serve_id])
+    elo_delta = db.relationship("EloChange")
+
     row_titles = ["Rounds",
                   "Score Difference",
                   "Elo Gap",
@@ -115,6 +121,22 @@ class Games(db.Model):
                   "Format",
                   "Tournament"
                   ]
+
+    @property
+    def teams_protested(self):
+        from database.models import GameEvents
+        events = GameEvents.query.filter(GameEvents.game_id == self.id, GameEvents.event_type == 'Protest').all()
+        return events
+
+    @property
+    def formatted_start_time(self):
+        if self.start_time < 0: return "??"
+        return time.strftime("%d/%m/%y (%H:%M)", time.localtime(self.start_time))
+
+    @property
+    def formatted_length(self):
+        if self.start_time < 0: return "??"
+        return time.strftime("(%H:%M:%S)", time.localtime(self.length))
 
     def reset(self):
         self.started = False
@@ -147,7 +169,8 @@ class Games(db.Model):
             "Ace Percentage": sum(i.aces_scored for i in pgs) / ((self.team_one_score + self.team_two_score) or 1),
             "Faults": sum(i.faults for i in pgs),
             "Fault Percentage": sum(i.faults for i in pgs) / ((self.team_one_score + self.team_two_score) or 1),
-            "Start Time": 0 if not self.start_time or self.start_time <= 0 else (self.start_time - Games.query.filter(Games.start_time > 0).order_by(Games.start_time).first().start_time) / (24.0 * 60 * 60 * 60),
+            "Start Time": 0 if not self.start_time or self.start_time <= 0 else (self.start_time - Games.query.filter(
+                Games.start_time > 0).order_by(Games.start_time).first().start_time) / (24.0 * 60 * 60 * 60),
             "Court": self.court,
             "Ranked": self.ranked,
             "Timeline": self.id,

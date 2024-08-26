@@ -9,9 +9,9 @@
 {% block bodyBlock %}
     <div class="row">
         <div class="col-sm-8">
-            <a href="/{{ tournamentLink }}teams/{{ team }}">
-                <img src="/api/teams/image?name={{ team }}" class="team_logo"></a>
-            <h1><a href="/{{ tournamentLink }}players/{{ player }}" class="hide">Statistics for {{ name }}</a></h1>
+            <a href="/{{ tournamentLink }}teams/{{ team.searchable_name }}">
+                <img src="{{ team.image_url }}" class="team_logo"></a>
+            <h1><a href="/{{ tournamentLink }}players/{{ player.searchable_name }}" class="hide">Statistics for {{ player.name }}</a></h1>
             <table class="jaredTable">
                 <tbody>
                 {% for k, v in stats.items() %}
@@ -39,17 +39,17 @@
         </div>
         <div class="col-sm-4">
             <div style="min-height: 400px">
-                <h2><a class="hide" href="/{{ tournamentLink }}fixtures/admin?team={{ team.searchableName }}">Cards</a>
+                <h2><a class="hide" href="/{{ tournamentLink }}fixtures/admin?team={{ team.searchable_name }}">Cards</a>
                 </h2>
-                {% for type, reason, hex, game, name in cards %}
-                    <p><a href="/games/{{ game }}/admin" class="hide"><b>[<span
-                            style="color: {{ hex }}">{{ type }}</span>]:
-                    </b> <i>{{ name }}</i> for <i>{{ reason }}</i></a></p>
+                {% for i in cards %}
+                    <p><a href="/games/{{ i.game_id }}/admin" class="hide"><b>[<span
+                            style="color: {{ i.hex }}">{{ i.type }}</span>]:
+                    </b> <i>{{ i.reason }}</i></a></p>
 
                 {% endfor %}
             </div>
             <div>
-                <h2><a class="hide" href="/{{ tournamentLink }}fixtures/admin?team={{ team.searchableName }}">Noteable
+                <h2><a class="hide" href="/{{ tournamentLink }}fixtures/admin?team={{ team.searchable_name }}">Noteable
                     Matches</a></h2>
                 {% for line in key_games %}
                     <p style="color: black;"><a class="hide"

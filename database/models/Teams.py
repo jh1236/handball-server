@@ -1,8 +1,6 @@
-"""Defines the comments object and provides functions to get and manipulate one"""
 import time
 
 from database import db
-
 
 # create table main.teams
 # (
@@ -20,6 +18,10 @@ from database import db
 # substitute     INTEGER
 # references main.people
 # );
+
+PERCENTAGES = [
+    "Percentage"
+]
 
 
 class Teams(db.Model):
@@ -45,8 +47,70 @@ class Teams(db.Model):
 
     def elo(self, last_game=None):
         from database.models import People
-        players = People.query.filter((People.id == self.captain_id) | (People.id == self.non_captain_id) | (People.id == self.substitute_id))
+        players = People.query.filter(
+            (People.id == self.captain_id) | (People.id == self.non_captain_id) | (People.id == self.substitute_id)).all()
+        if not players:
+            return 1500.0
         elos = []
         for i in players:
             elos.append(i.elo(last_game))
         return sum(elos) / len(elos)
+
+    @property
+    def short_name(self):
+        return self.name if len(self.name) < 30 else self.name[:27] + "..."
+
+    def players(self):
+        return [i for i in [self.captain, self.non_captain, self.substitute] if i]
+
+    def stats(self, games_filter=None, make_nice=True, ranked=True):
+
+        from database.models import PlayerGameStats, Games
+        games = Games.query.filter((Games.team_one_id == self.id) | (Games.team_two_id == self.id),
+                                   Games.is_bye == False, Games.is_final == False)
+        pgs = PlayerGameStats.query.join(Games, PlayerGameStats.game_id == Games.id).filter(
+            Games.is_bye == False, Games.is_final == False,
+            PlayerGameStats.team_id == self.id)
+        # '== False' is not an error here, as Model overrides __eq__, so using a not operator provides a different result
+        if self.non_captain_id is not None and ranked:
+            games = games.filter(Games.ranked)
+            pgs = pgs.filter(Games.ranked)
+
+        if games_filter:
+            games = games_filter(games)
+            pgs = games_filter(pgs)
+
+        games = games.all()
+        pgs = pgs.all()
+
+        ret = {
+            "Elo": self.elo(games[-1].id if games else 9999999),
+            "Games Played": len(games),
+            "Games Won": sum(i.winning_team_id == self.id for i in games),
+            "Games Lost": sum(i.winning_team_id != self.id for i in games),
+            "Percentage": sum(i.winning_team_id == self.id for i in games) / (len(games) or 1),
+            "Green Cards": sum(i.green_cards for i in pgs),
+            "Yellow Cards": sum(i.yellow_cards for i in pgs),
+            "Red Cards": sum(i.red_cards for i in pgs),
+            "Faults": sum(i.faults for i in pgs),
+            "Double Faults": sum(i.double_faults for i in pgs),
+            "Timeouts Called": sum(
+                (i.team_one_timeouts if i.team_one_id == self.id else i.team_two_timeouts) for i in games),
+            # Points for and against are different because points for shouldn't include opponents double faults, but points against should
+            "Points Scored": sum(i.points_scored for i in pgs),
+            "Points Against": sum((i.team_two_score if i.team_one_id == self.id else i.team_one_score) for i in games),
+            "Point Difference": sum(i.points_scored for i in pgs) - sum(
+                (i.team_two_score if i.team_one_id == self.id else i.team_one_score) for i in games),
+        }
+        if make_nice:
+            for k, v in ret.items():
+                if k in PERCENTAGES:
+                    ret[k] = f"{100.0 * v: .2f}%"
+                elif isinstance(v, float):
+                    ret[k] = round(v, 2)
+        return ret
+
+    @classmethod
+    @property
+    def BYE(cls):
+        return cls.query.filter(cls.id == 1).first()

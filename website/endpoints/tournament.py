@@ -111,6 +111,8 @@ def add_tourney_endpoints(app):
         if request.json["playerTwo"]:
             with open("./config/signups/teams.json") as fp:
                 teams = json.load(fp)
+            if request.json["teamName"] in teams:
+                return "Team already exists", 401
             teams[request.json["teamName"]] = {
                 "players": [
                     request.json["playerOne"],

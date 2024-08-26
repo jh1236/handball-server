@@ -248,11 +248,11 @@ function openCardModal(colorIn, firstTeam, teamName) {
     firstTeamSelected = firstTeam
     console.log(players)
     console.log(players.length)
-    document.getElementById("nameOne").textContent = playerLookup[players[0]]
+    document.getElementById("nameOne").textContent = playerLookup[players[0]].replace(/[\n\r]/g, '')
     if (players.length > 1) {
-        document.getElementById("nameTwo").textContent = playerLookup[players[1]]
-        document.getElementById("nameTwo").style.display = "block"
-        document.getElementById("playerTwo").style.display = "block"
+        document.getElementById("nameTwo").textContent = playerLookup[players[1]].replace(/[\n\r]/g, '')
+        document.getElementById("nameTwo").style.display = ""
+        document.getElementById("playerTwo").style.display = ""
     } else {
         document.getElementById("nameTwo").style.display = "none"
         document.getElementById("playerTwo").style.display = "none"
@@ -416,7 +416,6 @@ function timeoutOverlay(timeIn = 0, firstTeam) {
 
 function startServeClock() {
     if (waiting) return
-    waiting = true
     if (startTime > 0) {
         stopServeClock()
         return
@@ -429,11 +428,7 @@ function startServeClock() {
         }), headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }).then(
-        () => {
-            waiting = false
-        }
-    );
+    });
 }
 
 function forfeit(firstTeam) {

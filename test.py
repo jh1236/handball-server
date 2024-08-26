@@ -1,3 +1,5 @@
+import traceback
+
 from database import db
 from database.models import *
 from start import app
@@ -41,16 +43,16 @@ def regen_elo():
     db.session.commit()
 
 
-def sync_all_games():
+def sync_all_games(start=0):
     games = Games.query.all()
-    for i in games:
+    for i in games[start:]:
         if i.is_bye: continue
         if i.id % 20 == 0:
             print(f"Syncing Game {i.id}")
         try:
             manage_game.sync(i.id)
         except Exception as e:
-            print(e.args)
+            print(traceback.format_exc())
             print(f"Game {i.id} failed to sync")
     db.session.commit()
 
@@ -77,5 +79,6 @@ def interpolate_start_times():
 
 if __name__ == '__main__':
     with app.app_context():
-        sync_all_games()
-        db.session.commit()
+        manage_game.create_tournament("The Seventh SUSS Championship", "RoundRobin", "BasicFinals", True, True, True,
+                                      [97, 99, 100, 101, 102, 103],
+                                      [1, 2, 3, 4, 13, 14])

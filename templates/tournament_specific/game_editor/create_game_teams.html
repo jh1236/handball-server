@@ -21,9 +21,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamOne">Team One</button>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="T1">
+                    <input id="searchT1" class="dropbtn" type="text">
                     {% for team in teams %}
-                    <p onclick="setTeamOne('{{team[0]}}', '{{team[1]}}')">{{team[1]}}</p>
+                    <p onclick="setTeamOne('{{team.searchable_name}}', '{{team.name}}')">{{team.name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -32,9 +33,10 @@
         <td>
             <div class="dropdown">
                 <button onclick="myFunction(this)" class="button dropbtn" id="teamTwo">Team Two</button>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="T2">
+                    <input id="searchT2" class="dropbtn" type="text">
                     {% for team in teams %}
-                    <p onclick="setTeamTwo('{{team[0]}}', '{{team[1]}}')">{{team[1]}}</p>
+                    <p onclick="setTeamTwo('{{team.searchable_name}}', '{{team.name}}')">{{team.name}}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -46,15 +48,15 @@
     <button disabled class="button" id="umpire">Official</button>
 {% else %}
     <div class="dropdown">
-    <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
-    <div class="dropdown-content">
-        {% for i in officials %}
-        <p onclick="setOfficial('{{i[0]}}', '{{i[1]}}')">{{i[1]}}</p>
-        {% endfor %}
+        <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
+        <div class="dropdown-content">
+            {% for i in officials %}
+                <p onclick="setOfficial('{{i.person.searchable_name}}', '{{i.person.name}}')">{{i.person.name}}</p>
+            {% endfor %}
+        </div>
     </div>
-</div>
 {% endif %}
-<script>setOfficial('{{officials[0][0]}}', '{{officials[0][1]}}')</script>
+<script>setOfficial('{{officials[0].person.searchable_name}}', '{{officials[0].person.name}}')</script>
 
 <br>
 <br>

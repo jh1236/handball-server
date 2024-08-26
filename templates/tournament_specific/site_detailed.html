@@ -21,8 +21,8 @@
         <th style="width: 220px;"><b>First Team</b></th>
         <th></th>
         <th style="width: 220px;"><b>Second Team</b></th>
-        <th style="width: 100px;"><b>Umpire</b></th>
-        {% if t.scorer %}
+        <th style="width: 100px;"><b>Official</b></th>
+        {% if t.has_scorer %}
             <th style="width: 100px;"><b>Scorer</b></th> {% endif %}
         {% if t.two_courts %}
             <th  style="width: 100px;"><b>Court</b></th> {% endif %}
@@ -40,18 +40,18 @@
         {% for game in round %}
 
             <tr>
-                <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a></td>
+                <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one.name }}</a></td>
                 <td><a href="/games/{{ game.id }}" class="hide"> vs </a></td>
-                <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[1] }}</a></td>
-                <td><a href="/{{ tournamentLink }}officials/{{ game.umpireqSearchableName }}"
-                       class="hide"><i>{{ game.umpire }}</i></a></td>
-                {% if t.scorer %}
-                    <td><i><a href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}"
-                              class="hide">{{ game.scorer }}</a></i></td> {% endif %}
+                <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_two.name }}</a></td>
+                <td><a href="/games/{{ game.id }}"
+                       class="hide"><i>{{ game.official.person.name if game.official else '-' }}</i></a></td>
+                {% if t.has_scorer %}
+                    <td><i><a href="/games/{{ game.id }}"
+                              class="hide">{{ game.scorer.person.name if game.scorer else '-' }}</a></i></td> {% endif %}
                 {% if t.two_courts %}
                     <td><a href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"
-                           class="hide">{{ game.court_name }}</a></td> {% endif %}
-                <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
+                           class="hide">Court {{ game.court + 1 }}</a></td> {% endif %}
+                <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one_score }} - {{ game.team_two_score }}</a></td>
             </tr>
 
         {% endfor %}
@@ -71,18 +71,18 @@
             </tr>
             {% for game in round %}
                 <tr>
-                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[0] }}</a></td>
-                    <td><a href="/games/{{ game.id }}" class="hide"> vs</a></td>
-                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.teams[1] }}</a></td>
-                    <td><a href="/{{ tournamentLink }}fixtures/detailed?umpire={{ game.umpireSearchableName }}"
-                           class="hide"><i>{{ game.umpire }}</i></a></td>
-                    {% if t.scorer %}
-                        <td><i><a href="/{{ tournamentLink }}officials/{{ game.scorerSearchableName }}"
-                                  class="hide">{{ game.scorer }}</a></i></td> {% endif %}
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one.name }}</a></td>
+                    <td><a href="/games/{{ game.id }}" class="hide"> vs </a></td>
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_two.name }}</a></td>
+                    <td><a href="/games/{{ game.id }}"
+                           class="hide"><i>{{ game.official.person.name }}</i></a></td>
+                    {% if t.has_scorer %}
+                        <td><i><a href="/games/{{ game.id }}"
+                                  class="hide">{{ game.scorer.person.name }}</a></i></td> {% endif %}
                     {% if t.two_courts %}
                         <td><a href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"
-                               class="hide">{{ game.court_name }}</a></td> {% endif %}
-                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.score_string }}</a></td>
+                               class="hide">Court {{ game.court + 1 }}</a></td> {% endif %}
+                    <td><a href="/games/{{ game.id }}" class="hide">{{ game.team_one_score }} - {{ game.team_two_score }}</a></td>
                 </tr>
 
             {% endfor %}

@@ -1,62 +1,73 @@
 {
-    "Aesthetic GFs": {
+    "International Waters": {
         "colors": [
-            "None/Unknown",
-            "None/Unknown"
+            "Blue",
+            "Pink"
         ],
         "players": [
-            "Kiara",
-            "Florencia (Flo)"
+            "Jared Healy",
+            "William Prozerska"
         ]
     },
-    "But t Buddies": {
-        "colors": [
-            "None/Unknown",
-            "None/Unknown"
-        ],
-        "players": [
-            "Alex Soudure",
-            "Liam Cooper"
-        ]
-    },
-    "Handchester United": {
-        "colors": [
-            "Red",
-            "None/Unknown"
-        ],
-        "players": [
-            "Edward Smith",
-            "Maddie Harvey"
-        ]
-    },
-    "Saelmoa": {
+    "Kazakhstan": {
         "colors": [
             "Black",
             "Red"
         ],
         "players": [
-            "Brigitte",
-            "Sophie"
+            "Jamie Farago",
+            "Connor Li"
         ]
     },
-    "The Baes": {
+    "Lichtenstein": {
         "colors": [
-            "Pink",
-            "None/Unknown"
+            "Blue",
+            "Red"
         ],
         "players": [
-            "Eva",
-            "Dora"
+            "Charlie Wyatt",
+            "James Turner"
         ]
     },
-    "WWBD": {
+    "Mozambique": {
         "colors": [
-            "Pink",
-            "Orange"
+            "Black",
+            "White"
         ],
         "players": [
-            "Digby Ross",
-            "Jared Healy"
+            "Lachlan Banks",
+            "Digby Ross"
+        ]
+    },
+    "Saint Vincent and the Grenadines": {
+        "colors": [
+            "Green",
+            "Yellow"
+        ],
+        "players": [
+            "Tristan Nel",
+            "Dora Wan"
+        ]
+    },
+    "Transcaucasian Socialist Federative Soviet Republic": {
+        "colors": [
+            "Red",
+            "White"
+        ],
+        "players": [
+            "Alex Soudure",
+            "Eva Hajigabriel"
+        ]
+    },
+    "Vatican City": {
+        "colors": [
+            "Black",
+            "Blue"
+        ],
+        "players": [
+            "Tomasz Sakowski",
+            "Sharai Rose",
+            "Ethan Dal Molin"
         ]
     }
 }
