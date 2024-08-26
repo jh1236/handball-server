@@ -589,50 +589,15 @@ def add_tournament_specific(app):
                 200,
             )
 
-    @app.get("/<tournament>/officials/<nice_name>/")
-    def official_site(tournament, nice_name):
-
+    @app.get("/<tournament_searchable>/officials/<nice_name>/")
+    def official_site(tournament_searchable, nice_name):
         recent_games = []
-        stats = {
-            "Green Cards Given": 0,
-            "Yellow Cards Given": 0,
-            "Red Cards Given": 0,
-            "Cards Given": 0,
-            "Cards Per Game": 0,
-            "Faults Called": 0,
-            "Faults Per Game": 0,
-            "Games Umpired": 0,
-            "Games Scored": 0,
-            "Rounds Umpired": 0
-        }
-        tournament_id = get_tournament_id(tournament)
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
         official = Officials.query.join(People).filter(People.searchable_name == nice_name).first()
-        q = db.session.query(PlayerGameStats).join(Games, Games.id == PlayerGameStats.game_id).filter(
-            Games.official_id == official.id)
-        if tournament:
-            q = q.filter(Games.tournament_id == tournament_id)
-        prev_game_id = -1
-        for pgs in q.all():
-            stats["Green Cards Given"] += pgs.green_cards
-            stats["Yellow Cards Given"] += pgs.yellow_cards
-            stats["Red Cards Given"] += pgs.red_cards
-            stats["Cards Given"] += pgs.green_cards + pgs.yellow_cards + pgs.red_cards
-            stats["Faults Called"] += pgs.faults
-            if pgs.game_id > prev_game_id:
-                stats["Games Umpired"] += 1
-                stats["Rounds Umpired"] += pgs.game.team_one_score + pgs.game.team_two_score
-
-        q = Games.query.filter(Games.scorer_id == official.id)
         games = Games.query.filter((Games.official_id == official.id) | (Games.scorer_id == official.id))
-
-        if tournament:
-            q = q.filter(Games.tournament_id == tournament_id)
-            games = games.filter(Games.tournament_id == tournament_id)
+        if tournament_searchable:
+            games = games.filter(Games.tournament_id == tournament.id)
         games = games.all()
-        stats["Games Scored"] = len(q.all())
-        stats["Cards Per Game"] = round(stats["Cards Given"] / (stats["Games Umpired"] or 1), 2)
-        stats["Faults Per Game"] = round(stats["Faults Called"] / (stats["Games Umpired"] or 1), 2)
-
         for g in games:
             recent_games.append(
                 (
@@ -646,7 +611,7 @@ def add_tournament_specific(app):
                 "tournament_specific/official.html",
                 name=official.person.name,
                 link=nice_name,
-                stats=[(k, v) for k, v in stats.items()],
+                stats=[(k, v) for k, v in official.stats(tournament).items()],
                 games=recent_games,
             ),
             200,

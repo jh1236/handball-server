@@ -85,7 +85,7 @@ class Teams(db.Model):
 
         ret = {
             "Elo": self.elo(games[-1].id if games else 9999999),
-            "Games Played": len(games),
+            "Games Played": len([i for i in games if i.started]),
             "Games Won": sum(i.winning_team_id == self.id for i in games),
             "Games Lost": sum(i.winning_team_id != self.id for i in games),
             "Percentage": sum(i.winning_team_id == self.id for i in games) / (len(games) or 1),

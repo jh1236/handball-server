@@ -68,6 +68,51 @@ class People(db.Model):
             elo_deltas = elo_deltas.filter(EloChange.game_id <= last_game)
         return 1500.0 + sum(i.elo_delta for i in elo_deltas)
 
+    def simple_stats(self, games_filter=None, make_nice=True, include_unranked=False, include_solo=False) -> dict[
+        str, str | float]:
+        from database.models import PlayerGameStats, Games
+        from database.models import Teams
+        q = db.session.query(Games, PlayerGameStats, Teams).filter(
+            PlayerGameStats.game_id == Games.id,
+            PlayerGameStats.player_id == self.id,
+            Teams.id == PlayerGameStats.team_id)
+        q = q.filter(Games.is_bye == False, Games.is_final == False)
+        # '== False' is not an error here, as Model overrides __eq__, so using a not operator provides a different result
+        if games_filter:
+            q = games_filter(q)
+        if not include_unranked:
+            if not include_solo:
+                q = q.filter(Games.ranked)
+            else:
+                q = q.filter(Games.ranked | (Teams.non_captain_id == None))
+
+        q = q.all()
+        games = [i[0] for i in q]
+        players = [i[1] for i in q]
+        games_played = len(games) or 1  # used as a divisor to save me thinking about div by zero
+        ret = {
+            "B&F Votes": len([i for i in games if i.best_player_id == self.id]),
+            "Elo": self.elo(max([i.id for i in games] + [0])),
+            "Games Won": len([g for g, p in zip(games, players) if g.winning_team_id == p.team_id]),
+            "Games Lost": len([g for g, p in zip(games, players) if g.winning_team_id != p.team_id]),
+            "Games Played": len([i for i in games if i.started]),
+            "Percentage": len([g for g, p in zip(games, players) if g.winning_team_id == p.team_id]) / games_played,
+            "Points Scored": sum(i.points_scored for i in players),
+            "Points Served": sum(i.served_points for i in players),
+            "Aces Scored": sum(i.aces_scored for i in players),
+            "Faults": sum(i.faults for i in players),
+            "Double Faults": sum(i.double_faults for i in players),
+            "Green Cards": sum(i.green_cards for i in players),
+            "Yellow Cards": sum(i.yellow_cards for i in players),
+            "Red Cards": sum(i.red_cards for i in players)
+        }
+        for k, v in ret.items():
+            if k in PERCENTAGES:
+                ret[k] = f"{100.0 * v: .2f}%"
+            elif isinstance(v, float):
+                ret[k] = round(v, 2)
+        return ret
+
     def stats(self, games_filter=None, make_nice=True, include_unranked=False, include_solo=False) -> dict[
         str, str | float]:
         from database.models import PlayerGameStats, Games
@@ -99,7 +144,7 @@ class People(db.Model):
             "Elo": self.elo(max([i.id for i in games] + [0])),
             "Games Won": len([g for g, p in zip(games, players) if g.winning_team_id == p.team_id]),
             "Games Lost": len([g for g, p in zip(games, players) if g.winning_team_id != p.team_id]),
-            "Games Played": len(games),
+            "Games Played": len([i for i in games if i.started]),
             "Percentage": len([g for g, p in zip(games, players) if g.winning_team_id == p.team_id]) / games_played,
             "Points Scored": sum(i.points_scored for i in players),
             "Points Served": sum(i.served_points for i in players),

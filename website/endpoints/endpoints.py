@@ -30,7 +30,7 @@ def add_endpoints(app):
     @app.get("/api/users/image")
     def user_image():
         team = request.args.get("name", type=str)
-        if os.path.isfile(f"./resources/images/teams/{team}.png"):
+        if os.path.isfile(f"./resources/images/users/{team}.png"):
             return send_file(
                 f"./resources/images/users/{team}.png", mimetype="image/png"
             )

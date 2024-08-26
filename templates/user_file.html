@@ -6,102 +6,90 @@
 {% endblock %}
 
 {% block bodyBlock %}
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<a href="/user">
-    <img src="/api/users/image?name={{ user.nice_name() }}" class="title_logo"></a>
-<h1><a href="/user/" class="hide">{{ user.name }}</a></h1><a class="hide" href="/logout/"><i>(Log out)</i></a>
-<div class="row">
-    <div class="col">
-        <div style="min-height: 200px">
-            <h2>Games To Play</h2>
-            {% if not to_play %}
-                <br>
-                <br>
-                <i>No Ongoing Games</i>
-            {% else %}
-                <table class="jaredTable">
-                <tbody>
-                <tr>
-                    <th>Team One</th>
-                    <td></td>
-                    <th>Team Two</th>
-                    <th>Court</th>
-                    {% for i in to_play %}
-                        <tr>
-                            <td><a href="/games/{{ i.id }}"
-                                   class="hide">{{ i.teams[0] }}</a></td>
-                            <td><a href="/games/{{ i.id }}" class="hide">vs</a></td>
-                            <td><a href="/games/{{ i.id }}"
-                                   class="hide">{{ i.teams[1] }}</a></td>
-                            <td><a href="/games/{{ i.id }}"
-                                   class="hide">{{ i.court_display }}</a></td>
-                        </tr>
-                    {% endfor %}
-            {% endif %}
-            </tbody>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <a href="/user">
+        <img src="/api/users/image?name={{ user.searchable_name }}" class="title_logo"></a>
+    <h1><a href="/user/" class="hide">{{ user.name }}</a></h1><a class="hide" href="/logout/"><i>(Log out)</i></a>
+    <div class="row">
+        <div class="col">
+            <div style="min-height: 200px">
+                <h2>Recent Games</h2>
+                {% if not recent %}
+                    <br>
+                    <br>
+                    <i>No Recent Games</i>
+                {% else %}
+                    <table class="jaredTable">
+                    <tbody>
+                    <tr>
+                        <th>Role</th>
+                        <th>Team One</th>
+                        <td></td>
+                        <th>Team Two</th>
+                        <th>Score</th>
+                        {% for i in recent %}
+                            <tr>
+                                <td>
+                                    {% if not i.started %} <i> {% endif %}
+                                    <a href="/games/{{ i.id }}"
+                                       class="hide">{{ 'Umpire' if i.official_id == umpire.id else ('Scorer' if i.scorer_id == umpire.id else 'Player') }}</a>
+                                    {% if not i.started %} </i> {% endif %}
+                                </td>
+                                <td>
+                                    {% if not i.started %} <i> {% endif %}
+                                    <a href="/games/{{ i.id }}"
+                                       class="hide">{{ i.team_one.name }}</a>
+                                    {% if not i.started %} </i> {% endif %}
+                                </td>
+                                <td>
+                                    {% if not i.started %} <i> {% endif %}
+                                    <a href="/games/{{ i.id }}" class="hide">vs</a>
+                                    {% if not i.started %} </i> {% endif %}
+                                </td>
+                                <td>
+                                    {% if not i.started %} <i> {% endif %}
+                                    <a href="/games/{{ i.id }}"
+                                       class="hide">{{ i.team_two.name }}</a>
+                                    {% if not i.started %} </i> {% endif %}
+                                </td>
+                                <td>
+                                    {% if not i.started %} <i> {% endif %}
+                                    <a href="/games/{{ i.id }}"
+                                       class="hide">{{ i.team_one_score }} - {{ i.team_two_score }}</a>
+                                    {% if not i.started %} </i> {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                {% endif %}
+                </tbody>
 
-            </table>
-        </div>
-        <div style="min-height: 200px">
-            <h2>Games To Officiate</h2>
-            {% if not to_officiate %}
+                </table>
+            </div>
+            <br>
+            <div style="min-height: 200px">
+                <h2>A 4th section</h2>
                 <br>
                 <br>
-                <i>No Ongoing Games</i>
-            {% else %}
-                <table class="jaredTable">
-                <tbody>
-                <tr>
-                    <th>Team One</th>
-                    <td></td>
-                    <th>Team Two</th>
-                    <th>Official</th>
-                    <th>Scorer</th>
-                    <th>Court</th>
-                    {% for i in to_officiate %}
-                        <tr>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}"
-                                   class="hide">{{ i.teams[0] }}</a></td>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}" class="hide">vs</a></td>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}"
-                                   class="hide">{{ i.teams[1] }}</a></td>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}"
-                                   class="hide">{{ i.primary_official }}</a></td>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}"
-                                   class="hide">{{ i.scorer }}</a></td>
-                            <td><a href="/{{ i.tournament.nice_name() }}/games/{{ i.id }}"
-                                   class="hide">{{ i.court_display }}</a></td>
-                        </tr>
-                    {% endfor %}
-            {% endif %}
-            </tbody>
-
-            </table>
+                <i>I don't know what to put here</i>
+            </div>
         </div>
-    </div>
-    <div class="col">
-        <div style="min-height: 200px">
-            <h2><a class="hide" href="/video/">Videos Set By UM</a></h2>
-            {% if reqd %}
-                {% for i in reqd %}
-                    <p><a class="hide" href="/video/{{ i }}?tags=required,new"><i>Video {{ i }}</i></a></p>
+        <div class="col">
+            <div>
+                <h2><a class="hide" href="/officials/{{ user.searchable_name }}">My Officiating Stats</a></h2>
+                {% for k, v in (umpire.stats()).items() %}
+                    <p>{{ k }}:<i> {{ v }}</i></p>
                 {% endfor %}
-            {% else %}
-                <br>
-                <br>
-                <i>There are no required videos at this time</i>
-            {% endif %}
+            </div>
+            <div>
+                <h2><a class="hide" href="/officials/{{ user.searchable_name }}">My Playing Stats</a></h2>
+                {% for k, v in (user.simple_stats()).items() %}
+                    <p>{{ k }}:<i> {{ v }}</i></p>
+                {% endfor %}
+            </div>
         </div>
-        <div>
-            <h2><a class="hide" href="/officials/{{ user.nice_name() }}">My Stats</a></h2>
-            {% for k, v in (user.get_stats()).items() %}
-                <p>{{ k }}:<i> {{ v }}</i></p>
-            {% endfor %}
-        </div>
+        <br>
+        <br>
     </div>
     <br>
     <br>
-</div>
-<br>
-<br>
 {% endblock %}

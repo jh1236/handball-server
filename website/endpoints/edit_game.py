@@ -4,6 +4,7 @@ from flask import request, jsonify
 
 from structure import manage_game
 from utils.logging_handler import logger
+from utils.permissions import officials_only
 
 
 def add_game_endpoints(app):

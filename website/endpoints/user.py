@@ -1,5 +1,6 @@
 from flask import request, Response
 import utils.permissions
+from database import db
 from database.models import People
 from utils.sidebar_wrapper import render_template_sidebar
 
@@ -25,13 +26,9 @@ def add_user_endpoints(app):
             return response
         return "Wrong Password", 403
 
-    @app.post("/api/logout")
-    def api_logout():
-        """
-        SCHEMA:
-        {
-
-        }
-        """
-        utils.permissions.logout()
-        return "Logged out", 200
+    @app.post("/api/image")
+    def set_user_image():
+        user_id = request.json.get("user_id")
+        image_location = request.json.get("image_location")
+        People.query.filter(People.user_id == user_id).image_url = image_location
+        db.session.commit()

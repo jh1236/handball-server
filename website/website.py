@@ -3,7 +3,8 @@ import random
 from flask import send_file, request, redirect
 
 import utils.permissions
-from database.models import PlayerGameStats, People, Tournaments
+from database import db
+from database.models import PlayerGameStats, People, Tournaments, Officials, Games, EloChange
 from structure.GameUtils import filter_games, get_query_descriptor
 from utils.permissions import fetch_user, officials_only
 from utils.sidebar_wrapper import render_template_sidebar
@@ -64,7 +65,14 @@ def init_api(app):
     @app.get("/user/")
     @officials_only
     def user_page():
-        return render_template_sidebar("user_file.html", user=fetch_user()), 200
+        user = fetch_user()
+        umpire = Officials.query.filter(Officials.person_id == user.id).first()
+        recent = db.session.query(Games).join(PlayerGameStats,
+                                              PlayerGameStats.game_id == Games.id).filter(
+            Games.is_bye == False, (Games.official_id == umpire.id) | (Games.scorer_id == umpire.id) | (
+                        PlayerGameStats.player_id == user.id), ).order_by(Games.started, -Games.start_time).group_by(
+            Games.id).limit(5).all()
+        return render_template_sidebar("user_file.html", user=fetch_user(), umpire=umpire, recent=recent), 200
 
     @app.get("/find")
     def game_finder():

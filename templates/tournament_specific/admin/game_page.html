@@ -39,7 +39,7 @@
             {% endif %}
             <p>{% if not game.is_bye %}<a href="/games/{{ game.id }}/edit" class="hide">{% endif %}<b>Status:</b>
                 {% if not game.is_bye %}</a>{% endif %} <i>{{ game.admin_status }}</i></p>
-            {% if game.start_time > 0 %}
+            {% if game.start_time and game.start_time > 0 %}
                 <p><b>Match Time:</b> <i>{{ game.formatted_start_time }}</i></p>
             {% endif %}
             {% if game.best_player_id %}
@@ -120,7 +120,7 @@
             <div style="min-height: 150px">
                 <h2>Notes</h2>
                 <br>
-                {% if not game.notes.strip() %}
+                {% if not game.notes or not game.notes.strip() %}
                     <i>No notes were left for this game</i>
                 {% else %}
                     {{ game.notes }}
@@ -153,7 +153,7 @@
             <div style="min-height: 150px">
                 <h2>Resolve</h2>
                 <br>
-                {% if not game.status not in ['Official', 'Resolved', 'Bye'] %}
+                {% if game.admin_status in ['Official', 'Resolved', 'Bye', 'Waiting For Start'] %}
                     <i>This game does not need resolution</i>
                 {% else %}
                     <button onclick="resolveGame()" class="button">Resolve</button>

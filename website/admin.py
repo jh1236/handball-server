@@ -378,7 +378,7 @@ def add_admin_pages(app):
 
         card_events = GameEvents.query.filter(
             (GameEvents.event_type == "Warning") | (GameEvents.event_type.like("% Card")),
-            (GameEvents.team_id == team.id),
+            (GameEvents.player_id == player.id),
             GameEvents.tournament_id == tournament).all()
 
         for i in card_events:
@@ -486,7 +486,7 @@ def add_admin_pages(app):
                                 INNER JOIN teams AS serving ON games.team_one_id = serving.id 
                                 INNER JOIN teams as receiving ON games.team_two_id = receiving.id 
                                 WHERE 
-                                    tournament_id = ? AND NOT games.is_bye AND (admin_status <> 'Resolved' AND admin_status <> 'Official' AND admin_status <> 'Forfeited');
+                                    tournament_id = ? AND NOT games.is_bye AND (admin_status <> 'Resolved' AND admin_status <> 'Official' AND admin_status <> 'Forfeited' AND admin_status <> 'Waiting For Start');
                             """,
                 (tournament_id,),
             ).fetchall()
