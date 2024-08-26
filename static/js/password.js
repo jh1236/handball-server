@@ -14,11 +14,9 @@ function runPassword() {
         alert("You have not entered a password!")
         return
     }
-    alert(password+" "+user_id)
 
-    
     //go to /api/login with user_id and password in post body
-    fetch("/api/login/check", {
+    fetch("/api/login", {
         method: "POST",
         body: JSON.stringify({
             "user_id": user_id,
@@ -28,18 +26,10 @@ function runPassword() {
             "Content-Type": "application/json"
         }
     }).then((res) => {
-        res.json().then(
-            o => {
-                if (o.success) { s
-                    alert("success")
-                    document.location.href = "/"
-                } else {
-                    alert("Invalid user id or password!")
-                }
-            }
-        )
+        if (res.status === 200) {
+            window.location.reload()
+        } else {
+            alert("Incorrect password!")
+        }
     })
-    alert("what the fuck");
-
-    // document.location.href = window.location.href.split('?')[0] + '?key=' + input.value
 }

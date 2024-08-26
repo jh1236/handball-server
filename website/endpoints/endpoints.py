@@ -6,6 +6,7 @@ from utils.logging_handler import logger
 from website.endpoints.edit_game import add_game_endpoints
 from website.endpoints.graph import add_graph_endpoints
 from website.endpoints.tournament import add_tourney_endpoints
+from website.endpoints.user import add_user_endpoints
 
 
 def add_endpoints(app):
@@ -52,3 +53,4 @@ def add_endpoints(app):
     add_tourney_endpoints(app)
     add_graph_endpoints(app)
     add_game_endpoints(app)
+    add_user_endpoints(app)

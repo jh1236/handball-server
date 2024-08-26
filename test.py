@@ -5,33 +5,21 @@ from database.models import People
 from website.website import init_api
 
 from utils import permissions
-app = flask.Flask(__name__) # just cause i don't understand the configs im just stealing start.py
-app.config["DEBUG"] = True
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
-app.config['SECRET_KEY'] = 'secret!'
 
-db.init_app(app)
-init_api(app)
-
-with app.app_context():
-    
-    permissions.set_password(21, "2") # 
-    db.create_all()
-    # People.query.filter(People.id == 21).first().password = permissions.encrypt("0")
-    # db.session.commit()
-    
-    if permissions.check_password(21, "2"):
-        # permissions.reset_token(21)
-        print(permissions.get_token(21, "0")) # also checks password
-        print(People.query.filter(People.id == 21).first().token_timeout)
-    else:
-        print("failed")
-
+from start import app
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        if permissions.check_password(21, "0"):
+            # permissions.reset_token(21)
+            print(permissions.get_token(21, "0"))  # also checks password
+            print(People.query.filter(People.id == 21).first().token_timeout)
+        else:
+            print("failed")
 
 # print(permissions.encrypt("0"))
 # print(permissions.encrypt("0"))
 # print(permissions.check_password())
-
 
 
 # from database import db

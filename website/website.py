@@ -1,6 +1,6 @@
 import random
 
-from flask import send_file, request
+from flask import send_file, request, redirect
 
 import utils.permissions
 from database.models import PlayerGameStats, People, Tournaments
@@ -13,7 +13,6 @@ numbers = ["Zero", "One", "Two", "Three", "Four", "Five", "Six"]
 
 
 def init_api(app):
-
     add_endpoints(app)
 
     @app.get("/")
@@ -57,56 +56,6 @@ def init_api(app):
         if rand.randrange(1, 10):
             return send_file("./resources/documents/pdf/code_of_conduct_2.pdf"), 200
         return send_file("./resources/documents/pdf/code_of_conduct.pdf"), 200
-            @app.get("/test/login")
-    @officials_only
-    def user_page2():
-        key = fetch_user()
-        user = People.query.filter(People.password == key).first()
-
-        return """
-        <html><body>
-            <form action="/test/login" method="post">
-            <input type="text" id="name" name="name">
-            <input type="email" id="email" name="email">
-            <input type="submit" value="Submit">
-            </form>
-        </body></html>
-    """, 200
-    
-    @app.post("/api/login/check")
-    def login2():
-        print(str(request.method) + " hi2")
-        print(str(request.form) + " hello2")
-        user_id = request.form.get("user_id")
-        password = request.form.get("password")
-        if utils.permissions.check_password(user_id, password):
-            token =  utils.permissions.get_token(user_id, password)
-            # set cookie to token
-            response = "Logged in", 200
-            response.set_cookie('token', token)
-            response.set_cookie('userID', user_id)
-            response.set_cookie('userName', People.query.filter(People.id == user_id).first().name)
-            return response
-        print("access denied")
-        return "Access Denied", 403
-    
-    @app.get("/api/login")
-    def login():
-        return render_template_sidebar("permissions/login.html", error=""), 200
-        print(str(request.method) + " hi")
-        print(str(request.form) + " hello")
-        if request.method == "POST":
-            user_id = request.form.get("user_id")
-            password = request.form.get("password")
-            if utils.permissions.check_password(user_id, password):
-                token =  utils.permissions.get_token(user_id, password)
-                # set cookie to token
-                response = "Logged in", 200
-                response.set_cookie('token', token)
-                response.set_cookie('userID', user_id)
-                response.set_cookie('userName', People.query.filter(People.id == user_id).first().name)
-                return response
-            return render_template_sidebar("permissions/login.html", error="Incorrect Password or Username"), 200
 
     @app.get("/favicon.ico/")
     def icon():
@@ -115,10 +64,7 @@ def init_api(app):
     @app.get("/user/")
     @officials_only
     def user_page():
-        key = fetch_user()
-        user = People.query.filter(People.password == key).first()
-
-        return "Todo", 500
+        return render_template_sidebar("user_file.html", user=fetch_user()), 200
 
     @app.get("/find")
     def game_finder():

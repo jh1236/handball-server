@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = 'secret!'
 db.init_app(app)
 init_api(app)
 
-cloudflare = True
+cloudflare = False
 
 if cloudflare:
     port = 443
@@ -24,5 +24,5 @@ else:
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=True, ssl_context=ssl_context)
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False, ssl_context=ssl_context)
     # 5000: arbitrary port but one with higher value, lower ones might be reserved
