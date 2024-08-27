@@ -86,9 +86,9 @@ class Teams(db.Model):
         ret = {
             "Elo": self.elo(games[-1].id if games else 9999999),
             "Games Played": len([i for i in games if i.started]),
-            "Games Won": sum(i.winning_team_id == self.id for i in games),
-            "Games Lost": sum(i.winning_team_id != self.id for i in games),
-            "Percentage": sum(i.winning_team_id == self.id for i in games) / (len(games) or 1),
+            "Games Won": sum(i.winning_team_id == self.id for i in games if i.ended),
+            "Games Lost": sum(i.winning_team_id != self.id for i in games if i.ended),
+            "Percentage": sum(i.winning_team_id == self.id for i in games if i.ended) / (len([i for i in games if i.ended]) or 1),
             "Green Cards": sum(i.green_cards for i in pgs),
             "Yellow Cards": sum(i.yellow_cards for i in pgs),
             "Red Cards": sum(i.red_cards for i in pgs),
