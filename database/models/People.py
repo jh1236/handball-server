@@ -89,12 +89,13 @@ class People(db.Model):
         q = q.all()
         games = [i[0] for i in q]
         players = [i[1] for i in q]
-        games_played = len(games) or 1  # used as a divisor to save me thinking about div by zero
+        games_played = len(
+            [i for i in games if i.started]) or 1  # used as a divisor to save me thinking about div by zero
         ret = {
             "B&F Votes": len([i for i in games if i.best_player_id == self.id]),
             "Elo": self.elo(max([i.id for i in games] + [0])),
-            "Games Won": len([g for g, p in zip(games, players) if g.winning_team_id == p.team_id]),
-            "Games Lost": len([g for g, p in zip(games, players) if g.winning_team_id != p.team_id]),
+            "Games Won": len([g for g, p in zip(games, players) if g.winning_team_id == p.team_id and g.ended]),
+            "Games Lost": len([g for g, p in zip(games, players) if g.winning_team_id != p.team_id and g.ended]),
             "Games Played": len([i for i in games if i.started]),
             "Percentage": len([g for g, p in zip(games, players) if g.winning_team_id == p.team_id]) / games_played,
             "Points Scored": sum(i.points_scored for i in players),
