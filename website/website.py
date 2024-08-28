@@ -1,10 +1,10 @@
 import random
 
-from flask import send_file, request, redirect
+from flask import send_file, request
 
 import utils.permissions
 from database import db
-from database.models import PlayerGameStats, People, Tournaments, Officials, Games, EloChange
+from database.models import PlayerGameStats, Tournaments, Officials, Games
 from structure.GameUtils import filter_games, get_query_descriptor
 from utils.permissions import fetch_user, officials_only
 from utils.sidebar_wrapper import render_template_sidebar
@@ -70,8 +70,8 @@ def init_api(app):
         recent = db.session.query(Games).join(PlayerGameStats,
                                               PlayerGameStats.game_id == Games.id).filter(
             Games.is_bye == False, (Games.official_id == umpire.id) | (Games.scorer_id == umpire.id) | (
-                        PlayerGameStats.player_id == user.id), ).order_by(Games.started, -Games.start_time).group_by(
-            Games.id).limit(5).all()
+                        PlayerGameStats.player_id == user.id), ).order_by(Games.started, -Games.start_time, Games.id).group_by(
+            Games.id).limit(10).all()
         return render_template_sidebar("user_file.html", user=fetch_user(), umpire=umpire, recent=recent), 200
 
     @app.get("/find")
