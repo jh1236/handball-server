@@ -543,7 +543,6 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
             elos[i] = sum(j.player.elo() for j in v)
             elos[i] /= len(v) or 1
 
-        print(teams)
         for i in teams:
             my_team = i != teams[0]
             win = game.winning_team_id == i[0].team_id
@@ -553,11 +552,11 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
                 add = EloChange(game_id=game.id, player_id=player_id, tournament_id=game.tournament_id,
                                 elo_delta=elo_delta)
                 db.session.add(add)
-    end_of_round = Games.query.filter(Games.tournament_id == game.tournament_id, not Games.is_bye, not Games.ended).all()
+    games_left_in_round = Games.query.filter(Games.tournament_id == game.tournament_id, Games.is_bye == False, Games.ended == False).all()
     tournament = game.tournament
     sync(game_id)
-
-    if not end_of_round:
+    print(games_left_in_round)
+    if not games_left_in_round:
         if not tournament.in_finals:
             fixtures = get_type_from_name(tournament.fixtures_type, tournament.id)
             fixtures.end_of_round()
