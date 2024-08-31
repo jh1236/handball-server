@@ -5,6 +5,8 @@ from math import ceil
 
 from utils.databaseManager import DatabaseManager
 
+# from database.models import Tournaments
+# from database import db
 
 class FixturesGenerator:
 
@@ -55,6 +57,25 @@ ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
     def begin_tournament(self):
         self._begin_tournament(self.tournament_id)
         self.end_of_round()
+        
+    def end_tournament(self, note="Thank you for participating in the tournament! We look forward to seeing you next time"):
+        """i wanted to auotmate this but i couldnt get it to work, either with sqlalchamy or sqlite"""
+        pass
+    
+    
+    
+        # Tournaments.query.filter(Tournaments.id == self.tournament_id).first().finished = 1
+        # Tournaments.query.filter(Tournaments.id == self.tournament_id).first().notes = note
+        # db.session.commit()
+        # # WHY THE FUCK WONT ANY OF THIS WORK!!!
+        
+        
+        # # with DatabaseManager() as c:
+        # #     c.execute("UPDATE tournaments SET finished = 1 WHERE id = ?", (self.tournament_id,))
+        # #     if note:
+        # #         c.execute("UPDATE tournaments SET notes = ? WHERE id = ?", (note, self.tournament_id))
+        # #     else:
+        # #         c.execute("UPDATE tournaments SET notes = 'Thank you for participating in the tournament! We look forward to seeing you next time' WHERE id = ?", (self.tournament_id,))
 
     def add_umpires(self):
         with DatabaseManager() as c:
@@ -187,10 +208,12 @@ def get_type_from_name(name: str, tournament: int) -> FixturesGenerator:
     from FixtureGenerators.Pooled import Pooled
     from FixtureGenerators.RoundRobin import RoundRobin
     from FixtureGenerators.Swiss import Swiss
+    from FixtureGenerators.TopThreeFinals import TopThreeFinals
     return {
         "BasicFinals": BasicFinals(tournament),
         "Pooled": Pooled(tournament),
         "RoundRobin": RoundRobin(tournament),
         "OneRoundEditable": OneRound(tournament),
-        "Swiss": Swiss(tournament)
+        "Swiss": Swiss(tournament),
+        "TopThreeFinals": TopThreeFinals(tournament)
     }[name]

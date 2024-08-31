@@ -1,7 +1,8 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
+from database.models import Tournaments
 from structure import manage_game
 from utils.databaseManager import DatabaseManager
-
+from database import db
 
 class RoundRobin(FixturesGenerator):
     def __init__(self, tournament):
@@ -26,8 +27,11 @@ ORDER BY tournamentTeams.team_id""",
         if len(teams) % 2 != 0:
             teams += [1]
         if len(teams) <= rounds:
-            with DatabaseManager() as c:
-                c.execute("""UPDATE tournaments SET in_finals = 1 WHERE tournaments.id = ?""", (tournament,))
+            Tournaments.query.filter(Tournaments.id == tournament).first().in_finals = True
+            db.session.commit()
+            # with DatabaseManager() as c:
+                
+            #     c.execute("""UPDATE tournaments SET in_finals = 1 WHERE tournaments.id = ?""", (tournament,))
             return
         print(teams)
 
