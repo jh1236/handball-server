@@ -2,6 +2,7 @@
 import time
 import typing
 
+from collections import defaultdict
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.models import TournamentTeams
@@ -50,21 +51,21 @@ def sorter(teams, tournament) -> list[tuple["Teams", dict[str, float]]]:
             continue
         pools[-1].append(i)
 
-    points = {}
-    for i in pools:
-        if len(i) == 1:
-            points[i[0][0].team_id] = 0
-            continue
-        for j, t1 in enumerate(i):
-            points[t1[0].team_id] = 0
-            for t2 in i[j:]:
-                games = Games.query.filter((Games.team_one_id == t1[0].team_id) | (Games.team_two_id == t1[0].team_id),
-                                           (Games.team_one_id == t2[0].team_id) | (Games.team_two_id == t2[0].team_id),
-                                           Games.ended == True, Games.tournament_id == tournament.id).all()
-                for g in games:
-                    points[g.winning_team_id] += 1
+    points = {} #defaultdict(int) # TODO: FIX THIS
+    # for i in pools:
+    #     if len(i) == 1:
+    #         points[i[0][0].team_id] = 0
+    #         continue
+    #     for j, t1 in enumerate(i):
+    #         points[t1[0].team_id] = 0
+    #         for t2 in i[j:]:
+    #             games = Games.query.filter((Games.team_one_id == t1[0].team_id) | (Games.team_two_id == t1[0].team_id),
+    #                                        (Games.team_one_id == t2[0].team_id) | (Games.team_two_id == t2[0].team_id),
+    #                                        Games.ended == True, Games.tournament_id == tournament.id).all()
+    #             for g in games:
+    #                 points[g.winning_team_id] += 1 # chuck back in points[s[0].team_id],
     return sorted(teams, key=lambda s: (
-        -s[1]["Percentage"], -s[1]["Point Difference"], points[s[0].team_id], -s[1]["Points Scored"], s[1]["Red Cards"],
+        -s[1]["Percentage"], -s[1]["Point Difference"],  -s[1]["Points Scored"], s[1]["Red Cards"],
         s[1]["Yellow Cards"], s[1]["Green Cards"], s[1]["Double Faults"], s[1]["Faults"], s[1]["Timeouts Called"]))
 
 
