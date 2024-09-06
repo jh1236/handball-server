@@ -31,6 +31,10 @@ def init_api(app):
     def pipe():
         return send_file("./resources/pipe.mp3")
 
+    @app.get("/robots.txt")
+    def robots():
+        return send_file("./resources/robots.txt")
+    
     @app.get("/documents/")
     def docs():
         return render_template_sidebar("rules.html"), 200
