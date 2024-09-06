@@ -4,11 +4,12 @@ from flask import request, jsonify
 
 from structure import manage_game
 from utils.logging_handler import logger
-from utils.permissions import officials_only
+from utils.permissions import officials_only, admin_only
 
 
 def add_game_endpoints(app):
     @app.get("/api/games/change_code")
+    @admin_only
     def change_code():
         """
         SCHEMA:
@@ -20,6 +21,7 @@ def add_game_endpoints(app):
         return jsonify({"code": manage_game.change_code(game_id)})
 
     @app.post("/api/games/update/start")
+    @officials_only
     def start():
         """
         SCHEMA:
@@ -47,6 +49,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/score")
+    @officials_only
     def score():
         """
         SCHEMA:
@@ -64,6 +67,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/ace")
+    @officials_only
     def ace():
         """
         SCHEMA:
@@ -77,6 +81,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/substitute")
+    @officials_only
     def substitute():
         """
         SCHEMA:
@@ -94,6 +99,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/pardon")
+    @officials_only
     def pardon():
         """
         SCHEMA:
@@ -111,6 +117,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/end")
+    @officials_only
     def end():
         """
         SCHEMA:
@@ -130,6 +137,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/timeout")
+    @officials_only
     def timeout():
         """
         SCHEMA:
@@ -145,6 +153,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/forfeit")
+    @officials_only
     def forfeit():
         """
         SCHEMA:
@@ -160,6 +169,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/end_timeout")
+    @officials_only
     def end_timeout():
         """
         SCHEMA:
@@ -173,6 +183,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/serve_clock")
+    @officials_only
     def serve_timer():
         """
         SCHEMA:
@@ -187,6 +198,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/fault")
+    @officials_only
     def fault():
         """
         SCHEMA:
@@ -200,6 +212,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/undo")
+    @officials_only
     def undo():
         """
         SCHEMA:
@@ -213,6 +226,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/delete")
+    @officials_only
     def delete():
         """
         SCHEMA:
@@ -226,6 +240,7 @@ def add_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/card")
+    @officials_only
     def card():
         """
         SCHEMA:

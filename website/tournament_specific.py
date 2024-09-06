@@ -775,8 +775,8 @@ def add_tournament_specific(app):
                 200,
             )
 
-    @officials_only
     @app.get("/games/<game_id>/finalise")
+    @officials_only
     def finalise_game(game_id):
         visual_swap = request.args.get("swap", "false") == "true"
         visual_str = "true" if visual_swap else "false"
@@ -844,8 +844,8 @@ def add_tournament_specific(app):
             200,
         )
 
-    @officials_only
     @app.get("/<tournament_name>/create_players")
+    @officials_only
     def create_game_players(tournament_name):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
         players = People.query.order_by(People.searchable_name).all()

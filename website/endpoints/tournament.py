@@ -8,10 +8,11 @@ from database import db
 from database.models import Tournaments
 from structure import manage_game
 from utils.logging_handler import logger
-
+from utils.permissions import admin_only, officials_only
 
 def add_tourney_endpoints(app):
     @app.post("/api/note")
+    @admin_only
     def note():
         """
         SCHEMA:
@@ -47,6 +48,7 @@ def add_tourney_endpoints(app):
             )
 
     @app.post("/api/tournaments/serve_style")
+    @admin_only
     def serve_style():
         """
         WARNING: DO NOT CHANGE WHILE A GAME IS IN PROGRESS
@@ -64,6 +66,7 @@ def add_tourney_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/create")
+    @officials_only
     def create():
         """
         SCHEMA:
@@ -84,6 +87,7 @@ def add_tourney_endpoints(app):
         return jsonify({"id": gid})
 
     @app.post("/api/games/update/resolve")
+    @admin_only
     def resolve():
         """
         SCHEMA:
