@@ -1,4 +1,3 @@
-import time
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -12,8 +11,6 @@ from database.models import People, PlayerGameStats, Games, Tournaments, Tournam
 from structure import manage_game
 from structure.GameUtils import game_string_to_commentary
 from structure.get_information import get_tournament_id
-from structure.manage_game import substitute
-from utils.databaseManager import DatabaseManager
 from utils.permissions import (
     fetch_user,
     officials_only,

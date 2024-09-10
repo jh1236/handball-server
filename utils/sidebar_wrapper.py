@@ -1,7 +1,6 @@
 from flask import request, render_template
 
-from database.models import People
-from utils.databaseManager import DatabaseManager
+from database.models import People, Tournaments
 from utils.permissions import fetch_user_name
 
 
@@ -10,12 +9,11 @@ def link(tournament):
 
 
 def render_template_sidebar(template: str, **kwargs):
-    with DatabaseManager() as c:
-        tournaments = c.execute("""SELECT searchable_name, name FROM tournaments""").fetchall()
+    tournaments = Tournaments.query.all()
     current = None
     for i in tournaments:
-        if i[0] in request.path:
-            current = i
+        if i.searchable_name in request.path:
+            current = (i.searchable_name, i.name)
     current = current or (None, None)
     username = fetch_user_name()
     person = People.query.filter(People.name == username).first()
