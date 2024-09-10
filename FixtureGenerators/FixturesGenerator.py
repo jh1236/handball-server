@@ -3,7 +3,10 @@ from dataclasses import dataclass
 from itertools import zip_longest
 from math import ceil
 
+from database import db
+from database.models import Tournaments, Games
 from utils.databaseManager import DatabaseManager
+
 
 # from database.models import Tournaments
 # from database import db
@@ -33,49 +36,34 @@ class FixturesGenerator:
             self.add_umpires()
 
     def add_courts(self):
-        with DatabaseManager() as c:
-            games_query = c.execute("""
-SELECT games.id,
-       games.round,
-       games.is_final,
-       coalesce(CAST(SUM(otherGames.winning_team_id = teams.id) AS REAL), 0) / max(COUNT(otherGames.id), 1) as o
-FROM games
-         INNER JOIN teams ON (teams.id = games.team_one_id OR teams.id = games.team_two_id)
-         LEFT JOIN games otherGames ON (teams.id = otherGames.team_one_id OR teams.id = otherGames.team_two_id) AND
-                                       games.tournament_id = otherGames.tournament_id AND otherGames.id < games.id
-WHERE games.tournament_id = ?  AND games.started = 0 AND games.is_bye = 0 AND games.round = (SELECT MAX(round) FROM games inn WHERE inn.tournament_id = games.tournament_id AND not inn.is_final)
-GROUP by games.id
-ORDER BY games.round, o DESC""", (self.tournament_id,)).fetchall()
-            games = [i for i in games_query if not i[2]]
-            finals = [i for i in games_query if i[2]]
-            l = ceil(len(games) / 2) - 1
-            for i, g in enumerate(games):
-                c.execute("""UPDATE games SET court = ? WHERE id = ?""", (i > l, g[0]))
-            for i in finals:
-                c.execute("""UPDATE games SET court = 0 WHERE id = ?""", (i[0]))
+        rounds = Games.query.filter(Games.tournament == self.tournament_id).order_by(Games.round.desc()).first().round
+        games = Games.query.filter(Games.tournament_id == self.tournament_id, Games.round == rounds,
+                                   Games.is_bye == False, Games.started == False, Games.is_final == False).all()
+        finals = Games.query.filter(Games.tournament_id == self.tournament_id, Games.round == rounds,
+                                   Games.is_bye == False, Games.started == False, Games.is_final == True).all()
+
+
+
+        l = ceil(len(games) / 2) - 1
+        f = Games.tournament_id == self.tournament_id
+        games.sort(key=lambda x: x.team_one.stats(f)["Games Won"] + x.team_two.stats(f)["Games Won"], reverse=True)
+        for i, g in enumerate(games):
+            g.court = i > l
+        for g in finals:
+            g.court = 0
+        db.session.commit()
 
     def begin_tournament(self):
         self._begin_tournament(self.tournament_id)
         self.end_of_round()
-        
-    def end_tournament(self, note="Thank you for participating in the tournament! We look forward to seeing you next time"):
-        """i wanted to auotmate this but i couldnt get it to work, either with sqlalchamy or sqlite"""
-        pass
-    
-    
-    
-        # Tournaments.query.filter(Tournaments.id == self.tournament_id).first().finished = 1
-        # Tournaments.query.filter(Tournaments.id == self.tournament_id).first().notes = note
-        # db.session.commit()
-        # # WHY THE FUCK WONT ANY OF THIS WORK!!!
-        
-        
-        # # with DatabaseManager() as c:
-        # #     c.execute("UPDATE tournaments SET finished = 1 WHERE id = ?", (self.tournament_id,))
-        # #     if note:
-        # #         c.execute("UPDATE tournaments SET notes = ? WHERE id = ?", (note, self.tournament_id))
-        # #     else:
-        # #         c.execute("UPDATE tournaments SET notes = 'Thank you for participating in the tournament! We look forward to seeing you next time' WHERE id = ?", (self.tournament_id,))
+
+    def end_tournament(self,note="Thank you for participating in the tournament! We look forward to seeing you next time"):
+        """i wanted to automate this but i couldn't get it to work, either with SQLAlchemy or sqlite"""
+
+        tournament = Tournaments.query.filter(Tournaments.id == self.tournament_id).first()
+        tournament.finished = True
+        tournament.notes = note
+        db.session.commit()
 
     def add_umpires(self):
         with DatabaseManager() as c:
@@ -144,7 +132,8 @@ GROUP BY officials.id""",
                             -it.court_one_games,
                         ),
                     )
-                    print(f"c1: {[(i.person_id, i.proficiency) for i in court_one_officials]}, c2: {[(i.person_id, i.proficiency) for i in court_two_officials]}")
+                    print(
+                        f"c1: {[(i.person_id, i.proficiency) for i in court_one_officials]}, c2: {[(i.person_id, i.proficiency) for i in court_two_officials]}")
                     #  games.id, round, court, official, scorer, [players]
 
                     if not g:

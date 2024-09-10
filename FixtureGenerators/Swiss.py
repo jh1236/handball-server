@@ -1,8 +1,10 @@
+from math import log2, ceil
+
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
 from structure import manage_game
 from utils.databaseManager import DatabaseManager
-from collections import defaultdict
-from math import log2,ceil
+
+
 class Swiss(FixturesGenerator):
     def __init__(self, tournament):
 
