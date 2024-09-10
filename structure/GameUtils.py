@@ -1,13 +1,11 @@
 from collections import defaultdict
-from random import random, Random
+from random import Random
 from typing import Callable
 
-from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
 
 from database import db
 from database.models import Games, PlayerGameStats, Taunts, GameEvents
-from utils.databaseManager import DatabaseManager
 
 
 def copy_case(string: str, other: str) -> str:

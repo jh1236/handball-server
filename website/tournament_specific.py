@@ -255,7 +255,7 @@ def add_tournament_specific(app):
 
         prev_event = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
 
-        visual_swap = request.args.get("swap", "false") == "true"
+        visual_swap = (request.args.get("swap", "false") == "true") == (game.iga_side_id == game.team_one_id)
 
         faulted = GameEvents.query.filter(GameEvents.game_id == game_id, (GameEvents.event_type == "Score") | (
                 GameEvents.event_type == "Fault")).order_by(GameEvents.id.desc()).first()
@@ -333,7 +333,10 @@ def add_tournament_specific(app):
         pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).all()
         # quick and dirty hack
         players = [[i for i in pgs if i.team_id == pgs[0].team_id], [i for i in pgs if i.team_id != pgs[0].team_id]]
-        teams = [players[0][0].team, players[1][0].team]  # quicker and dirtier hack
+        if game.is_bye:
+            teams = [players[0][0].team, Teams.query.filter(Teams.id == 1).first()]  # quicker and dirtier hack
+        else:
+            teams = [players[0][0].team, players[1][0].team]  # quicker and dirtier hack
         team_stats: list[dict[str, float | str]] = []
 
         for i, t in enumerate(players):
@@ -354,11 +357,10 @@ def add_tournament_specific(app):
                 team_stats[i]["Red Cards"] += p.red_cards
                 team_stats[i]["Faults"] += p.faults
                 team_stats[i]["Double Faults"] += p.double_faults
-                team_stats[i]["Elo"] += p.player.elo(last_game=game_id)
             team_stats[i]["Timeouts Remaining"] = 1 - (game.team_two_timeouts if i else game.team_one_timeouts)
-            team_stats[i]["Elo"] = round(team_stats[i]["Elo"] / len(t), 2)
+            team_stats[i]["Elo"] = round(t[0].team.elo(last_game=game_id), 2) if t else 1500.0
             elo_change = EloChange.query.filter(EloChange.player_id == t[0].player_id,
-                                                EloChange.game_id == game_id).first()
+                                                EloChange.game_id == game_id).first() if t else None
             if elo_change:
                 elo_delta = round(elo_change.elo_delta, 2)
                 team_stats[i]["Elo"] = f'{team_stats[i]["Elo"]} [{"+" if elo_delta >= 0 else ""}{elo_delta}]'

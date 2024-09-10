@@ -6,7 +6,6 @@ from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 
 from database.models import Games
-from utils.databaseManager import DatabaseManager
 
 T = TypeVar("T")
 
