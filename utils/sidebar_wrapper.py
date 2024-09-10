@@ -19,7 +19,7 @@ def render_template_sidebar(template: str, **kwargs):
     person = People.query.filter(People.name == username).first()
     a = {
         **kwargs,
-        "tournaments": tournaments,
+        "tournaments": [(i.searchable_name, i.name) for i in tournaments],
         "username": username,
         "user_image": (person.image_url if person.image_url else person.image()) if person else None,
     }
