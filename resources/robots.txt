@@ -1,2 +1,18 @@
-User-agent: *
+User-agent: *	
+Disallow:
+Disallow: */admin
+Disallow: /second_suss_championship/
+Disallow: /third_suss_championship/
+Disallow: /fifth_suss_championship/
+Disallow: /fifth_suss_championship/
+Disallow: /sixth_suss_championship/
+Disallow: /seventh_suss_championship/
+Disallow: /suss_practice/
+Disallow: /teams/*/
+Disallow: /players/*/
+Disallow: /officials/*/
+Disallow: /*?
+
+
+User-agent: GPTBot
 Disallow: /
