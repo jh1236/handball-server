@@ -5,7 +5,6 @@ from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.database_utilities import on_court_for_game
 from database.models import *
-from utils.databaseManager import DatabaseManager
 from utils.statistics import calc_elo
 
 SIDES = ["Left", "Right", "Substitute"]
@@ -531,12 +530,14 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
     game.notes = notes.strip()
 
     if game.ranked and not game.is_final:  # the game is unranked, so doing elo stuff is silly
-        team_one = PlayerGameStats.query.filter((PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded > 0) | (game.admin_status == 'Forfeit'),
-                                                PlayerGameStats.team_id == game.team_one_id,
-                                                PlayerGameStats.game_id == game.id).all()
-        team_two = PlayerGameStats.query.filter((PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded > 0) | (game.admin_status == 'Forfeit'),
-                                                PlayerGameStats.team_id == game.team_two_id,
-                                                PlayerGameStats.game_id == game.id).all()
+        team_one = PlayerGameStats.query.filter(
+            (PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded > 0) | (game.admin_status == 'Forfeit'),
+            PlayerGameStats.team_id == game.team_one_id,
+            PlayerGameStats.game_id == game.id).all()
+        team_two = PlayerGameStats.query.filter(
+            (PlayerGameStats.rounds_on_court + PlayerGameStats.rounds_carded > 0) | (game.admin_status == 'Forfeit'),
+            PlayerGameStats.team_id == game.team_two_id,
+            PlayerGameStats.game_id == game.id).all()
         teams = [team_one, team_two]
         elos = [0, 0]
         for i, v in enumerate(teams):
@@ -552,7 +553,8 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
                 add = EloChange(game_id=game.id, player_id=player_id, tournament_id=game.tournament_id,
                                 elo_delta=elo_delta)
                 db.session.add(add)
-    games_left_in_round = Games.query.filter(Games.tournament_id == game.tournament_id, Games.is_bye == False, Games.ended == False).all()
+    games_left_in_round = Games.query.filter(Games.tournament_id == game.tournament_id, Games.is_bye == False,
+                                             Games.ended == False).all()
     tournament = game.tournament
     sync(game_id)
     print(games_left_in_round)
@@ -667,7 +669,8 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
         first_team, second_team = second_team, first_team
 
     g = Games(tournament_id=tournament_id, team_one_id=first_team.id, team_two_id=second_team.id,
-              official_id=official, court=court, is_final=is_final, round=round_number, ranked=ranked, is_bye=is_bye, someone_has_won=is_bye)
+              official_id=official, court=court, is_final=is_final, round=round_number, ranked=ranked, is_bye=is_bye,
+              someone_has_won=is_bye)
     if is_bye:
         g.noteable_status = "Bye"
         g.admin_status = "Bye"
@@ -690,22 +693,25 @@ def create_tournament(name, fixtures_gen, finals_gen, ranked, two_courts, scorer
                       officials: list[int] = None):
     officials = officials or []
     teams = teams or []
-    with DatabaseManager() as c:
-        searchable_name = searchable_of(name)
-        # tournament = Tournaments(name=name, searchable_name=searchable_name, fixtures_type=fixtures_gen,finals_type=finals_gen, ranked=ranked, two_courts=two_courts,has_scorer=scorer,image_ur;=)
-        c.execute("""INSERT INTO tournaments(name, searchable_name, fixtures_type, finals_type, ranked, two_courts,  has_scorer, image_url, finished, is_pooled, notes, in_finals) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, '', 0)""", (
-            name, searchable_name, fixtures_gen, finals_gen, ranked, two_courts, scorer,
-            '/api/tournaments/image?name=' + searchable_name))
-        tournament = c.execute("""SELECT id FROM tournaments ORDER BY id desc LIMIT 1""").fetchone()[0]
-        for i in teams:
-            c.execute(
-                """INSERT INTO tournamentTeams(tournament_id, team_id, pool) VALUES (?, ?, 0)""",
-                (tournament, i))
-        for i in officials:
-            c.execute(
-                """INSERT INTO tournamentOfficials(tournament_id, official_id, is_scorer, is_umpire) VALUES (?, ?, 1, 1)""",
-                (tournament, i))
+    searchable_name = searchable_of(name)
+    tournament = Tournaments(name=name,
+                             searchable_name=searchable_name,
+                             fixtures_type=fixtures_gen,
+                             finals_type=finals_gen,
+                             ranked=ranked,
+                             two_courts=two_courts,
+                             has_scorer=scorer,
+                             image_url='/api/tournaments/image?name=' + searchable_name
+                             )
+
+    db.session.add(tournament)
+    for i in teams:
+        tt = TournamentTeams(tournament_id=tournament.id, team_id=i.id)
+        db.session.add(tt)
+    for i in officials:
+        to = TournamentOfficials(tournament_id=tournament.id, official_id=i.id, is_scorer=True, is_official=True)
+        db.session.add(to)
+    db.session.commit()
     fixtures = get_type_from_name(fixtures_gen, tournament)
     fixtures.begin_tournament()
 

@@ -1,10 +1,11 @@
+from collections import defaultdict
+from random import Random
 from typing import Callable
 
 from werkzeug.datastructures import MultiDict
 
 from database import db
-from database.models import Games, PlayerGameStats
-from utils.databaseManager import DatabaseManager
+from database.models import Games, PlayerGameStats, Taunts, GameEvents
 
 
 def copy_case(string: str, other: str) -> str:
@@ -15,48 +16,27 @@ def copy_case(string: str, other: str) -> str:
 
 def game_string_to_commentary(game: int) -> list[str]:
     out = []
-    with DatabaseManager() as c:
-        game_events = c.execute("""SELECT
-    (SELECT taunt FROM taunts WHERE event_type = taunts.event ORDER BY random()) as newTaunt,
-    people.name                                                                 as person,
-    t1.name                                                                     as team,
-    (SELECT people.name
-     FROM teams
-              INNER JOIN playerGameStats ON teams.id = playerGameStats.team_id AND games.id = playerGameStats.game_id
-              INNER JOIN people ON playerGameStats.player_id = people.id
-     WHERE (team_one_left_id = people.id OR team_one_right_id = people.id OR team_two_left_id = people.id OR team_two_right_id = people.id)
-       AND people.id <> gameEvents.player_id
-       AND teams.id = t1.id)                                                    as team_mate,
-    (SELECT people.name
-     FROM teams
-              INNER JOIN playerGameStats ON playerGameStats.team_id = teams.id
-              INNER JOIN people ON playerGameStats.player_id = people.id
-     WHERE teams.id = t2.id
-     ORDER BY random())                                                         as other_player,
-    t2.name                                                                     as other_team,
-    off.name                                                                    as umpire
+    taunts = defaultdict(list)
+    taunts_query = Taunts.query.all()
+    for i in taunts_query:
+        taunts[i.event].append(i.taunt)
+    ge = GameEvents.query.filter(GameEvents.game_id == game).all()
 
-FROM gameEvents
-         INNER JOIN people on people.id = gameEvents.player_id
-         INNER JOIN teams t1 on gameEvents.team_id = t1.id
-         INNER JOIN games on gameEvents.game_id = games.id
-         INNER JOIN officials on officials.id = games.official_id
-         INNER JOIN people off on off.id = officials.person_id
-         INNER JOIN teams t2 on (games.team_two_id + games.team_one_id - t1.id) = t2.id
+    r = Random(game)
 
-WHERE games.id = ? AND newTaunt is not null AND (gameEvents.notes is null OR gameEvents.notes <> 'Penalty')
-GROUP BY gameEvents.id;""", (game,)).fetchall()
     if not game:
         return ["Hang Tight, the game will start soon!"]
-    for taunt, player, team, team_mate, other_player, other_team, umpire in game_events:
-        if not player: continue
-        team_mate = team_mate or player
-        string = taunt.replace("%p", player).replace("%r", other_player)
+    for i in ge:
+        if not i.player: continue
+        possible = taunts[i.event_type]
+        string = possible[r.randint(0, len(possible) - 1)]
         string = (
-            string.replace("%t", team)
-            .replace("%o", other_team)
-            .replace("%q", team_mate)
-            .replace("%u", repr(umpire))
+            string.replace("%t", i.team.name)
+            .replace("%p", i.player.name)
+            .replace("%r", i.opposite_player.name)
+            .replace("%o", i.other_team.name)
+            .replace("%q", i.team_mate.name)
+            .replace("%u", repr(i.game.official.person.name))  # this is getting ridiculous...
         )
         out.append(string)
     return out
@@ -64,40 +44,10 @@ GROUP BY gameEvents.id;""", (game,)).fetchall()
 
 def game_string_to_events(game: int) -> list[str]:
     out = []
-    with DatabaseManager() as c:
-        game_events = c.execute("""SELECT
-       event_type as taunt,
-       people.name                                                                 as person,
-       t1.name                                                                     as team,
-       (SELECT people.name
-        FROM teams
-                 INNER JOIN playerGameStats ON teams.id = playerGameStats.team_id AND games.id = playerGameStats.game_id
-                 INNER JOIN people ON playerGameStats.player_id = people.id
-        WHERE (team_one_left_id = people.id OR team_one_right_id = people.id OR team_two_left_id = people.id OR team_two_right_id = people.id) 
-          AND people.id <> gameEvents.player_id
-          AND teams.id = t1.id)                                                    as team_mate,
-       (SELECT people.name
-        FROM teams
-                 INNER JOIN playerGameStats ON playerGameStats.team_id = teams.id
-                 INNER JOIN people ON playerGameStats.player_id = people.id
-            AND (event_type <> 'Ace' OR (gameEvents.side_served = 'Left') = (people.id = gameEvents.team_one_left_id OR people.id = gameEvents.team_two_left_id))
-        WHERE teams.id = t2.id
-        ORDER BY random())                                                         as other_player,
-       t2.name                                                                     as other_team,
-       off.name                                                                    as umpire
-
-FROM gameEvents
-         INNER JOIN people on people.id = gameEvents.player_id
-         INNER JOIN teams t1 on gameEvents.team_id = t1.id
-         INNER JOIN games on gameEvents.game_id = games.id
-         INNER JOIN officials on officials.id = games.official_id
-         INNER JOIN people off on off.id = officials.person_id
-         INNER JOIN teams t2 on (games.team_two_id + games.team_one_id - t1.id) = t2.id
-
-WHERE games.id = ? AND (gameEvents.notes is null OR gameEvents.notes <> 'Penalty')
-GROUP BY gameEvents.id""", (game,)).fetchall()
-    for taunt, player, team, team_mate, other_player, other_team, umpire in game_events:
-        string = f"{taunt} for {player} from ({team})."
+    ge = GameEvents.query.filter(GameEvents.game_id == game).all()
+    for i in ge:
+        if not i.player: continue
+        string = f"{i.event_type} for {i.player.name} from {i.team.name}."
         out.append(string)
     return out
 

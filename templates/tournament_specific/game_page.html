@@ -24,7 +24,7 @@
             <p><b>Match Official:</b>{% if not game.is_bye %}
                 <a class="hide"
                    href="/{{ tournamentLink }}officials/{{ game.official.person.searchable_name }}">{% endif %}
-                <i>{{ game.official.person.name }}</i>
+                <i>{{ game.official.person.name if game.official else "None" }}</i>
                 {% if not game.is_bye %}</a> {% endif %}</p>
             {% if game.scorer %}
                 <p><b>Match Scorer:</b>

@@ -66,3 +66,22 @@ class GameEvents(db.Model):
     team_one_right = db.relationship("People", foreign_keys=[team_one_right_id])
     team_two_left = db.relationship("People", foreign_keys=[team_two_left_id])
     team_two_right = db.relationship("People", foreign_keys=[team_two_right_id])
+
+    @property
+    def other_team(self):
+        return self.game.team_two if self.team_id == self.game.team_one_id else self.game.team_one
+
+    @property
+    def opposite_player(self):
+        print(f"{self.team_id} == {self.game.team_one_id} ({self.team_id == self.game.team_one_id})")
+        if self.team_id == self.game.team_one_id:
+            return self.team_two_left if self.player_id == self.team_one_left else self.team_two_right
+        else:
+            return self.team_one_left if self.player_id == self.team_two_left else self.team_one_right
+
+    @property
+    def team_mate(self):
+        if self.team_id == self.game.team_one_id:
+            return self.team_one_left if self.player_id != self.team_one_left else self.team_one_right
+        else:
+            return self.team_two_left if self.player_id != self.team_two_left else self.team_two_right
