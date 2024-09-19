@@ -15,10 +15,12 @@ if (greenCardsUsed && warningsUsed) {
         Warning: {
             "swearing": "Audible Swearing",
             "timeWasting": "Delay of Game",
-            "endOfGameProcess": "Did not follow the end of game process"
+            "endOfGameProcess": "Did not follow the end of game process",
+            "carry": "Unreasonable Carry"
         },
         Green: {
             "dissent": "Disrespect Towards Officials",
+            "knownSwearing": "Audible Swearing",
             "danger": "Dangerous Play (James)",
             "badTimeWasting": "Deliberate Delay of Game",
             "hindrance" : "Deliberately Hindering another Player",
@@ -48,6 +50,7 @@ if (greenCardsUsed && warningsUsed) {
             "timeWasting": "Delay of Game",
             "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
             "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
+            "carry": "Unreasonable Carry"
         },
         Yellow: {
             "directedSwearing": "Swearing Towards Players or Officials",
@@ -74,6 +77,7 @@ if (greenCardsUsed && warningsUsed) {
             "timeWasting": "Delay of Game",
             "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
             "allowedNonCaptain": "Allowed Non Captain to Speak to Umpire",
+            "carry": "Unreasonable Carry"
         },
         Yellow: {
             "directedSwearing": "Swearing Towards Players or Officials",
@@ -96,6 +100,7 @@ if (greenCardsUsed && warningsUsed) {
     CARDS = {
         Yellow: {
             "swearing": "Audible Swearing",
+            "carry": "Unreasonable Carry",
             "dissent": "Disrespect Towards Officials",
             "timeWasting": "Delay of Game",
             "spokeOutOfTurn": "Spoke to Umpire from Outside BRA",
@@ -674,6 +679,7 @@ window.onclick = function (event) {
         document.getElementById("myModal").style.display = "none";
     }
 }
+
 window.onload = () => {
     document.getElementsByClassName("close")[0].onclick = function () {
         document.getElementById("myModal").style.display = "none";
