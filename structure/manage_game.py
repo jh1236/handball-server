@@ -731,7 +731,7 @@ def get_timeout_time(game_id):
     return time_out_time + 30 if (time_out_time > 0) else 0
 
 def get_last_score_time(game_id):
-    most_recent_score = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'score')
+    most_recent_score = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Score')
                        .order_by(GameEvents.id.desc()).first())
     
     if not most_recent_score: return -1
