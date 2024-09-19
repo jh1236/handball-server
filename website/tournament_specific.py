@@ -769,7 +769,8 @@ def add_tournament_specific(app):
                         game.team_one_score - game.team_two_score),
                     VERBAL_WARNINGS=Config().use_warnings,
                     GREEN_CARDS=Config().use_green_cards,
-                    faulted=faulted
+                    faulted=faulted,
+                    last_score_time=manage_game.get_last_score_time(game_id) * 1000
                 ),
                 200,
             )

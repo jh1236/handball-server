@@ -3,6 +3,7 @@ let tournament = ""
 let teamsSwapped = false
 let teamName = ""
 let startTime = -1
+let lastScoreTime = -1
 
 let waiting = false
 let greenCardsUsed = document.currentScript.getAttribute('greens') === 'True'
@@ -413,6 +414,27 @@ function timeoutOverlay(timeIn = 0, firstTeam) {
     }, 10)
 }
 
+function lastScoreTimer(timeIn = 0) {
+    console.log(lastScoreTime)
+    if (timeIn > 0) {
+        lastScoreTime = timeIn
+    }
+
+
+    let clock = Math.round((lastScoreTime - Date.now()) / 100) / 10
+    let element = document.getElementById("serveBtn")
+    element.textContent = `text`
+    
+    // element.textContent = `Ready Timer: ${clock.toFixed(1)}` // what the fuck do you mean "toFixed???
+    // element.style = "font-size:18px;font-weight:bold"
+    setTimeout(() => {lastScoreTimer(-1)}, 10)
+
+    // if (timeoutTime < -5){
+    //     element.textContent = 'Serve Timer'
+    // } else {
+    // }
+}
+
 
 function startServeClock() {
     if (waiting) return
@@ -454,44 +476,44 @@ function forfeit(firstTeam) {
 }
 
 function stopServeClock() {
-    if (waiting) return
-    waiting = true
-    startTime = -1
-    document.getElementById("serveBtn").style = ""
-    document.getElementById("serveBtn").textContent = "Start Serve Timer"
-    fetch("/api/games/update/serve_clock", {
-        method: "POST", body: JSON.stringify({
-            id: id,
-            start: false,
-        }), headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    }).then(
-        (res) => {
-            waiting = false
-            if (res.ok) {
-                location.reload()
-            } else {
-                alert("Error!")
-            }
-        }
-    );
+    // if (waiting) return
+    // waiting = true
+    // startTime = -1
+    // document.getElementById("serveBtn").style = ""
+    // document.getElementById("serveBtn").textContent = "Start Serve Timer"
+    // fetch("/api/games/update/serve_clock", {
+    //     method: "POST", body: JSON.stringify({
+    //         id: id,
+    //         start: false,
+    //     }), headers: {
+    //         "Content-type": "application/json; charset=UTF-8"
+    //     }
+    // }).then(
+    //     (res) => {
+    //         waiting = false
+    //         if (res.ok) {
+    //             location.reload()
+    //         } else {
+    //             alert("Error!")
+    //         }
+    //     }
+    // );
 }
 
 function serveClock(timeIn = 0) {
-    if (timeIn > 0) {
-        startTime = timeIn
-    }
-    let clock = Math.round((startTime - Date.now()) / 100) / 10
-    document.getElementById("serveBtn").textContent = `Serve Timer: ${clock.toFixed(1)}`
-    document.getElementById("serveBtn").style = "font-size:18px;font-weight:bold"
-    if (clock > -3) {
-        setTimeout(serveClock, 10)
-    } else {
-        startTime = -1
-        document.getElementById("serveBtn").style = ""
-        document.getElementById("serveBtn").textContent = "Start Serve Timer"
-    }
+    // if (timeIn > 0) {
+    //     startTime = timeIn
+    // }
+    // let clock = Math.round((startTime - Date.now()) / 100) / 10
+    // document.getElementById("serveBtn").textContent = `Serve Timer: ${clock.toFixed(1)}`
+    // document.getElementById("serveBtn").style = "font-size:18px;font-weight:bold"
+    // if (clock > -3) {
+    //     setTimeout(serveClock, 10)
+    // } else {
+    //     startTime = -1
+    //     document.getElementById("serveBtn").style = ""
+    //     document.getElementById("serveBtn").textContent = "Start Serve Timer"
+    // }
 }
 
 function timeout(firstTeam) {
