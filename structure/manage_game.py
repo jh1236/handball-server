@@ -730,6 +730,14 @@ def get_timeout_time(game_id):
     time_out_time = last_time_out.created_at
     return time_out_time + 30 if (time_out_time > 0) else 0
 
+def get_last_score_time(game_id):
+    most_recent_score = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'score')
+                       .order_by(GameEvents.id.desc()).first())
+    
+    if not most_recent_score: return -1
+    print(most_recent_score.created_at)
+    return most_recent_score.created_at + 20 if (most_recent_score.created_at or -1) + 5 > time.time() else -1
+
 
 def get_timeout_caller(game_id):
     """Returns if the first team listed called the timeout"""
