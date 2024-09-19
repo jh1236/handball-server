@@ -285,7 +285,7 @@ def add_tournament_specific(app):
                 time_elapsed=sec,
                 update_count=manage_game.change_code(int(true_game_id)),
                 timeout_time=manage_game.get_timeout_time(game_id) * 1000,
-                serve_time=manage_game.get_serve_timer(game_id) * 1000,
+                serve_time=max(manage_game.get_serve_timer(game_id), manage_game.get_last_score_time(game_id)) * 1000,
                 id=int(true_game_id)
             ),
             200,
@@ -705,9 +705,9 @@ def add_tournament_specific(app):
         raw_team_one_players = [((1 - i), v) for i, v in enumerate(players[0][:2])]
         raw_team_two_players = [((1 - i), v) for i, v in enumerate(players[1][:2])]
         team_one_players = sorted([((1 - i), v) for i, v in enumerate(players[0][:2])],
-                                         key=lambda a: a[1].player.searchable_name)
+                                  key=lambda a: a[1].player.searchable_name)
         team_two_players = sorted([((1 - i), v) for i, v in enumerate(players[1][:2])],
-                                         key=lambda a: a[1].player.searchable_name)
+                                  key=lambda a: a[1].player.searchable_name)
         all_officials = Officials.query.all()
         # TODO: Write a permissions decorator for scorers and primary officials
         # if key not in [game.primary_official.key, game.scorer.key] and not is_admin:
