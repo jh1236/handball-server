@@ -36,7 +36,7 @@ class FixturesGenerator:
             self.add_umpires()
 
     def add_courts(self):
-        rounds = Games.query.filter(Games.tournament == self.tournament_id).order_by(Games.round.desc()).first().round
+        rounds = Games.query.filter(Games.tournament_id == self.tournament_id).order_by(Games.round.desc()).first().round
         games = Games.query.filter(Games.tournament_id == self.tournament_id, Games.round == rounds,
                                    Games.is_bye == False, Games.started == False, Games.is_final == False).all()
         finals = Games.query.filter(Games.tournament_id == self.tournament_id, Games.round == rounds,
