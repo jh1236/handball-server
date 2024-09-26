@@ -28,7 +28,7 @@
     {% if match_points > 0 %}
         <p style="font-size: 30px"><b>{{ match_points }} Match Points</b></p>
     {% endif %}
-    <p style="font-size: 30px" id="readyTimer"><b>{{ last_score_time }}</b></p>
+    <p style="font-size: 30px; display: none" id="readyTimer"></p>
 
 
     <br>
@@ -425,9 +425,6 @@
         timeoutOverlay({{ timeout_time }}, {{ timeout_first }})
     </script>
 {% endif %}
-<p> {{ last_score_time }} </p>
-<script>console.log("test")</script>
-<script>console.log({{ last_score_time }})</script>
 <script>lastScoreTimer({{ last_score_time }})</script>
 
 </body>
