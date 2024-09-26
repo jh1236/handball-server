@@ -28,6 +28,8 @@
     {% if match_points > 0 %}
         <p style="font-size: 30px"><b>{{ match_points }} Match Points</b></p>
     {% endif %}
+    <p style="font-size: 30px; display: none" id="readyTimer"></p>
+
 
     <br>
     <table class="jaredTable">
@@ -423,7 +425,6 @@
         timeoutOverlay({{ timeout_time }}, {{ timeout_first }})
     </script>
 {% endif %}
-
 <script>lastScoreTimer({{ last_score_time }})</script>
 
 </body>
