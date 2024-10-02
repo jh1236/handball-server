@@ -80,7 +80,7 @@ def add_tourney_endpoints(app):
                 playersTwo: list[str] (OPTIONAL) = the list of players on team two if the game is created by players
             }
         """
-        print(request.json)
+        logger.info(request.json)
         gid = manage_game.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"],
                                       request.json["official"], request.json.get("playersOne", None),
                                       request.json.get("playersTwo", None))
@@ -136,7 +136,7 @@ def add_tourney_endpoints(app):
         with open("config/signups/officials.json") as fp:
             umpires = json.load(fp)
         umpires += request.json["umpires"]
-        print(request.json["umpires"])
+        logger.info(request.json["umpires"])
         with open("config/signups/officials.json", "w+") as fp:
             json.dump(umpires, fp)
         return "", 204
