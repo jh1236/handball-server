@@ -15,7 +15,7 @@ WHERE event_type LIKE '% Card'
    or event_type = 'Warning';"""
 
 class DatabaseManager:
-    def __init__(self, force_create_tables=False, path=None):
+    def __init__(self, force_create_tables=False, path=None, read_only=False):
         self.closed = False
         self.path = path or "./instance/database.db"
         self.conn = sqlite3.connect("./instance/database.db")
@@ -30,6 +30,7 @@ class DatabaseManager:
         self.read_write_c.execute("PRAGMA query_only = OFF")
         if force_create_tables:
             self.create_tables()
+        self.cursor = self.read_only_c if read_only else self.read_write_c
 
     def create_tables(self):
         # everything but the punishments view is created via the ORM
@@ -48,7 +49,7 @@ class DatabaseManager:
         self.conn.close()
 
     def __enter__(self, read_only=False):
-        return self.read_only_c if read_only else self.read_write_c
+        return self.cursor
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close_connection()
