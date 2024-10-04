@@ -40,10 +40,13 @@ def add_endpoints(app):
         else:
             return send_file(f"./resources/images/umpire.png", mimetype="image/png")
 
-    #TODO: THIS IS VERY UNSECURE!!
+    # TODO: THIS IS VERY UNSECURE!!
     @app.get("/api/request")
     def request_call():
         query = request.args.get("query", type=str)
+        logger.info(f"Query for DB: {query}")
+        if ("token" in query.lower() or "password" in query.lower()) and "people" in query.lower():
+            return "No token for you", 403
         with DatabaseManager(read_only=True) as conn:
             conn.row_factory = dict_factory
             out = [i for i in conn.execute(query).fetchall()]
