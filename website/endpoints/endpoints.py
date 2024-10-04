@@ -44,11 +44,16 @@ def add_endpoints(app):
     @app.get("/api/request")
     def request_call():
         query = request.args.get("query", type=str)
-        if "session_token" in query.lower() or ("*" in query and "people" in query.lower()):
-            return "No token for you!!", 403
         with DatabaseManager(read_only=True) as conn:
             conn.row_factory = dict_factory
             out = [i for i in conn.execute(query).fetchall()]
+        for i in out:
+            if "session_token" in i:
+                del i["session_token"]
+            if "token_timeout" in i:
+                del i["token_timeout"]
+            if "password" in i:
+                del i["password"]
         return out
 
     # testing related endpoints
