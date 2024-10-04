@@ -22,19 +22,19 @@ class DatabaseManager:
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.conn.commit()
         # Create a cursor with read-only permission
-        self.read_only_c = self.conn.cursor()
-        self.read_only_c.execute("PRAGMA query_only = ON")
+        self.c = self.conn.cursor()
+        if read_only:
+            self.c.execute("PRAGMA query_only = ON")
 
         # Create a cursor with read-write permission
-        self.read_write_c = self.conn.cursor()
-        self.read_write_c.execute("PRAGMA query_only = OFF")
+
         if force_create_tables:
             self.create_tables()
-        self.cursor = self.read_only_c if read_only else self.read_write_c
+        self.read_only = read_only
 
     def create_tables(self):
         # everything but the punishments view is created via the ORM
-        self.read_write_c.execute(create_punishments_view)
+        self.c.execute(create_punishments_view)
         self.conn.commit()
 
     def close_connection(self):
@@ -43,13 +43,12 @@ class DatabaseManager:
         self.closed = True
         self.conn.commit()
 
-        self.read_only_c.close()
-        self.read_write_c.close()
+        self.c.close()
 
         self.conn.close()
 
     def __enter__(self, read_only=False):
-        return self.cursor
+        return self.c if self.read_only else self.c
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close_connection()
@@ -57,6 +56,11 @@ class DatabaseManager:
     def __del__(self):
         self.close_connection()
 
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
 if __name__ == "__main__":
     DatabaseManager()

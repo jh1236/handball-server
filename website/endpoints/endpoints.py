@@ -4,7 +4,7 @@ from flask import request, send_file
 from sqlalchemy import text
 
 from database import db
-from utils.databaseManager import DatabaseManager
+from utils.databaseManager import DatabaseManager, dict_factory
 from utils.logging_handler import logger
 from website.endpoints.edit_game import add_game_endpoints
 from website.endpoints.graph import add_graph_endpoints
@@ -40,11 +40,15 @@ def add_endpoints(app):
         else:
             return send_file(f"./resources/images/umpire.png", mimetype="image/png")
 
+    #TODO: THIS IS VERY UNSECURE!!
     @app.get("/api/request")
     def request_call():
         query = request.args.get("query", type=str)
-        with db.session.connection().execution_options(postgresql_readonly=True) as conn:
-            out = [dict(i._mapping) for i in conn.execute(text(query)).all()]
+        if "session_token" in query.lower() or ("*" in query and "people" in query.lower()):
+            return "No token for you!!", 403
+        with DatabaseManager(read_only=True) as conn:
+            conn.row_factory = dict_factory
+            out = [i for i in conn.execute(query).fetchall()]
         return out
 
     # testing related endpoints
