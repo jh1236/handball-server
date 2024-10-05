@@ -561,7 +561,7 @@ function timeout(firstTeam) {
         endTimeout(firstTeam)
         return
     }
-    timeoutOverlay(Date.now() + 30000, firstTeam)
+    timeoutOverlay(Date.now() + 30000, Number(firstTeam))
     fetch("/api/games/update/timeout", {
         method: "POST", body: JSON.stringify({
             id: id,
