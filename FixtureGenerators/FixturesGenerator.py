@@ -6,6 +6,7 @@ from math import ceil
 from database import db
 from database.models import Tournaments, Games
 from utils.databaseManager import DatabaseManager
+from utils.logging_handler import logger
 
 
 # from database.models import Tournaments
@@ -36,7 +37,7 @@ class FixturesGenerator:
             self.add_umpires()
 
     def add_courts(self):
-        rounds = Games.query.filter(Games.tournament == self.tournament_id).order_by(Games.round.desc()).first().round
+        rounds = Games.query.filter(Games.tournament_id == self.tournament_id).order_by(Games.round.desc()).first().round
         games = Games.query.filter(Games.tournament_id == self.tournament_id, Games.round == rounds,
                                    Games.is_bye == False, Games.started == False, Games.is_final == False).all()
         finals = Games.query.filter(Games.tournament_id == self.tournament_id, Games.round == rounds,
@@ -100,9 +101,9 @@ GROUP BY officials.id""",
             games_scored: int
             court_one_games: int
 
-        print([(i) for i in officials])
+        logger.info([(i) for i in officials])
         officials = [Official(*i) for i in officials]
-        print([(i.person_id, i.proficiency) for i in officials])
+        logger.info([(i.person_id, i.proficiency) for i in officials])
         rounds = defaultdict(list)
         game_to_players = defaultdict(list)
         for i in players:
@@ -132,7 +133,7 @@ GROUP BY officials.id""",
                             -it.court_one_games,
                         ),
                     )
-                    print(
+                    logger.info(
                         f"c1: {[(i.person_id, i.proficiency) for i in court_one_officials]}, c2: {[(i.person_id, i.proficiency) for i in court_two_officials]}")
                     #  games.id, round, court, official, scorer, [players]
 

@@ -3,7 +3,7 @@ from math import log2, ceil
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
 from structure import manage_game
 from utils.databaseManager import DatabaseManager
-
+from utils.logging_handler import logger
 
 class Swiss(FixturesGenerator):
     def __init__(self, tournament):
@@ -51,7 +51,7 @@ class Swiss(FixturesGenerator):
                     games += [(team1, team2)]
                     # remove the team from the priority list as well
                     found = True
-                    print(team2)
+                    logger.debug(team2)
                     priority.remove(team2)
                     teams.remove(team2)
                     break

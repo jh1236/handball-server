@@ -29,15 +29,17 @@ def game_string_to_commentary(game: int) -> list[str]:
     for i in ge:
         if not i.player: continue
         possible = taunts[i.event_type]
+        if not possible: continue
         string = possible[r.randint(0, len(possible) - 1)]
         string = (
             string.replace("%t", i.team.name)
             .replace("%p", i.player.name)
-            .replace("%r", i.opposite_player.name)
             .replace("%o", i.other_team.name)
             .replace("%q", i.team_mate.name)
             .replace("%u", repr(i.game.official.person.name))  # this is getting ridiculous...
         )
+        if i.opposite_player:
+            string = string.replace("%r", i.opposite_player.name)
         out.append(string)
     return out
 

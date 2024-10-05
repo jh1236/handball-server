@@ -3,6 +3,7 @@ let tournament = ""
 let teamsSwapped = false
 let teamName = ""
 let startTime = -1
+let lastScoreTime = -1
 
 let waiting = false
 let greenCardsUsed = document.currentScript.getAttribute('greens') === 'True'
@@ -416,6 +417,37 @@ function timeoutOverlay(timeIn = 0, firstTeam) {
     setTimeout(() => {
         timeoutOverlay(-1, firstTeam)
     }, 10)
+}
+
+function lastScoreTimer(timeIn = 0) {
+    console.log(lastScoreTime)
+    if (timeIn > 0) {
+        lastScoreTime = timeIn
+    }
+
+
+    let clock = Math.round((lastScoreTime - Date.now()) / 100) / 10
+    let element = document.getElementById("readyTimer")
+    let timeLeft = (lastScoreTime - Date.now()) / 1000
+    element.textContent = `Ready Timer: ${clock.toFixed(1)}` // what the fuck do you mean "toFixed???
+    if (timeLeft > 10) {
+        element.style = "font-size: 30px;font-weight:bold;display:inline"
+    } else if (timeLeft > 5) {
+        element.textContent = `Ready Timer: ${clock.toFixed(1)}` // what the fuck do you mean "toFixed???
+        if (Math.floor(timeLeft) % 2 === 0) {
+            element.style = "font-size: 30px;display:inline"
+        } else {
+            element.style = "font-size: 30px;font-weight:bold;display:inline"
+        }
+    } else if (timeLeft > 0) {
+        element.style = "font-size: 30px;font-weight:bold;display:inline; color: red;"
+    }
+    if (timeLeft < -5){
+        element.style = "font-size: 30px;display:none"
+        element.textContent = 'Serve Timer'
+    } else {
+        setTimeout(() => {lastScoreTimer(-1)}, 10)
+    }
 }
 
 

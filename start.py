@@ -4,6 +4,9 @@ from database import db
 from website.website import init_api
 from waitress import serve
 from flask_minify import Minify
+from utils.logging_handler import logger
+
+logger.setLevel("INFO")
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True

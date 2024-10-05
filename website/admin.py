@@ -16,6 +16,7 @@ from utils.sidebar_wrapper import render_template_sidebar
 from utils.util import fixture_sorter
 from website.tournament_specific import priority_to_classname
 from website.website import numbers
+from utils.logging_handler import logger
 
 
 def add_admin_pages(app):
@@ -29,7 +30,7 @@ def add_admin_pages(app):
         fixtures = defaultdict(list)
         for game in games:
             fixtures[game.round].append(game)
-            print(game.official)
+            logger.debug(game.official)
         new_fixtures = {}
         for k, v in fixtures.items():
             new_fixtures[k] = [j for j in fixture_sorter(v)]

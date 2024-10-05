@@ -6,6 +6,7 @@ from database import db
 from database.database_utilities import on_court_for_game
 from database.models import *
 from utils.statistics import calc_elo
+from utils.logging_handler import logger
 
 SIDES = ["Left", "Right", "Substitute"]
 
@@ -557,7 +558,7 @@ def end_game(game_id, best_player, notes, protest_team_one, protest_team_two):
                                              Games.ended == False).all()
     tournament = game.tournament
     sync(game_id)
-    print(games_left_in_round)
+    logger.info(games_left_in_round)
     if not games_left_in_round:
         if not tournament.in_finals:
             fixtures = get_type_from_name(tournament.fixtures_type, tournament.id)
@@ -590,7 +591,7 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
         for i in teams[1:]:
             if not i.captain_id:
                 continue  # this is most likely the bye team, or it's so fucked up in the db that we probs wanna skip it anyway
-            print(players)
+            logger.info(players)
             if sorted([i.non_captain_id or -1, i.captain_id, i.substitute_id or -1]) == sorted(players):
                 first_team = i
                 break
@@ -619,7 +620,7 @@ def create_game(tournament_id, team_one, team_two, official=None, players_one=No
         for i in teams[1:]:
             if not i.captain_id:
                 continue  # this is most likely the bye team, or it's so fucked up in the db that we probs wanna skip it anyway
-            print(players)
+            logger.debug(players)
             if sorted([i.non_captain_id or -1, i.captain_id, i.substitute_id or -1]) == sorted(players):
                 second_team = i
                 break
@@ -729,6 +730,13 @@ def get_timeout_time(game_id):
     if not last_time_out: return 0
     time_out_time = last_time_out.created_at
     return time_out_time + 30 if (time_out_time > 0) else 0
+
+def get_last_score_time(game_id):
+    most_recent_score = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Score')
+                       .order_by(GameEvents.id.desc()).first())
+    
+    if not most_recent_score: return -1
+    return most_recent_score.created_at + 20 if (most_recent_score.created_at or -1) + 25 > time.time() else -1
 
 
 def get_timeout_caller(game_id):
