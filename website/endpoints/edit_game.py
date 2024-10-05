@@ -211,6 +211,20 @@ def add_game_endpoints(app):
         manage_game.fault(game_id)
         return "", 204
 
+    @app.post("/api/games/update/official_timeout")
+    @officials_only
+    def official_timeout():
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the current game
+            }
+        """
+        logger.info(f"Request for Official Timeout: {request.json}")
+        game_id = request.json["id"]
+        manage_game.official_timeout(game_id)
+        return "", 204
+
     @app.post("/api/games/update/undo")
     @officials_only
     def undo():

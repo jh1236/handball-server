@@ -400,18 +400,46 @@ function timeoutOverlay(timeIn = 0, firstTeam) {
     }
     let clock = Math.round((timeoutTime - Date.now()) / 100) / 10
     let element;
-    if (firstTeam) {
+    if (firstTeam === 1) {
         element = document.getElementById("timeoutOne")
-    } else {
+    } else if (firstTeam === 0) {
         element = document.getElementById("timeoutTwo")
+    } else {
+        console.log(timeoutTime)
+        clock = Math.round((Date.now() - timeoutTime) / 100) / 10
+        element = document.getElementById("timeoutOfficial")
     }
     if (timeoutTime < 0) return
-    teamName = element.textContent.split("Timeout ")[1].split(":")[0]
+    teamName = element.textContent.split(":")[0]
     element.style = "font-size:18px;font-weight:bold"
-    element.textContent = `Timeout ${teamName}: ${clock.toFixed(1)}`
+    element.textContent = ` ${teamName}: ${clock.toFixed(1)}`
     setTimeout(() => {
         timeoutOverlay(-1, firstTeam)
     }, 10)
+}
+
+function umpireTimeout() {
+    if (waiting) return
+    waiting = true
+    if (timeoutTime > 0) {
+        endTimeout(null)
+        return
+    }
+    timeoutOverlay(Date.now(), null)
+    fetch("/api/games/update/official_timeout", {
+        method: "POST", body: JSON.stringify({
+            id: id,
+        }), headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    }).then(
+        (res) => {
+            waiting = false
+            if (!res.ok) {
+                alert("Error!")
+            }
+        }
+    );
 }
 
 function lastScoreTimer(timeIn = 0) {
@@ -533,7 +561,7 @@ function timeout(firstTeam) {
         endTimeout(firstTeam)
         return
     }
-    timeoutOverlay(Date.now() + 30000, firstTeam)
+    timeoutOverlay(Date.now() + 30000, Number(firstTeam))
     fetch("/api/games/update/timeout", {
         method: "POST", body: JSON.stringify({
             id: id,
@@ -555,11 +583,17 @@ function endTimeout(firstTeam) {
     timeoutTime = -1
     if (firstTeam) {
         element = document.getElementById("timeoutOne")
-    } else {
+    } else if (firstTeam != null) {
         element = document.getElementById("timeoutTwo")
+    } else {
+        element = document.getElementById("timeoutOfficial")
     }
     element.style = ""
-    element.innerHTML = `<s>Timeout ${teamName}</s>`
+    if (firstTeam != null) {
+        element.innerHTML = `<s>${teamName}</s>`
+    } else {
+        element.innerHTML = teamName
+    }
     fetch("/api/games/update/end_timeout", {
         method: "POST", body: JSON.stringify({
             id: id,
