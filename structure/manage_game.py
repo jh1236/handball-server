@@ -136,7 +136,7 @@ def sync(game_id):
             case "Timeout":
                 if is_team_one:
                     game.team_one_timeouts += 1
-                else:
+                elif i.team_id == game.team_two_id:
                     game.team_two_timeouts += 1
             case "Substitute":
                 pass

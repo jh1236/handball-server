@@ -15,6 +15,14 @@ body {
     text-align: center;
 }
 
+.dot {
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: #FF9122
+}
+
 /* Fixtures table and its contents */
 .jaredTable {
     background-color: var(--color-bg);
