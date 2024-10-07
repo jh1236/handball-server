@@ -5,6 +5,8 @@ let updateCount = 0
 
 let startTime = 0
 
+let isUmpireTimeout = false
+
 let startTimeServe = 0
 let setup = (newId, change_id) => {
     id = newId
@@ -102,18 +104,44 @@ function jump() {
 
 
 function timeout(timeIn = 0) {
-    console.log(timeIn)
+    const dot1 = document.getElementById("dot1")
+    const dot2 = document.getElementById("dot2")
     if (timeIn > 0) {
         startTime = timeIn
+        isUmpireTimeout = Date.now() > timeIn
+        if (isUmpireTimeout) {
+            dot1.style.opacity = 1
+        }
     }
-    let clock = (startTime - Date.now()) / 1000
-    document.getElementById("timeout").textContent = clock.toFixed(1)
-    if (clock > 0) {
-        setTimeout(timeout, 10)
-        document.getElementById("timeout").style = ""
+    if (isUmpireTimeout) {
+        document.getElementById("timeout").textContent = "Timeout"
+        document.getElementById("timeout").style = 'font-size: 200pt; color: #FF9122'
+        dot1.style.color = ""
+        dot2.style.color = ""
+        let temp = dot1.style.opacity
+        dot1.style.opacity = dot2.style.opacity
+        document.getElementById("dot2").style.opacity = temp
+        console.log(temp)
+        setTimeout(timeout, 1000) //one seconds
     } else {
-        document.getElementById("timeout").textContent = "0.0"
-        document.getElementById("timeout").style.color = "#FF2222"
+        let clock = (startTime - Date.now()) / 1000
+        document.getElementById("timeout").textContent = clock.toFixed(1)
+        if (clock > 0) {
+            setTimeout(timeout, 10)
+            document.getElementById("timeout").style = ""
+        } else {
+            if (dot1.style.opacity === dot2.style.opacity) {
+                dot1.style.opacity = 1
+            }
+            let temp = dot1.style.opacity
+            dot1.style.opacity = dot2.style.opacity
+            dot2.style.opacity = temp
+            document.getElementById("timeout").textContent = "0.0"
+            document.getElementById("timeout").style.color = "#FF2222"
+            dot1.style.backgroundColor = "#FF2222"
+            dot2.style.backgroundColor = "#FF2222"
+            setTimeout(timeout, 1000) //two seconds
+        }
     }
 }
 

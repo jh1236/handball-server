@@ -3,6 +3,7 @@ import time
 
 from database import db
 from database.models import People
+from utils.logging_handler import logger
 
 
 # create table main.gameEvents
@@ -73,7 +74,7 @@ class GameEvents(db.Model):
 
     @property
     def opposite_player(self):
-        print(f"{self.team_id} == {self.game.team_one_id} ({self.team_id == self.game.team_one_id})")
+        logger.debug(f"{self.team_id} == {self.game.team_one_id} ({self.team_id == self.game.team_one_id})")
         if self.team_id == self.game.team_one_id:
             return self.team_two_left if self.player_id == self.team_one_left else self.team_two_right
         else:

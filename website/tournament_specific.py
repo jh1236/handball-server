@@ -743,6 +743,7 @@ def add_tournament_specific(app):
                     a: 9999999 if a.card_time_remaining < 0 else a.card_time_remaining).card_time_remaining,
                  max(i, key=lambda a: 9999999 if a.card_time < 0 else a.card_time).card_time)
                 for i in players]
+            timeout_caller = manage_game.get_timeout_caller(game_id)
             return (
                 render_template(
                     f"tournament_specific/game_editor/edit_game.html",
@@ -763,7 +764,7 @@ def add_tournament_specific(app):
                     team_card_times=team_card_times,
                     timeout_time=manage_game.get_timeout_time(game_id) * 1000,
                     # making this an int lets me put it straight into the js function without worrying about 'true' vs 'True' shenanigans
-                    timeout_first=int(manage_game.get_timeout_caller(game_id) == teams[0].id),
+                    timeout_first=-1 if timeout_caller is None else int(timeout_caller == teams[0].id),
                     match_points=0 if (
                             max(game.team_one_score, game.team_two_score) < 10 or game.someone_has_won) else abs(
                         game.team_one_score - game.team_two_score),
