@@ -10,7 +10,8 @@ def add_get_game_endpoints(app):
     @app.route('/api/game/<int:id>', methods=['GET'])
     def get_game(id):
         """
-        SCHEMA : {
+        SCHEMA :
+        {
             id: <int> = the id of the game
         }
         """
@@ -20,7 +21,8 @@ def add_get_game_endpoints(app):
     @app.route('/api/game/events/<int:id>', methods=['GET'])
     def get_game_events(id):
         """
-        SCHEMA : {
+        SCHEMA :
+        {
             id: <int> = the id of the game
         }
         """
@@ -30,7 +32,8 @@ def add_get_game_endpoints(app):
     @app.route('/api/game', methods=['GET'])
     def get_games():
         """
-        SCHEMA : {
+        SCHEMA :
+        s{
             tournament: <str> (OPTIONAL) = the searchable name of the tournament the games are from
             team: List<str> (OPTIONAL) = the searchable name of the team who played in the game
             player: List<str> (OPTIONAL) = the searchable name of the player who played in the game
