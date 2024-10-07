@@ -88,3 +88,24 @@ class GameEvents(db.Model):
         else:
             team_mate = self.team_two_left if self.player_id != self.team_two_left else self.team_two_right
         return team_mate if team_mate else self.player
+
+    def as_dict(self):
+        return {
+            "game_id": self.game_id,
+            "tournament_id": self.tournament_id,
+            "event_type": self.event_type,
+            "team_id": self.team_id,
+            "player_id": self.player_id,
+            "details": self.details,
+            "notes": self.notes,
+            "player_who_served_id": self.player_who_served_id,
+            "team_who_served_id": self.team_who_served_id,
+            "side_served": self.side_served,
+            "player_to_serve_id": self.player_to_serve_id,
+            "team_to_serve_id": self.team_to_serve_id,
+            "side_to_serve": self.side_to_serve,
+            "team_one_left": self.team_one_left.as_dict(),
+            "team_one_right": self.team_one_right.as_dict(),
+            "team_two_left": self.team_two_left.as_dict(),
+            "team_two_right": self.team_two_right.as_dict(),
+        }

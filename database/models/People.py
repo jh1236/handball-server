@@ -209,3 +209,18 @@ class People(db.Model):
         tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable_name).first().id
         return bool(PlayerGameStats.query.filter(PlayerGameStats.player_id == self.id,
                                                  PlayerGameStats.tournament_id == tournament_id).first())
+
+    def as_dict(self, include_stats=False, tournament=None, admin_view=False):
+        from PlayerGameStats import PlayerGameStats
+        d = {
+            "name": self.name,
+            "searchable_name": self.searchable_name,
+            "image_url": self.image_url,
+        }
+        if include_stats:
+            game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament)) if tournament else None
+            d |= self.stats(game_filter)
+        if admin_view:
+            d |= {
+                "is_admin": self.is_admin
+            }

@@ -48,7 +48,8 @@ class Teams(db.Model):
     def elo(self, last_game=None):
         from database.models import People
         players = People.query.filter(
-            (People.id == self.captain_id) | (People.id == self.non_captain_id) | (People.id == self.substitute_id)).all()
+            (People.id == self.captain_id) | (People.id == self.non_captain_id) | (
+                    People.id == self.substitute_id)).all()
         if not players:
             return 1500.0
         elos = []
@@ -88,7 +89,8 @@ class Teams(db.Model):
             "Games Played": len([i for i in games if i.started]),
             "Games Won": sum(i.winning_team_id == self.id for i in games if i.ended),
             "Games Lost": sum(i.winning_team_id != self.id for i in games if i.ended),
-            "Percentage": sum(i.winning_team_id == self.id for i in games if i.ended) / (len([i for i in games if i.ended]) or 1),
+            "Percentage": sum(i.winning_team_id == self.id for i in games if i.ended) / (
+                    len([i for i in games if i.ended]) or 1),
             "Green Cards": sum(i.green_cards for i in pgs),
             "Yellow Cards": sum(i.yellow_cards for i in pgs),
             "Red Cards": sum(i.red_cards for i in pgs),
@@ -114,3 +116,18 @@ class Teams(db.Model):
     @property
     def BYE(cls):
         return cls.query.filter(cls.id == 1).first()
+
+    def as_dict(self, include_stats=False):
+        d = {
+            "name": self.name,
+            "searchable_name": self.searchable_name,
+            "image_url": self.image_url,
+            "primary_color": self.primary_color,
+            "secondary_color": self.secondary_color,
+            "captain_id": self.captain.as_dict(include_stats=include_stats),
+            "non_captain_id": self.non_captain.as_dict(include_stats=include_stats),
+            "substitute_id": self.substitute.as_dict(include_stats=include_stats),
+        }
+        if include_stats:
+            d |= self.stats()
+        return d

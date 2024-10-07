@@ -140,7 +140,7 @@ class Games(db.Model):
 
     @property
     def losing_team_id(self):
-        #cheeky maths hack
+        # cheeky maths hack
         return self.team_two_id + self.team_two_id - self.winning_team_id
 
     def reset(self):
@@ -183,3 +183,43 @@ class Games(db.Model):
             "Format": "Practice" if self.tournament_id == 1 else "Championship",
             "Tournament": self.tournament.name,
         }
+
+    def as_dict(self, admin_view=False):
+        d = {
+            "tournament": self.tournament.as_dict(),
+            "team_one": self.team_one.as_dict(),
+            "team_two": self.team_two.as_dict(),
+            "team_one_score": self.team_one_score,
+            "team_two_score": self.team_two_score,
+            "team_one_timeouts": self.team_one_timeouts,
+            "team_two_timeouts": self.team_two_timeouts,
+            "first_team_winning": self.winning_team_id == self.team_one_id,
+            "started": self.started,
+            "someone_has_won": self.someone_has_won,
+            "ended": self.ended,
+            "protested": self.protested,
+            "resolved": self.resolved,
+            "ranked": self.ranked,
+            "best_player_id": self.best_player.as_dict(),
+            "official": self.official.as_dict(),
+            "scorer": self.scorer_id.as_dict(),
+            "first_team_iga": self.iga_side_id == self.team_one_id,
+            "first_team_to_serve": self.team_to_serve_id == self.team_one_id,
+            "side_to_serve": self.side_to_serve,
+            "start_time": self.start_time,
+            "serve_timer": self.serve_timer,
+            "length": self.length,
+            "court": self.court,
+            "is_final": self.is_final,
+            "round": self.round,
+            "is_bye": self.is_bye,
+            "status": self.status,
+        }
+        if admin_view:
+            d |= {
+                "admin_status": self.admin_status,
+                "noteable_status": self.noteable_status,
+                "notes": self.notes,
+            }
+
+        return d
