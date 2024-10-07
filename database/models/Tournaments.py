@@ -2,7 +2,6 @@
 import time
 import typing
 
-from collections import defaultdict
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.models import TournamentTeams
@@ -28,10 +27,9 @@ if typing.TYPE_CHECKING:
 # imageURL          TEXT
 # );
 def sorter(teams, tournament) -> list[tuple["Teams", dict[str, float]]]:
-    from database.models import Games
     pass_one = sorted(teams, key=lambda s: (
-    -s[1]["Percentage"], -s[1]["Point Difference"], -s[1]["Points Scored"], s[1]["Red Cards"],
-    s[1]["Yellow Cards"], s[1]["Green Cards"], s[1]["Double Faults"], s[1]["Faults"], s[1]["Timeouts Called"]))
+        -s[1]["Percentage"], -s[1]["Point Difference"], -s[1]["Points Scored"], s[1]["Red Cards"],
+        s[1]["Yellow Cards"], s[1]["Green Cards"], s[1]["Double Faults"], s[1]["Faults"], s[1]["Timeouts Called"]))
     re_sort = False
     for i, next_i in zip(pass_one, pass_one[1:]):
         if i[1]["Percentage"] == next_i[1]["Percentage"]:
@@ -65,7 +63,7 @@ def sorter(teams, tournament) -> list[tuple["Teams", dict[str, float]]]:
     #             for g in games:
     #                 points[g.winning_team_id] += 1 # chuck back in points[s[0].team_id],
     return sorted(teams, key=lambda s: (
-        -s[1]["Percentage"], -s[1]["Point Difference"],  -s[1]["Points Scored"], s[1]["Red Cards"],
+        -s[1]["Percentage"], -s[1]["Point Difference"], -s[1]["Points Scored"], s[1]["Red Cards"],
         s[1]["Yellow Cards"], s[1]["Green Cards"], s[1]["Double Faults"], s[1]["Faults"], s[1]["Timeouts Called"]))
 
 
@@ -124,3 +122,20 @@ class Tournaments(db.Model):
         teams = beautify_stats(sorter(teams, None))
         teams = [i for i in teams if i[1]["Games Played"]]
         return teams
+
+    def as_dict(self):
+        return {
+            "name": self.name,
+            "searchable_name": self.searchable_name,
+            "fixtures_type": self.fixtures_type,
+            "finals_type": self.finals_type,
+            "ranked": self.ranked,
+            "two_courts": self.two_courts,
+            "has_scorer": self.has_scorer,
+            "finished": self.finished,
+            "in_finals": self.in_finals,
+            "is_pooled": self.is_pooled,
+            "notes": self.notes,
+            "image_url": self.image_url,
+            "badminton_serves": self.badminton_serves,
+        }

@@ -86,19 +86,6 @@ def add_tourney_endpoints(app):
                                       request.json.get("playersTwo", None))
         return jsonify({"id": gid})
 
-    @app.post("/api/games/update/resolve")
-    @admin_only
-    def resolve():
-        """
-        SCHEMA:
-            {
-                id: <int> = id of the game to resolve
-            }
-        """
-        logger.info(f"Request for end: {request.json}")
-        game_id = request.json["id"]
-        manage_game.resolve_game(game_id)
-        return "", 204
 
     @app.post("/api/signup")
     def signup():

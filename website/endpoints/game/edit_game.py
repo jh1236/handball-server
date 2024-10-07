@@ -7,7 +7,7 @@ from utils.logging_handler import logger
 from utils.permissions import officials_only, admin_only
 
 
-def add_game_endpoints(app):
+def add_edit_game_endpoints(app):
     @app.get("/api/games/change_code")
     @admin_only
     def change_code():
@@ -275,4 +275,18 @@ def add_game_endpoints(app):
         duration = request.json["duration"]
         reason = request.json["reason"]
         manage_game.card(game_id, first_team, left_player, color, duration, reason)
+        return "", 204
+
+    @app.post("/api/games/update/resolve")
+    @admin_only
+    def resolve():
+        """
+        SCHEMA:
+            {
+                id: <int> = id of the game to resolve
+            }
+        """
+        logger.info(f"Request for end: {request.json}")
+        game_id = request.json["id"]
+        manage_game.resolve_game(game_id)
         return "", 204

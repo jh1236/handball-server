@@ -1,15 +1,17 @@
 import os
 
 from flask import request, send_file
-from sqlalchemy import text
 
-from database import db
 from utils.databaseManager import DatabaseManager, dict_factory
 from utils.logging_handler import logger
-from website.endpoints.edit_game import add_game_endpoints
+from website.endpoints.game.edit_game import add_edit_game_endpoints
+from website.endpoints.game.get_game import add_get_game_endpoints
 from website.endpoints.graph import add_graph_endpoints
-from website.endpoints.tournament import add_tourney_endpoints
-from website.endpoints.user import add_user_endpoints
+from website.endpoints.officials.officials import add_get_official_endpoints
+from website.endpoints.players.players import add_get_player_endpoints
+from website.endpoints.players.user import add_user_endpoints
+from website.endpoints.teams.get_teams import add_get_teams_endpoints
+from website.endpoints.tournaments.tournament import add_tourney_endpoints
 
 
 def add_endpoints(app):
@@ -74,5 +76,9 @@ def add_endpoints(app):
 
     add_tourney_endpoints(app)
     add_graph_endpoints(app)
-    add_game_endpoints(app)
+    add_edit_game_endpoints(app)
+    add_get_game_endpoints(app)
     add_user_endpoints(app)
+    add_get_teams_endpoints(app)
+    add_get_player_endpoints(app)
+    add_get_official_endpoints(app)

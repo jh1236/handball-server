@@ -27,7 +27,7 @@ def n_chunks(l: list[T], n: int, s=None) -> list[list[T]]:
         yield l[i::n]
 
 
-def fixture_sorter(games: list[Games]) -> list[list[Any]]:
+def fixture_sorter(games: list[Games]) -> list[Games]:
     """INPUT: any object where id is list index 0 and court is list index 1 and isBye is list index 2"""
 
     court_one = [i for i in games if i.court == 0 and not i.is_bye]
