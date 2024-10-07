@@ -24,7 +24,7 @@ def add_get_game_endpoints(app):
             id: <int> = the id of the game
         }
         """
-        ge = GameEvents.query.filter(GameEvents.id == id).all()
+        ge = GameEvents.query.filter(GameEvents.game_id == id).all()
         return [i.as_dict() for i in ge]
 
     @app.route('/api/game', methods=['GET'])
