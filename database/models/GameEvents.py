@@ -82,7 +82,9 @@ class GameEvents(db.Model):
 
     @property
     def team_mate(self):
+        team_mate = None
         if self.team_id == self.game.team_one_id:
-            return self.team_one_left if self.player_id != self.team_one_left else self.team_one_right
+            team_mate = self.team_one_left if self.player_id != self.team_one_left else self.team_one_right
         else:
-            return self.team_two_left if self.player_id != self.team_two_left else self.team_two_right
+            team_mate = self.team_two_left if self.player_id != self.team_two_left else self.team_two_right
+        return team_mate if team_mate else self.player

@@ -1,7 +1,10 @@
 import os
 
 from flask import request, send_file
+from sqlalchemy import text
 
+from database import db
+from utils.databaseManager import DatabaseManager, dict_factory
 from utils.logging_handler import logger
 from website.endpoints.edit_game import add_game_endpoints
 from website.endpoints.graph import add_graph_endpoints
@@ -36,6 +39,25 @@ def add_endpoints(app):
             )
         else:
             return send_file(f"./resources/images/umpire.png", mimetype="image/png")
+
+    # TODO: THIS IS VERY UNSECURE!!
+    @app.get("/api/request")
+    def request_call():
+        query = request.args.get("query", type=str)
+        logger.info(f"Query for DB: {query}")
+        if ("token" in query.lower() or "password" in query.lower()) and "people" in query.lower():
+            return "No token for you", 403
+        with DatabaseManager(read_only=True) as conn:
+            conn.row_factory = dict_factory
+            out = [i for i in conn.execute(query).fetchall()]
+        for i in out:
+            if "session_token" in i:
+                del i["session_token"]
+            if "token_timeout" in i:
+                del i["token_timeout"]
+            if "password" in i:
+                del i["password"]
+        return out
 
     # testing related endpoints
     @app.get("/api/mirror")

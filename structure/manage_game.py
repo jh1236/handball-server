@@ -137,7 +137,7 @@ def sync(game_id):
             case "Timeout":
                 if is_team_one:
                     game.team_one_timeouts += 1
-                else:
+                elif i.team_id == game.team_two_id:
                     game.team_two_timeouts += 1
             case "Substitute":
                 pass
@@ -575,6 +575,12 @@ def substitute(game_id, first_team, left_player):
     _add_to_game(game_id, "Substitute", first_team, left_player)
     db.session.commit()
 
+def official_timeout(game_id):
+    if game_is_over(game_id):
+        raise ValueError("Game is Already Over!")
+    _add_to_game(game_id, "Timeout", None, None)
+    db.session.commit()
+
 
 def create_game(tournament_id, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,
                 court=0, is_final=False):
@@ -729,25 +735,28 @@ def get_timeout_time(game_id):
                                             GameEvents.id > most_recent_end).order_by(GameEvents.id.desc()).first()
     if not last_time_out: return 0
     time_out_time = last_time_out.created_at
+    print(time_out_time)
+    if not last_time_out.team_id:
+        return time_out_time  #the timeout is an umpire timeout
     return time_out_time + 30 if (time_out_time > 0) else 0
 
 def get_last_score_time(game_id):
-    most_recent_score = (GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Score')
+    most_recent_score = (GameEvents.query.filter(GameEvents.game_id == game_id,
+                         (GameEvents.event_type == 'Score') | (GameEvents.event_type == 'Fault') | (GameEvents.event_type == 'Timeout'))
                        .order_by(GameEvents.id.desc()).first())
     
-    if not most_recent_score: return -1
+    if not most_recent_score or most_recent_score.event_type == 'Timeout': return -1
     return most_recent_score.created_at + 20 if (most_recent_score.created_at or -1) + 25 > time.time() else -1
 
 
 def get_timeout_caller(game_id):
     """Returns if the first team listed called the timeout"""
-    game = Games.query.filter(Games.id == game_id).first()
     last_time_out = GameEvents.query.filter(GameEvents.game_id == game_id, GameEvents.event_type == 'Timeout').order_by(
         GameEvents.id.desc()).first()
     if last_time_out:
         return last_time_out.team_id
     else:
-        return False
+        return None
 
 
 def delete(game_id):
