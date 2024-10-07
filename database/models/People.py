@@ -211,7 +211,7 @@ class People(db.Model):
                                                  PlayerGameStats.tournament_id == tournament_id).first())
 
     def as_dict(self, include_stats=False, tournament=None, admin_view=False):
-        from PlayerGameStats import PlayerGameStats
+        from database.models import PlayerGameStats
         d = {
             "name": self.name,
             "searchable_name": self.searchable_name,
@@ -224,3 +224,4 @@ class People(db.Model):
             d |= {
                 "is_admin": self.is_admin
             }
+        return d

@@ -117,17 +117,22 @@ class Teams(db.Model):
     def BYE(cls):
         return cls.query.filter(cls.id == 1).first()
 
-    def as_dict(self, include_stats=False):
+    def as_dict(self, include_stats=False, tournament=None):
         d = {
             "name": self.name,
             "searchable_name": self.searchable_name,
             "image_url": self.image_url,
             "primary_color": self.primary_color,
             "secondary_color": self.secondary_color,
-            "captain_id": self.captain.as_dict(include_stats=include_stats),
-            "non_captain_id": self.non_captain.as_dict(include_stats=include_stats),
-            "substitute_id": self.substitute.as_dict(include_stats=include_stats),
+            "captain": self.captain.as_dict(include_stats=include_stats,
+                                            tournament=tournament) if self.captain else None,
+            "non_captain": self.non_captain.as_dict(include_stats=include_stats,
+                                                    tournament=tournament) if self.non_captain else None,
+            "substitute": self.substitute.as_dict(include_stats=include_stats,
+                                                  tournament=tournament) if self.substitute else None,
         }
         if include_stats:
-            d |= self.stats()
+            from database.models import Games
+            game_filter = (lambda a: a.filter(Games.tournament_id == tournament)) if tournament else None
+            d |= self.stats(game_filter)
         return d

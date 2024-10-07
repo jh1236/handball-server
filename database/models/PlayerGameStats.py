@@ -155,7 +155,6 @@ class PlayerGameStats(db.Model):
     def as_dict(self):
         d = {
             "game": self.game.as_dict(),
-            "player": self.player_id.as_dict(),
             "team": self.team.as_dict(),
             "rounds_on_court": self.rounds_on_court,
             "rounds_carded": self.rounds_carded,
@@ -177,4 +176,8 @@ class PlayerGameStats(db.Model):
             "card_time": self.card_time,
             "card_time_remaining": self.card_time_remaining,
             "start_side": self.start_side,
-        }
+            "Elo": round(self.player.elo(self.game_id), 2),
+            "Elo Delta": round(self.player.elo(self.game_id) - self.player.elo(self.game_id - 1), 2),
+        } | self.player.as_dict()
+
+        return d

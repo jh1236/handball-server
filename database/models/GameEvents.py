@@ -82,7 +82,6 @@ class GameEvents(db.Model):
 
     @property
     def team_mate(self):
-        team_mate = None
         if self.team_id == self.game.team_one_id:
             team_mate = self.team_one_left if self.player_id != self.team_one_left else self.team_one_right
         else:
@@ -91,18 +90,15 @@ class GameEvents(db.Model):
 
     def as_dict(self):
         return {
-            "game_id": self.game_id,
-            "tournament_id": self.tournament_id,
+            "game": self.game.as_dict(),
             "event_type": self.event_type,
-            "team_id": self.team_id,
-            "player_id": self.player_id,
+            "team": self.team.as_dict(),
+            "player": self.player.as_dict(),
             "details": self.details,
             "notes": self.notes,
-            "player_who_served_id": self.player_who_served_id,
-            "team_who_served_id": self.team_who_served_id,
+            "first_team_just_served": self.team_who_served_id == self.game.team_one_id,
             "side_served": self.side_served,
-            "player_to_serve_id": self.player_to_serve_id,
-            "team_to_serve_id": self.team_to_serve_id,
+            "first_team_to_serve": self.team_to_serve_id == self.game.team_one_id,
             "side_to_serve": self.side_to_serve,
             "team_one_left": self.team_one_left.as_dict(),
             "team_one_right": self.team_one_right.as_dict(),

@@ -186,6 +186,7 @@ class Games(db.Model):
 
     def as_dict(self, admin_view=False):
         d = {
+            "id": self.id,
             "tournament": self.tournament.as_dict(),
             "team_one": self.team_one.as_dict(),
             "team_two": self.team_two.as_dict(),
@@ -200,9 +201,9 @@ class Games(db.Model):
             "protested": self.protested,
             "resolved": self.resolved,
             "ranked": self.ranked,
-            "best_player_id": self.best_player.as_dict(),
-            "official": self.official.as_dict(),
-            "scorer": self.scorer_id.as_dict(),
+            "best_player": self.best_player.as_dict() if self.best_player else None,
+            "official": self.official.as_dict(tournament=self.tournament) if self.official else None,
+            "scorer": self.scorer.as_dict(tournament=self.tournament) if self.scorer else None,
             "first_team_iga": self.iga_side_id == self.team_one_id,
             "first_team_to_serve": self.team_to_serve_id == self.team_one_id,
             "side_to_serve": self.side_to_serve,
