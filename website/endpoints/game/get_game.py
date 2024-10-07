@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from flask import request
 
-from database.models import Games, Tournaments, Teams, PlayerGameStats, People, Officials
+from database.models import Games, Tournaments, Teams, PlayerGameStats, People, Officials, GameEvents
 from utils.util import fixture_sorter
 
 
@@ -16,6 +16,16 @@ def add_get_game_endpoints(app):
         """
         game = Games.query.filter(Games.id == id).first()
         return game.as_dict()
+
+    @app.route('/api/game/events/<int:id>', methods=['GET'])
+    def get_game_events(id):
+        """
+        SCHEMA : {
+            id: <int> = the id of the game
+        }
+        """
+        ge = GameEvents.query.filter(Games.id == id).all()
+        return [i.as_dict() for i in ge]
 
     @app.route('/api/game', methods=['GET'])
     def get_games():
