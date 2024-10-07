@@ -65,3 +65,6 @@ class Officials(db.Model):
         stats["Cards Per Game"] = round(stats["Cards Given"] / (stats["Games Umpired"] or 1), 2)
         stats["Faults Per Game"] = round(stats["Faults Called"] / (stats["Games Umpired"] or 1), 2)
         return stats
+
+    def as_dict(self, tournament=None):
+        return self.person.as_dict(include_stats=False) | self.stats(tournament=tournament)
