@@ -89,8 +89,7 @@ class GameEvents(db.Model):
         return team_mate if team_mate else self.player
 
     def as_dict(self, include_game=True):
-        return {
-            "game": self.game.as_dict(),
+        d = {
             "event_type": self.event_type,
             "team": self.team.as_dict() if self.team else None,
             "player": self.player.as_dict() if self.player else None,
@@ -105,3 +104,6 @@ class GameEvents(db.Model):
             "team_two_left": self.team_two_left.as_dict() if self.team_two_left else None,
             "team_two_right": self.team_two_right.as_dict() if self.team_two_right else None
         }
+        if include_game:
+            d["game"] = self.game.as_dict()
+        return d
