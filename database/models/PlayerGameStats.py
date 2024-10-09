@@ -152,9 +152,8 @@ class PlayerGameStats(db.Model):
     def row_by_name(cls, name):
         return cls.rows[name]
 
-    def as_dict(self):
+    def as_dict(self, include_game=  True):
         d = {
-            "game": self.game.as_dict(),
             "team": self.team.as_dict(),
             "rounds_on_court": self.rounds_on_court,
             "rounds_carded": self.rounds_carded,
@@ -179,5 +178,6 @@ class PlayerGameStats(db.Model):
             "Elo": round(self.player.elo(self.game_id), 2),
             "Elo Delta": round(self.player.elo(self.game_id) - self.player.elo(self.game_id - 1), 2),
         } | self.player.as_dict()
-
+        if include_game:
+            d["game"] = self.game.as_dict()
         return d

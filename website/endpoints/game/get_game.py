@@ -32,7 +32,8 @@ def add_get_game_endpoints(app):
             player: List<str> (OPTIONAL) = the searchable name of the player who played in the game
             official: List<str> (OPTIONAL) = the searchable name of the officials who officiated in the game
             court: <str> (OPTIONAL) = the court the game was on
-            includeGameEvents: <bool> (OPTIONAL) = whether gameEvents should be included
+            includeGameEvents: <bool> (OPTIONAL) = whether Game Events should be included
+            includePlayerStats: <bool> (OPTIONAL) = whether Player Stats should be included
         }
         """
         tournament_searchable = request.args.get('tournament', None, type=str)
@@ -40,7 +41,8 @@ def add_get_game_endpoints(app):
         player_searchable = request.args.getlist('player', type=str)
         official_searchable = request.args.getlist('official', type=str)
         court = request.args.get('court', None, type=int)
-        include_game_events = request.args.get('includeGameEvents', None, type=bool)
+        include_game_events = request.args.get('includeGameEvents', False, type=bool)
+        include_player_stats = request.args.get('includePlayerStats', False, type=bool)
         games = Games.query
         if tournament_searchable:
             tid = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first().id
@@ -60,7 +62,7 @@ def add_get_game_endpoints(app):
             games = games.join(PlayerGameStats, PlayerGameStats.game_id == Games.id).filter(
                 PlayerGameStats.player_id == pid)
         games = games.order_by((Games.start_time.desc()), Games.id.desc())
-        return [i.as_dict(include_game_events=include_game_events) for i in games.all()]
+        return [i.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats) for i in games.all()]
 
     @app.route('/api/fixtures')
     def get_fixtures():
