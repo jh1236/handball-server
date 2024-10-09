@@ -1,5 +1,3 @@
-import time
-
 from flask import request, jsonify
 
 from structure import manage_game

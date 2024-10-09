@@ -33,7 +33,7 @@ def add_get_game_endpoints(app):
     def get_games():
         """
         SCHEMA :
-        s{
+        {
             tournament: <str> (OPTIONAL) = the searchable name of the tournament the games are from
             team: List<str> (OPTIONAL) = the searchable name of the team who played in the game
             player: List<str> (OPTIONAL) = the searchable name of the player who played in the game
@@ -47,6 +47,7 @@ def add_get_game_endpoints(app):
         player_searchable = request.args.getlist('player', type=str)
         official_searchable = request.args.getlist('official', type=str)
         court = request.args.get('court', None, type=int)
+        include_game_events = request.args.get('includeGameEvents', None, type=bool)
         games = Games.query
         if tournament_searchable:
             tid = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first().id
@@ -66,7 +67,7 @@ def add_get_game_endpoints(app):
             games = games.join(PlayerGameStats, PlayerGameStats.game_id == Games.id).filter(
                 PlayerGameStats.player_id == pid)
         games = games.order_by((Games.start_time.desc()), Games.id.desc())
-        return [i.as_dict() for i in games.all()]
+        return [i.as_dict(include_game_events=include_game_events) for i in games.all()]
 
     @app.route('/api/fixtures')
     def get_fixtures():
