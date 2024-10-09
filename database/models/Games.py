@@ -184,7 +184,7 @@ class Games(db.Model):
             "Tournament": self.tournament.name,
         }
 
-    def as_dict(self, admin_view=False):
+    def as_dict(self, admin_view=False, include_game_events=False):
         d = {
             "id": self.id,
             "tournament": self.tournament.as_dict(),
@@ -222,5 +222,8 @@ class Games(db.Model):
                 "noteable_status": self.noteable_status,
                 "notes": self.notes,
             }
+        if include_game_events:
+            from database.models import GameEvents
+            d["Events"] = [i.as_dict() for i in GameEvents.query.filter(GameEvents.game_id == self.id).all()]
 
         return d

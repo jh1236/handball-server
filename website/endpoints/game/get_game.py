@@ -39,6 +39,7 @@ def add_get_game_endpoints(app):
             player: List<str> (OPTIONAL) = the searchable name of the player who played in the game
             official: List<str> (OPTIONAL) = the searchable name of the officials who officiated in the game
             court: <str> (OPTIONAL) = the court the game was on
+            includeGameEvents: <bool> = whether gameEvents should be included
         }
         """
         tournament_searchable = request.args.get('tournament', None, type=str)
