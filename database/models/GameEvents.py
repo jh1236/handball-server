@@ -88,7 +88,7 @@ class GameEvents(db.Model):
             team_mate = self.team_two_left if self.player_id != self.team_two_left else self.team_two_right
         return team_mate if team_mate else self.player
 
-    def as_dict(self):
+    def as_dict(self, include_game=True):
         return {
             "game": self.game.as_dict(),
             "event_type": self.event_type,

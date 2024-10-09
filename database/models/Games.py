@@ -224,6 +224,6 @@ class Games(db.Model):
             }
         if include_game_events:
             from database.models import GameEvents
-            d["Events"] = [i.as_dict() for i in GameEvents.query.filter(GameEvents.game_id == self.id).all()]
+            d["Events"] = [i.as_dict(include_game=False) for i in GameEvents.query.filter(GameEvents.game_id == self.id).all()]
 
         return d
