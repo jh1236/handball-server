@@ -91,7 +91,7 @@ class GameEvents(db.Model):
     def as_dict(self, include_game=True):
         d = {
             "event_type": self.event_type,
-            "team": self.team.as_dict() if self.team else None,
+            "first_team": (self.team_id == self.game.team_one_id) if self.team else None,
             "player": self.player.as_dict() if self.player else None,
             "details": self.details,
             "notes": self.notes,
