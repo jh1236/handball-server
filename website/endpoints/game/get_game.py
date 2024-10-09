@@ -13,21 +13,14 @@ def add_get_game_endpoints(app):
         SCHEMA :
         {
             id: <int> = the id of the game
+            includeGameEvents: <bool> (OPTIONAL) = whether gameEvents should be included
         }
         """
         game = Games.query.filter(Games.id == id).first()
-        return game.as_dict()
+        include_game_events = request.args.get('includeGameEvents', None, type=bool)
 
-    @app.route('/api/game/events/<int:id>', methods=['GET'])
-    def get_game_events(id):
-        """
-        SCHEMA :
-        {
-            id: <int> = the id of the game
-        }
-        """
-        ge = GameEvents.query.filter(GameEvents.game_id == id).all()
-        return [i.as_dict() for i in ge]
+        return game.as_dict(include_game_events=include_game_events)
+
 
     @app.route('/api/game', methods=['GET'])
     def get_games():
@@ -39,7 +32,7 @@ def add_get_game_endpoints(app):
             player: List<str> (OPTIONAL) = the searchable name of the player who played in the game
             official: List<str> (OPTIONAL) = the searchable name of the officials who officiated in the game
             court: <str> (OPTIONAL) = the court the game was on
-            includeGameEvents: <bool> = whether gameEvents should be included
+            includeGameEvents: <bool> (OPTIONAL) = whether gameEvents should be included
         }
         """
         tournament_searchable = request.args.get('tournament', None, type=str)
