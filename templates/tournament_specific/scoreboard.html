@@ -62,9 +62,14 @@
                                 href="/{{ tournamentLink }}fixtures/detailed?court={{ game.court }}"><i>{{ game.court + 1 }}</i></a>
             </p>
             <p><b>Official:</b>
-                <a class="hide" href="/{{ tournamentLink }}officials/{{ game.official.person.searchable_name }}">
-                    <i>{{ game.official.person.name }}</i>
-                </a></p>
+                {% if not game.is_bye %}
+                    <a class="hide"
+                       href="/{{ tournamentLink }}officials/{{ game.official.person.searchable_name }}">
+                        <i>{{ game.official.person.name }}</i>
+                    </a>
+                {% else %}
+                    <i>None</i>
+                {% endif %}
             <p><b>Time Elapsed:</b> <i id="elapsed">{{ time_elapsed }}</i></p>
             {% if game.scorer %}
                 <p><b>Scorer:</b>
@@ -98,24 +103,25 @@
         </td>
     </tr>
     <tr>
+        {% if not game.is_bye %}
         <td>
-            {% if team_card_times[0][0] < 0 %}
-                <div class="rectangle {% if prev_event == "Red Card" %}red_card{% endif %}"
-                     style="background-color: #EC4A4A; color:#EC4A4A; width:100%">Red Card
-                </div>
-            {% elif team_card_times[0][0] > 0 %}
-                {% if team_card_times[0][1] > 2 %}
-                    <div class="rectangle {% if prev_event == "Yellow Card" %}yellow_card{% endif %}"
-                         style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(team_card_times[0][0]) / team_card_times[0][1] }}%">
-                        Yellow Card
+                {% if team_card_times[0][0] < 0 %}
+                    <div class="rectangle {% if prev_event == "Red Card" %}red_card{% endif %}"
+                        style="background-color: #EC4A4A; color:#EC4A4A; width:100%">Red Card
                     </div>
-                {% else %}
-                    <div class="rectangle {% if prev_event == "Green Card" %}green_card{% endif %}"
-                         style="background-color: #84AA63; color: #84AA63;width:{{ 100*(team_card_times[0][0]) / team_card_times[0][1] }}%">
-                        Green Card
-                    </div>
+                {% elif team_card_times[0][0] > 0 %}
+                    {% if team_card_times[0][1] > 2 %}
+                        <div class="rectangle {% if prev_event == "Yellow Card" %}yellow_card{% endif %}"
+                            style="background-color: #FCCE6E; color: #FCCE6E;width:{{ 100*(team_card_times[0][0]) / team_card_times[0][1] }}%">
+                            Yellow Card
+                        </div>
+                    {% else %}
+                        <div class="rectangle {% if prev_event == "Green Card" %}green_card{% endif %}"
+                            style="background-color: #84AA63; color: #84AA63;width:{{ 100*(team_card_times[0][0]) / team_card_times[0][1] }}%">
+                            Green Card
+                        </div>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
         </td>
         <td></td>
         <td>
@@ -137,6 +143,7 @@
                 {% endif %}
             {% endif %}
         </td>
+        {% endif %}
     </tr>
     {% for i in range(3) %}
         <tr>
