@@ -246,9 +246,12 @@ def add_tournament_specific(app):
 
         pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).order_by(PlayerGameStats.team_id).all()
 
+        # stolen from ./games/<id>/
         players = [[i for i in pgs if i.team_id == pgs[0].team_id], [i for i in pgs if i.team_id != pgs[0].team_id]]
-
-        teams = [i[0].team for i in players]  # bit cheeky but it works
+        if game.is_bye:
+            teams = [players[0][0].team, Teams.query.filter(Teams.id == 1).first()]  # quicker and dirtier hack
+        else:
+            teams = [players[0][0].team, players[1][0].team]  # quicker and dirtier hack
 
         prev_event = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
 
@@ -265,7 +268,7 @@ def add_tournament_specific(app):
             (max(i, key=lambda
                 a: 9999999 if a.card_time_remaining < 0 else a.card_time_remaining).card_time_remaining,
              max(i, key=lambda a: 9999999 if a.card_time < 0 else a.card_time).card_time)
-            for i in players]
+            for i in players if i]
 
         if visual_swap:
             teams = list(reversed(teams))
