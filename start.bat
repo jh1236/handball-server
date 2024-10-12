@@ -3,7 +3,7 @@ ECHO Please make sure nginx is running, routing port 80 to 8080
 timeout t/ 30
 
 set repeated_failure=0
-set github_token=PUT TOKEN HERE
+set github_token=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
 
 :BEGIN
 py start.py --no-debug
