@@ -1,6 +1,6 @@
 import random
 
-from flask import send_file, request
+from flask import send_file, request, render_template
 
 import utils.permissions
 from database import db
@@ -30,6 +30,19 @@ def init_api(app):
     @app.get("/pipe.mp3")
     def pipe():
         return send_file("./resources/pipe.mp3")
+    
+    @app.get("/teapot")
+    def teapot():
+        return (
+            render_template(
+                "generic_error.html", 
+                error=418,
+                reason="I'm a teapot",
+                image="https://http.cat/418",
+                message="This server is a teapot, and can't brew coffee."
+            ), 
+            418
+        )
 
     @app.get("/robots.txt")
     def robots():
