@@ -43,7 +43,7 @@ if __name__ == "__main__":
             server.close()
             return "Stopping server", 200 # there is like a 50% chance this will not be returned, and the server will just close without sending a message to the client. whoopsie
 
-        print("Starting server")
+        logger.info("Starting server")
         server = create_server(app, host="0.0.0.0", port=port)
         server.run()
 
