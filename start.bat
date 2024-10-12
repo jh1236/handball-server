@@ -1,9 +1,18 @@
 @ECHO OFF
 ECHO Please make sure nginx is running, routing port 80 to 8080
-timeout t/ 30
+timeout /t 30
 
 set repeated_failure=0
-set github_token=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
+set github_token=None
+set can_update=0
+if exist github_token.txt (
+    set /p github_token=<github_token.txt
+    set can_update=1
+) else (
+    ECHO github_token.txt not found, please create one with your github token
+    ECHO Updating from github will not work without a github TOKEN
+    timeout /t 15
+)
 
 :BEGIN
 py start.py --no-debug
@@ -34,8 +43,12 @@ if %repeated_failure% lss 3 (
 goto :BEGIN
 
 :UPDATE
+if %can_update% == 0 (
+    ECHO Cannot update from github without a github token, restarting instead...
+    goto :BEGIN
+)
 ECHO Pulling from github...
-git pull https://%github_token%@github.com/jh1236/matchmaking updater
+git pull https://%github_token%@github.com/jh1236/matchmaking
 ECHO Retrying start.py... Attempt %repeated_failure%
 goto :BEGIN
 
