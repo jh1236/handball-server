@@ -37,7 +37,7 @@ if __name__ == "__main__":
         @admin_only
         def stop_server():
             # by default restart the server because we don't want it to have downtime
-            app.config['EXIT_CODE'] = flask.request.args.get("exit_code", 1) 
+            app.config['EXIT_CODE'] = int(flask.request.args.get("exit_code", 1))
             exit_reasons = {0: "stop", 1: "restart", 2: "update and restart server"}
             logger.important(f"User requested server to stop, exit code: {app.config['EXIT_CODE']}: {exit_reasons[app.config['EXIT_CODE']]}\nThe error below is expected and can be ignored")   
             server.close()
