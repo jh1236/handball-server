@@ -35,7 +35,7 @@ goto :BEGIN
 
 :UPDATE
 ECHO Pulling from github...
-git pull https://%github_token%@github.com/jh1236/matchmaking UPDATE
+git pull https://%github_token%@github.com/jh1236/matchmaking
 ECHO Retrying start.py... Attempt %repeated_failure%
 goto :BEGIN
 
