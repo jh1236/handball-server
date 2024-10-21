@@ -10,3 +10,5 @@ config/password.txt
 .DS_Store
 .vscode/
 github_token.txt
+venv/
+.venv/
