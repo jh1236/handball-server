@@ -157,11 +157,15 @@ class Games(db.Model):
         self.notes = None
         self.winning_team_id = None
 
+    @property
+    def rounds(self):
+        return self.team_one_score + self.team_two_score
+
     def stats(self):
         from database.models import PlayerGameStats
         pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == self.id).all()
         return {
-            "Rounds": self.team_one_score + self.team_two_score,
+            "Rounds": self.rounds,
             "Score Difference": abs(self.team_one_score - self.team_two_score),
             "Elo Gap": abs(self.team_one.elo(self.id) - self.team_two.elo(self.id)),
             "Length": self.length,

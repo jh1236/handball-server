@@ -346,7 +346,7 @@ def add_admin_pages(app):
                                                             PlayerGameStats.game_id == Games.id).outerjoin(EloChange,
                                                                                                            EloChange.game_id == Games.id).filter(
             Games.ended, PlayerGameStats.player_id == player.id, EloChange.player_id == PlayerGameStats.player_id,
-                         Games.admin_status != 'Official')
+                         (Games.admin_status != 'Official') | (Games.best_player_id == player.id))
 
         if tournament:
             key_games = key_games.filter(Games.tournament_id == tournament)
@@ -354,7 +354,7 @@ def add_admin_pages(app):
 
         key_games = [
             (
-                i.noteable_status,
+                i.noteable_status if i.noteable_status != "Official" else "Best on ground",
                 f"{i.team_one.name} vs {i.team_two.name} [{i.team_one_score} - {i.team_two_score}] <{'' if e and e.elo_delta < 0 else '+'}{round(e.elo_delta, 2) if e else 0}>",
                 i.id, i.tournament.searchable_name) for i, e in key_games
         ]

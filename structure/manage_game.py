@@ -152,9 +152,8 @@ def sync(game_id):
                 game.protested = True
             case "End Game":
                 game.best_player_id = i.details
-                if i.details:
-                    PlayerGameStats.query.filter(PlayerGameStats.player_id == i.details,
-                                                 PlayerGameStats.game_id == game_id).first().is_best_player = 1
+                for j in all_players:
+                    j.is_best_player = j.player_id == i.details
                 game.notes = i.notes
                 game.ended = True
             case "Start":
