@@ -33,7 +33,7 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=port, debug=True)
 
     else:
-        @app.get("/stop")
+        @app.get("/api/stop")
         @admin_only
         def stop_server():
             # by default restart the server because we don't want it to have downtime
