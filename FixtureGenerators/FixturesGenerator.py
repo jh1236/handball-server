@@ -3,7 +3,7 @@ from itertools import zip_longest
 from math import ceil
 
 from database import db
-from database.models import Tournaments, Games, PlayerGameStats, TournamentOfficials
+from database.models import Games, PlayerGameStats, TournamentOfficials, Tournaments
 from utils.logging_handler import logger
 
 
@@ -65,15 +65,16 @@ class FixturesGenerator:
         db.session.commit()
 
     def add_umpires(self):
+        from database.models import Tournaments # WHAT THE FUCK?! i dont know what is going on here, but this fixes it?!
         games_query = Games.query.filter(Games.tournament_id == self.tournament_id, Games.is_bye == False).order_by(
             Games.id).all()
         players = PlayerGameStats.query.join(Games, Games.id == PlayerGameStats.game_id).filter(
             PlayerGameStats.tournament_id == self.tournament_id, Games.is_bye == False).all()
-        scorer = Tournaments.query.filter(Tournaments.id == self.tournament_id).first().has_scorer
+        logger.fatal(Tournaments.__dict__)
+        logger.fatal(Games.__dict__)
+        tourney = Tournaments.query.filter(Tournaments.id == self.tournament_id).first()
         officials = TournamentOfficials.query.filter(TournamentOfficials.tournament_id == self.tournament_id).all()
 
-        logger.info([(i) for i in officials])
-        logger.info([(i.person_id, i.proficiency) for i in officials])
         rounds = defaultdict(list)
         game_to_players = defaultdict(list)
         for i in players:
@@ -95,6 +96,7 @@ class FixturesGenerator:
                             it.court_one_umpired,
                         ),
                     )
+                    print([(i.official.person.name, i.games_umpired,) for i in court_one_officials])
                     court_two_officials: list[TournamentOfficials] = sorted(
                         officials,
                         key=lambda it: (
@@ -104,8 +106,8 @@ class FixturesGenerator:
                         ),
                     )
                     logger.info(
-                        f"c1: {[(i.person_id, i.proficiency) for i in court_one_officials]},"
-                        " c2: {[(i.official.person_id, i.official.proficiency) for i in court_two_officials]}"
+                        f"c1: {[(i.official.person_id, i.official.proficiency) for i in court_one_officials]}, "
+                        f"c2: {[(i.official.person_id, i.official.proficiency) for i in court_two_officials]}"
                     )
                     #  games.id, round, court, official, scorer, [players]
 
@@ -113,7 +115,7 @@ class FixturesGenerator:
                         continue
                     if g.official_id:
                         continue
-                    for o in court_one_officials if g[2] == 0 else court_two_officials:
+                    for o in court_one_officials if g.court == 0 else court_two_officials:
                         if o.official_id in [k.official_id for k in games if k]:
                             # the official is already umpiring this round
                             continue
@@ -122,8 +124,9 @@ class FixturesGenerator:
                             # the official is playing this round
                             continue
                         g.official_id = o.official_id
+                        db.session.commit()
                         break
-            if not scorer:
+            if not tourney.has_scorer:
                 continue
             for games in zip_longest(court_one_games, court_two_games):
                 for g in games:
@@ -152,10 +155,12 @@ class FixturesGenerator:
                             # the official is playing this round
                             continue
                         g.scorer_id = o.official_id
+                        db.session.commit()
                         break
                     if not g.scorer_id:
                         # there was no scorer found, set the scorer to be equal to the umpire
                         g.scorer_id = g.official_id
+                        db.session.commit()
 
         db.session.commit()
 

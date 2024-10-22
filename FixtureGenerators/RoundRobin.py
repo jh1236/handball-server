@@ -1,6 +1,6 @@
 from FixtureGenerators.FixturesGenerator import FixturesGenerator
 from database import db
-from database.models import Tournaments, TournamentTeams, Games
+from database.models import Games, TournamentTeams, Tournaments
 from structure import manage_game
 
 
@@ -11,7 +11,7 @@ class RoundRobin(FixturesGenerator):
 
     def _end_of_round(self, tournament_id):
 
-        teams = [i.team for i in TournamentTeams.query.filter(TournamentTeams.tournament_id == tournament_id).all()]
+        teams = [i.team_id for i in TournamentTeams.query.filter(TournamentTeams.tournament_id == tournament_id).all()]
         last_game = Games.query.filter(Games.tournament_id == tournament_id).order_by(Games.round.desc()).first()
         rounds = (last_game.round if last_game else 0) + 1
 

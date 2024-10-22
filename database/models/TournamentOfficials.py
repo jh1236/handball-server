@@ -32,21 +32,21 @@ class TournamentOfficials(db.Model):
     @property
     def games_umpired(self):
         from database.models import Games
-        return Games.query.filter(Games.tournament_id == self.tournament_id, Games.official_id == self.id).count()
+        return Games.query.filter(Games.tournament_id == self.tournament_id, Games.official_id == self.official_id).count()
 
     @property
     def court_one_umpired(self):
         from database.models import Games
-        return Games.query.filter(Games.tournament_id == self.tournament_id, Games.official_id == self.id,
+        return Games.query.filter(Games.tournament_id == self.tournament_id, Games.official_id == self.official_id,
                                   Games.court == 0).count()
 
     @property
     def court_two_umpired(self):
         from database.models import Games
-        return Games.query.filter(Games.tournament_id == self.tournament_id, Games.official_id == self.id,
+        return Games.query.filter(Games.tournament_id == self.tournament_id, Games.official_id == self.official_id,
                                   Games.court == 1).count()
 
     @property
     def games_scored(self):
         from database.models import Games
-        return Games.query.filter(Games.tournament_id == self.tournament_id, Games.scorer_id == self.id).count()
+        return Games.query.filter(Games.tournament_id == self.tournament_id, Games.scorer_id == self.official_id).count()
