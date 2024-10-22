@@ -12,7 +12,8 @@ class RoundRobin(FixturesGenerator):
     def _end_of_round(self, tournament_id):
 
         teams = [i.team for i in TournamentTeams.query.filter(TournamentTeams.tournament_id == tournament_id).all()]
-        rounds = Games.query.filter(Games.tournament == tournament_id).order_by(Games.round.desc()).first().round + 1
+        last_game = Games.query.filter(Games.tournament_id == tournament_id).order_by(Games.round.desc()).first()
+        rounds = (last_game.round if last_game else 0) + 1
 
         if len(teams) % 2 != 0:  # if there is an odd number of teams, add a bye.
             teams += [1]
