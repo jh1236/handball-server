@@ -9,3 +9,6 @@ config/password.txt
 /clips/videos - Copy/
 .DS_Store
 .vscode/
+github_token.txt
+venv/
+.venv/
