@@ -581,7 +581,7 @@ def official_timeout(game_id):
     db.session.commit()
 
 
-def create_game(tournament_id, team_one, team_two, official=None, players_one=None, players_two=None, round_number=-1,
+def create_game(tournament_id, team_one: int|str, team_two: int|str, official=None, players_one=None, players_two=None, round_number=-1,
                 court=0, is_final=False):
     """Pass team_one & team_two in as either int (team id) or str (searchable_name)."""
     if isinstance(tournament_id, str):
@@ -711,14 +711,15 @@ def create_tournament(name, fixtures_gen, finals_gen, ranked, two_courts, scorer
                              )
 
     db.session.add(tournament)
+    db.session.commit()
     for i in teams:
-        tt = TournamentTeams(tournament_id=tournament.id, team_id=i.id)
+        tt = TournamentTeams(tournament_id=tournament.id, team_id=i)
         db.session.add(tt)
     for i in officials:
-        to = TournamentOfficials(tournament_id=tournament.id, official_id=i.id, is_scorer=True, is_official=True)
+        to = TournamentOfficials(tournament_id=tournament.id, official_id=i, is_scorer=True, is_umpire=True)
         db.session.add(to)
     db.session.commit()
-    fixtures = get_type_from_name(fixtures_gen, tournament)
+    fixtures = get_type_from_name(fixtures_gen, tournament.id)
     fixtures.begin_tournament()
 
 
