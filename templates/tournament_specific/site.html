@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block bodyBlock %}
-<h1><a href="/{{ tournament }}fixtures" class="hide">Fixtures</a></h1>
+<h1><a href="/{{ tournamentLink }}fixtures" class="hide">Fixtures</a></h1>
 <p><i><a href="/{{ tournamentLink }}fixtures/detailed" class="hide">Show More</a></i></p>
 
 <table class="jaredTable">
@@ -38,7 +38,7 @@
     {% if finals %}
         <tr>
         <td></td>
-            <th colspan="3" style="font-size: 30px"><b>Finals:</b></th>
+            <th colspan="3" style="font-size: 30px"><a href="/{{ tournamentLink }}fixtures/admin" class="hide"><b>Finals:</b></a></th>
         </tr>
         <tr><td colspan="999"><hr></td></tr>
         {% for i, round in finals %}
