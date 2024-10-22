@@ -37,7 +37,7 @@ def init_api(app):
             render_template(
                 "generic_error.html", 
                 error=418,
-                reason="I'm a teapot",
+                reason="I'm a teapot.",
                 image="https://http.cat/418",
                 message="This server is a teapot, and can't brew coffee."
             ), 
