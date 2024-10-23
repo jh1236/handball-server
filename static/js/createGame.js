@@ -47,13 +47,32 @@ let lookup = ["Player One", "Player Two", "Substitute"]
 
 let teamListOne = ["", ""]
 let teamListTwo = ["", ""]
-let setTeamListOne = (d, s, i) => {
-    teamListOne[i] = d
+let setTeamListOne = (s, i) => {
+    teamListOne[i] = s
     document.getElementById("teamOne" + i).textContent = `${lookup[i]}: ${s}`
 }
 
-let setTeamListTwo = (d, s, i) => {
-    teamListTwo[i] = d
+let setCustomName = (team, pos) => {
+    const list = team ? teamListTwo : teamListOne
+    const v = document.getElementById(`customName${team}${pos}`).value
+    list[pos] = v
+    document.getElementById((team ? "teamTwo" : "teamOne") + (pos)).textContent = `${lookup[pos]}: ${v}`
+    console.log(v)
+    if (v) {
+        for (const i of document.getElementById(`P${pos + 1}T${team+1}`).children) {
+            if (i.id.startsWith("customName")) continue
+            i.style.display = "none"
+        }
+    } else {
+        for (const i of document.getElementById(`P${pos + 1}T${team+1}`).children) {
+            if (i.id.startsWith("customName")) continue
+            i.style.display = "block"
+        }
+    }
+}
+
+let setTeamListTwo = (s, i) => {
+    teamListTwo[i] = s
     document.getElementById("teamTwo" + i).textContent = `${lookup[i]}: ${s}`
 }
 
@@ -120,7 +139,7 @@ function myFunction(button) {
 
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = function (event) {
-    if (!event.target.matches('.dropbtn')) {
+    if (!event.target.matches('.dropbtn') && !event.target.matches('.ignore')) {
         const dropdowns = document.getElementsByClassName("dropdown-content");
         let i;
         for (i = 0; i < dropdowns.length; i++) {
@@ -136,7 +155,6 @@ window.onload = () => {
     if (window.location.href.includes("create_players")) {
         for (let t = 1; t <= 2; t++) {
             for (let p = 1; p <= 3; p++) {
-                console.log(`searchP${p}T${t}`)
                 let elem = document.getElementById(`searchP${p}T${t}`)
                 elem.onkeyup = (e) => {
                     for (let i of document.getElementById(`P${p}T${t}`).children) {

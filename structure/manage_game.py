@@ -387,7 +387,7 @@ def start_game(game_id, swap_service, team_one, team_two, team_one_iga, official
                         team_one_right_id=team_one[1], team_two_right_id=team_two[1])
     db.session.add(to_add)
     sync(game_id)
-    if pgs_from_game_and_player(game_id, to_add.player_to_serve_id).card_time_remaining != 0:
+    if (p := pgs_from_game_and_player(game_id, to_add.player_to_serve_id)) and p.card_time_remaining != 0:
         to_add.player_to_serve_id = team_two[1] if swap_service else team_one[1]
     db.session.commit()
 
@@ -578,6 +578,7 @@ def substitute(game_id, first_team, left_player):
     _add_to_game(game_id, "Substitute", first_team, left_player)
     db.session.commit()
 
+
 def official_timeout(game_id):
     if game_is_over(game_id):
         raise ValueError("Game is Already Over!")
@@ -585,71 +586,54 @@ def official_timeout(game_id):
     db.session.commit()
 
 
-def create_game(tournament_id, team_one: int|str, team_two: int|str, official=None, players_one=None, players_two=None, round_number=-1,
+def create_game(tournament_id, team_one: int | str, team_two: int | str, official=None, players_one=None,
+                players_two=None, round_number=-1,
                 court=0, is_final=False):
     """Pass team_one & team_two in as either int (team id) or str (searchable_name)."""
     if isinstance(tournament_id, str):
         tournament_id = Tournaments.query.filter(Tournaments.searchable_name == tournament_id).first().id
-    if players_one is not None:
-        players = [-1, -1, -1]
-        for i, v in enumerate(players_one):
-            player = People.query.filter(People.searchable_name == v).first()
-            players[i] = player.id if player else -1
-        teams = Teams.query.all()
-        first_team = None
-        for i in teams[1:]:
-            if not i.captain_id:
-                continue  # this is most likely the bye team, or it's so fucked up in the db that we probs wanna skip it anyway
-            logger.info(players)
-            if sorted([i.non_captain_id or -1, i.captain_id, i.substitute_id or -1]) == sorted(players):
-                first_team = i
-                break
-        if not first_team:
-            if len([i for i in players if i > 0]) == 1:
-                team_one = "(Solo) " + People.query.filter(People.id == players[0]).first().name
-            if not team_one:
-                raise NameError("You need to give a new team a name!")
-            players = [i if i > 0 else None for i in players]
-            add = Teams(name=team_one, searchable_name=searchable_of(team_one), captain_id=players[0],
-                        non_captain_id=players[1], substitute_id=players[2])
-            db.session.add(add)
-            first_team = add
-    else:
-        if isinstance(team_one, int):
-            first_team = Teams.query.filter(Teams.id == team_one).first()
+    teams = []
+    for players, team in [(players_one, team_one), (players_two, team_two)]:
+        if players is not None:
+            new_players = [-1, -1, -1]
+            for i, v in enumerate(players):
+                player = People.query.filter(People.name == v).first()
+                print(v)
+                if not v.strip():
+                    new_players[i] = -1
+                else:
+                    if not player:
+                        player = People(name=v, searchable_name=searchable_of(v))
+                        db.session.add(player)
+                        db.session.commit()
+                    new_players[i] = player.id
+            all_teams = Teams.query.all()
+            out_team = None
+            for i in all_teams[1:]:
+                if not i.captain_id:
+                    continue  # this is most likely the bye team, or it's so fucked up in the db that we probs wanna skip it anyway
+                if sorted([i.non_captain_id or -1, i.captain_id, i.substitute_id or -1]) == sorted(new_players):
+                    out_team = i
+                    break
+            if not out_team:
+                if len([i for i in new_players if i > 0]) == 1:
+                    team_one = "(Solo) " + People.query.filter(People.id == new_players[0]).first().name
+                if not team_one:
+                    raise NameError("You need to give a new team a name!")
+                new_players = [i if i > 0 else None for i in new_players]
+                add = Teams(name=team_one, searchable_name=searchable_of(team), captain_id=new_players[0],
+                            non_captain_id=new_players[1], substitute_id=new_players[2])
+                db.session.add(add)
+                out_team = add
         else:
-            first_team = Teams.query.filter(Teams.searchable_name == team_one).first()
-    if players_two is not None:
-        players = [-1, -1, -1]
-        for i, v in enumerate(players_two):
-            player = People.query.filter(People.searchable_name == v).first()
-            players[i] = player.id if player else -1
-        teams = Teams.query.all()
-        second_team = None
-        for i in teams[1:]:
-            if not i.captain_id:
-                continue  # this is most likely the bye team, or it's so fucked up in the db that we probs wanna skip it anyway
-            logger.debug(players)
-            if sorted([i.non_captain_id or -1, i.captain_id, i.substitute_id or -1]) == sorted(players):
-                second_team = i
-                break
-        if not second_team:
-            if len([i for i in players if i > 0]) == 1:
-                team_two = "(Solo) " + People.query.filter(People.id == players[0]).first().name
-            if not team_two:
-                raise NameError("You need to give a new team a name!")
-            players = [i if i > 0 else None for i in players]
-            add = Teams(name=team_two, searchable_name=searchable_of(team_two), captain_id=players[0],
-                        non_captain_id=players[1], substitute_id=players[2])
-            db.session.add(add)
-            second_team = add
-    else:
-        if isinstance(team_two, int):
-            second_team = Teams.query.filter(Teams.id == team_two).first()
-        else:
-            second_team = Teams.query.filter(Teams.searchable_name == team_two).first()
+            if isinstance(team_one, int):
+                out_team = Teams.query.filter(Teams.id == team).first()
+            else:
+                out_team = Teams.query.filter(Teams.searchable_name == team).first()
+        teams.append(out_team)
     ranked = True
-    for i in [first_team, second_team]:
+    print(teams)
+    for i in teams:
         if i == 1: continue
         if not TournamentTeams.query.filter(TournamentTeams.team_id == i.id,
                                             TournamentTeams.tournament_id == tournament_id):
@@ -673,12 +657,12 @@ def create_game(tournament_id, team_one: int|str, team_two: int|str, official=No
                 > 32400
         ):
             round_number = round_number + 1
-    is_bye = 1 in [first_team.id, second_team.id]
+    is_bye = 1 in [i.id for i in teams]
     court = -1 if is_bye else court
-    if is_bye and first_team.id == 1:
-        first_team, second_team = second_team, first_team
+    if is_bye and teams[0].id == 1:
+        teams = list(reversed(teams))
 
-    g = Games(tournament_id=tournament_id, team_one_id=first_team.id, team_two_id=second_team.id,
+    g = Games(tournament_id=tournament_id, team_one_id=teams[0].id, team_two_id=teams[1].id,
               official_id=official, court=court, is_final=is_final, round=round_number, ranked=ranked, is_bye=is_bye,
               someone_has_won=is_bye)
     if is_bye:
@@ -688,7 +672,8 @@ def create_game(tournament_id, team_one: int|str, team_two: int|str, official=No
         g.winning_team_id = 1
     db.session.add(g)
     db.session.commit()  # this is a risk, but i want this to work so ¯\_(ツ)_/¯
-    for i, opp in [(first_team, second_team), (second_team, first_team)]:
+    print([teams, list(reversed(teams))])
+    for i, opp in [teams, list(reversed(teams))]:
         players = [i.captain_id, i.non_captain_id, i.substitute_id]
         for j in players:
             if not j: break
@@ -741,14 +726,17 @@ def get_timeout_time(game_id):
     time_out_time = last_time_out.created_at
     print(time_out_time)
     if not last_time_out.team_id:
-        return time_out_time  #the timeout is an umpire timeout
+        return time_out_time  # the timeout is an umpire timeout
     return time_out_time + 30 if (time_out_time > 0) else 0
+
 
 def get_last_score_time(game_id):
     most_recent_score = (GameEvents.query.filter(GameEvents.game_id == game_id,
-                         (GameEvents.event_type == 'Score') | (GameEvents.event_type == 'Fault') | (GameEvents.event_type == 'Timeout'))
-                       .order_by(GameEvents.id.desc()).first())
-    
+                                                 (GameEvents.event_type == 'Score') | (
+                                                             GameEvents.event_type == 'Fault') | (
+                                                             GameEvents.event_type == 'Timeout'))
+                         .order_by(GameEvents.id.desc()).first())
+
     if not most_recent_score or most_recent_score.event_type == 'Timeout': return -1
     return most_recent_score.created_at + 20 if (most_recent_score.created_at or -1) + 25 > time.time() else -1
 
