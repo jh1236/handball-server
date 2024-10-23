@@ -150,6 +150,10 @@ def sync(game_id):
                 game.resolved = True
             case "Protest":
                 game.protested = True
+                if is_team_one:
+                    for j in all_players:
+                        if i.team_id == j.team_id:
+                            j.team_protested = True
             case "End Game":
                 game.best_player_id = i.details
                 for j in all_players:

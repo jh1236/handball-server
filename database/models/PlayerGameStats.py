@@ -67,6 +67,7 @@ class PlayerGameStats(db.Model):
     red_cards = db.Column(db.Integer(), default=0, nullable=False)
     card_time = db.Column(db.Integer(), default=0, nullable=False)
     card_time_remaining = db.Column(db.Integer(), default=0, nullable=False)
+    team_protested = db.Column(db.Boolean(), default=False, nullable=False)
     start_side = db.Column(db.Text())
 
     tournament = db.relationship("Tournaments", foreign_keys=[tournament_id])
@@ -118,10 +119,10 @@ class PlayerGameStats(db.Model):
         self.card_time_remaining = 0
         self.is_best_player = 0
 
-    def stats(self):
+    def stats(self, admin=False):
         from database.models import GameEvents
         first_ge = GameEvents.query.filter(GameEvents.game_id == self.game_id).first()
-        return self.game.stats() | {
+        d = self.game.stats() | {
             "Rounds on Court": self.rounds_on_court,
             "Ranked": self.game.ranked,
             "Rounds Carded": self.rounds_carded,
@@ -147,37 +148,40 @@ class PlayerGameStats(db.Model):
             "Timeouts Used": (
                 self.game.team_one_timeouts if self.game.team_one_id == self.team_id else self.game.team_two_timeouts),
         }
+        if admin:
+            d["Penalty Points"] = self.green_cards * 2 + self.yellow_cards * 5 + self.red_cards * 10
+        return d
 
     @classmethod
     def row_by_name(cls, name):
         return cls.rows[name]
 
-    def as_dict(self, include_game=  True):
+    def as_dict(self, include_game=True):
         d = {
-            "team": self.team.as_dict(),
-            "rounds_on_court": self.rounds_on_court,
-            "rounds_carded": self.rounds_carded,
-            "points_scored": self.points_scored,
-            "aces_scored": self.aces_scored,
-            "is_best_player": self.is_best_player,
-            "faults": self.faults,
-            "double_faults": self.double_faults,
-            "served_points": self.served_points,
-            "served_points_won": self.served_points_won,
-            "serves_received": self.serves_received,
-            "serves_returned": self.serves_returned,
-            "ace_streak": self.ace_streak,
-            "serve_streak": self.serve_streak,
-            "warnings": self.warnings,
-            "green_cards": self.green_cards,
-            "yellow_cards": self.yellow_cards,
-            "red_cards": self.red_cards,
-            "card_time": self.card_time,
-            "card_time_remaining": self.card_time_remaining,
-            "start_side": self.start_side,
-            "Elo": round(self.player.elo(self.game_id), 2),
-            "Elo Delta": round(self.player.elo(self.game_id) - self.player.elo(self.game_id - 1), 2),
-        } | self.player.as_dict()
+                "team": self.team.as_dict(),
+                "rounds_on_court": self.rounds_on_court,
+                "rounds_carded": self.rounds_carded,
+                "points_scored": self.points_scored,
+                "aces_scored": self.aces_scored,
+                "is_best_player": self.is_best_player,
+                "faults": self.faults,
+                "double_faults": self.double_faults,
+                "served_points": self.served_points,
+                "served_points_won": self.served_points_won,
+                "serves_received": self.serves_received,
+                "serves_returned": self.serves_returned,
+                "ace_streak": self.ace_streak,
+                "serve_streak": self.serve_streak,
+                "warnings": self.warnings,
+                "green_cards": self.green_cards,
+                "yellow_cards": self.yellow_cards,
+                "red_cards": self.red_cards,
+                "card_time": self.card_time,
+                "card_time_remaining": self.card_time_remaining,
+                "start_side": self.start_side,
+                "Elo": round(self.player.elo(self.game_id), 2),
+                "Elo Delta": round(self.player.elo(self.game_id) - self.player.elo(self.game_id - 1), 2),
+            } | self.player.as_dict()
         if include_game:
             d["game"] = self.game.as_dict()
         return d

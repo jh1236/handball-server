@@ -114,7 +114,7 @@ class People(db.Model):
                 ret[k] = round(v, 2)
         return ret
 
-    def stats(self, games_filter=None, make_nice=True, include_unranked=False, include_solo=False) -> dict[
+    def stats(self, games_filter=None, make_nice=True, include_unranked=False, include_solo=False, admin=False) -> dict[
         str, str | float]:
         from database.models import PlayerGameStats, Games
         from database.models import EloChange
@@ -193,6 +193,9 @@ class People(db.Model):
                     sum(i.serves_received for i in players) or 1),
             "Votes per 100 games": 100 * len([i for i in games if i.best_player_id == self.id]) / games_played,
         }
+        if admin:
+            ret["Penalty Points"] = ret["Green Cards"] * 2 + ret["Yellow Cards"] * 5 + ret["Red Cards"] * 10
+            ret["Warnings"] = sum(i.warnings for i in players)
         if make_nice:
             for k, v in ret.items():
                 if k in PERCENTAGES:
