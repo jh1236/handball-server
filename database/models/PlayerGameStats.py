@@ -67,7 +67,6 @@ class PlayerGameStats(db.Model):
     red_cards = db.Column(db.Integer(), default=0, nullable=False)
     card_time = db.Column(db.Integer(), default=0, nullable=False)
     card_time_remaining = db.Column(db.Integer(), default=0, nullable=False)
-    team_protested = db.Column(db.Boolean(), default=False, nullable=False)
     start_side = db.Column(db.Text())
 
     tournament = db.relationship("Tournaments", foreign_keys=[tournament_id])
