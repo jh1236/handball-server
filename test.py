@@ -81,7 +81,11 @@ def interpolate_start_times():
 
 if __name__ == '__main__':
     with app.app_context():
-        gid = 471
+        # manage_game.create_tournament("test", "RoundRobin", "BasicFinals", False, True, True,
+        #                               [i.team_id for i in TournamentTeams.query.filter(TournamentTeams.tournament_id == 5)],
+        #                               [i.official_id for i in
+        #                                TournamentOfficials.query.filter(TournamentOfficials.tournament_id == 5)])
+        gid = 522
         a = ""
         while a != 'x':
             game = Games.query.filter(Games.id == gid).first()
