@@ -670,7 +670,6 @@ def create_game(tournament_id, team_one: int | str, team_two: int | str, officia
         g.winning_team_id = 1
     db.session.add(g)
     db.session.commit()  # this is a risk, but i want this to work so ¯\_(ツ)_/¯
-    print([teams, list(reversed(teams))])
     for i, opp in [teams, list(reversed(teams))]:
         players = [i.captain_id, i.non_captain_id, i.substitute_id]
         for j in players:
