@@ -598,7 +598,6 @@ def create_game(tournament_id, team_one: int | str, team_two: int | str, officia
             new_players = [-1, -1, -1]
             for i, v in enumerate(players):
                 player = People.query.filter(People.name == v).first()
-                print(v)
                 if not v.strip():
                     new_players[i] = -1
                 else:
