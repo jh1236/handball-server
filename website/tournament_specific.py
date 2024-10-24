@@ -14,7 +14,7 @@ from structure.get_information import get_tournament_id
 from utils.permissions import (
     fetch_user,
     officials_only,
-    user_on_mobile,
+    user_on_mobile, fetch_user_name,
 )  # Temporary till i make a function that can handle dynamic/game permissions
 from utils.sidebar_wrapper import render_template_sidebar, link
 from utils.util import fixture_sorter
@@ -823,7 +823,12 @@ def add_tournament_specific(app):
     def create_game(tournament_name):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
         teams = Teams.query.filter(Teams.id != 1).order_by(Teams.searchable_name).all()
-        officials = Officials.query.join(People).order_by(People.searchable_name).all()
+        user = fetch_user()
+        if user.is_admin:
+            officials = Officials.query.join(People).order_by(People.searchable_name != user.searchable_name,
+                                                              People.searchable_name).all()
+        else:
+            officials = Officials.query.join(People).filter(People.searchable_name == user.searchable_name).all()
 
         if not get_type_from_name(tournament.fixtures_type, tournament.id).manual_allowed():
             return (
@@ -833,10 +838,6 @@ def add_tournament_specific(app):
                 ),
                 400,
             )
-
-        key = fetch_user()
-        official = [i for i in officials if i.person.password == key]
-        officials = official + [i for i in officials if i.person.password != key]
 
         return (
             render_template(
@@ -853,7 +854,13 @@ def add_tournament_specific(app):
     def create_game_players(tournament_name):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
         players = People.query.order_by(People.searchable_name).all()
-        officials = Officials.query.join(People).order_by(People.searchable_name).all()
+        user = fetch_user()
+        if user.is_admin:
+            officials = Officials.query.join(People).order_by(People.searchable_name != user.searchable_name,
+                                                              People.searchable_name).all()
+        else:
+            officials = Officials.query.join(People).filter(People.searchable_name == user.searchable_name).all()
+
         if not get_type_from_name(tournament.fixtures_type, tournament.id).manual_allowed():
             return (
                 render_template(
@@ -863,10 +870,6 @@ def add_tournament_specific(app):
                 400,
             )
 
-        key = fetch_user()
-
-        official = [i for i in officials if i.person.password == key]
-        officials = official + [i for i in officials if i.person.password != key]
         return (
             render_template(
                 "tournament_specific/game_editor/create_game_players.html",
