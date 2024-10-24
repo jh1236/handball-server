@@ -721,7 +721,6 @@ def get_timeout_time(game_id):
                                             GameEvents.id > most_recent_end).order_by(GameEvents.id.desc()).first()
     if not last_time_out: return 0
     time_out_time = last_time_out.created_at
-    print(time_out_time)
     if not last_time_out.team_id:
         return time_out_time  # the timeout is an umpire timeout
     return time_out_time + 30 if (time_out_time > 0) else 0
