@@ -616,11 +616,11 @@ def create_game(tournament_id, team_one: int | str, team_two: int | str, officia
                     break
             if not out_team:
                 if len([i for i in new_players if i > 0]) == 1:
-                    team_one = "(Solo) " + People.query.filter(People.id == new_players[0]).first().name
-                if not team_one:
+                    out_team = "(Solo) " + People.query.filter(People.id == new_players[0]).first().name
+                if not out_team:
                     raise NameError("You need to give a new team a name!")
                 new_players = [i if i > 0 else None for i in new_players]
-                add = Teams(name=team_one, searchable_name=searchable_of(team), captain_id=new_players[0],
+                add = Teams(name=out_team, searchable_name=searchable_of(team), captain_id=new_players[0],
                             non_captain_id=new_players[1], substitute_id=new_players[2])
                 db.session.add(add)
                 out_team = add
