@@ -97,7 +97,7 @@ def add_edit_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/pardon")
-    @officials_only
+    @admin_only
     def pardon():
         """
         SCHEMA:
