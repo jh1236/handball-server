@@ -450,8 +450,8 @@ def card(game_id, first_team, left_player, color, duration, reason):
     db.session.commit()
 
 
-def undo(game_id):
-    if game_is_ended(game_id):
+def undo(game_id, override=False):
+    if game_is_ended(game_id) and not override:
         raise ValueError("Game is Already Over!")
     delete_after = GameEvents.query.filter(GameEvents.game_id == game_id,
                                            (GameEvents.notes == None) | (GameEvents.notes != 'Penalty'),
@@ -751,8 +751,8 @@ def get_timeout_caller(game_id):
         return None
 
 
-def delete(game_id):
-    if game_is_ended(game_id):
+def delete(game_id, override=False):
+    if game_is_ended(game_id) and not override:
         raise ValueError("Game is Already Over!")
     GameEvents.query.filter(GameEvents.game_id == game_id).delete()
     PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).delete()
