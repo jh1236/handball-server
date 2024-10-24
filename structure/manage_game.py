@@ -608,7 +608,7 @@ def create_game(tournament_id, team_one: int | str, team_two: int | str, officia
                     new_players[i] = player.id
             all_teams = Teams.query.all()
             out_team = None
-            for i in all_teams[1:]:
+            for i in all_teams[1:]: # try to skip the bye team
                 if not i.captain_id:
                     continue  # this is most likely the bye team, or it's so fucked up in the db that we probs wanna skip it anyway
                 if sorted([i.non_captain_id or -1, i.captain_id, i.substitute_id or -1]) == sorted(new_players):
@@ -625,7 +625,7 @@ def create_game(tournament_id, team_one: int | str, team_two: int | str, officia
                 db.session.add(add)
                 out_team = add
         else:
-            if isinstance(team_one, int):
+            if isinstance(team, int):
                 out_team = Teams.query.filter(Teams.id == team).first()
             else:
                 out_team = Teams.query.filter(Teams.searchable_name == team).first()
