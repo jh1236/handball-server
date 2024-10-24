@@ -631,7 +631,6 @@ def create_game(tournament_id, team_one: int | str, team_two: int | str, officia
                 out_team = Teams.query.filter(Teams.searchable_name == team).first()
         teams.append(out_team)
     ranked = True
-    print(teams)
     for i in teams:
         if i == 1: continue
         if not TournamentTeams.query.filter(TournamentTeams.team_id == i.id,
