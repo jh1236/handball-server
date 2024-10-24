@@ -107,7 +107,7 @@ def add_edit_game_endpoints(app):
             leftPlayer: <bool> = if the player listed as left is being pardoned
         }
         """
-        logger.info(f"Request for substitute: {request.json}")
+        logger.info(f"Request for pardon: {request.json}")
         game_id = request.json["id"]
         first_team = request.json["firstTeam"]
         first_player = request.json["leftPlayer"]
