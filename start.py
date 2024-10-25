@@ -2,11 +2,11 @@ import flask
 
 from database import db
 from website.website import init_api
-from flask_minify import Minify
 from utils.logging_handler import logger
 from utils.args_handler import args
 
 if not args.debug:
+    from flask_minify import Minify
     from waitress import create_server
     from utils.permissions import admin_only
 
@@ -16,9 +16,8 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = args.debug
 app.config["SQLALCHEMY_DATABASE_URI"] = args.database
 app.config['SECRET_KEY'] = 'secret!'
-app.config['EXIT_CODE'] = 1 # 0 = stop server, 1 = fatal error or restart, 2 = uppdate and restart server
+app.config['EXIT_CODE'] = 1 # 0 = stop server, 1 = fatal error or restart, 2 = update and restart server
 
-Minify(app=app, html=True, js=True, cssless=True)
 
 db.init_app(app)
 init_api(app)
@@ -33,6 +32,8 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=port, debug=True)
 
     else:
+        Minify(app=app, html=True, js=True, cssless=True)  
+        
         @app.get("/api/stop")
         @admin_only
         def stop_server():
