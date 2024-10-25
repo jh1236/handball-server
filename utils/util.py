@@ -1,6 +1,6 @@
 import re
 from itertools import zip_longest
-from typing import TypeVar, Any, Generator
+from typing import TypeVar, Iterator
 from urllib.request import urlopen, Request
 
 from bs4 import BeautifulSoup
@@ -18,7 +18,7 @@ def chunks_sized(lst: list[T], n: int) -> list[list[T]]:
     return lizt
 
 
-def n_chunks(l: list[T], n: int, s=None) -> Generator[list[T]]:
+def n_chunks(l: list[T], n: int, s=None) -> Iterator[list[T]]:
     """Yield n number of striped chunks from l."""
     l = l.copy()
     while s and len(l) % n != 0:
