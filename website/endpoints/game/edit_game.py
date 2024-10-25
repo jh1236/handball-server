@@ -1,8 +1,9 @@
 from flask import request, jsonify
+from typing_extensions import override
 
 from structure import manage_game
 from utils.logging_handler import logger
-from utils.permissions import officials_only, admin_only
+from utils.permissions import officials_only, admin_only, fetch_user
 
 
 def add_edit_game_endpoints(app):
@@ -97,7 +98,7 @@ def add_edit_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/pardon")
-    @officials_only
+    @admin_only
     def pardon():
         """
         SCHEMA:
@@ -107,7 +108,7 @@ def add_edit_game_endpoints(app):
             leftPlayer: <bool> = if the player listed as left is being pardoned
         }
         """
-        logger.info(f"Request for substitute: {request.json}")
+        logger.info(f"Request for pardon: {request.json}")
         game_id = request.json["id"]
         first_team = request.json["firstTeam"]
         first_player = request.json["leftPlayer"]
@@ -234,7 +235,8 @@ def add_edit_game_endpoints(app):
         """
         logger.info(f"Request for undo: {request.json}")
         game_id = request.json["id"]
-        manage_game.undo(game_id)
+        override = fetch_user().is_admin
+        manage_game.undo(game_id, override)
         return "", 204
 
     @app.post("/api/games/update/delete")
@@ -248,7 +250,8 @@ def add_edit_game_endpoints(app):
         """
         logger.info(f"Request for delete: {request.json}")
         game_id = request.json["id"]
-        manage_game.delete(game_id)
+        override = fetch_user().is_admin
+        manage_game.delete(game_id, override)
         return "", 204
 
     @app.post("/api/games/update/card")

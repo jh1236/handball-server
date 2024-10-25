@@ -76,8 +76,8 @@ def add_tourney_endpoints(app):
             teamTwo: str = the searchable name of the second team, or the name of the team to be created if players is populated
             official: str (OPTIONAL) = the searchable name of the official (used to change officials)
             scorer: str (OPTIONAL) = the searchable name of the scorer (used to change scorer)
-            playersOne: list[str] (OPTIONAL) = the list of players on team one if the game is created by players
-            playersTwo: list[str] (OPTIONAL) = the list of players on team two if the game is created by players
+            playersOne: list[str] (OPTIONAL) = the list of players' true name on team one if the game is created by players
+            playersTwo: list[str] (OPTIONAL) = the list of players' true name on team two if the game is created by players
         }
         """
         logger.info(request.json)

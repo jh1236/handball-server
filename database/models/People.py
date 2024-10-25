@@ -42,7 +42,7 @@ class People(db.Model):
     image_url = db.Column(db.Text())
     session_token = db.Column(db.Text())
     token_timeout = db.Column(db.Integer())
-    is_admin = db.Column(db.Boolean(), nullable=False)
+    is_admin = db.Column(db.Boolean(), nullable=False, default=False)
 
     def image(self, tournament=None):
         from database.models import Teams

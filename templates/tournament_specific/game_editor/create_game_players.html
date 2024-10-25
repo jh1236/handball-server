@@ -15,7 +15,8 @@
     setTournament("{{ tournamentLink }}")
 </script>
 <h1>Create Game </h1>
-<p onclick="document.location.href = document.location.href.replace('create_players','create')"><i>Choose Teams Instead</i></p>
+<p onclick="document.location.href = document.location.href.replace('create_players','create')"><i>Choose Teams
+    Instead</i></p>
 <table class="jaredTable">
     <tr>
         <th><label>Team One: <input type="text" id="nameOne"></label></th>
@@ -30,8 +31,9 @@
                 <div class="dropdown-content" id="P1T1">
                     <input id="searchP1T1" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p.searchable_name}}', '{{p.name}}', 0)">{{p.name}}</p>
+                        <p onclick="setTeamListOne('{{ p.name }}', 0)">{{ p.name }}</p>
                     {% endfor %}
+                    <input type="text" class="ignore" id="customName00" onkeyup="setCustomName(0,0)">
                 </div>
             </div>
         </td>
@@ -42,8 +44,9 @@
                 <div class="dropdown-content" id="P1T2">
                     <input id="searchP1T2" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p.searchable_name}}', '{{p.name}}', 0)">{{p.name}}</p>
+                        <p onclick="setTeamListTwo('{{ p.name }}', 0)">{{ p.name }}</p>
                     {% endfor %}
+                    <input type="text" class="ignore" id="customName10" onkeyup="setCustomName(1,0)">
                 </div>
             </div>
         </td>
@@ -55,8 +58,9 @@
                 <div class="dropdown-content" id="P2T1">
                     <input id="searchP2T1" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p.searchable_name}}', '{{p.name}}', 1)">{{p.name}}</p>
+                        <p onclick="setTeamListOne('{{ p.name }}', 1)">{{ p.name }}</p>
                     {% endfor %}
+                    <input type="text" class="ignore" id="customName01" onkeyup="setCustomName(0,1)">
                 </div>
             </div>
         </td>
@@ -67,8 +71,9 @@
                 <div class="dropdown-content" id="P2T2">
                     <input id="searchP2T2" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p.searchable_name}}', '{{p.name}}', 1)">{{p.name}}</p>
+                        <p onclick="setTeamListTwo('{{ p.name }}', 1)">{{ p.name }}</p>
                     {% endfor %}
+                    <input type="text" class="ignore" id="customName11" onkeyup="setCustomName(1,1)">
                 </div>
             </div>
         </td>
@@ -83,8 +88,9 @@
                 <div class="dropdown-content" id="P3T1">
                     <input id="searchP3T1" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListOne('{{p.searchable_name}}', '{{p.name}}', 2)">{{p.name}}</p>
+                        <p onclick="setTeamListOne('{{ p.name }}', 2)">{{ p.name }}</p>
                     {% endfor %}
+                    <input type="text" class="ignore" id="customName00" onkeyup="setCustomName(0,2)">
                 </div>
             </div>
         </td>
@@ -95,8 +101,9 @@
                 <div class="dropdown-content" id="P3T2">
                     <input id="searchP3T2" class="dropbtn" type="text">
                     {% for p in players %}
-                    <p onclick="setTeamListTwo('{{p.searchable_name}}', '{{p.name}}', 2)">{{p.name}}</p>
+                        <p onclick="setTeamListTwo('{{ p.name }}', 2)">{{ p.name }}</p>
                     {% endfor %}
+                    <input type="text" class="ignore" id="customName00" onkeyup="setCustomName(1,2)">
                 </div>
             </div>
         </td>
@@ -111,7 +118,7 @@
         <button onclick="myFunction(this)" class="button dropbtn" id="umpire">Official</button>
         <div class="dropdown-content">
             {% for i in officials %}
-                <p onclick="setOfficial('{{i.person.searchable_name}}', '{{i.person.name}}')">{{i.person.name}}</p>
+                <p onclick="setOfficial('{{ i.person.searchable_name }}', '{{ i.person.name }}')">{{ i.person.name }}</p>
             {% endfor %}
         </div>
     </div>
