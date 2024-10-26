@@ -5,6 +5,7 @@
 
 from database import db
 from database.models import *
+from fix_images import load_images
 from start import app
 from structure import manage_game
 from utils.statistics import calc_elo
@@ -81,22 +82,4 @@ def interpolate_start_times():
 
 if __name__ == '__main__':
     with app.app_context():
-        # manage_game.create_tournament("test", "RoundRobin", "BasicFinals", False, True, True,
-        #                               [i.team_id for i in TournamentTeams.query.filter(TournamentTeams.tournament_id == 5)],
-        #                               [i.official_id for i in
-        #                                TournamentOfficials.query.filter(TournamentOfficials.tournament_id == 5)])
-        gid = 522
-        a = ""
-        while a != 'x':
-            game = Games.query.filter(Games.id == gid).first()
-            if game and not game.is_bye and not game.ended:
-                manage_game.start_game(gid, True, [game.team_one.captain.searchable_name,
-                                                   game.team_one.non_captain.searchable_name],
-                                       [game.team_two.captain.searchable_name,
-                                        game.team_two.non_captain.searchable_name], True)
-                manage_game.forfeit(gid, True)
-                manage_game.end_game(gid, game.team_one.captain.searchable_name, "", None, None)
-                a = input(f"Game {gid}: {game.team_one.name} vs {game.team_two.name} ({game.is_final})")
-            else:
-                input(f"{gid} does not exist")
-            gid += 1
+        load_images()

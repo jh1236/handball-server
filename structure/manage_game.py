@@ -5,8 +5,9 @@ from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.database_utilities import on_court_for_game
 from database.models import *
-from utils.statistics import calc_elo
 from utils.logging_handler import logger
+from utils.statistics import calc_elo
+from utils.util import fix_image_for
 
 SIDES = ["Left", "Right", "Substitute"]
 
@@ -623,6 +624,8 @@ def create_game(tournament_id, team_one: int | str, team_two: int | str, officia
                 add = Teams(name=team, searchable_name=searchable_of(team), captain_id=new_players[0],
                             non_captain_id=new_players[1], substitute_id=new_players[2])
                 db.session.add(add)
+                db.session.commit()
+                fix_image_for(add.name, add.id)
                 out_team = add
         else:
             if isinstance(team, int):

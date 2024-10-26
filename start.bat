@@ -29,6 +29,7 @@ if %EXIT_CODE% == 1 (
 
 if %EXIT_CODE% == 1 goto :RESTART
 if %EXIT_CODE% == 2 goto :UPDATE
+if %EXIT_CODE% == 3 goto :TEST
 ECHO Server has been stopped.
 goto :END
 
@@ -49,6 +50,12 @@ if %can_update% == 0 (
 )
 ECHO Pulling from github...
 git pull https://%github_token%@github.com/jh1236/matchmaking
+ECHO Retrying start.py... Attempt %repeated_failure%
+goto :BEGIN
+
+:TEST
+ECHO running test.py before restart
+py test.py
 ECHO Retrying start.py... Attempt %repeated_failure%
 goto :BEGIN
 

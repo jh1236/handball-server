@@ -1,11 +1,13 @@
 import re
 from itertools import zip_longest
+from threading import Thread
 from typing import TypeVar, Iterator
 from urllib.request import urlopen, Request
 
 from bs4 import BeautifulSoup
 
-from database.models import Games
+from database import db
+from database.models import Games, Teams
 
 T = TypeVar("T")
 
@@ -42,6 +44,12 @@ def fixture_sorter(games: list[Games]) -> list[Games]:
     this_round = [i for i in this_round if i]
     return this_round + byes
 
+def fix_image_for(name, tid):
+    def f():
+        img = google_image(name)
+        Teams.query.filter(Teams.id == tid).first().image_url = img
+        db.session.commit()
+    Thread(target = f).run()
 
 def google_image(word):
     url = "https://www.google.com/search?tbm=isch&q=" + re.sub("[^a-zA-Z0-9]", "", word.replace(" ", "_"))

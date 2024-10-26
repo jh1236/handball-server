@@ -32,15 +32,15 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=port, debug=True)
 
     else:
-        Minify(app=app, html=True, js=True, cssless=True)  
-        
+        Minify(app=app, html=True, js=True, cssless=True)
+
         @app.get("/api/stop")
         @admin_only
         def stop_server():
             # by default restart the server because we don't want it to have downtime
             app.config['EXIT_CODE'] = int(flask.request.args.get("exit_code", 1))
-            exit_reasons = {0: "stop", 1: "restart", 2: "update and restart server"}
-            logger.important(f"User requested server to stop, exit code: {app.config['EXIT_CODE']}: {exit_reasons[app.config['EXIT_CODE']]}\nThe error below is expected and can be ignored")   
+            exit_reasons = {0: "stop", 1: "restart", 2: "update and restart server", 3: "running test.py"}
+            logger.important(f"User requested server to stop, exit code: {app.config['EXIT_CODE']}: {exit_reasons[app.config['EXIT_CODE']]}\nThe error below is expected and can be ignored")
             server.close()
             return "Stopping server", 200 # there is like a 50% chance this will not be returned, and the server will just close without sending a message to the client. whoopsie
 
