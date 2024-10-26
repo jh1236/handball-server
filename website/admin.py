@@ -413,24 +413,6 @@ def add_admin_pages(app):
                 400,
             )
 
-        @dataclass
-        class Game:
-            teams: list[str]
-            score_string: str
-            id: int
-            requires_action_string: str = ""
-
-        @dataclass
-        class Player:
-            name: str
-            searchableName: str
-            penalty_points: int
-            warnings: int
-            yellow_cards: int
-            red_cards: int
-            rounds_on_bench: int
-
-        teams = TournamentTeams.query.filter(TournamentTeams.tournament_id == tournament_id).all()
         tourney = Tournaments.query.filter(Tournaments.id == tournament_id).first()
         with DatabaseManager() as c:
             # there has to be a reason this is the required syntax but i can't work it out1
