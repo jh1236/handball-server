@@ -625,7 +625,7 @@ def add_tournament_specific(app):
         official = TournamentOfficials.query.group_by(TournamentOfficials.official_id)
         if tournament_id:
             official = official.filter(TournamentOfficials.tournament_id == tournament_id.id)
-        official = [i.official.person for i in official.all()]
+        official = sorted([i.official.person for i in official.all()], key=lambda a: a.official.person.searchable_name)
         return (
             render_template_sidebar(
                 "tournament_specific/all_officials.html",
