@@ -1,6 +1,7 @@
 import time
 
 from database import db
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 
 # create table main.teams
 # (
@@ -45,6 +46,7 @@ class Teams(db.Model):
     non_captain = db.relationship("People", foreign_keys=[non_captain_id])
     substitute = db.relationship("People", foreign_keys=[substitute_id])
 
+    @hybrid_method
     def elo(self, last_game=None):
         from database.models import People
         players = People.query.filter(
@@ -56,6 +58,24 @@ class Teams(db.Model):
         for i in players:
             elos.append(i.elo(last_game))
         return sum(elos) / len(elos)
+    
+    @hybrid_method
+    def win_percentage(self, tournament=None, ranked=True):
+        
+        from database.models import Games
+        
+        games = Games.query.filter(
+            (Games.team_one_id == self.id) | (Games.team_two_id == self.id), 
+            Games.ended == True)
+        
+        if tournament:
+            games = games.filter(Games.tournament_id == tournament)
+        if ranked:
+            games = games.filter(Games.ranked == True)
+            
+        games = games.all()
+        return sum(i.winning_team_id == self.id for i in games) / (len([i for i in games]) or 1)
+        
 
     @property
     def short_name(self):
