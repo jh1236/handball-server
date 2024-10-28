@@ -1,5 +1,6 @@
 import re
 import time
+from typing import Iterable
 
 from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
@@ -585,6 +586,16 @@ def official_timeout(game_id):
     _add_to_game(game_id, "Timeout", None, None)
     db.session.commit()
 
+def teams_to_id(teams: Iterable[Iterable[Teams] | Teams]) -> tuple[tuple[int] | int]:
+    """can turn a collection of teams up to 2 levels deep into a tuple of ids with the same structure
+
+    Args:
+        teams (Iterable[Iterable[Teams]  |  Teams]): Collection of teams objects (Teams, (Teams, Teams)) is valid
+
+    Returns:
+        tuple[tuple[int] | int]: tuple of team id's with same structure as input
+    """
+    return tuple(tuple(i.id for i in j) if isinstance(j, (tuple, list, set)) else j.id for j in teams)
 
 def create_game(tournament_id, team_one: int | str, team_two: int | str, official=None, players_one=None,
                 players_two=None, round_number=-1,

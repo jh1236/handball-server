@@ -45,7 +45,21 @@ class Teams(db.Model):
     captain = db.relationship("People", foreign_keys=[captain_id])
     non_captain = db.relationship("People", foreign_keys=[non_captain_id])
     substitute = db.relationship("People", foreign_keys=[substitute_id])
-
+    
+    @hybrid_method
+    def games_played(self, tournament=None, ranked=None):
+        from database.models import Games
+        games = Games.query.filter(
+            (Games.team_one_id == self.id) | (Games.team_two_id == self.id), 
+            Games.ended == True)
+        
+        if tournament != None:
+            games = games.filter(Games.tournament_id == tournament)
+        if ranked != None:
+            games = games.filter(Games.ranked == ranked)
+            
+        games = games.all()
+        return len(games)
     @hybrid_method
     def elo(self, last_game=None):
         from database.models import People

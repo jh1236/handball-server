@@ -3,13 +3,15 @@ from itertools import zip_longest
 from math import ceil
 
 from database import db
-from database.models import Games, PlayerGameStats, TournamentOfficials, Tournaments
+from database.models import Tournaments
+from database.models import Games, PlayerGameStats, TournamentOfficials
 from utils.logging_handler import logger
-
+print(dir(Tournaments))
 
 # from database.models import Tournaments
 # from database import db
-
+# from database.models import Tournaments # WHAT THE FUCK?! i dont know what is going on here, but this fixes it?!
+        
 class FixturesGenerator:
 
     def __init__(self, tournament_id, *, fill_officials, editable, fill_courts):
@@ -65,13 +67,11 @@ class FixturesGenerator:
         db.session.commit()
 
     def add_umpires(self):
-        from database.models import Tournaments # WHAT THE FUCK?! i dont know what is going on here, but this fixes it?!
+        print(dir(Tournaments))
         games_query = Games.query.filter(Games.tournament_id == self.tournament_id, Games.is_bye == False).order_by(
             Games.id).all()
         players = PlayerGameStats.query.join(Games, Games.id == PlayerGameStats.game_id).filter(
             PlayerGameStats.tournament_id == self.tournament_id, Games.is_bye == False).all()
-        logger.fatal(Tournaments.__dict__)
-        logger.fatal(Games.__dict__)
         tourney = Tournaments.query.filter(Tournaments.id == self.tournament_id).first()
         officials = TournamentOfficials.query.filter(TournamentOfficials.tournament_id == self.tournament_id).all()
 
