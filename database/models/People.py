@@ -213,7 +213,7 @@ class People(db.Model):
         return bool(PlayerGameStats.query.filter(PlayerGameStats.player_id == self.id,
                                                  PlayerGameStats.tournament_id == tournament_id).first())
 
-    def as_dict(self, include_stats=False, tournament=None, admin_view=False):
+    def as_dict(self, include_stats=False, tournament=None, admin_view=False, make_nice=False):
         from database.models import PlayerGameStats
         d = {
             "name": self.name,
@@ -222,7 +222,7 @@ class People(db.Model):
         }
         if include_stats:
             game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament)) if tournament else None
-            d["stats"] = self.stats(game_filter, make_nice=False, admin=admin_view)
+            d["stats"] = self.stats(game_filter, make_nice=make_nice, admin=admin_view)
         if admin_view:
             d |= {
                 "isAdmin": self.is_admin

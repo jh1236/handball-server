@@ -16,6 +16,8 @@ def add_get_player_endpoints(app):
         """
         tournament = request.args.get("tournament", None)
         team = request.args.get("team", None)
+        make_nice = request.args.get('makeNice', False, type=bool)
+
         includeStats = request.args.get("includeStats", False, type=bool)
         q = PlayerGameStats.query
         if tournament:
@@ -25,7 +27,7 @@ def add_get_player_endpoints(app):
             tid = Teams.query.filter(Teams.searchable_name == team).first().id
             q = q.filter(PlayerGameStats.team_id == tid)
         q = q.group_by(PlayerGameStats.player_id)
-        return [i.player.as_dict(include_stats=includeStats) for i in q.all()]
+        return [i.player.as_dict(include_stats=includeStats, make_nice=make_nice) for i in q.all()]
 
     @app.get("/api/players/<searchable>")
     def get_player(searchable):
@@ -36,6 +38,8 @@ def add_get_player_endpoints(app):
             game: <int> (OPTIONAL) = the game to get the stats for this player
         }
         """
+        make_nice = request.args.get('makeNice', False, type=bool)
+
         game = request.args.get("game", None, type=int)
         if game:
             return PlayerGameStats.query.join(People, PlayerGameStats.player_id == People.id).filter(
@@ -43,5 +47,5 @@ def add_get_player_endpoints(app):
         tournament = request.args.get("tournament", None)
         tid = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id if tournament else None
         return People.query.filter(People.searchable_name == searchable).first().as_dict(include_stats=True,
-                                                                                         tournament=tid)
+                                                                                         tournament=tid, make_nice=make_nice)
 

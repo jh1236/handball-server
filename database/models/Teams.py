@@ -117,7 +117,7 @@ class Teams(db.Model):
     def BYE(cls):
         return cls.query.filter(cls.id == 1).first()
 
-    def as_dict(self, include_stats=False, tournament=None, include_player_stats=None):
+    def as_dict(self, include_stats=False, tournament=None, include_player_stats=None, make_nice=False):
         include_player_stats = include_stats if include_player_stats is None else include_player_stats
         d = {
             "name": self.name,
@@ -135,5 +135,5 @@ class Teams(db.Model):
         if include_stats:
             from database.models import Games
             game_filter = (lambda a: a.filter(Games.tournament_id == tournament)) if tournament else None
-            d["stats"] = self.stats(game_filter, make_nice=False)
+            d["stats"] = self.stats(game_filter, make_nice=make_nice)
         return d
