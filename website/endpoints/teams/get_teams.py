@@ -42,7 +42,7 @@ def add_get_teams_endpoints(app):
         return Teams.query.filter(Teams.searchable_name == searchable).first().as_dict(include_stats=True,
                                                                                        tournament=tid)
 
-    @app.get('/api/ladder')
+    @app.get('/api/teams/ladder/')
     def get_ladder():
         """
         SCHEMA:
