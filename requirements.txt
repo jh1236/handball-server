@@ -3,5 +3,5 @@ bs4
 matplotlib==3.8.3
 flask_sqlalchemy
 bcrypt==4.2.0
-
+flask-cors
 flask_minify==0.48
