@@ -7,7 +7,8 @@ def add_get_teams_endpoints(app):
     @app.route('/api/team', methods=['GET'])
     def get_teams():
         """
-        SCHEMA: {
+        SCHEMA:
+        {
             tournament: <str> (OPTIONAL) = the searchable name of the tournament the games are from
             player: List<str> (OPTIONAL) = the searchable name of the player who played in the game
             includeStats: <bool> (OPTIONAL) = whether stats should be included

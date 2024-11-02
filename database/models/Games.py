@@ -157,11 +157,15 @@ class Games(db.Model):
         self.notes = None
         self.winning_team_id = None
 
+    @property
+    def rounds(self):
+        return self.team_one_score + self.team_two_score
+
     def stats(self):
         from database.models import PlayerGameStats
         pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == self.id).all()
         return {
-            "Rounds": self.team_one_score + self.team_two_score,
+            "Rounds": self.rounds,
             "Score Difference": abs(self.team_one_score - self.team_two_score),
             "Elo Gap": abs(self.team_one.elo(self.id) - self.team_two.elo(self.id)),
             "Length": self.length,
@@ -184,7 +188,7 @@ class Games(db.Model):
             "Tournament": self.tournament.name,
         }
 
-    def as_dict(self, admin_view=False):
+    def as_dict(self, admin_view=False, include_game_events=False, include_player_stats=False):
         d = {
             "id": self.id,
             "tournament": self.tournament.as_dict(),
@@ -222,5 +226,12 @@ class Games(db.Model):
                 "noteable_status": self.noteable_status,
                 "notes": self.notes,
             }
+        if include_game_events:
+            from database.models import GameEvents
+            d["events"] = [i.as_dict(include_game=False) for i in GameEvents.query.filter(GameEvents.game_id == self.id).all()]
+
+        if include_player_stats:
+            from database.models import PlayerGameStats
+            d["players"] = [i.as_dict(False) for i in PlayerGameStats.query.filter(PlayerGameStats.game_id == self.id).all()]
 
         return d

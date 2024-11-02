@@ -1,10 +1,9 @@
-import time
-
 from flask import request, jsonify
+from typing_extensions import override
 
 from structure import manage_game
 from utils.logging_handler import logger
-from utils.permissions import officials_only, admin_only
+from utils.permissions import officials_only, admin_only, fetch_user
 
 
 def add_edit_game_endpoints(app):
@@ -13,9 +12,9 @@ def add_edit_game_endpoints(app):
     def change_code():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-            }
+        {
+            id: <int> = id of the current game
+        }
         """
         game_id = int(request.args["id"])
         return jsonify({"code": manage_game.change_code(game_id)})
@@ -53,11 +52,11 @@ def add_edit_game_endpoints(app):
     def score():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-                firstTeam: <bool> = if the team listed first scored
-                leftPlayer: <bool> = if the player listed as left scored
-            }
+        {
+            id: <int> = id of the current game
+            firstTeam: <bool> = if the team listed first scored
+            leftPlayer: <bool> = if the player listed as left scored
+        }
         """
         logger.info(f"Request for score: {request.json}")
         game_id = int(request.json["id"])
@@ -71,9 +70,9 @@ def add_edit_game_endpoints(app):
     def ace():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-            }
+        {
+            id: <int> = id of the current game
+        }
         """
         logger.info(f"Request for ace: {request.json}")
         game_id = request.json["id"]
@@ -85,11 +84,11 @@ def add_edit_game_endpoints(app):
     def substitute():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-                firstTeam: <bool> = if the team listed first is substituting
-                leftPlayer: <bool> = if the player listed as left is leaving the court
-            }
+        {
+            id: <int> = id of the current game
+            firstTeam: <bool> = if the team listed first is substituting
+            leftPlayer: <bool> = if the player listed as left is leaving the court
+        }
         """
         logger.info(f"Request for substitute: {request.json}")
         game_id = request.json["id"]
@@ -103,13 +102,13 @@ def add_edit_game_endpoints(app):
     def pardon():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-                firstTeam: <bool> = if the team listed first is being pardoned
-                leftPlayer: <bool> = if the player listed as left is being pardoned
-            }
+        {
+            id: <int> = id of the current game
+            firstTeam: <bool> = if the team listed first is being pardoned
+            leftPlayer: <bool> = if the player listed as left is being pardoned
+        }
         """
-        logger.info(f"Request for substitute: {request.json}")
+        logger.info(f"Request for pardon: {request.json}")
         game_id = request.json["id"]
         first_team = request.json["firstTeam"]
         first_player = request.json["leftPlayer"]
@@ -121,13 +120,13 @@ def add_edit_game_endpoints(app):
     def end():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-                bestPlayer: <str> = the name of the best on ground
-                notes: <str> (OPTIONAL) = any notes the umpire wishes to leave
-                protestTeamOne: str = null if no protest, the reason if a protest is present
-                protestTeamTwo: str = null if no protest, the reason if a protest is present
-            }
+        {
+            id: <int> = id of the current game
+            bestPlayer: <str> = the name of the best on ground
+            notes: <str> (OPTIONAL) = any notes the umpire wishes to leave
+            protestTeamOne: str = null if no protest, the reason if a protest is present
+            protestTeamTwo: str = null if no protest, the reason if a protest is present
+        }
         """
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]
@@ -141,10 +140,10 @@ def add_edit_game_endpoints(app):
     def timeout():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-                firstTeam: <bool> = if the team listed first called the timeout
-            }
+        {
+            id: <int> = id of the current game
+            firstTeam: <bool> = if the team listed first called the timeout
+        }
         """
         logger.info(f"Request for timeout: {request.json}")
         first_team = request.json["firstTeam"]
@@ -157,10 +156,10 @@ def add_edit_game_endpoints(app):
     def forfeit():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-                firstTeam: <bool> = if the team listed first forfeited
-            }
+        {
+            id: <int> = id of the current game
+            firstTeam: <bool> = if the team listed first forfeited
+        }
         """
         logger.info(f"Request for forfeit: {request.json}")
         first_team = request.json["firstTeam"]
@@ -173,9 +172,9 @@ def add_edit_game_endpoints(app):
     def end_timeout():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-            }
+        {
+            id: <int> = id of the current game
+        }
         """
         logger.info(f"Request for end_timeout: {request.json}")
         game_id = request.json["id"]
@@ -187,10 +186,10 @@ def add_edit_game_endpoints(app):
     def serve_timer():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-                start: <bool> = if the serve timer is starting or ending
-            }
+        {
+            id: <int> = id of the current game
+            start: <bool> = if the serve timer is starting or ending
+        }
         """
         logger.info(f"Request for serve_clock: {request.json}")
         game_id = request.json["id"]
@@ -202,9 +201,9 @@ def add_edit_game_endpoints(app):
     def fault():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-            }
+        {
+            id: <int> = id of the current game
+        }
         """
         logger.info(f"Request for fault: {request.json}")
         game_id = request.json["id"]
@@ -216,9 +215,9 @@ def add_edit_game_endpoints(app):
     def official_timeout():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-            }
+        {
+            id: <int> = id of the current game
+        }
         """
         logger.info(f"Request for Official Timeout: {request.json}")
         game_id = request.json["id"]
@@ -230,13 +229,14 @@ def add_edit_game_endpoints(app):
     def undo():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-            }
+        {
+            id: <int> = id of the current game
+        }
         """
         logger.info(f"Request for undo: {request.json}")
         game_id = request.json["id"]
-        manage_game.undo(game_id)
+        override = fetch_user().is_admin
+        manage_game.undo(game_id, override)
         return "", 204
 
     @app.post("/api/games/update/delete")
@@ -244,13 +244,14 @@ def add_edit_game_endpoints(app):
     def delete():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-            }
+        {
+            id: <int> = id of the current game
+        }
         """
         logger.info(f"Request for delete: {request.json}")
         game_id = request.json["id"]
-        manage_game.delete(game_id)
+        override = fetch_user().is_admin
+        manage_game.delete(game_id, override)
         return "", 204
 
     @app.post("/api/games/update/card")
@@ -258,14 +259,14 @@ def add_edit_game_endpoints(app):
     def card():
         """
         SCHEMA:
-            {
-                id: <int> = id of the current game
-                firstTeam: <bool> = if the team listed first received the card
-                leftPlayer: <bool> = if the player listed as left received the card
-                color: <str> = the type of card ("Red", "Yellow", "Green", "Warning")
-                duration: <int> = the amount of rounds the card carries
-                reason: <str> = the reason for the card
-            }
+        {
+            id: <int> = id of the current game
+            firstTeam: <bool> = if the team listed first received the card
+            leftPlayer: <bool> = if the player listed as left received the card
+            color: <str> = the type of card ("Red", "Yellow", "Green", "Warning")
+            duration: <int> = the amount of rounds the card carries
+            reason: <str> = the reason for the card
+        }
         """
         logger.info(f"Request for card: {request.json}")
         color = request.json["color"]
@@ -282,9 +283,9 @@ def add_edit_game_endpoints(app):
     def resolve():
         """
         SCHEMA:
-            {
-                id: <int> = id of the game to resolve
-            }
+        {
+            id: <int> = id of the game to resolve
+        }
         """
         logger.info(f"Request for end: {request.json}")
         game_id = request.json["id"]

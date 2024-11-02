@@ -283,16 +283,16 @@ def add_admin_pages(app):
             "Rounds Carded": 5,
             "Games Played": 5,
             "Games Won": 4,
+            "Penalty Points":3,
+            "Warnings":4,
         }
         player_headers = [
             "B&F Votes",
             "Elo",
             "Games Won",
             "Games Played",
-            "Points Scored",
-            "Aces Scored",
-            "Faults",
-            "Double Faults",
+            "Penalty Points",
+            "Warnings",
             "Green Cards",
             "Yellow Cards",
             "Red Cards",
@@ -305,7 +305,7 @@ def add_admin_pages(app):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
         game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament.id)) if tournament else None
         unranked = tournament is not None
-        players_in = [(i, i.stats(games_filter=game_filter, include_unranked=unranked)) for i in players if
+        players_in = [(i, i.stats(games_filter=game_filter, include_unranked=unranked, admin=True)) for i in players if
                       i.played_in_tournament(tournament_searchable)]
         players = []
         for i in players_in:
@@ -346,7 +346,7 @@ def add_admin_pages(app):
                                                             PlayerGameStats.game_id == Games.id).outerjoin(EloChange,
                                                                                                            EloChange.game_id == Games.id).filter(
             Games.ended, PlayerGameStats.player_id == player.id, EloChange.player_id == PlayerGameStats.player_id,
-                         Games.admin_status != 'Official')
+                         (Games.admin_status != 'Official') | (Games.best_player_id == player.id))
 
         if tournament:
             key_games = key_games.filter(Games.tournament_id == tournament)
@@ -354,7 +354,7 @@ def add_admin_pages(app):
 
         key_games = [
             (
-                i.noteable_status,
+                i.noteable_status if i.noteable_status != "Official" else "Best on ground",
                 f"{i.team_one.name} vs {i.team_two.name} [{i.team_one_score} - {i.team_two_score}] <{'' if e and e.elo_delta < 0 else '+'}{round(e.elo_delta, 2) if e else 0}>",
                 i.id, i.tournament.searchable_name) for i, e in key_games
         ]
@@ -413,135 +413,36 @@ def add_admin_pages(app):
                 400,
             )
 
-        @dataclass
-        class Tourney:
-            name: str
-            searchableName: str
-            editable: str
-
-        # ladder
-        @dataclass
-        class LadderTeam:
-            name: str
-            searchableName: str
-            games_won: int
-            games_played: int
-            pool: int
-
-        @dataclass
-        class Game:
-            teams: list[str]
-            score_string: str
-            id: int
-            requires_action_string: str = ""
-
-        @dataclass
-        class Player:
-            name: str
-            searchableName: str
-            penalty_points: int
-            warnings: int
-            yellow_cards: int
-            red_cards: int
-            rounds_on_bench: int
-
+        tourney = Tournaments.query.filter(Tournaments.id == tournament_id).first()
         with DatabaseManager() as c:
-            teams = c.execute(
-                """
-                             SELECT 
-                                 name, teams.searchable_name, SUM(games.winning_team_id = teams.id) as gamesWon, COUNT(games.id) as gamesPlayed, pool 
-                                 FROM tournamentTeams 
-                                 INNER JOIN teams ON tournamentTeams.team_id = teams.id
-                                 INNER JOIN games ON (teams.id = games.team_one_id OR teams.id = games.team_two_id) AND tournamentTeams.tournament_id = games.tournament_id 
-                                 WHERE games.tournament_id = ? AND NOT games.is_final AND NOT games.is_bye
-                                 group by teams.id 
-                                 ORDER BY 
-                                     CAST(gamesWon AS REAL) / gamesPlayed DESC  
-                                 LIMIT 10;""",
-                (tournament_id,),
-            ).fetchall()
-            tourney = c.execute(
-                "SELECT name, searchable_name, fixtures_type, is_pooled from tournaments where id = ?",
-                (tournament_id,),
-            ).fetchone()
-
-            ladder = [LadderTeam(*team) for team in teams]
-
-            if tourney[3]:  # this tournament is pooled
-                ladder = [
-                    (
-                        f"Pool {numbers[i]}",
-                        list(enumerate((j for j in ladder if j.pool == i), start=1)),
-                    )
-                    for i in range(1, 3)
-                ]
-            else:
-                ladder = [("", list(enumerate(ladder, start=1)))]
-
             # there has to be a reason this is the required syntax but i can't work it out1
 
-            games = c.execute(
-                """         SELECT 
-                                serving.name, receiving.name, team_one_score, team_two_score, games.id, games.admin_status 
-                                FROM games 
-                                INNER JOIN teams AS serving ON games.team_one_id = serving.id 
-                                INNER JOIN teams as receiving ON games.team_two_id = receiving.id 
-                                WHERE 
-                                    tournament_id = ? AND NOT games.is_bye AND (admin_status <> 'Resolved' AND admin_status <> 'Official' AND admin_status <> 'Forfeited' AND admin_status <> 'Waiting For Start');
-                            """,
-                (tournament_id,),
-            ).fetchall()
-            games_requiring_action = [
-                Game(game[:2], f"{game[2]} - {game[3]}", game[4], game[5]) for game in games
-            ]
+            games_requiring_action = Games.query.filter(Games.tournament_id == tournament_id,
+                                                        Games.is_bye == False,
+                                                        Games.admin_status != 'Official',
+                                                        Games.admin_status != 'Resolved',
+                                                        Games.admin_status != 'Forfeited',
+                                                        Games.admin_status != 'Waiting For Start',
+                                                        Games.admin_status != 'In Progress').all()
 
-            games = c.execute(
-                """
-                            SELECT 
-                                serving.name, receiving.name, team_one_score, team_two_score, games.id
-                                FROM games 
-                                INNER JOIN teams AS serving ON games.team_one_id = serving.id 
-                                INNER JOIN teams as receiving ON games.team_two_id = receiving.id 
-                                WHERE tournament_id = ? AND
-                                CASE -- if there is finals, return the finals, else return the last round
-                                    WHEN (SELECT count(*) FROM games WHERE tournament_id = ? AND is_final = 1) > 0 THEN
-                                        is_final = 1
-                                    ELSE 
-                                        round = (SELECT max(round) FROM games WHERE tournament_id = ?) 
-                                END;""",
-                (tournament_id,) * 3,
-            ).fetchall()
-            current_round = [
-                Game(game[:2], f"{game[2]} - {game[3]}", game[4]) for game in games
-            ]
+            last_game = Games.query.filter(Games.tournament_id == tournament_id).order_by(Games.id.desc()).first()
+            if last_game.is_final:
+                current_round = Games.query.filter(Games.tournament_id == tournament_id, Games.is_final).all()
+            else:
+                current_round = Games.query.filter(Games.tournament_id == tournament_id,
+                                                   Games.round == last_game.round).all()
 
-            playerList = c.execute(
-                """
-                                SELECT 
-                                    people.name, searchable_name, sum(yellow_cards) * 5 + sum(red_cards) * 10, sum(warnings), sum(yellow_cards), sum(red_cards), sum(rounds_carded) 
-                                    FROM playerGameStats 
-                                    INNER JOIN people ON player_id = people.id 
-                                    WHERE 
-                                        tournament_id = ?
-                                    GROUP BY player_id 
-                                    ORDER BY 
-                                        sum(yellow_cards) * 5 + sum(red_cards) * 10 DESC 
-                                    LIMIT 10;""",
-                (tournament_id,),
-            ).fetchall()
-            players = [Player(*player) for player in playerList]
-
+            players = People.query.filter(PlayerGameStats.tournament_id == tournament_id).all()
+            f = lambda a: a.filter(Games.tournament_id == tournament_id)
+            players = [(i, i.stats(games_filter=f, admin=True)) for i in players]
+            players.sort(key=lambda a: (-a[1]["Penalty Points"], -a[1]["Warnings"], -a[1]["Games Played"]))
+            if len(players) > 10:
+                players = players[:10]
             notes = (
-                    c.execute(
-                        "SELECT notes FROM tournaments WHERE id = ?", (tournament_id,)
-                    ).fetchone()[0]
+                    tourney.notes.strip()
                     or "Notices will appear here when posted"
             )
-            in_progress = c.execute(
-                "SELECT not(finished) FROM tournaments WHERE id=?", (tournament_id,)
-            ).fetchone()[0]
-            iseditable = get_type_from_name(tourney[2], tournament_id).manual_allowed()
-            tourney = Tourney(tourney[0], tourney[1], iseditable)
+
         return (
             render_template_sidebar(
                 "tournament_specific/admin/tournament_home.html",
@@ -549,7 +450,6 @@ def add_admin_pages(app):
                 current_round=current_round,
                 players=players,
                 notes=notes,
-                in_progress=in_progress,
                 require_action=games_requiring_action,
             ),
             200,

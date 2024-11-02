@@ -16,10 +16,10 @@ def add_tourney_endpoints(app):
     def note():
         """
         SCHEMA:
-            {
-                tournament: str = the searchable name of the tournament
-                note: str = the note for the tournament
-            }
+        {
+            tournament: str = the searchable name of the tournament
+            note: str = the note for the tournament
+        }
         """
         logger.info(f"Request for notes: {request.json}")
         tournament = request.json["tournament"]
@@ -33,9 +33,9 @@ def add_tourney_endpoints(app):
     def tourney_image():
         """
         SCHEMA:
-            {
-                name: str = the searchable name of the tournament
-            }
+        {
+            name: str = the searchable name of the tournament
+        }
         """
         tournament = request.args.get("name", type=str)
         if os.path.isfile(f"./resources/images/tournaments/{tournament}.png"):
@@ -53,10 +53,10 @@ def add_tourney_endpoints(app):
         """
         WARNING: DO NOT CHANGE WHILE A GAME IS IN PROGRESS
         SCHEMA:
-            {
-                tournament: str = the searchable name of the tournament
-                badminton_serves: bool = if the tournament should use badminton serving
-            }
+        {
+            tournament: str = the searchable name of the tournament
+            badminton_serves: bool = if the tournament should use badminton serving
+        }
         """
         logger.info(f"Request for serve_style: {request.json}")
         tournament = request.json["tournament"]
@@ -70,15 +70,15 @@ def add_tourney_endpoints(app):
     def create():
         """
         SCHEMA:
-            {
-                tournament: str = the searchable name of the tournament
-                teamOne: str = the searchable name of the first team, or the name of the team to be created if players is populated
-                teamTwo: str = the searchable name of the second team, or the name of the team to be created if players is populated
-                official: str (OPTIONAL) = the searchable name of the official (used to change officials)
-                scorer: str (OPTIONAL) = the searchable name of the scorer (used to change scorer)
-                playersOne: list[str] (OPTIONAL) = the list of players on team one if the game is created by players
-                playersTwo: list[str] (OPTIONAL) = the list of players on team two if the game is created by players
-            }
+        {
+            tournament: str = the searchable name of the tournament
+            teamOne: str = the searchable name of the first team, or the name of the team to be created if players is populated
+            teamTwo: str = the searchable name of the second team, or the name of the team to be created if players is populated
+            official: str (OPTIONAL) = the searchable name of the official (used to change officials)
+            scorer: str (OPTIONAL) = the searchable name of the scorer (used to change scorer)
+            playersOne: list[str] (OPTIONAL) = the list of players' true name on team one if the game is created by players
+            playersTwo: list[str] (OPTIONAL) = the list of players' true name on team two if the game is created by players
+        }
         """
         logger.info(request.json)
         gid = manage_game.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"],
@@ -91,13 +91,13 @@ def add_tourney_endpoints(app):
     def signup():
         """
         SCHEMA:
-            {
-                teamName: str = the name of the team to sign up
-                playerOne: str = the name of the first player
-                playerTwo: str [OPTIONAL] = the name of the second player. If not populated, the team is not added
-                substitute: str [OPTIONAL] = the name of the team to substitute
-                umpires: str = the list of people who wish to umpire for the tournament
-            }
+        {
+            teamName: str = the name of the team to sign up
+            playerOne: str = the name of the first player
+            playerTwo: str [OPTIONAL] = the name of the second player. If not populated, the team is not added
+            substitute: str [OPTIONAL] = the name of the team to substitute
+            umpires: str = the list of people who wish to umpire for the tournament
+        }
         """
         if request.json["playerTwo"]:
             with open("./config/signups/teams.json") as fp:

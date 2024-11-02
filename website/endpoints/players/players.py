@@ -10,11 +10,13 @@ def add_get_player_endpoints(app):
         SCHEMA:
         {
             tournament: <str> (OPTIONAL) = the searchable name of the tournament the games are from
-            team: str (OPTIONAL) = the searchable name of the team the player played with
+            team: <str> (OPTIONAL) = the searchable name of the team the player played with
+            includeStats: <bool> (OPTIONAL) = whether Stats should be included
         }
         """
         tournament = request.args.get("tournament", None)
         team = request.args.get("team", None)
+        includeStats = request.args.get("includeStats", False, type=bool)
         q = PlayerGameStats.query
         if tournament:
             tid = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id
@@ -23,7 +25,7 @@ def add_get_player_endpoints(app):
             tid = Teams.query.filter(Teams.searchable_name == team).first().id
             q = q.filter(PlayerGameStats.team_id == tid)
         q = q.group_by(PlayerGameStats.player_id)
-        return [i.player.as_dict() for i in q.all()]
+        return [i.player.as_dict(include_stats=includeStats) for i in q.all()]
 
     @app.get("/api/player/<searchable>")
     def get_player(searchable):

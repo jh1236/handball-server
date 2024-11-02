@@ -14,7 +14,7 @@ from structure.get_information import get_tournament_id
 from utils.permissions import (
     fetch_user,
     officials_only,
-    user_on_mobile,
+    user_on_mobile, fetch_user_name,
 )  # Temporary till i make a function that can handle dynamic/game permissions
 from utils.sidebar_wrapper import render_template_sidebar, link
 from utils.util import fixture_sorter
@@ -246,9 +246,12 @@ def add_tournament_specific(app):
 
         pgs = PlayerGameStats.query.filter(PlayerGameStats.game_id == game_id).order_by(PlayerGameStats.team_id).all()
 
+        # stolen from ./games/<id>/
         players = [[i for i in pgs if i.team_id == pgs[0].team_id], [i for i in pgs if i.team_id != pgs[0].team_id]]
-
-        teams = [i[0].team for i in players]  # bit cheeky but it works
+        if game.is_bye:
+            teams = [players[0][0].team, Teams.query.filter(Teams.id == 1).first()]  # quicker and dirtier hack
+        else:
+            teams = [players[0][0].team, players[1][0].team]  # quicker and dirtier hack
 
         prev_event = GameEvents.query.filter(GameEvents.game_id == game_id).order_by(GameEvents.id.desc()).first()
 
@@ -265,7 +268,7 @@ def add_tournament_specific(app):
             (max(i, key=lambda
                 a: 9999999 if a.card_time_remaining < 0 else a.card_time_remaining).card_time_remaining,
              max(i, key=lambda a: 9999999 if a.card_time < 0 else a.card_time).card_time)
-            for i in players]
+            for i in players if i]
 
         if visual_swap:
             teams = list(reversed(teams))
@@ -622,7 +625,7 @@ def add_tournament_specific(app):
         official = TournamentOfficials.query.group_by(TournamentOfficials.official_id)
         if tournament_id:
             official = official.filter(TournamentOfficials.tournament_id == tournament_id.id)
-        official = [i.official.person for i in official.all()]
+        official = sorted([i.official.person for i in official.all()], key=lambda a: a.searchable_name)
         return (
             render_template_sidebar(
                 "tournament_specific/all_officials.html",
@@ -820,7 +823,12 @@ def add_tournament_specific(app):
     def create_game(tournament_name):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
         teams = Teams.query.filter(Teams.id != 1).order_by(Teams.searchable_name).all()
-        officials = Officials.query.join(People).order_by(People.searchable_name).all()
+        user = fetch_user()
+        if user.is_admin:
+            officials = Officials.query.join(People).order_by(People.searchable_name != user.searchable_name,
+                                                              People.searchable_name).all()
+        else:
+            officials = Officials.query.join(People).filter(People.searchable_name == user.searchable_name).all()
 
         if not get_type_from_name(tournament.fixtures_type, tournament.id).manual_allowed():
             return (
@@ -830,10 +838,6 @@ def add_tournament_specific(app):
                 ),
                 400,
             )
-
-        key = fetch_user()
-        official = [i for i in officials if i.person.password == key]
-        officials = official + [i for i in officials if i.person.password != key]
 
         return (
             render_template(
@@ -850,7 +854,13 @@ def add_tournament_specific(app):
     def create_game_players(tournament_name):
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
         players = People.query.order_by(People.searchable_name).all()
-        officials = Officials.query.join(People).order_by(People.searchable_name).all()
+        user = fetch_user()
+        if user.is_admin:
+            officials = Officials.query.join(People).order_by(People.searchable_name != user.searchable_name,
+                                                              People.searchable_name).all()
+        else:
+            officials = Officials.query.join(People).filter(People.searchable_name == user.searchable_name).all()
+
         if not get_type_from_name(tournament.fixtures_type, tournament.id).manual_allowed():
             return (
                 render_template(
@@ -860,10 +870,6 @@ def add_tournament_specific(app):
                 400,
             )
 
-        key = fetch_user()
-
-        official = [i for i in officials if i.person.password == key]
-        officials = official + [i for i in officials if i.person.password != key]
         return (
             render_template(
                 "tournament_specific/game_editor/create_game_players.html",

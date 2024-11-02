@@ -96,7 +96,7 @@ class Tournaments(db.Model):
     finished = db.Column(db.Boolean(), nullable=False, default=False)
     in_finals = db.Column(db.Boolean(), nullable=False, default=False)
     is_pooled = db.Column(db.Boolean(), nullable=False, default=False)
-    notes = db.Column(db.Text(), nullable=False)
+    notes = db.Column(db.Text(), nullable=False, default="")
     image_url = db.Column(db.Text(), nullable=False)
     badminton_serves = db.Column(db.Boolean(), nullable=False, default=False)
 

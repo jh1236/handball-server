@@ -142,7 +142,7 @@
         {# Substitutes #}
         <tr>
             <td>
-                {% if players[0].__len__() > 2 and game.round <= 9 and not substitutes[0] %}
+                {% if players[0].__len__() > 2 and game.rounds <= 9 and not substitutes[0] %}
                     <div class="dropdown">
                         <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
                             Substitute {{ teams[0].name }}</button>
@@ -157,7 +157,7 @@
                 {% endif %}</td>
             <td></td>
             <td>
-                {% if players[1].__len__() > 2 and game.round <= 9 and not substitutes[1] %}
+                {% if players[1].__len__() > 2 and game.rounds <= 9 and not substitutes[1] %}
                     <div class="dropdown" style="background-color: #2a5d88;">
                         <button onclick="myFunction(this)" class="smallBtn dropbtn" style="background-color: #2a5d88;">
                             Substitute {{ teams[1].name }}</button>

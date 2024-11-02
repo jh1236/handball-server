@@ -67,7 +67,7 @@
                     <th style="min-width: 150px" colspan="{{ players[0].__len__() }}"><b><a
                             href="/{{ tournamentLink }}teams/{{ teams[0].searchable_name }}"
                             class="hide">{{ teams[0].name }}</a></b></th>
-                    <th style="min-width: 150px" colspan="{{ players[0].__len__() }}"><b>{% if not game.is_bye %}
+                    <th style="min-width: 150px" colspan="{{ players[1].__len__() }}"><b>{% if not game.is_bye %}
                         <a href="/{{ tournamentLink }}teams/{{ teams[1].searchable_name }}"
                            class="hide">{% endif %}{{ teams[1].name }}{% if not game.is_bye %}
                         </a>{% endif %}</b></th>

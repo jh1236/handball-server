@@ -1,8 +1,8 @@
 from flask import request, Response
+
 import utils.permissions
 from database import db
 from database.models import People
-from utils.sidebar_wrapper import render_template_sidebar
 
 
 def add_user_endpoints(app):
