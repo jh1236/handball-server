@@ -1,4 +1,4 @@
-# API REFERENCE
+# GAMES API REFERENCE
 
 ## GET endpoints
 

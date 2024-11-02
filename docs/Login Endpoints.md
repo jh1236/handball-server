@@ -1,4 +1,4 @@
-# API REFERENCE
+# USERS API REFERENCE
 
 ## GET endpoints
 

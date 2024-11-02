@@ -1,4 +1,4 @@
-# API REFERENCE
+# TOURNAMENTS API REFERENCE
 
 ## GET endpoints
 

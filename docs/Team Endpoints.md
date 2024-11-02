@@ -1,4 +1,4 @@
-# API REFERENCE
+# TEAMS API REFERENCE
 
 ## GET endpoints
 

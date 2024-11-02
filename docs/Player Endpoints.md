@@ -1,4 +1,4 @@
-# API REFERENCE
+# PLAYERS API REFERENCE
 
 ## GET endpoints
 

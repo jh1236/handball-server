@@ -1,4 +1,6 @@
-# Games Data structure
+# TYPES
+
+## Games Data structure
 
 ```json lines
 {
@@ -60,7 +62,7 @@ if include_player_stats: (default False)
 }
 ```
 
-# GameEvents Data Structure
+## GameEvents Data Structure
 
 ```json lines
 {
@@ -88,7 +90,7 @@ if include_game: (default True)
 }
 ```
 
-# Person Data Structure
+## Person Data Structure
 
 ```json lines
 {
@@ -166,7 +168,7 @@ if include_stats && admin:
 }
 ```
 
-# Official Data Structure
+## Official Data Structure
 
 everything from `Person` plus
 
@@ -187,7 +189,7 @@ everything from `Person` plus
 }
 ```
 
-# PlayerGameStats Data Structure
+## PlayerGameStats Data Structure
 
 everything from `Person` plus
 
@@ -227,7 +229,7 @@ if include_game: (default true)
 }
 ```
 
-# Team Data Structure
+## Team Data Structure
 
 ```json lines
 {
@@ -263,7 +265,7 @@ if include_stats: (default false)
 }
 ```
 
-# Tournament Data Structure
+## Tournament Data Structure
 
 ```json lines
 {

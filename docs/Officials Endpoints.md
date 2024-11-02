@@ -1,4 +1,4 @@
-# API REFERENCE
+# OFFICIALS API REFERENCE
 
 ## GET endpoints
 
