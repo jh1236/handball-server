@@ -16,7 +16,7 @@ def add_get_player_endpoints(app):
         """
         tournament = request.args.get("tournament", None)
         team = request.args.get("team", None)
-        make_nice = request.args.get('makeNice', False, type=bool)
+        make_nice = request.args.get('formatData', False, type=bool)
 
         includeStats = request.args.get("includeStats", False, type=bool)
         q = PlayerGameStats.query
@@ -38,7 +38,7 @@ def add_get_player_endpoints(app):
             game: <int> (OPTIONAL) = the game to get the stats for this player
         }
         """
-        make_nice = request.args.get('makeNice', False, type=bool)
+        make_nice = request.args.get('formatData', False, type=bool)
 
         game = request.args.get("game", None, type=int)
         if game:

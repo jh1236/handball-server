@@ -20,7 +20,7 @@ This endpoint is open to the public.
     - The searchable name of the team that the players play on
 - includeStats: bool (Optional)
     - True if the stats of each player should be included
-- makeNice: bool (Optional)
+- formatData: bool (Optional)
   - True if the server should format the data before it is sent.
 
 #### Return Structure
@@ -48,7 +48,7 @@ This endpoint is open to the public.
     - The searchable name of the tournament to get stats from
 - game: str (Optional)
     - The searchable name of the tournament to get stats from
-- makeNice: bool (Optional)
+- formatData: bool (Optional)
   - True if the server should format the data before it is sent.
 
 #### Return Structure

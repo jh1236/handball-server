@@ -16,7 +16,7 @@ def add_get_teams_endpoints(app):
             includeStats: <bool> (OPTIONAL) = whether stats should be included
         }
         """
-        make_nice = request.args.get('makeNice', False, type=bool)
+        make_nice = request.args.get('formatData', False, type=bool)
 
         tournament_searchable = request.args.get('tournament', None, type=str)
         player_searchable = request.args.getlist('player', type=str)
@@ -40,7 +40,7 @@ def add_get_teams_endpoints(app):
         }
         """
         tournament = request.args.get("tournament", None)
-        make_nice = request.args.get('makeNice', False, type=bool)
+        make_nice = request.args.get('formatData', False, type=bool)
 
         tid = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id if tournament else None
         return Teams.query.filter(Teams.searchable_name == searchable).first().as_dict(include_stats=True,
@@ -57,7 +57,7 @@ def add_get_teams_endpoints(app):
         """
         tournament_searchable = request.args.get('tournament', None, type=str)
         include_stats = request.args.get('includeStats', False, type=bool)
-        make_nice = request.args.get('makeNice', False, type=bool)
+        make_nice = request.args.get('formatData', False, type=bool)
         if tournament_searchable:
             tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
             ladder: list[tuple["Teams", dict[str, float]]] | list[

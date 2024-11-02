@@ -20,7 +20,7 @@ This endpoint is open to the public.
     - The searchable name of the player that must be in the team
 - includeStats: bool (Optional)
     - True if the stats of each team should be included
-- makeNice: bool (Optional)
+- formatData: bool (Optional)
   - True if the server should format the data before it is sent.
 
 #### Return Structure
@@ -46,7 +46,7 @@ This endpoint is open to the public.
     - The searchable name of the team to get stats for
 - tournament: str (Optional)
     - The searchable name of the tournament to get stats from
-- makeNice: bool (Optional)
+- formatData: bool (Optional)
   - True if the server should format the data before it is sent.
 
 #### Return Structure
@@ -71,7 +71,7 @@ This endpoint is open to the public.
     - The searchable name of the team to get the ladder for
 - includeStats: bool (Optional)
     - The searchable name of the tournament to get stats from
-- makeNice: bool (Optional)
+- formatData: bool (Optional)
     - True if the server should format the data before it is sent.
 
 #### Return Structure
