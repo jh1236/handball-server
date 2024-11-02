@@ -29,8 +29,8 @@ def add_edit_game_endpoints(app):
                 id: <int> = id of the current game
                 swapService: <bool> = if the team listed first is serving
                 teamOneIGA: <bool> = if the team listed first is on the IGA side of the court
-                teamOne: <list[str]> = the names team listed first in order [left, right, substitute]
-                teamTwo: <list[str]> = the names team listed second in order [left, right, substitute]
+                teamOne: <list[str]> = the searchable names of the team listed first in order [left, right, substitute]
+                teamTwo: <list[str]> = the searchable names of the team listed second in order [left, right, substitute]
                 official: <str> (OPTIONAL) = the official who is actually umpiring the game
                 scorer: <str> (OPTIONAL) = the scorer who is actually scoring the game
             }
@@ -99,7 +99,7 @@ def add_edit_game_endpoints(app):
         return "", 204
 
     @app.post("/api/games/update/pardon")
-    @officials_only
+    @admin_only
     def pardon():
         """
         SCHEMA:

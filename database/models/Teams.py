@@ -107,7 +107,7 @@ class Teams(db.Model):
         if make_nice:
             for k, v in ret.items():
                 if k in PERCENTAGES:
-                    ret[k] = f"{100.0 * v: .2f}%"
+                    ret[k] = f"{100.0 * v: .2f}%".strip()
                 elif isinstance(v, float):
                     ret[k] = round(v, 2)
         return ret
@@ -117,18 +117,19 @@ class Teams(db.Model):
     def BYE(cls):
         return cls.query.filter(cls.id == 1).first()
 
-    def as_dict(self, include_stats=False, tournament=None):
+    def as_dict(self, include_stats=False, tournament=None, include_player_stats=None):
+        include_player_stats = include_stats if include_player_stats is None else include_player_stats
         d = {
             "name": self.name,
             "searchable_name": self.searchable_name,
             "image_url": self.image_url,
             "primary_color": self.primary_color,
             "secondary_color": self.secondary_color,
-            "captain": self.captain.as_dict(include_stats=include_stats,
+            "captain": self.captain.as_dict(include_stats=include_player_stats,
                                             tournament=tournament) if self.captain else None,
-            "non_captain": self.non_captain.as_dict(include_stats=include_stats,
+            "non_captain": self.non_captain.as_dict(include_stats=include_player_stats,
                                                     tournament=tournament) if self.non_captain else None,
-            "substitute": self.substitute.as_dict(include_stats=include_stats,
+            "substitute": self.substitute.as_dict(include_stats=include_player_stats,
                                                   tournament=tournament) if self.substitute else None,
         }
         if include_stats:

@@ -176,8 +176,8 @@ class PlayerGameStats(db.Model):
             "card_time": self.card_time,
             "card_time_remaining": self.card_time_remaining,
             "start_side": self.start_side,
-            "Elo": round(self.player.elo(self.game_id), 2),
-            "Elo Delta": round(self.player.elo(self.game_id) - self.player.elo(self.game_id - 1), 2),
+            "elo": round(self.player.elo(self.game_id), 2),
+            "elo_delta": round(self.player.elo(self.game_id) - self.player.elo(self.game_id - 1), 2),
         } | self.player.as_dict()
 
         return d

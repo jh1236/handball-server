@@ -196,7 +196,7 @@ class People(db.Model):
         if make_nice:
             for k, v in ret.items():
                 if k in PERCENTAGES:
-                    ret[k] = f"{100.0 * v: .2f}%"
+                    ret[k] = f"{100.0 * v: .2f}%".strip()
                 elif isinstance(v, float):
                     ret[k] = round(v, 2)
         return ret

@@ -49,7 +49,7 @@ def sorter(teams, tournament) -> list[tuple["Teams", dict[str, float]]]:
             continue
         pools[-1].append(i)
 
-    points = {} #defaultdict(int) # TODO: FIX THIS
+    points = {}  # defaultdict(int) # TODO: FIX THIS
     # for i in pools:
     #     if len(i) == 1:
     #         points[i[0][0].team_id] = 0
@@ -100,12 +100,14 @@ class Tournaments(db.Model):
     image_url = db.Column(db.Text(), nullable=False)
     badminton_serves = db.Column(db.Boolean(), nullable=False, default=False)
 
-    def ladder(self):
+    def ladder(self, make_nice: bool = True):
         teams = [(i, i.stats(make_nice=False)) for i in
                  TournamentTeams.query.filter(TournamentTeams.tournament_id == self.id,
                                               TournamentTeams.team_id != 1).all()]
 
-        teams = beautify_stats(sorter(teams, self))
+        teams = sorter(teams, self)
+        if make_nice:
+            teams = beautify_stats(teams)
         if get_type_from_name(self.fixtures_type, self).manual_allowed():
             teams = [i for i in teams if i[1]["Games Played"]]
         if self.is_pooled:
@@ -115,11 +117,13 @@ class Tournaments(db.Model):
         return teams
 
     @classmethod
-    def all_time_ladder(cls):
+    def all_time_ladder(cls, make_nice: bool = True):
         from database.models import Teams
         teams = [(i, i.stats(make_nice=False)) for i in
                  Teams.query.filter(Teams.id != 1).all()]
-        teams = beautify_stats(sorter(teams, None))
+        teams = sorter(teams, None)
+        if make_nice:
+            teams = beautify_stats(teams)
         teams = [i for i in teams if i[1]["Games Played"]]
         return teams
 
