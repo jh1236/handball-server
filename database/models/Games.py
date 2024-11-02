@@ -192,38 +192,38 @@ class Games(db.Model):
         d = {
             "id": self.id,
             "tournament": self.tournament.as_dict(),
-            "team_one": self.team_one.as_dict(),
-            "team_two": self.team_two.as_dict(),
-            "team_one_score": self.team_one_score,
-            "team_two_score": self.team_two_score,
-            "team_one_timeouts": self.team_one_timeouts,
-            "team_two_timeouts": self.team_two_timeouts,
-            "first_team_winning": self.winning_team_id == self.team_one_id,
+            "teamOne": self.team_one.as_dict(),
+            "teamTwo": self.team_two.as_dict(),
+            "teamOneScore": self.team_one_score,
+            "teamTwoScore": self.team_two_score,
+            "teamOneTimeouts": self.team_one_timeouts,
+            "teamTwoTimeouts": self.team_two_timeouts,
+            "firstTeamWinning": self.winning_team_id == self.team_one_id,
             "started": self.started,
-            "someone_has_won": self.someone_has_won,
+            "someoneHasWon": self.someone_has_won,
             "ended": self.ended,
             "protested": self.protested,
             "resolved": self.resolved,
             "ranked": self.ranked,
-            "best_player": self.best_player.as_dict() if self.best_player else None,
+            "bestPlayer": self.best_player.as_dict() if self.best_player else None,
             "official": self.official.as_dict(tournament=self.tournament) if self.official else None,
             "scorer": self.scorer.as_dict(tournament=self.tournament) if self.scorer else None,
-            "first_team_iga": self.iga_side_id == self.team_one_id,
-            "first_team_to_serve": self.team_to_serve_id == self.team_one_id,
-            "side_to_serve": self.side_to_serve,
-            "start_time": self.start_time,
-            "serve_timer": self.serve_timer,
+            "firstTeamIga": self.iga_side_id == self.team_one_id,
+            "firstTeamToServe": self.team_to_serve_id == self.team_one_id,
+            "sideToServe": self.side_to_serve,
+            "startTime": self.start_time,
+            "serveTimer": self.serve_timer,
             "length": self.length,
             "court": self.court,
-            "is_final": self.is_final,
+            "isFinal": self.is_final,
             "round": self.round,
-            "is_bye": self.is_bye,
+            "isBye": self.is_bye,
             "status": self.status,
         }
         if admin_view:
             d |= {
-                "admin_status": self.admin_status,
-                "noteable_status": self.noteable_status,
+                "adminStatus": self.admin_status,
+                "noteableStatus": self.noteable_status,
                 "notes": self.notes,
             }
         if include_game_events:
@@ -232,6 +232,6 @@ class Games(db.Model):
 
         if include_player_stats:
             from database.models import PlayerGameStats
-            d["players"] = [i.as_dict(False) for i in PlayerGameStats.query.filter(PlayerGameStats.game_id == self.id).all()]
+            d["players"] = [i.as_dict(include_game=False) for i in PlayerGameStats.query.filter(PlayerGameStats.game_id == self.id).all()]
 
         return d

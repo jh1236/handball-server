@@ -90,19 +90,19 @@ class GameEvents(db.Model):
 
     def as_dict(self, include_game=True):
         d = {
-            "event_type": self.event_type,
-            "first_team": (self.team_id == self.game.team_one_id) if self.team else None,
+            "eventType": self.event_type,
+            "firstTeam": (self.team_id == self.game.team_one_id) if self.team else None,
             "player": self.player.as_dict() if self.player else None,
             "details": self.details,
             "notes": self.notes,
-            "first_team_just_served": self.team_who_served_id == self.game.team_one_id,
-            "side_served": self.side_served,
-            "first_team_to_serve": self.team_to_serve_id == self.game.team_one_id,
-            "side_to_serve": self.side_to_serve,
-            "team_one_left": self.team_one_left.as_dict() if self.team_one_left else None,
-            "team_one_right": self.team_one_right.as_dict() if self.team_one_right else None,
-            "team_two_left": self.team_two_left.as_dict() if self.team_two_left else None,
-            "team_two_right": self.team_two_right.as_dict() if self.team_two_right else None
+            "firstTeamJustServed": self.team_who_served_id == self.game.team_one_id,
+            "sideServed": self.side_served,
+            "firstTeamToServe": self.team_to_serve_id == self.game.team_one_id,
+            "sideToServe": self.side_to_serve,
+            "teamOneLeft": self.team_one_left.as_dict() if self.team_one_left else None,
+            "teamOneRight": self.team_one_right.as_dict() if self.team_one_right else None,
+            "teamTwoLeft": self.team_two_left.as_dict() if self.team_two_left else None,
+            "teamTwoRight": self.team_two_right.as_dict() if self.team_two_right else None
         }
         if include_game:
             d["game"] = self.game.as_dict()

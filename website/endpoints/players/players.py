@@ -4,14 +4,14 @@ from database.models import PlayerGameStats, Teams, Tournaments, People
 
 
 def add_get_player_endpoints(app):
-    @app.get("/api/player")
+    @app.get("/api/players")
     def get_players():
         """
         SCHEMA:
         {
             tournament: <str> (OPTIONAL) = the searchable name of the tournament the games are from
             team: <str> (OPTIONAL) = the searchable name of the team the player played with
-            includeStats: <bool> (OPTIONAL) = whether Stats should be included
+            includeStats: <bool> (OPTIONAL) = whether stats should be included
         }
         """
         tournament = request.args.get("tournament", None)
@@ -27,7 +27,7 @@ def add_get_player_endpoints(app):
         q = q.group_by(PlayerGameStats.player_id)
         return [i.player.as_dict(include_stats=includeStats) for i in q.all()]
 
-    @app.get("/api/player/<searchable>")
+    @app.get("/api/players/<searchable>")
     def get_player(searchable):
         """
         SCHEMA:
@@ -44,3 +44,4 @@ def add_get_player_endpoints(app):
         tid = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id if tournament else None
         return People.query.filter(People.searchable_name == searchable).first().as_dict(include_stats=True,
                                                                                          tournament=tid)
+

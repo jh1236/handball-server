@@ -15,32 +15,11 @@ from website.endpoints.tournaments.tournament import add_tourney_endpoints
 
 
 def add_endpoints(app):
-    @app.get("/api/teams/image")
-    def team_image():
-        team = request.args.get("name", type=str)
-        if os.path.isfile(f"./resources/images/teams/{team}.png"):
-            return send_file(
-                f"./resources/images/teams/{team}.png", mimetype="image/png"
-            )
-        else:
-            return send_file(
-                f"./resources/images/teams/blank.png", mimetype="image/png"
-            )
 
     @app.get("/api/image")
     def image():
         team = request.args.get("name", type=str)
         return send_file(f"./resources/images/{team}.png", mimetype="image/png")
-
-    @app.get("/api/users/image")
-    def user_image():
-        team = request.args.get("name", type=str)
-        if os.path.isfile(f"./resources/images/users/{team}.png"):
-            return send_file(
-                f"./resources/images/users/{team}.png", mimetype="image/png"
-            )
-        else:
-            return send_file(f"./resources/images/umpire.png", mimetype="image/png")
 
     # TODO: THIS IS VERY UNSECURE!!
     @app.get("/api/request")

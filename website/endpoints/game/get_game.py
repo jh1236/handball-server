@@ -3,26 +3,28 @@ from collections import defaultdict
 from flask import request
 
 from database.models import Games, Tournaments, Teams, PlayerGameStats, People, Officials, GameEvents
+from utils.permissions import fetch_user
 from utils.util import fixture_sorter
 
 
 def add_get_game_endpoints(app):
-    @app.route('/api/game/<int:id>', methods=['GET'])
+    @app.route('/api/games/<int:id>', methods=['GET'])
     def get_game(id):
         """
         SCHEMA :
         {
             id: <int> = the id of the game
             includeGameEvents: <bool> (OPTIONAL) = whether gameEvents should be included
+            includePlayerStats: <bool> (OPTIONAL) = whether Player Stats should be included
         }
         """
         game = Games.query.filter(Games.id == id).first()
         include_game_events = request.args.get('includeGameEvents', None, type=bool)
+        include_player_stats = request.args.get('includePlayerStats', False, type=bool)
 
-        return game.as_dict(include_game_events=include_game_events)
+        return game.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats)
 
-
-    @app.route('/api/game', methods=['GET'])
+    @app.route('/api/games', methods=['GET'])
     def get_games():
         """
         SCHEMA :
@@ -36,13 +38,14 @@ def add_get_game_endpoints(app):
             includePlayerStats: <bool> (OPTIONAL) = whether Player Stats should be included
         }
         """
+        is_admin = fetch_user().is_admin
         tournament_searchable = request.args.get('tournament', None, type=str)
         team_searchable = request.args.getlist('team', type=str)
         player_searchable = request.args.getlist('player', type=str)
         official_searchable = request.args.getlist('official', type=str)
         court = request.args.get('court', None, type=int)
-        include_game_events = request.args.get('includeGameEvents', False, type=bool)
-        include_player_stats = request.args.get('includePlayerStats', False, type=bool)
+        include_game_events = request.args.get('includeGameEvents', False, type=bool) and is_admin
+        include_player_stats = request.args.get('includePlayerStats', False, type=bool) and is_admin
         games = Games.query
         if tournament_searchable:
             tid = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first().id
@@ -62,7 +65,8 @@ def add_get_game_endpoints(app):
             games = games.join(PlayerGameStats, PlayerGameStats.game_id == Games.id).filter(
                 PlayerGameStats.player_id == pid)
         games = games.order_by((Games.start_time.desc()), Games.id.desc())
-        return [i.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats) for i in games.all()]
+        return [i.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats,
+                          admin_view=is_admin) for i in games.all()]
 
     @app.route('/api/fixtures')
     def get_fixtures():

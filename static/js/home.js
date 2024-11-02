@@ -9,7 +9,7 @@ function newRound(tournament) {
 }
 
 function sendNotes(tournament) {
-    fetch('/api/note', {
+    fetch('/api/tournaments/note', {
         method: 'POST', body: JSON.stringify({
             tournament: tournament.replace('/', ''),
             note: document.getElementById("notes").value

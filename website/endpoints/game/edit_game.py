@@ -1,5 +1,4 @@
 from flask import request, jsonify
-from typing_extensions import override
 
 from structure import manage_game
 from utils.logging_handler import logger
@@ -291,3 +290,24 @@ def add_edit_game_endpoints(app):
         game_id = request.json["id"]
         manage_game.resolve_game(game_id)
         return "", 204
+
+    @app.post("/api/games/update/create")
+    @officials_only
+    def create():
+        """
+        SCHEMA:
+        {
+            tournament: str = the searchable name of the tournament
+            teamOne: str = the searchable name of the first team, or the name of the team to be created if players is populated
+            teamTwo: str = the searchable name of the second team, or the name of the team to be created if players is populated
+            official: str = the searchable name of the official (used to change officials)
+            scorer: str (OPTIONAL) = the searchable name of the scorer (used to change scorer)
+            playersOne: list[str] (OPTIONAL) = the list of players' true name on team one if the game is created by players
+            playersTwo: list[str] (OPTIONAL) = the list of players' true name on team two if the game is created by players
+        }
+        """
+        logger.info(request.json)
+        gid = manage_game.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"],
+                                      request.json["official"], request.json.get("playersOne", None),
+                                      request.json.get("playersTwo", None))
+        return jsonify({"id": gid})

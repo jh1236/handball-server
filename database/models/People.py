@@ -217,14 +217,14 @@ class People(db.Model):
         from database.models import PlayerGameStats
         d = {
             "name": self.name,
-            "searchable_name": self.searchable_name,
-            "image_url": self.image_url,
+            "searchableName": self.searchable_name,
+            "imageUrl": self.image_url,
         }
         if include_stats:
             game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament)) if tournament else None
-            d |= self.stats(game_filter)
+            d["stats"] = self.stats(game_filter, make_nice=False, admin=admin_view)
         if admin_view:
             d |= {
-                "is_admin": self.is_admin
+                "isAdmin": self.is_admin
             }
         return d

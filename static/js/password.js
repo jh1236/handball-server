@@ -19,7 +19,7 @@ function runPassword() {
     fetch("/api/login", {
         method: "POST",
         body: JSON.stringify({
-            "user_id": user_id,
+            "userId": user_id,
             "password": password
         }),
         headers: {

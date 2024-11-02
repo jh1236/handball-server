@@ -4,7 +4,7 @@ from database.models import PlayerGameStats, Teams, Tournaments, People, Officia
 
 
 def add_get_official_endpoints(app):
-    @app.get("/api/official")
+    @app.get("/api/officials")
     def get_officials():
         """
         SCHEMA:
@@ -18,9 +18,11 @@ def add_get_official_endpoints(app):
             tid = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id
             q = q.join(TournamentOfficials, TournamentOfficials.official_id == Officials.id).filter(
                 TournamentOfficials.tournament_id == tid)
-        return [i.player.as_dict() for i in q.all()]
+        else:
+            tid = None
+        return [i.as_dict(tournament=tid) for i in q.all()]
 
-    @app.get("/api/official/<searchable>")
+    @app.get("/api/officials/<searchable>")
     def get_official(searchable):
         """
         SCHEMA:

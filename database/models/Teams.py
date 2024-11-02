@@ -121,13 +121,13 @@ class Teams(db.Model):
         include_player_stats = include_stats if include_player_stats is None else include_player_stats
         d = {
             "name": self.name,
-            "searchable_name": self.searchable_name,
-            "image_url": self.image_url,
-            "primary_color": self.primary_color,
-            "secondary_color": self.secondary_color,
+            "searchableName": self.searchable_name,
+            "imageUrl": self.image_url,
+            "primaryColor": self.primary_color,
+            "secondaryColor": self.secondary_color,
             "captain": self.captain.as_dict(include_stats=include_player_stats,
                                             tournament=tournament) if self.captain else None,
-            "non_captain": self.non_captain.as_dict(include_stats=include_player_stats,
+            "nonCaptain": self.non_captain.as_dict(include_stats=include_player_stats,
                                                     tournament=tournament) if self.non_captain else None,
             "substitute": self.substitute.as_dict(include_stats=include_player_stats,
                                                   tournament=tournament) if self.substitute else None,
@@ -135,5 +135,5 @@ class Teams(db.Model):
         if include_stats:
             from database.models import Games
             game_filter = (lambda a: a.filter(Games.tournament_id == tournament)) if tournament else None
-            d |= self.stats(game_filter)
+            d["stats"] = self.stats(game_filter, make_nice=False)
         return d

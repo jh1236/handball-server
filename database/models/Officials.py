@@ -67,4 +67,4 @@ class Officials(db.Model):
         return stats
 
     def as_dict(self, tournament=None):
-        return self.person.as_dict(include_stats=False) | self.stats(tournament=tournament)
+        return self.person.as_dict(include_stats=False) | {"stats": self.stats(tournament=tournament)}

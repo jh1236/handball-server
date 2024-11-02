@@ -1,10 +1,12 @@
-from flask import request
+import os
+
+from flask import request, send_file
 
 from database.models import Teams, Tournaments, People, TournamentTeams
 
 
 def add_get_teams_endpoints(app):
-    @app.route('/api/team', methods=['GET'])
+    @app.route('/api/teams', methods=['GET'])
     def get_teams():
         """
         SCHEMA:
@@ -27,7 +29,7 @@ def add_get_teams_endpoints(app):
             q = q.filter((Teams.captain_id == pid) | (Teams.non_captain_id == pid) | (Teams.substitute_id == pid))
         return [i.as_dict(include_stats=include_stats, include_player_stats=False) for i in q.all()]
 
-    @app.route('/api/team/<searchable>', methods=['GET'])
+    @app.route('/api/teams/<searchable>', methods=['GET'])
     def get_team(searchable):
         """
         SCHEMA:
@@ -69,3 +71,15 @@ def add_get_teams_endpoints(app):
         ret["pooled"] = pooled
 
         return ret
+
+    @app.get("/api/teams/image")
+    def team_image():
+        team = request.args.get("name", type=str)
+        if os.path.isfile(f"./resources/images/teams/{team}.png"):
+            return send_file(
+                f"./resources/images/teams/{team}.png", mimetype="image/png"
+            )
+        else:
+            return send_file(
+                f"./resources/images/teams/blank.png", mimetype="image/png"
+            )

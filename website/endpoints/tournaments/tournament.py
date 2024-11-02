@@ -11,7 +11,7 @@ from utils.logging_handler import logger
 from utils.permissions import admin_only, officials_only
 
 def add_tourney_endpoints(app):
-    @app.post("/api/note")
+    @app.post("/api/tournaments/note")
     @admin_only
     def note():
         """
@@ -47,7 +47,7 @@ def add_tourney_endpoints(app):
                 f"./resources/images/teams/blank.png", mimetype="image/png"
             )
 
-    @app.post("/api/tournaments/serve_style")
+    @app.post("/api/tournaments/serveStyle")
     @admin_only
     def serve_style():
         """
@@ -61,30 +61,10 @@ def add_tourney_endpoints(app):
         logger.info(f"Request for serve_style: {request.json}")
         tournament = request.json["tournament"]
         t = Tournaments.query.filter(Tournaments.searchable_name == tournament).first()
-        t.badminton_serves = request.json.get("badminton_serves", not t.badminton_serves)
+        t.badminton_serves = request.json.get("badmintonServes", not t.badminton_serves)
         db.session.commit()
         return "", 204
 
-    @app.post("/api/games/update/create")
-    @officials_only
-    def create():
-        """
-        SCHEMA:
-        {
-            tournament: str = the searchable name of the tournament
-            teamOne: str = the searchable name of the first team, or the name of the team to be created if players is populated
-            teamTwo: str = the searchable name of the second team, or the name of the team to be created if players is populated
-            official: str (OPTIONAL) = the searchable name of the official (used to change officials)
-            scorer: str (OPTIONAL) = the searchable name of the scorer (used to change scorer)
-            playersOne: list[str] (OPTIONAL) = the list of players' true name on team one if the game is created by players
-            playersTwo: list[str] (OPTIONAL) = the list of players' true name on team two if the game is created by players
-        }
-        """
-        logger.info(request.json)
-        gid = manage_game.create_game(request.json["tournament"], request.json["teamOne"], request.json["teamTwo"],
-                                      request.json["official"], request.json.get("playersOne", None),
-                                      request.json.get("playersTwo", None))
-        return jsonify({"id": gid})
 
 
     @app.post("/api/signup")
