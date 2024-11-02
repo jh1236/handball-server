@@ -387,7 +387,7 @@ def add_tournament_specific(app):
             200,
         )
 
-    @app.get("/<tournament_name>/ladder/")
+    @app.get("/<tournament_name>/ladder")
     def ladder_site(tournament_name):
         priority = {
             # "Team Names": 1,
@@ -406,7 +406,7 @@ def add_tournament_specific(app):
             "Elo": 3,
         }
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_name).first()
-        if tournament:
+        if tournament_name:
             ladder = tournament.ladder()
         else:
             ladder = Tournaments.all_time_ladder()
