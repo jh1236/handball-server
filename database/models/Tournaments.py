@@ -140,6 +140,6 @@ class Tournaments(db.Model):
             "inFinals": self.in_finals,
             "isPooled": self.is_pooled,
             "notes": self.notes,
-            "imageUrl": self.image_url,
+            "imageUrl": self.image_url if not self.image_url.startswith("/") else "https://squarers.org" + self.image_url,
             "usingBadmintonServes": self.badminton_serves,
         }

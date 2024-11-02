@@ -218,7 +218,7 @@ class People(db.Model):
         d = {
             "name": self.name,
             "searchableName": self.searchable_name,
-            "imageUrl": self.image_url,
+            "imageUrl": self.image_url if not self.image_url.startswith("/") else "https://squarers.org" + self.image_url,
         }
         if include_stats:
             game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament)) if tournament else None

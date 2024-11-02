@@ -122,7 +122,7 @@ class Teams(db.Model):
         d = {
             "name": self.name,
             "searchableName": self.searchable_name,
-            "imageUrl": self.image_url,
+            "imageUrl": self.image_url if not self.image_url.startswith("/") else "https://squarers.org" + self.image_url,
             "primaryColor": self.primary_color,
             "secondaryColor": self.secondary_color,
             "captain": self.captain.as_dict(include_stats=include_player_stats,
