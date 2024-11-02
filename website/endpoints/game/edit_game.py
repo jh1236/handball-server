@@ -168,7 +168,7 @@ def add_edit_game_endpoints(app):
         manage_game.forfeit(game_id, first_team)
         return "", 204
 
-    @app.post("/api/games/update/end_timeout")
+    @app.post("/api/games/update/endTimeout")
     @officials_only
     def end_timeout():
         """
@@ -182,7 +182,7 @@ def add_edit_game_endpoints(app):
         manage_game.end_timeout(game_id)
         return "", 204
 
-    @app.post("/api/games/update/serve_clock")
+    @app.post("/api/games/update/serveClock")
     @officials_only
     def serve_timer():
         """
@@ -211,7 +211,7 @@ def add_edit_game_endpoints(app):
         manage_game.fault(game_id)
         return "", 204
 
-    @app.post("/api/games/update/official_timeout")
+    @app.post("/api/games/update/officialTimeout")
     @officials_only
     def official_timeout():
         """

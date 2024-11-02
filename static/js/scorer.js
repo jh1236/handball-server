@@ -426,7 +426,7 @@ function umpireTimeout() {
         return
     }
     timeoutOverlay(Date.now(), null)
-    fetch("/api/games/update/official_timeout", {
+    fetch("/api/games/update/officialTimeout", {
         method: "POST", body: JSON.stringify({
             id: id,
         }), headers: {
@@ -481,7 +481,7 @@ function startServeClock() {
         return
     }
     serveClock(Date.now() + 8000)
-    fetch("/api/games/update/serve_clock", {
+    fetch("/api/games/update/serveClock", {
         method: "POST", body: JSON.stringify({
             id: id,
             start: true,
@@ -519,7 +519,7 @@ function stopServeClock() {
     startTime = -1
     document.getElementById("serveBtn").style = ""
     document.getElementById("serveBtn").textContent = "Start Serve Timer"
-    fetch("/api/games/update/serve_clock", {
+    fetch("/api/games/update/serveClock", {
         method: "POST", body: JSON.stringify({
             id: id,
             start: false,
@@ -594,7 +594,7 @@ function endTimeout(firstTeam) {
     } else {
         element.innerHTML = teamName
     }
-    fetch("/api/games/update/end_timeout", {
+    fetch("/api/games/update/endTimeout", {
         method: "POST", body: JSON.stringify({
             id: id,
         }), headers: {
