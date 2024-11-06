@@ -85,7 +85,7 @@ This endpoint is open to the public
 
 <hr>
 
-### /api/fixtures
+### /api/games/fixtures
 
 #### Description
 

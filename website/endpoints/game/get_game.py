@@ -75,7 +75,7 @@ def add_get_game_endpoints(app):
             out["tournament"] = tournament.as_dict()
         return out
 
-    @app.route('/api/fixtures')
+    @app.route('/api/games/fixtures')
     def get_fixtures():
         """
         SCHEMA :
