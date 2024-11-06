@@ -47,7 +47,7 @@ def add_tourney_endpoints(app):
             name: str = the searchable name of the tournament
         }
         """
-        return {"tournaments": [i.as_dict() for i in Tournaments.all()]}
+        return {"tournaments": [i.as_dict() for i in Tournaments.query.all()]}
 
     @app.get("/api/tournaments/image")
     def tourney_image():
