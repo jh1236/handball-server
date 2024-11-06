@@ -39,7 +39,7 @@ def add_tourney_endpoints(app):
         """
         return {"tournament": Tournaments.query.filter(Tournaments.searchable_name == searchable).first().as_dict()}
 
-    @app.get("/api/tournaments>")
+    @app.get("/api/tournaments")
     def get_tournaments():
         """
         SCHEMA:
