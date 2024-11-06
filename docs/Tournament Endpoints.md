@@ -2,6 +2,47 @@
 
 ## GET endpoints
 
+### /api/tournaments/<searchable>
+
+#### Description
+
+Returns a single Tournament
+
+#### Permissions:
+
+This endpoint is open to the public.
+
+#### Arguments:
+
+- searchable: str
+    - The searchable name of the tournament to get stats for
+
+#### Return Structure
+
+- tournament: Tournament
+
+<hr>
+
+### /api/tournaments/
+
+#### Description
+
+Returns all Tournaments
+
+#### Permissions:
+
+This endpoint is open to the public.
+
+#### Arguments:
+
+- N/A
+
+#### Return Structure
+
+- tournaments: list\[Tournament\]
+
+<hr>
+
 ### /api/tournaments/image
 
 #### Description

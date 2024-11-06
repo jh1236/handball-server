@@ -39,8 +39,7 @@ This endpoint is open to the public.
 
 #### Description
 
-Returns the details of a single player, with the option to filter stats from a certain tournament
-or game. If the game is passed, a PlayerGameStats is returned, otherwise a Player is returned
+Returns the details of a single team, with the option to filter stats from a certain tournament.
 
 #### Permissions:
 

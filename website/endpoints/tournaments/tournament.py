@@ -29,6 +29,26 @@ def add_tourney_endpoints(app):
         db.session.commit()
         return "", 204
 
+    @app.get("/api/tournaments/<searchable>")
+    def get_tournament(searchable):
+        """
+        SCHEMA:
+        {
+            name: str = the searchable name of the tournament
+        }
+        """
+        return {"tournament": Tournaments.query.filter(Tournaments.searchable_name == searchable).first().as_dict()}
+
+    @app.get("/api/tournaments>")
+    def get_tournaments():
+        """
+        SCHEMA:
+        {
+            name: str = the searchable name of the tournament
+        }
+        """
+        return {"tournaments": [i.as_dict() for i in Tournaments.all()]}
+
     @app.get("/api/tournaments/image")
     def tourney_image():
         """
