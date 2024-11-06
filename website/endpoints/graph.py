@@ -1,10 +1,10 @@
 import io
 
+import matplotlib.ticker as mtick
 import numpy as np
 from flask import request, Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-import matplotlib.ticker as mtick
 from werkzeug.datastructures import MultiDict
 
 from database import db

@@ -1,22 +1,18 @@
-import datetime
-import time
 from collections import defaultdict
 from dataclasses import dataclass
 
 from flask import render_template
 
-from FixtureGenerators.FixturesGenerator import get_type_from_name
 from database import db
 from database.models import Games, Tournaments, EloChange, PlayerGameStats, GameEvents, Teams, TournamentTeams, People
 from structure.GameUtils import game_string_to_events
 from structure.get_information import get_tournament_id
 from utils.databaseManager import DatabaseManager
+from utils.logging_handler import logger
 from utils.permissions import admin_only
 from utils.sidebar_wrapper import render_template_sidebar
 from utils.util import fixture_sorter
 from website.tournament_specific import priority_to_classname
-from website.website import numbers
-from utils.logging_handler import logger
 
 
 def add_admin_pages(app):

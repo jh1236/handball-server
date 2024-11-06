@@ -5,6 +5,7 @@ from structure import manage_game
 from utils.databaseManager import DatabaseManager
 from utils.logging_handler import logger
 
+
 class Swiss(FixturesGenerator):
     def __init__(self, tournament):
 

@@ -1,7 +1,6 @@
 from flask import request, jsonify
 
 from structure import manage_game
-from utils.enable_cors import enable_cors
 from utils.logging_handler import logger
 from utils.permissions import officials_only, admin_only, fetch_user
 
@@ -9,7 +8,7 @@ from utils.permissions import officials_only, admin_only, fetch_user
 def add_edit_game_endpoints(app):
     @app.get("/api/games/change_code")
     @admin_only
-    @enable_cors
+    
     def change_code():
         """
         SCHEMA:
@@ -22,7 +21,7 @@ def add_edit_game_endpoints(app):
 
     @app.post("/api/games/update/start")
     @officials_only
-    @enable_cors
+    
     def start():
         """
         SCHEMA:

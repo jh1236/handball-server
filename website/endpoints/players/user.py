@@ -2,9 +2,9 @@ import os
 
 from flask import request, Response, send_file
 
-from utils import permissions
 from database import db
 from database.models import People
+from utils import permissions
 
 
 def add_user_endpoints(app):

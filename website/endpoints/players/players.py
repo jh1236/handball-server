@@ -1,12 +1,11 @@
 from flask import request
 
 from database.models import PlayerGameStats, Teams, Tournaments, People
-from utils.enable_cors import enable_cors
 
 
 def add_get_player_endpoints(app):
     @app.get("/api/players")
-    @enable_cors
+    
     def get_players():
         """
         SCHEMA:
@@ -32,7 +31,7 @@ def add_get_player_endpoints(app):
         return [i.player.as_dict(include_stats=includeStats, make_nice=make_nice) for i in q.all()]
 
     @app.get("/api/players/<searchable>")
-    @enable_cors
+    
     def get_player(searchable):
         """
         SCHEMA:

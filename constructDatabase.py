@@ -7,6 +7,7 @@ from FixtureMakers.Pooled import Pooled
 from structure.Tournament import load_all_tournaments
 from structure.UniversalTournament import get_all_players, get_all_officials, get_all_teams
 from structure.structureNew import RiggedGame
+
 from utils.databaseManager import DatabaseManager
 from utils.util import n_chunks
 

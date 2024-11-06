@@ -2,7 +2,6 @@
 import time
 
 from database import db
-from database.models import People
 from utils.logging_handler import logger
 
 

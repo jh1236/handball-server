@@ -1,14 +1,14 @@
 import json
 import os
 
-from flask import jsonify, send_file
 from flask import request
+from flask import send_file
 
 from database import db
 from database.models import Tournaments
-from structure import manage_game
 from utils.logging_handler import logger
-from utils.permissions import admin_only, officials_only
+from utils.permissions import admin_only
+
 
 def add_tourney_endpoints(app):
     @app.post("/api/tournaments/note")

@@ -3,12 +3,11 @@ import os
 from flask import request, send_file
 
 from database.models import Teams, Tournaments, People, TournamentTeams
-from utils.enable_cors import enable_cors
 
 
 def add_get_teams_endpoints(app):
     @app.route('/api/teams', methods=['GET'])
-    @enable_cors
+    
     def get_teams():
         """
         SCHEMA:
@@ -36,7 +35,7 @@ def add_get_teams_endpoints(app):
         return [i.as_dict(include_stats=include_stats, include_player_stats=include_player_stats, make_nice=make_nice) for i in q.all()]
 
     @app.route('/api/teams/<searchable>', methods=['GET'])
-    @enable_cors
+    
     def get_team(searchable):
         """
         SCHEMA:
@@ -52,7 +51,7 @@ def add_get_teams_endpoints(app):
                                                                                        tournament=tid, make_nice=make_nice)
 
     @app.get('/api/teams/ladder/')
-    @enable_cors
+    
     def get_ladder():
         """
         SCHEMA:

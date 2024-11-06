@@ -14,8 +14,7 @@ from structure.get_information import get_tournament_id
 from utils.permissions import (
     fetch_user,
     officials_only,
-    user_on_mobile, fetch_user_name,
-)  # Temporary till i make a function that can handle dynamic/game permissions
+    user_on_mobile, )  # Temporary till i make a function that can handle dynamic/game permissions
 from utils.sidebar_wrapper import render_template_sidebar, link
 from utils.util import fixture_sorter
 from website.website import numbers

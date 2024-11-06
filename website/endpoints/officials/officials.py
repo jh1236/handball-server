@@ -1,12 +1,11 @@
 from flask import request
 
-from database.models import PlayerGameStats, Teams, Tournaments, People, Officials, TournamentOfficials
-from utils.enable_cors import enable_cors
+from database.models import Tournaments, People, Officials, TournamentOfficials
 
 
 def add_get_official_endpoints(app):
     @app.get("/api/officials")
-    @enable_cors
+    
     def get_officials():
         """
         SCHEMA:
@@ -25,7 +24,7 @@ def add_get_official_endpoints(app):
         return [i.as_dict(tournament=tid) for i in q.all()]
 
     @app.get("/api/officials/<searchable>")
-    @enable_cors
+    
     def get_official(searchable):
         """
         SCHEMA:
