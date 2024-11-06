@@ -1,10 +1,9 @@
 import flask
-from flask_cors import CORS
 
 from database import db
-from website.website import init_api
-from utils.logging_handler import logger
 from utils.args_handler import args
+from utils.logging_handler import logger
+from website.website import init_api
 
 if not args.debug:
     from flask_minify import Minify
@@ -22,7 +21,6 @@ app.config['EXIT_CODE'] = 1 # 0 = stop server, 1 = fatal error or restart, 2 = u
 
 db.init_app(app)
 init_api(app)
-CORS(app)
 
 if __name__ == "__main__":
     with app.app_context():

@@ -3,12 +3,14 @@ from collections import defaultdict
 from flask import request
 
 from database.models import Games, Tournaments, Teams, PlayerGameStats, People, Officials, GameEvents
+from utils.enable_cors import enable_cors
 from utils.permissions import fetch_user
 from utils.util import fixture_sorter
 
 
 def add_get_game_endpoints(app):
     @app.route('/api/games/<int:id>', methods=['GET'])
+    @enable_cors
     def get_game(id):
         """
         SCHEMA :
@@ -25,6 +27,7 @@ def add_get_game_endpoints(app):
         return game.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats)
 
     @app.route('/api/games', methods=['GET'])
+    @enable_cors
     def get_games():
         """
         SCHEMA :
@@ -69,6 +72,7 @@ def add_get_game_endpoints(app):
                           admin_view=is_admin) for i in games.all()]
 
     @app.route('/api/fixtures')
+    @enable_cors
     def get_fixtures():
         """
         SCHEMA :
