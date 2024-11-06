@@ -28,6 +28,12 @@ if __name__ == "__main__":
 
     port = (25565 if args.debug else 8080) if args.port == -1 else args.port
 
+    @app.after_request
+    def cors_fixer(response):
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
+
+
     if args.debug:
         app.run(host="0.0.0.0", port=port, debug=True)
 
