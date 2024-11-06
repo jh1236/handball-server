@@ -28,7 +28,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-    port = (80 if args.debug else 8080) if args.port == -1 else args.port
+    port = (25565 if args.debug else 8080) if args.port == -1 else args.port
 
     if args.debug:
         app.run(host="0.0.0.0", port=port, debug=True)

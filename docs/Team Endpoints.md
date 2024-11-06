@@ -22,6 +22,8 @@ This endpoint is open to the public.
     - True if the stats of each team should be included
 - formatData: bool (Optional)
   - True if the server should format the data before it is sent.
+- includePlayerStats: bool (Optional)
+  - if the stats for each player should be included
 
 #### Return Structure
 
