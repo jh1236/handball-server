@@ -21,11 +21,15 @@ This endpoint is open to the public.
 - includeStats: bool (Optional)
     - True if the stats of each player should be included
 - formatData: bool (Optional)
-  - True if the server should format the data before it is sent.
+    - True if the server should format the data before it is sent.
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- list\[Person\]
+- players: list\[Person\]
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -34,7 +38,7 @@ This endpoint is open to the public.
 #### Description
 
 Returns the details of a single player, with the option to filter stats from a certain tournament
-or game.  If the game is passed, a PlayerGameStats is returned, otherwise a Player is returned
+or game. If the game is passed, a PlayerGameStats is returned, otherwise a Player is returned
 
 #### Permissions:
 
@@ -49,11 +53,15 @@ This endpoint is open to the public.
 - game: str (Optional)
     - The searchable name of the tournament to get stats from
 - formatData: bool (Optional)
-  - True if the server should format the data before it is sent.
+    - True if the server should format the data before it is sent.
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- Person | PlayerGameStats   (See description)
+- player: Person | PlayerGameStats   (See description)
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -70,7 +78,7 @@ This endpoint is open to the public.
 #### Arguments:
 
 - name: str (Optional)
-  - The searchable name of the user to get an image from
+    - The searchable name of the user to get an image from
 
 #### Return Structure
 

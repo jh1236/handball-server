@@ -7,7 +7,6 @@ from database.models import Teams, Tournaments, People, TournamentTeams
 
 def add_get_teams_endpoints(app):
     @app.route('/api/teams', methods=['GET'])
-    
     def get_teams():
         """
         SCHEMA:
@@ -24,18 +23,25 @@ def add_get_teams_endpoints(app):
         player_searchable = request.args.getlist('player', type=str)
         include_stats = request.args.get('includeStats', False, type=bool)
         include_player_stats = request.args.get('includePlayerStats', None, type=bool)
+        return_tournament = request.args.get('returnTournament', False, type=bool)
         q = Teams.query.filter(Teams.id != 1)
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable)
         if tournament_searchable:
-            tid = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first().id
+            tid = tournament.first().id
             q = q.join(TournamentTeams, TournamentTeams.team_id == Teams.id).filter(
                 TournamentTeams.tournament_id == tid)
         for i in player_searchable:
             pid = People.query.filter(People.searchable_name == i).first().id
             q = q.filter((Teams.captain_id == pid) | (Teams.non_captain_id == pid) | (Teams.substitute_id == pid))
-        return [i.as_dict(include_stats=include_stats, include_player_stats=include_player_stats, make_nice=make_nice) for i in q.all()]
+        out = {"teams":
+                   [i.as_dict(include_stats=include_stats, include_player_stats=include_player_stats,
+                              make_nice=make_nice) for
+                    i in q.all()]}
+        if return_tournament and tournament_searchable:
+            out["tournament"] = tournament.as_dict()
+        return out
 
     @app.route('/api/teams/<searchable>', methods=['GET'])
-    
     def get_team(searchable):
         """
         SCHEMA:
@@ -43,15 +49,20 @@ def add_get_teams_endpoints(app):
             tournament: <str> (OPTIONAL) = the searchable name of the tournament to pull statistics from
         }
         """
-        tournament = request.args.get("tournament", None)
+        tournament_searchable = request.args.get("tournament", None)
         make_nice = request.args.get('formatData', False, type=bool)
+        return_tournament = request.args.get('returnTournament', False, type=bool)
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
+        tid = tournament.id if tournament else None
 
-        tid = Tournaments.query.filter(Tournaments.searchable_name == tournament).first().id if tournament else None
-        return Teams.query.filter(Teams.searchable_name == searchable).first().as_dict(include_stats=True,
-                                                                                       tournament=tid, make_nice=make_nice)
+        out = {"team": Teams.query.filter(Teams.searchable_name == searchable).first().as_dict(include_stats=True,
+                                                                                               tournament=tid,
+                                                                                               make_nice=make_nice)}
+        if return_tournament and tournament_searchable:
+            out["tournament"] = tournament.as_dict()
+        return out
 
     @app.get('/api/teams/ladder/')
-    
     def get_ladder():
         """
         SCHEMA:
@@ -64,6 +75,7 @@ def add_get_teams_endpoints(app):
         include_stats = request.args.get('includeStats', False, type=bool)
         make_nice = request.args.get('formatData', False, type=bool)
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
+        return_tournament = request.args.get('returnTournament', False, type=bool)
         tid = tournament.id if tournament else None
         if tournament:
             ladder: list[tuple["Teams", dict[str, float]]] | list[
@@ -73,20 +85,24 @@ def add_get_teams_endpoints(app):
             ladder: list[tuple["Teams", dict[str, float]]] = Tournaments.all_time_ladder()
             pooled = False
 
-        ret = {}
+        out = {}
         if pooled:
-            ret["pool_one"] = [
-                i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice, tournament=tid) for i in
+            out["pool_one"] = [
+                i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice,
+                             tournament=tid) for i in
                 ladder[0]]
-            ret["pool_two"] = [
-                i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice, tournament=tid) for i in
+            out["pool_two"] = [
+                i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice,
+                             tournament=tid) for i in
                 ladder[1]]
         else:
-            ret["ladder"] = [i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice, tournament=tid)
+            out["ladder"] = [i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice,
+                                          tournament=tid)
                              for i in ladder]
-        ret["pooled"] = pooled
-
-        return ret
+        out["pooled"] = pooled
+        if return_tournament and tournament_searchable:
+            out["tournament"] = tournament.as_dict()
+        return out
 
     @app.get("/api/teams/image")
     def team_image():

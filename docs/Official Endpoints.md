@@ -16,11 +16,14 @@ This endpoint is open to the public.
 
 - tournament: str (Optional)
     - The searchable name of the tournament to get officials from
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- Official
-
+- official: Official
+- tournament: Tournament
+  - The tournament that was passed in
 <hr>
 
 ### /api/officials/<searchable>
@@ -37,9 +40,11 @@ This endpoint is open to the public.
 
 - tournament: str (Optional)
     - The searchable name of the tournament to get stats from
-
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 #### Return Structure
 
 - Official
-
+- tournament: Tournament
+  - The tournament that was passed in
 <hr>

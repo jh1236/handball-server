@@ -9,7 +9,6 @@ from utils.util import fixture_sorter
 
 def add_get_game_endpoints(app):
     @app.route('/api/games/<int:id>', methods=['GET'])
-    
     def get_game(id):
         """
         SCHEMA :
@@ -22,11 +21,12 @@ def add_get_game_endpoints(app):
         game = Games.query.filter(Games.id == id).first()
         include_game_events = request.args.get('includeGameEvents', None, type=bool)
         include_player_stats = request.args.get('includePlayerStats', False, type=bool)
-
-        return game.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats)
+        out = {
+            "game": game.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats)
+        }
+        return out
 
     @app.route('/api/games', methods=['GET'])
-    
     def get_games():
         """
         SCHEMA :
@@ -48,9 +48,11 @@ def add_get_game_endpoints(app):
         court = request.args.get('court', None, type=int)
         include_game_events = request.args.get('includeGameEvents', False, type=bool) and is_admin
         include_player_stats = request.args.get('includePlayerStats', False, type=bool) and is_admin
+        return_tournament = request.args.get('returnTournament', False, type=bool)
         games = Games.query
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
         if tournament_searchable:
-            tid = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first().id
+            tid = tournament.id
             games = games.filter(Games.tournament_id == tid)
         for i in official_searchable:
             off_id = Officials.query.join(People, Officials.person_id == People.id).filter(
@@ -67,11 +69,13 @@ def add_get_game_endpoints(app):
             games = games.join(PlayerGameStats, PlayerGameStats.game_id == Games.id).filter(
                 PlayerGameStats.player_id == pid)
         games = games.order_by((Games.start_time.desc()), Games.id.desc())
-        return [i.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats,
-                          admin_view=is_admin) for i in games.all()]
+        out = {"games": [i.as_dict(include_game_events=include_game_events, include_player_stats=include_player_stats,
+                                   admin_view=is_admin) for i in games.all()]}
+        if return_tournament and tournament_searchable:
+            out["tournament"] = tournament.as_dict()
+        return out
 
     @app.route('/api/fixtures')
-    
     def get_fixtures():
         """
         SCHEMA :
@@ -80,14 +84,18 @@ def add_get_game_endpoints(app):
         }
         """
         tournament_searchable = request.args.get('tournament', type=str)
-        tid = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first().id
-        games = Games.query.filter(Games.tournament_id == tid).all()
-
+        return_tournament = request.args.get('returnTournament', False, type=bool)
         fixtures = defaultdict(list)
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
+        tid = tournament.id
+        games = Games.query.filter(Games.tournament_id == tid).all()
         for game in games:
             fixtures[game.round].append(game)
         new_fixtures = []
         for k, v in fixtures.items():
             new_fixtures.append([j.as_dict() for j in fixture_sorter(v)])
         fixtures = new_fixtures
-        return fixtures
+        out = {"fixtures": fixtures}
+        if return_tournament and tournament_searchable:
+            out["tournament"] = tournament.as_dict()
+        return out

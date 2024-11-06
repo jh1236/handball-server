@@ -27,7 +27,7 @@ The user must be logged in as an official to use this endpoint
 
 #### Description
 
-Returns the data for a single game 
+Returns the data for a single game
 
 #### Permissions:
 
@@ -41,10 +41,10 @@ This endpoint is open to the public
     - True if the events of the game should be included
 - includePlayerStats
     - True if the stats of each player should be included
-  
+
 #### Return Structure
 
-- Game(includeGameEvents=includeGameEvents)
+- game: Game(includeGameEvents=includeGameEvents)
 
 <hr>
 
@@ -74,10 +74,14 @@ This endpoint is open to the public
     - True if the events of the games should be included
 - includePlayerStats (bool) (Optional)(**admin** only)
     - True if the stats of each player should be included
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- list\[Game(includeGameEvents=includeGameEvents)\]
+- games: list\[Game(includeGameEvents=includeGameEvents)\]
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -107,10 +111,14 @@ This endpoint is open to the public
     - True if the events of the games should be included
 - includePlayerStats
     - True if the stats of each player should be included
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- list\[Game(includeGameEvents=includeGameEvents)\]
+- fixtures: list\[Game(includeGameEvents=includeGameEvents)\]
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 <hr>

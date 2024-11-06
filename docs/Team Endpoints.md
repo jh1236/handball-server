@@ -21,13 +21,17 @@ This endpoint is open to the public.
 - includeStats: bool (Optional)
     - True if the stats of each team should be included
 - formatData: bool (Optional)
-  - True if the server should format the data before it is sent.
+    - True if the server should format the data before it is sent.
 - includePlayerStats: bool (Optional)
-  - if the stats for each player should be included
+    - if the stats for each player should be included
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- list\[Team\]
+- teams: list\[Team\]
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -49,7 +53,9 @@ This endpoint is open to the public.
 - tournament: str (Optional)
     - The searchable name of the tournament to get stats from
 - formatData: bool (Optional)
-  - True if the server should format the data before it is sent.
+    - True if the server should format the data before it is sent.
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
@@ -75,6 +81,8 @@ This endpoint is open to the public.
     - The searchable name of the tournament to get stats from
 - formatData: bool (Optional)
     - True if the server should format the data before it is sent.
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
@@ -86,6 +94,8 @@ This endpoint is open to the public.
     - The list of teams in order in pool 1 if the tournament is pooled
 - pool_two: list\[Team\]
     - The list of teams in order in pool 2 if the tournament is pooled
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -102,7 +112,7 @@ This endpoint is open to the public.
 #### Arguments:
 
 - name: str (Optional)
-  - The searchable name of the team to get an image from
+    - The searchable name of the team to get an image from
 
 #### Return Structure
 
