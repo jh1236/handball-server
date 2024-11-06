@@ -63,8 +63,9 @@ def add_get_teams_endpoints(app):
         tournament_searchable = request.args.get('tournament', None, type=str)
         include_stats = request.args.get('includeStats', False, type=bool)
         make_nice = request.args.get('formatData', False, type=bool)
-        if tournament_searchable:
-            tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
+        tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
+        tid = tournament.id if tournament else None
+        if tournament:
             ladder: list[tuple["Teams", dict[str, float]]] | list[
                 list[tuple["Teams", dict[str, float]]]] = tournament.ladder()
             pooled = tournament.is_pooled
@@ -75,13 +76,13 @@ def add_get_teams_endpoints(app):
         ret = {}
         if pooled:
             ret["pool_one"] = [
-                i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice) for i in
+                i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice, tournament=tid) for i in
                 ladder[0]]
             ret["pool_two"] = [
-                i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice) for i in
+                i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice, tournament=tid) for i in
                 ladder[1]]
         else:
-            ret["ladder"] = [i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice)
+            ret["ladder"] = [i[0].as_dict(include_stats=include_stats, include_player_stats=False, make_nice=make_nice, tournament=tid)
                              for i in ladder]
         ret["pooled"] = pooled
 
