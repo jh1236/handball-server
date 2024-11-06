@@ -1,5 +1,3 @@
-import os
-
 from flask import request, send_file
 
 from utils.databaseManager import DatabaseManager, dict_factory
