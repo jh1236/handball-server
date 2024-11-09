@@ -222,7 +222,7 @@ class People(db.Model):
             "imageUrl": img if not img or not img.startswith("/") else "https://squarers.org" + img,
         }
         if include_stats:
-            game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament)) if tournament else None
+            game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament.id)) if tournament else None
             d["stats"] = self.stats(game_filter, make_nice=make_nice, admin=admin_view)
         if admin_view:
             d |= {
