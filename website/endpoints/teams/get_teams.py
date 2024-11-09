@@ -26,8 +26,8 @@ def add_get_teams_endpoints(app):
         return_tournament = request.args.get('returnTournament', False, type=bool)
         q = Teams.query.filter(Teams.id != 1)
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable)
+        tid = None if not tournament else tournament.first().id
         if tournament_searchable:
-            tid = tournament.first().id
             q = q.join(TournamentTeams, TournamentTeams.team_id == Teams.id).filter(
                 TournamentTeams.tournament_id == tid)
         for i in player_searchable:
@@ -35,7 +35,7 @@ def add_get_teams_endpoints(app):
             q = q.filter((Teams.captain_id == pid) | (Teams.non_captain_id == pid) | (Teams.substitute_id == pid))
         out = {"teams":
                    [i.as_dict(include_stats=include_stats, include_player_stats=include_player_stats,
-                              make_nice=make_nice) for
+                              make_nice=make_nice, tournament=tid) for
                     i in q.all()]}
         if return_tournament and tournament_searchable:
             out["tournament"] = tournament.as_dict()
