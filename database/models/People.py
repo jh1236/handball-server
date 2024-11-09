@@ -215,7 +215,7 @@ class People(db.Model):
 
     def as_dict(self, include_stats=False, tournament=None, admin_view=False, make_nice=False):
         from database.models import PlayerGameStats
-        img = self.image(tournament=tournament.id)
+        img = self.image(tournament=tournament)
         d = {
             "name": self.name,
             "searchableName": self.searchable_name,
