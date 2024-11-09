@@ -113,10 +113,17 @@ This endpoint is open to the public
     - True if the stats of each player should be included
 - returnTournament: bool (Optional)
     - If the tournament is to be returned in the response
+- seperateFinals
+    - True if the finals should be returned in a separate list
 
 #### Return Structure
 
-- fixtures: list\[Game(includeGameEvents=includeGameEvents)\]
+- fixtures: list
+    - games: list\[Games\]
+    - final: boolean
+- finals: list\[Game(includeGameEvents=includeGameEvents)\]?
+    - games: list\[Games\]
+    - final: true
 - tournament: Tournament
     - The tournament that was passed in
 

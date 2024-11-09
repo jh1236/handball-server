@@ -84,18 +84,26 @@ def add_get_game_endpoints(app):
         }
         """
         tournament_searchable = request.args.get('tournament', type=str)
-        return_tournament = request.args.get('returnTournament', False, type=bool)
-        fixtures = defaultdict(list)
+        separate_finals = request.args.get('separateFinals', type=bool)
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
-        tid = tournament.id
+
+        tid = tournament.first().id
+        return_tournament = request.args.get('returnTournament', False, type=bool)
+
+        fixtures = defaultdict(list)
         games = Games.query.filter(Games.tournament_id == tid).all()
         for game in games:
             fixtures[game.round].append(game)
         new_fixtures = []
         for k, v in fixtures.items():
-            new_fixtures.append([j.as_dict() for j in fixture_sorter(v)])
+            new_fixtures.append({"games": [j.as_dict() for j in fixture_sorter(v)], "final": v[0].is_final})
         fixtures = new_fixtures
-        out = {"fixtures": fixtures}
+        if separate_finals:
+            finals = [i for i in fixtures if i["final"]]
+            fixtures = [i for i in fixtures if not i["final"]]
+            out = {"fixtures": fixtures, "finals": finals}
+        else:
+            out = {"fixtures": fixtures}
         if return_tournament and tournament_searchable:
             out["tournament"] = tournament.as_dict()
         return out
