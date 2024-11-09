@@ -215,10 +215,11 @@ class People(db.Model):
 
     def as_dict(self, include_stats=False, tournament=None, admin_view=False, make_nice=False):
         from database.models import PlayerGameStats
+        img = self.image(tournament=tournament)
         d = {
             "name": self.name,
             "searchableName": self.searchable_name,
-            "imageUrl": self.image_url if not self.image_url or not self.image_url.startswith("/") else "https://squarers.org" + self.image_url,
+            "imageUrl": img if not img or not img.startswith("/") else "https://squarers.org" + img,
         }
         if include_stats:
             game_filter = (lambda a: a.filter(PlayerGameStats.tournament_id == tournament)) if tournament else None
