@@ -87,7 +87,7 @@ def add_get_game_endpoints(app):
         separate_finals = request.args.get('separateFinals', type=bool)
         tournament = Tournaments.query.filter(Tournaments.searchable_name == tournament_searchable).first()
 
-        tid = tournament.first().id
+        tid = tournament.id
         return_tournament = request.args.get('returnTournament', False, type=bool)
 
         fixtures = defaultdict(list)
